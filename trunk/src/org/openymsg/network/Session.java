@@ -1675,9 +1675,9 @@ public class Session implements StatusConstants {
 				s = ChallengeResponseV9.getStrings(loginID.getId(), password,
 						pkt.getValue("94"));
 		} catch (NoSuchAlgorithmException e) {
-			throw new YMSG9BadFormatException("auth", false, e);
+			throw new YMSG9BadFormatException("auth", pkt, e);
 		} catch (IOException e) {
-			throw new YMSG9BadFormatException("auth", false, e);
+			throw new YMSG9BadFormatException("auth", pkt, e);
 		}
 		sessionStatus = SessionState.CONNECTED;
 		transmitAuthResp(s[0], s[1]);
@@ -1798,7 +1798,7 @@ public class Session implements StatusConstants {
 			se.setChatUser(0, ycu);
 			eventDispatchQueue.append(se, ServiceType.CHATLOGOFF);
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("chat logoff", false, e);
+			throw new YMSG9BadFormatException("chat logoff", pkt, e);
 		}
 	}
 
@@ -1906,7 +1906,7 @@ public class Session implements StatusConstants {
 			return; // ...to finally block
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new YMSG9BadFormatException("chat login", false, e);
+			throw new YMSG9BadFormatException("chat login", pkt, e);
 		} finally {
 			// FIX: Not thread safe if multiple chatroom supported!
 			if (joining && chatSessionStatus != SessionState.FAILED)
@@ -1946,7 +1946,7 @@ public class Session implements StatusConstants {
 			);
 			eventDispatchQueue.append(se, ServiceType.CHATMSG);
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("chat message", false, e);
+			throw new YMSG9BadFormatException("chat message", pkt, e);
 		}
 	}
 
@@ -1970,7 +1970,7 @@ public class Session implements StatusConstants {
 			);
 			eventDispatchQueue.append(se, ServiceType.MESSAGE);
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("chat PM", false, e);
+			throw new YMSG9BadFormatException("chat PM", pkt, e);
 		}
 	}
 
@@ -1996,7 +1996,7 @@ public class Session implements StatusConstants {
 			if (!yc.isClosed()) // Should never be closed!
 				eventDispatchQueue.append(se, ServiceType.CONFDECLINE);
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("conference decline", false, e);
+			throw new YMSG9BadFormatException("conference decline", pkt, e);
 		}
 	}
 
@@ -2029,7 +2029,7 @@ public class Session implements StatusConstants {
 			if (!yc.isClosed()) // Should never be closed fir invite!
 				eventDispatchQueue.append(se, ServiceType.CONFLOGOFF);
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("conference logoff", false, e);
+			throw new YMSG9BadFormatException("conference logoff", pkt, e);
 		}
 	}
 
@@ -2063,7 +2063,7 @@ public class Session implements StatusConstants {
 			if (!yc.isClosed())
 				eventDispatchQueue.append(se, ServiceType.CONFLOGON);
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("conference logon", false, e);
+			throw new YMSG9BadFormatException("conference logon", pkt, e);
 		}
 	}
 
@@ -2094,7 +2094,7 @@ public class Session implements StatusConstants {
 			if (!yc.isClosed())
 				eventDispatchQueue.append(se, ServiceType.CONFMSG);
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("conference mesg", false, e);
+			throw new YMSG9BadFormatException("conference mesg", pkt, e);
 		}
 	}
 
@@ -2137,7 +2137,7 @@ public class Session implements StatusConstants {
 				errorMessage(pkt, m);
 			}
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("contact ignore", false, e);
+			throw new YMSG9BadFormatException("contact ignore", pkt, e);
 		}
 	}
 
@@ -2189,7 +2189,7 @@ public class Session implements StatusConstants {
 				eventDispatchQueue.append(se, ServiceType.CONTACTNEW);
 			}
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("contact request", false, e);
+			throw new YMSG9BadFormatException("contact request", pkt, e);
 		}
 	}
 
@@ -2222,7 +2222,7 @@ public class Session implements StatusConstants {
 				eventDispatchQueue.append(se, ServiceType.FILETRANSFER);
 			}
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("file transfer", false, e);
+			throw new YMSG9BadFormatException("file transfer", pkt, e);
 		}
 	}
 
@@ -2248,7 +2248,7 @@ public class Session implements StatusConstants {
 					groupname);
 			eventDispatchQueue.append(se, ServiceType.FRIENDADD);
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("friend added", false, e);
+			throw new YMSG9BadFormatException("friend added", pkt, e);
 		}
 	}
 
@@ -2270,7 +2270,7 @@ public class Session implements StatusConstants {
 			SessionFriendEvent se = new SessionFriendEvent(this, yu, g);
 			eventDispatchQueue.append(se, ServiceType.FRIENDREMOVE);
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("friend removed", false, e);
+			throw new YMSG9BadFormatException("friend removed", pkt, e);
 		}
 	}
 
@@ -2287,7 +2287,7 @@ public class Session implements StatusConstants {
 			SessionGroupEvent se = new SessionGroupEvent(this, oldName, newName);
 			eventDispatchQueue.append(se, ServiceType.GROUPRENAME);
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("group rename", false, e);
+			throw new YMSG9BadFormatException("group rename", pkt, e);
 		}
 	}
 
@@ -2395,7 +2395,7 @@ public class Session implements StatusConstants {
 				}
 			}
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("friends list in list", false, e);
+			throw new YMSG9BadFormatException("friends list in list", pkt, e);
 		}
 
 		// Ignored list (people we don't want to hear from!)
@@ -2411,7 +2411,7 @@ public class Session implements StatusConstants {
 				}
 			}
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("ignored list in list", false, e);
+			throw new YMSG9BadFormatException("ignored list in list", pkt, e);
 		}
 
 		// Identities list (alternative yahoo ids we can use!)
@@ -2427,8 +2427,7 @@ public class Session implements StatusConstants {
 				}
 			}
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("identities list in list", false,
-					e);
+			throw new YMSG9BadFormatException("identities list in list", pkt, e);
 		}
 
 		// Stealth blocked list (people we don't want to see us!)
@@ -2444,7 +2443,7 @@ public class Session implements StatusConstants {
 				}
 			}
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("ignored list in list", false, e);
+			throw new YMSG9BadFormatException("ignored list in list", pkt, e);
 		}
 
 		// Yahoo gives us three cookies, Y, T and C
@@ -2454,7 +2453,7 @@ public class Session implements StatusConstants {
 			cookieT = ck[NetworkConstants.COOKIE_T]; // T=<cookie>
 			cookieC = ck[NetworkConstants.COOKIE_C]; // C=<cookie>
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("cookies in list", false, e);
+			throw new YMSG9BadFormatException("cookies in list", pkt, e);
 		}
 
 		// Primary identity: the *real* Yahoo ID for this account.
@@ -2466,8 +2465,7 @@ public class Session implements StatusConstants {
 				primaryID = loginID;
 			}
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("primary identity in list",
-					false, e);
+			throw new YMSG9BadFormatException("primary identity in list", pkt, e);
 		}
 
 		// Set the primary and login flags on the relevant YahooIdentity objects
@@ -2506,8 +2504,7 @@ public class Session implements StatusConstants {
 			try {
 				updateFriendsStatus(pkt);
 			} catch (Exception e) {
-				throw new YMSG9BadFormatException("online friends in logoff",
-						false, e);
+				throw new YMSG9BadFormatException("online friends in logoff", pkt, e);
 			}
 		}
 	}
@@ -2534,7 +2531,7 @@ public class Session implements StatusConstants {
 					updateFriendsStatus(pkt);
 				} catch (Exception e) {
 					throw new YMSG9BadFormatException(
-							"online friends in logon", false, e);
+							"online friends in logon", pkt, e);
 				}
 			}
 			// Still logging in?
@@ -2603,7 +2600,7 @@ public class Session implements StatusConstants {
 				}
 			}
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("message", false, e);
+			throw new YMSG9BadFormatException("message", pkt, e);
 		}
 	}
 
@@ -2631,7 +2628,7 @@ public class Session implements StatusConstants {
 			}
 			eventDispatchQueue.append(se, ServiceType.NEWMAIL);
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("new mail", false, e);
+			throw new YMSG9BadFormatException("new mail", pkt, e);
 		}
 	}
 
@@ -2656,7 +2653,7 @@ public class Session implements StatusConstants {
 				eventDispatchQueue.append(se, ServiceType.NOTIFY);
 			}
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("notify", false, e);
+			throw new YMSG9BadFormatException("notify", pkt, e);
 		}
 	}
 
