@@ -130,7 +130,7 @@ public class Session implements StatusConstants {
 	private final ChatroomManager chatroomManager;
 
 	/** Current conferences, hashed on room */
-	private final Hashtable<String, YahooConference> conferences = new Hashtable<String, YahooConference>();;
+	private final Hashtable<String, YahooConference> conferences = new Hashtable<String, YahooConference>();
 
 	private SessionState chatSessionStatus;
 
