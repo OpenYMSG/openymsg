@@ -1,0 +1,92 @@
+<project name="OpenYMSG" default="all">
+	<description>OpenYMSG - Java YMSG Instant Messaging API</description>
+
+	<!-- API version -->
+	<property name="release" value="0.1" />
+
+	<!-- Compile for 1.5 -->
+	<property name="j_target" value="1.5" />
+
+	<!-- Root directory for the source code -->
+	<property name="src" location="${basedir}/src" />
+	<property name="resources" location="${basedir}/resources" />
+	<property name="lib" location="${basedir}/lib" />
+	<property name="documentation" location="${basedir}/documentation" />
+
+	<!-- Dump the Jars here -->
+	<property name="dist" location="${basedir}/dist" />
+
+	<!-- Build directory -->
+	<property name="build" location="${basedir}/classes" />
+
+	<!-- Generate the javadoc here -->
+	<property name="javadoc.location" location="${dist}/documentation/javadoc/" />
+	
+	<path id="openymsg.classpath">
+		<pathelement path="${classpath}" />
+		<fileset dir="${lib}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<!-- Standard 'all' and 'clean' targets -->
+	<target name="all" depends="jars, javadoc" description="Builds everything." />
+	<target name="clean" description="Cleans previous build attempts">
+		<delete dir="${build}" />
+		<delete dir="${dist}" />
+	</target>
+
+	<!-- TARGET: Initialize -->
+	<target name="init" description="Pre-build initialization.">
+		<tstamp />
+		<mkdir dir="${build}" />
+		<mkdir dir="${build}/resources/" />
+		<mkdir dir="${dist}" />
+		<copy todir="${dist}/documentation">
+			<fileset dir="${documentation}" />
+		</copy>
+	</target>
+
+	<!-- TARGET: Compile network code -->
+	<target name="network" depends="init" description="Compiles the protocol API.">
+		<javac debug="${gen_db}" srcdir="${src}/org/openymsg/network" destdir="${build}" source="${j_target}">
+			<classpath refid="openymsg.classpath" />
+		</javac>
+		<copy file="${src}/org/openymsg/network/challenge.bin" todir="${build}/org/openymsg/network/" />
+	</target>
+
+	<!-- TARGET: Compile support code -->
+	<target name="support" depends="network" description="Compiles the support API.">
+		<javac debug="${gen_db}" srcdir="${src}/org/openymsg/support" destdir="${build}" source="${j_target}">
+			<classpath refid="openymsg.classpath" />
+		</javac>
+	</target>
+
+	<!-- TARGET: Compile test client code -->
+	<target name="client" depends="support" description="Compiles the test client.">
+		<javac debug="${gen_db}" srcdir="${src}/org/openymsg/test" destdir="${build}" source="${j_target}">
+			<classpath refid="openymsg.classpath" />
+		</javac>
+	</target>
+
+	<!-- TARGET: Jar -->
+	<target name="jars" depends="client" description="Builds the Jar files.">
+		<jar destfile="${dist}/openymsg_network_${release}.jar" basedir="${build}" includes="org/openymsg/network/**,resources/**" />
+		<jar destfile="${dist}/openymsg_support_${release}.jar" basedir="${build}" includes="org/openymsg/support/**" />
+		<jar destfile="${dist}/openymsg_test_${release}.jar" basedir="${build}" includes="org/openymsg/test/**" />
+	</target>
+
+	<!-- TARGET: Javadoc -->
+	<target name="javadoc" depends="init" description="Compiles the project javadoc.">
+		<javadoc 
+			destdir="${javadoc.location}" 
+			sourcepath="${src}" 
+			packagenames="org.openymsg.*" 
+			excludepackagenames="org.openymsg.test.*,org.jdom.*,org.junit.*" 
+			classpathref="openymsg.classpath"
+			windowtitle="OpenYMSG Javadoc" 
+			failonerror="yes">
+		</javadoc>
+	</target>
+
+</project>
