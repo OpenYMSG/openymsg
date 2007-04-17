@@ -18,62 +18,71 @@
  */
 package org.openymsg.network;
 
-import java.lang.reflect.Method;
-
 /**
+ * Exception indication an error during parsing of a YMSG9Packet.
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
 public class YMSG9BadFormatException extends RuntimeException {
-	private static final long serialVersionUID = 6813710810393070454L;
 
-	private static Method initCauseMethod; // Exception chaining
-
-	private Throwable throwable; // Chained object
+	private static final long serialVersionUID = 2722272866191388316L;
 
 	/**
-	 * STATIC CONSTRUCTOR
+	 * The packet of which parsing caused this exception to be thrown.
 	 */
-	static {
-		// Use reflection to find the initCause method, to remain backward
-		// compatable with pre SDK1.4 runtimes which don't carry it.
-		try {
-			Class<?>[] params = { Throwable.class };
-			initCauseMethod = YMSG9BadFormatException.class.getMethod(
-					"initCause", params);
-		} catch (NoSuchMethodException e) {
-			initCauseMethod = null;
+	private final YMSG9Packet packet;
+
+	/**
+	 * Constructs a new YMSG9BadFormatException with the specified detail
+	 * message.
+	 * 
+	 * @param message
+	 *            Optional additional detail message.
+	 * @param packet
+	 *            Packet of which parsing caused this exception to be thrown.
+	 * @param cause
+	 *            The cause.
+	 */
+	public YMSG9BadFormatException(String message, YMSG9Packet packet,
+			Throwable cause) {
+		super(constructMessage(message, packet), cause);
+		this.packet = packet;
+	}
+
+	/**
+	 * Convenience method for constructing the detailled Exception message;
+	 * 
+	 * @param message
+	 *            Optional additional detail message.
+	 * @param packet
+	 *            Packet of which parsing caused this exception to be thrown.
+	 * @return A String object combining the text representation of both
+	 *         parameters.
+	 */
+	private static String constructMessage(String message, YMSG9Packet packet) {
+		final StringBuilder result = new StringBuilder("Bad format for packet");
+
+		if (packet != null) {
+			result.append(": [");
+			result.append(packet.toString());
+			result.append("]");
 		}
-	}
+		result.append('.');
 
-	private YMSG9BadFormatException() {
-	}
-
-	public YMSG9BadFormatException(String m, boolean b) {
-		super("Bad parse of " + m + " packet");
-	}
-
-	public YMSG9BadFormatException(String m) {
-		super(m);
-	}
-
-	public YMSG9BadFormatException(String m, boolean b, Throwable ex) {
-		this(m, b);
-		// Record local copy of exception, for non-SDK1.4 runtimes.
-		throwable = ex;
-		// If >= SDK1.4, this won't be null
-		if (initCauseMethod != null) {
-			try {
-				Object[] params = { throwable };
-				initCauseMethod.invoke(this, params);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		if (message != null) {
+			result.append(System.getProperty("line.separator"));
+			result.append(message);
 		}
+		return result.toString();
 	}
 
-	public Throwable getCausingThrowable() {
-		return throwable;
+	/**
+	 * Returns the packet that caused this Exception.
+	 * 
+	 * @return the packet that caused this Exception.
+	 */
+	public YMSG9Packet getPacket() {
+		return packet;
 	}
 }

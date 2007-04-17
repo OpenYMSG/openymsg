@@ -287,7 +287,7 @@ public class InputThread extends Thread {
 				}
 			}
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("conference invite", false, e);
+			throw new YMSG9BadFormatException("conference invite", pkt, e);
 		}
 	}
 }
