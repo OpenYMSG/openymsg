@@ -84,8 +84,10 @@ public abstract class NetworkConstants {
 	// Default timouts (seconds)
 	public final static int LOGIN_TIMEOUT = 60;
 
-	// Ping timeout
-	public final static int PING_TIMEOUT = 1000 * 60 * 20; // 20 minutes
+	/**
+	 * Amount of seconds between sending subsequent PING packets.
+	 */
+	public final static int PING_TIMEOUT_IN_SECS = 60 * 20; // 20 minutes
 
 	// Buzz string
 	public final static String BUZZ = "<ding>";
