@@ -206,6 +206,10 @@ public class InputThread extends Thread {
 		case USERSTAT:
 			parentSession.receiveUserStat(pkt);
 			break;
+		case Y6_STATUS_UPDATE:
+			parentSession.receiveStatusUpdate(pkt);
+			break;
+			
 		default:
 			throw new IllegalArgumentException(
 					"Don't know how to handle service type '" + pkt.service
