@@ -41,6 +41,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.jdom.JDOMException;
 import org.openymsg.network.chatroom.ChatroomManager;
@@ -111,12 +115,12 @@ public class Session implements StatusConstants {
 
 	public volatile ConnectionHandler network;
 
-	private static PeriodicExecuter sessionPinger = new PeriodicExecuter(
-			NetworkConstants.PING_TIMEOUT);
+	private static final ScheduledExecutorService SCHEDULED_PINGER_SERVICE = new ScheduledThreadPoolExecutor(0);
+
+	private ScheduledFuture<?> pingerFuture;
 
 	private InputThread ipThread;
 
-	private Runnable sessionPingRunnable;
 
 	private final Hashtable<String, TypingNotifier> typingNotifiers = new Hashtable<String, TypingNotifier>();
 
@@ -137,16 +141,6 @@ public class Session implements StatusConstants {
 	private volatile YahooChatLobby currentLobby = null;
 
 	private YahooIdentity chatID;
-
-	/**
-	 * STATIC CONSTRUCTOR
-	 */
-	static {
-		Thread thread = new Thread(sessionPinger, "YMSG Ping Thread");
-		thread.setPriority(Thread.MIN_PRIORITY);
-		thread.setDaemon(true);
-		thread.start();
-	}
 
 	/**
 	 * Creates a new Session based on a ConnectionHandler as configured in the
@@ -1611,11 +1605,16 @@ public class Session implements StatusConstants {
 	}
 
 	/**
-	 * Transmit a PING packet.
+	 * Transmit a PING packet always and a CHATPING packet, if the user is
+	 * logged into a lobby.
 	 */
-	protected void transmitPing() throws IOException {
+	protected void transmitPings() throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		sendPacket(body, ServiceType.PING); // 0x12
+
+		if (currentLobby != null) {
+			transmitChatPing();
+		}
 	}
 
 	/**
@@ -2725,9 +2724,9 @@ public class Session implements StatusConstants {
 		ipThread = new InputThread(this);
 		ipThread.start();
 		// Add a Runnable to periodically send ping packets for our connection
-		sessionPingRunnable = new SessionPing();
-		sessionPinger.add(sessionPingRunnable);
-
+		pingerFuture = SCHEDULED_PINGER_SERVICE.scheduleAtFixedRate(new SessionPinger(this),
+				NetworkConstants.PING_TIMEOUT_IN_SECS, NetworkConstants.PING_TIMEOUT_IN_SECS,
+				TimeUnit.SECONDS);
 	}
 
 	/**
@@ -2740,11 +2739,12 @@ public class Session implements StatusConstants {
 			ipThread.interrupt();
 			ipThread = null;
 		}
+		
 		// Remove our pinger Runnable from scheduler
-		if (sessionPingRunnable != null) {
-			sessionPinger.remove(sessionPingRunnable);
-			sessionPingRunnable = null;
+		if (pingerFuture != null) {
+			pingerFuture.cancel(false);
 		}
+		
 		eventDispatchQueue.kill();
 		// If the network is open, close it
 		network.close();
@@ -3027,26 +3027,6 @@ public class Session implements StatusConstants {
 		}
 
 		eventDispatchQueue.append(event, type);
-	}
-
-	/**
-	 * This class is run by PeriodicExecuter. Client sends a ping packet to the
-	 * server every now and again.
-	 */
-	private class SessionPing implements Runnable {
-		public void run() {
-			try {
-				transmitPing();
-				if (currentLobby != null)
-					transmitChatPing();
-			} catch (Exception e) {
-				sendExceptionEvent(e, "Source: SessionPing");
-				if (sessionPingRunnable == this) // Air on the side of
-					// caution
-					sessionPingRunnable = null;
-				sessionPinger.remove(this);
-			}
-		}
 	}
 
 	/**
