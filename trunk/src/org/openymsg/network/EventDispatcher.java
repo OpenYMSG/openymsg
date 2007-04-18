@@ -192,17 +192,17 @@ public class EventDispatcher extends Thread {
 			case FRIENDREMOVE:
 				l.friendRemovedReceived((SessionFriendEvent) ev);
 				break;
-			case GROUPRENAME:
+			case GOTGROUPRENAME:
 				l.groupRenameReceived((SessionGroupEvent) ev);
 				break;
 			case CONTACTREJECT:
 				l.contactRejectionReceived(ev);
 				break;
-			case CHATLOGON:
-				l.chatLogonReceived((SessionChatEvent) ev);
+			case CHATJOIN:
+				l.chatJoinReceived((SessionChatEvent) ev);
 				break;
-			case CHATLOGOFF:
-				l.chatLogoffReceived((SessionChatEvent) ev);
+			case CHATEXIT:
+				l.chatExitReceived((SessionChatEvent) ev);
 				break;
 			case CHATDISCONNECT:
 				l.chatConnectionClosed(ev);

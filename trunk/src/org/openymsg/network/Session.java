@@ -935,7 +935,7 @@ public class Session implements StatusConstants {
 			}
 
 			// Transmit 'login' packet and wait for acknowledgement
-			transmitChatLogon(lobby.getNetworkName(), lobby.getParentRoomId());
+			transmitChatJoin(lobby.getNetworkName(), lobby.getParentRoomId());
 			while (chatSessionStatus == SessionState.CONNECTED
 					&& !past(timeout)) {
 				try {
@@ -1113,11 +1113,11 @@ public class Session implements StatusConstants {
 	}
 
 	/**
-	 * Transmit a CHATLOGON packet. We send one of these after the CHATCONNECT
+	 * Transmit a CHATJOINpacket. We send one of these after the CHATCONNECT
 	 * packet, as the second phase of chat login. Note: netname uses network
 	 * name of "room:lobby".
 	 */
-	protected void transmitChatLogon(String netname, long roomId)
+	protected void transmitChatJoin(String netname, long roomId)
 			throws IOException {
 		if (sessionStatus != SessionState.CONNECTED) {
 			throw new IllegalStateException(
@@ -1134,7 +1134,7 @@ public class Session implements StatusConstants {
 		body.addElement("104", netname);
 		body.addElement("129", Long.toString(roomId));
 		body.addElement("62", "2"); // FIX: what is this?
-		sendPacket(body, ServiceType.CHATLOGON); // 0x98
+		sendPacket(body, ServiceType.CHATJOIN); // 0x98
 	}
 
 	/**
@@ -1435,16 +1435,22 @@ public class Session implements StatusConstants {
 	}
 
 	/**
-	 * Transmit a GROUPRENAME packet, to change the name of one of our friends
+	 * Transmit a GOTGROUPRENAME packet, to change the name of one of our friends
 	 * groups.
 	 */
+	/*
+	 * TODO: Currently, this behavior is as it was in jYMSG. Protocol
+	 * specification would suggest that not 0x13 (GOTGROUPRENAME) but 0x89
+	 * (GROUPRENAME) should be used for this operation. Find out and make
+	 * sure.
+	 */ 
 	protected void transmitGroupRename(String oldName, String newName)
 			throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", primaryID.getId()); // ???: effective id?
 		body.addElement("65", oldName);
 		body.addElement("67", newName);
-		sendPacket(body, ServiceType.GROUPRENAME); // 0x13
+		sendPacket(body, ServiceType.GOTGROUPRENAME); // 0x13
 	}
 
 	/**
@@ -1754,8 +1760,7 @@ public class Session implements StatusConstants {
 
 	/**
 	 * Process an incoming CHATDISCONNECT packet. We get one of these to confirm
-	 * we have logged off. (Note: when sending a CHATDISCONNECT packet we should
-	 * get in reply a CHATLOGOFF prior to this packet!)
+	 * we have logged off.
 	 */
 	protected void receiveChatDisconnect(YMSG9Packet pkt) // 0xa0
 	{
@@ -1771,13 +1776,13 @@ public class Session implements StatusConstants {
 	}
 
 	/**
-	 * Process an incoming CHATLOGOFF packet. We get one of these when someone
+	 * Process an incoming CHATEXIT packet. We get one of these when someone
 	 * leaves the chatroom - including ourselves, received just prior to our
 	 * CHATDISCONNECT confirmation packet (see above). Note: on rare occassions
 	 * this packet has been received for a user we previously had not been
 	 * informed about.
 	 */
-	protected void receiveChatLogoff(YMSG9Packet pkt) // 0x9b
+	protected void receiveChatExit(YMSG9Packet pkt) // 0x9b
 	{
 		try {
 			String netname = pkt.getValue("104"); // room:lobby
@@ -1796,14 +1801,14 @@ public class Session implements StatusConstants {
 			// Create and fire event FIX: should cope with multiple users!
 			SessionChatEvent se = new SessionChatEvent(this, 1, ycl);
 			se.setChatUser(0, ycu);
-			eventDispatchQueue.append(se, ServiceType.CHATLOGOFF);
+			eventDispatchQueue.append(se, ServiceType.CHATEXIT);
 		} catch (Exception e) {
 			throw new YMSG9BadFormatException("chat logoff", pkt, e);
 		}
 	}
 
 	/**
-	 * Process an incoming CHATLOGON packet. We get one of these: (a) as a way
+	 * Process an incoming CHATJOIN packet. We get one of these: (a) as a way
 	 * of finishing the login handshaking process, containing room details (we
 	 * already know) and a list of current members. (b) when the login process
 	 * fails (room full?), containing only a 114 field (set to '-35'?) - see
@@ -1814,7 +1819,7 @@ public class Session implements StatusConstants {
 	 * the first (and subsequent?) packets have a status of 5, while the final
 	 * packet has a status of 1.
 	 */
-	protected void receiveChatLogon(YMSG9Packet pkt) // 0x98
+	protected void receiveChatJoin(YMSG9Packet pkt) // 0x98
 	{
 		boolean joining = false;
 		try {
@@ -1899,7 +1904,7 @@ public class Session implements StatusConstants {
 			if (!joining) {
 				// Did we actually accrue any *new* users in previous loop?
 				if (se.getChatUsers().length > 0)
-					eventDispatchQueue.append(se, ServiceType.CHATLOGON);
+					eventDispatchQueue.append(se, ServiceType.CHATJOIN);
 			} else {
 				chatSessionStatus = SessionState.LOGGED_ON;
 			}
@@ -2275,7 +2280,7 @@ public class Session implements StatusConstants {
 	}
 
 	/**
-	 * Process and incoming GROUPRENAME packet.
+	 * Process and incoming GOTGROUPRENAME packet.
 	 */
 	protected void receiveGroupRename(YMSG9Packet pkt) // 0x13
 	{
@@ -2285,7 +2290,7 @@ public class Session implements StatusConstants {
 			if (oldName == null || newName == null)
 				return;
 			SessionGroupEvent se = new SessionGroupEvent(this, oldName, newName);
-			eventDispatchQueue.append(se, ServiceType.GROUPRENAME);
+			eventDispatchQueue.append(se, ServiceType.GOTGROUPRENAME);
 		} catch (Exception e) {
 			throw new YMSG9BadFormatException("group rename", pkt, e);
 		}

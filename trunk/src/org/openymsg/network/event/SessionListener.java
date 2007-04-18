@@ -145,12 +145,12 @@ public interface SessionListener {
 	// Someone new joins the chatroom
 	// chatuser - YahooChatUser of new user
 	// lobby - YahooChatLobby which they have joined
-	public void chatLogonReceived(SessionChatEvent ev);
+	public void chatJoinReceived(SessionChatEvent ev);
 
 	// Someone leaves the chatroom
 	// chatuser - YahooChatUser of new user
 	// lobby - YahooChatLobby which they have joined
-	public void chatLogoffReceived(SessionChatEvent ev);
+	public void chatExitReceived(SessionChatEvent ev);
 
 	// Someone has sent a message to the chatroom
 	// from - Yahoo id user

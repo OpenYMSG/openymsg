@@ -122,11 +122,11 @@ public class InputThread extends Thread {
 		case CHATDISCONNECT:
 			parentSession.receiveChatDisconnect(pkt);
 			break;
-		case CHATLOGOFF:
-			parentSession.receiveChatLogoff(pkt);
+		case CHATEXIT:
+			parentSession.receiveChatExit(pkt);
 			break;
-		case CHATLOGON:
-			parentSession.receiveChatLogon(pkt);
+		case CHATJOIN:
+			parentSession.receiveChatJoin(pkt);
 			break;
 		case CHATMSG:
 			parentSession.receiveChatMsg(pkt);
@@ -167,7 +167,7 @@ public class InputThread extends Thread {
 		case FRIENDREMOVE:
 			parentSession.receiveFriendRemove(pkt);
 			break;
-		case GROUPRENAME:
+		case GOTGROUPRENAME:
 			parentSession.receiveGroupRename(pkt);
 			break;
 		case IDACT:
@@ -227,8 +227,8 @@ public class InputThread extends Thread {
 		case AUTHRESP:
 			parentSession.receiveAuthResp(pkt);
 			return true;
-		case CHATLOGON:
-			parentSession.receiveChatLogon(pkt);
+		case CHATJOIN:
+			parentSession.receiveChatJoin(pkt);
 			return true;
 		case LOGOFF:
 			parentSession.receiveLogoff(pkt);
