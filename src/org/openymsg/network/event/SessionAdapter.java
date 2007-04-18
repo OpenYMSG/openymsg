@@ -88,10 +88,10 @@ public class SessionAdapter implements SessionListener {
 	public void groupRenameReceived(SessionGroupEvent ev) {
 	}
 
-	public void chatLogonReceived(SessionChatEvent ev) {
+	public void chatJoinReceived(SessionChatEvent ev) {
 	}
 
-	public void chatLogoffReceived(SessionChatEvent ev) {
+	public void chatExitReceived(SessionChatEvent ev) {
 	}
 
 	public void chatMessageReceived(SessionChatEvent ev) {

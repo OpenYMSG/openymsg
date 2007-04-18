@@ -29,8 +29,8 @@ import org.openymsg.network.chatroom.YahooChatUser;
  * However, the packet does contain a user count. So to play it safe this class
  * uses an array.
  * 
- * From ChatUser ChatUsers Lobby Message Emote chatLogonReceived y y y y n n
- * chatLogoffReceived y y y y n n chatMessageReceived y y y y y y
+ * From ChatUser ChatUsers Lobby Message Emote chatJoinReceived y y y y n n
+ * chatDisconnectReceived y y y y n n chatMessageReceived y y y y y y
  * chatConnectionBroken n n n n n n
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
