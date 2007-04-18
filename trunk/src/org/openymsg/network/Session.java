@@ -450,12 +450,11 @@ public class Session implements StatusConstants {
 			throw new IllegalArgumentException(
 					"Cannot set custom state without message");
 		}
-		
+
 		this.status = status;
 		customStatusMessage = null;
-		
-		if (sessionStatus != SessionState.UNSTARTED)
-		{
+
+		if (sessionStatus != SessionState.UNSTARTED) {
 			transmitNewStatus();
 		}
 	}
@@ -488,7 +487,7 @@ public class Session implements StatusConstants {
 		status = Status.CUSTOM;
 		customStatusMessage = message;
 		customStatusBusy = showBusyIcon;
-		
+
 		transmitNewCustomStatus();
 	}
 
@@ -1474,6 +1473,7 @@ public class Session implements StatusConstants {
 
 	/**
 	 * Transmit the current status to the Yahoo network.
+	 * 
 	 * @throws IOException
 	 */
 	protected void transmitNewStatus() throws IOException {
@@ -1483,11 +1483,12 @@ public class Session implements StatusConstants {
 		body.addElement("97", "1");
 		sendPacket(body, ServiceType.Y6_STATUS_UPDATE, Status.AVAILABLE);
 	}
-	
+
 	/**
 	 * Transmit the current custom status to the Yahoo network.
+	 * 
 	 * @throws IOException
-	 */	
+	 */
 	protected void transmitNewCustomStatus() throws IOException {
 		final PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("10", "99");
@@ -2283,6 +2284,18 @@ public class Session implements StatusConstants {
 	protected void receiveIdDeact(YMSG9Packet pkt) // 0x08
 	{
 		// Fix: do something here!
+	}
+
+	/**
+	 * Process an incoming V6_STATUS_UPDATE packet. This most likely replaces
+	 * {@link #receiveIsAway(YMSG9Packet)} and
+	 * {@link #receiveIsBack(YMSG9Packet)}.
+	 * 
+	 * @param pkt The V6_STATUS_UPDATE packet.
+	 */
+	protected void receiveStatusUpdate(YMSG9Packet pkt) // 0xC6
+	{
+		updateFriendsStatus(pkt);
 	}
 
 	/**
