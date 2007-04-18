@@ -121,7 +121,6 @@ public class Session implements StatusConstants {
 
 	private InputThread ipThread;
 
-
 	private final Hashtable<String, TypingNotifier> typingNotifiers = new Hashtable<String, TypingNotifier>();
 
 	private EventDispatcher eventDispatchQueue;
@@ -2743,6 +2742,7 @@ public class Session implements StatusConstants {
 		// Remove our pinger Runnable from scheduler
 		if (pingerFuture != null) {
 			pingerFuture.cancel(false);
+			pingerFuture = null;
 		}
 		
 		eventDispatchQueue.kill();
