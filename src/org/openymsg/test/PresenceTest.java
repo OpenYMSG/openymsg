@@ -29,6 +29,13 @@ import org.openymsg.network.Status;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
 public class PresenceTest {
+
+	private static String USERNAME = PropertiesAvailableTest
+			.getUsername("presenceuser1");
+
+	private static String PASSWORD = PropertiesAvailableTest
+			.getPassword(USERNAME);
+
 	@Test
 	public void testDefaultStatus() throws Exception {
 		assertEquals(Status.AVAILABLE, new Session().getStatus());
@@ -140,6 +147,36 @@ public class PresenceTest {
 			fail("An IllegalArgumentException should have been thrown before this point.");
 		} catch (IllegalArgumentException e) {
 			// should happen
+		}
+	}
+
+	@Test
+	public void testActualLogin() throws Exception {
+		final Session sender = new Session();
+		try {
+			sender.login(USERNAME, PASSWORD);
+
+			sender.setStatus(Status.BUSY);
+			Thread.sleep(1000);
+			sender.setStatus(Status.AVAILABLE);
+			Thread.sleep(1000);
+			sender.setStatus(Status.OUTTOLUNCH);
+			Thread.sleep(1000);
+			sender.setStatus(Status.OUTTOLUNCH);
+			Thread.sleep(1000);
+			sender.setStatus(Status.AVAILABLE);
+			Thread.sleep(1000);
+			sender.setStatus("This is my custom message!", false);
+			Thread.sleep(1000);
+			sender.setStatus("This is my busy custom message!", true);
+			Thread.sleep(1000);
+
+		} finally {
+			try {
+				sender.logout();
+			} catch (Exception e) {
+				// ignore
+			}
 		}
 	}
 }

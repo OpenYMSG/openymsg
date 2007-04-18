@@ -115,7 +115,8 @@ public class Session implements StatusConstants {
 
 	public volatile ConnectionHandler network;
 
-	private static final ScheduledExecutorService SCHEDULED_PINGER_SERVICE = new ScheduledThreadPoolExecutor(0);
+	private static final ScheduledExecutorService SCHEDULED_PINGER_SERVICE = new ScheduledThreadPoolExecutor(
+			0);
 
 	private ScheduledFuture<?> pingerFuture;
 
@@ -426,13 +427,14 @@ public class Session implements StatusConstants {
 
 	/**
 	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc.
-	 * Legit values are in the StatusConstants interface. If you want to login
-	 * as invisible, set this to Status.INVISIBLE before you call login() Note:
-	 * setter is overloaded, the second version is intended for use when setting
-	 * custom status messages. The boolean is true if available and false if
-	 * away.
+	 * If you want to login as invisible, set this to Status.INVISIBLE before
+	 * you call login().
+	 * 
+	 * Note: this setter is overloaded. The second version is intended for use
+	 * when setting custom status messages.
 	 * 
 	 * @param status
+	 *            The new Status to be set for this user.
 	 * @throws IllegalArgumentException
 	 * @throws IOException
 	 */
@@ -448,11 +450,13 @@ public class Session implements StatusConstants {
 			throw new IllegalArgumentException(
 					"Cannot set custom state without message");
 		}
+		
 		this.status = status;
 		customStatusMessage = null;
-
-		if (sessionStatus == SessionState.LOGGED_ON) {
-			_doStatus();
+		
+		if (sessionStatus != SessionState.UNSTARTED)
+		{
+			transmitNewStatus();
 		}
 	}
 
@@ -465,11 +469,11 @@ public class Session implements StatusConstants {
 	 * away.
 	 * 
 	 * @param message
-	 * @param b
+	 * @param showBusyIcon
 	 * @throws IllegalArgumentException
 	 * @throws IOException
 	 */
-	public synchronized void setStatus(String message, boolean b)
+	public synchronized void setStatus(String message, boolean showBusyIcon)
 			throws IllegalArgumentException, IOException {
 		if (sessionStatus == SessionState.UNSTARTED) {
 			throw new IllegalArgumentException(
@@ -483,17 +487,9 @@ public class Session implements StatusConstants {
 
 		status = Status.CUSTOM;
 		customStatusMessage = message;
-		customStatusBusy = b;
-		_doStatus();
-	}
-
-	private void _doStatus() throws IllegalStateException, IOException {
-		if (status == Status.AVAILABLE)
-			transmitIsBack();
-		else if (status == Status.CUSTOM)
-			transmitIsAway(customStatusMessage, customStatusBusy);
-		else
-			transmitIsAway();
+		customStatusBusy = showBusyIcon;
+		
+		transmitNewCustomStatus();
 	}
 
 	public String getCustomStatusMessage() {
@@ -1428,15 +1424,14 @@ public class Session implements StatusConstants {
 	}
 
 	/**
-	 * Transmit a GOTGROUPRENAME packet, to change the name of one of our friends
-	 * groups.
+	 * Transmit a GOTGROUPRENAME packet, to change the name of one of our
+	 * friends groups.
 	 */
 	/*
 	 * TODO: Currently, this behavior is as it was in jYMSG. Protocol
 	 * specification would suggest that not 0x13 (GOTGROUPRENAME) but 0x89
-	 * (GROUPRENAME) should be used for this operation. Find out and make
-	 * sure.
-	 */ 
+	 * (GROUPRENAME) should be used for this operation. Find out and make sure.
+	 */
 	protected void transmitGroupRename(String oldName, String newName)
 			throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
@@ -1478,49 +1473,29 @@ public class Session implements StatusConstants {
 	}
 
 	/**
-	 * Transmit a regular ISAWAY packet. To return, try transmiting an ISBACK
-	 * packet!
-	 */
-	protected void transmitIsAway() throws IOException {
-		PacketBodyBuffer body = new PacketBodyBuffer();
-		body.addElement("10", status + "");
-		sendPacket(body, ServiceType.ISAWAY, status); // 0x03
-	}
-
-	/**
-	 * Sent out a custom ISAWAY message.
-	 * 
-	 * @param msg
-	 *            custom message.
-	 * @param isAway
-	 *            ''true'' to set state to 'away', ''false'' to set state to
-	 *            'back'.
+	 * Transmit the current status to the Yahoo network.
 	 * @throws IOException
 	 */
-	protected void transmitIsAway(String msg, boolean isAway)
-			throws IOException {
-		PacketBodyBuffer body = new PacketBodyBuffer();
-		status = Status.CUSTOM;
-		body.addElement("10", Long.toString(status.getValue()));
-		body.addElement("19", msg);
-		if (isAway) {
-			body.addElement("47", "1"); // 1=away
-		} else {
-			body.addElement("47", "0"); // 0=back
-		}
-		sendPacket(body, ServiceType.ISAWAY, status); // 0x03
+	protected void transmitNewStatus() throws IOException {
+		final PacketBodyBuffer body = new PacketBodyBuffer();
+		body.addElement("10", String.valueOf(status.getValue()));
+		body.addElement("19", "");
+		body.addElement("97", "1");
+		sendPacket(body, ServiceType.Y6_STATUS_UPDATE, Status.AVAILABLE);
 	}
-
+	
 	/**
-	 * Transmit an ISBACK packet, contains no body, just the Yahoo status. We
-	 * should send this to return from an ISAWAY, or after we have confirmed a
-	 * sucessful LOGON - it sets our initial status (visibility) to the outside
-	 * world. Typical initial values for 'status' are AVAILABLE and INVISIBLE.
-	 */
-	protected void transmitIsBack() throws IOException {
-		PacketBodyBuffer body = new PacketBodyBuffer();
-		body.addElement("10", status + "");
-		sendPacket(body, ServiceType.ISBACK, status); // 0x04
+	 * Transmit the current custom status to the Yahoo network.
+	 * @throws IOException
+	 */	
+	protected void transmitNewCustomStatus() throws IOException {
+		final PacketBodyBuffer body = new PacketBodyBuffer();
+		body.addElement("10", "99");
+		body.addElement("19", customStatusMessage);
+		body.addElement("97", "1");
+		body.addElement("47", (customStatusBusy ? "1" : "0"));
+		body.addElement("187", "0");
+		sendPacket(body, ServiceType.Y6_STATUS_UPDATE, Status.AVAILABLE);
 	}
 
 	/**
@@ -1806,8 +1781,8 @@ public class Session implements StatusConstants {
 	}
 
 	/**
-	 * Process an incoming CHATJOIN packet. We get one of these: (a) as a way
-	 * of finishing the login handshaking process, containing room details (we
+	 * Process an incoming CHATJOIN packet. We get one of these: (a) as a way of
+	 * finishing the login handshaking process, containing room details (we
 	 * already know) and a list of current members. (b) when the login process
 	 * fails (room full?), containing only a 114 field (set to '-35'?) - see
 	 * error handling code elsewhere (c) as a stripped down version when a new
@@ -2468,7 +2443,8 @@ public class Session implements StatusConstants {
 				primaryID = loginID;
 			}
 		} catch (Exception e) {
-			throw new YMSG9BadFormatException("primary identity in list", pkt, e);
+			throw new YMSG9BadFormatException("primary identity in list", pkt,
+					e);
 		}
 
 		// Set the primary and login flags on the relevant YahooIdentity objects
@@ -2507,7 +2483,8 @@ public class Session implements StatusConstants {
 			try {
 				updateFriendsStatus(pkt);
 			} catch (Exception e) {
-				throw new YMSG9BadFormatException("online friends in logoff", pkt, e);
+				throw new YMSG9BadFormatException("online friends in logoff",
+						pkt, e);
 			}
 		}
 	}
@@ -2541,11 +2518,7 @@ public class Session implements StatusConstants {
 		} finally {
 			if (sessionStatus != SessionState.LOGGED_ON) {
 				// set inital presence state.
-				if (status == Status.AVAILABLE) {
-					transmitIsBack();
-				} else {
-					transmitIsAway();
-				}
+				setStatus(status);
 
 				sessionStatus = SessionState.LOGGED_ON;
 			}
@@ -2723,9 +2696,9 @@ public class Session implements StatusConstants {
 		ipThread = new InputThread(this);
 		ipThread.start();
 		// Add a Runnable to periodically send ping packets for our connection
-		pingerFuture = SCHEDULED_PINGER_SERVICE.scheduleAtFixedRate(new SessionPinger(this),
-				NetworkConstants.PING_TIMEOUT_IN_SECS, NetworkConstants.PING_TIMEOUT_IN_SECS,
-				TimeUnit.SECONDS);
+		pingerFuture = SCHEDULED_PINGER_SERVICE.scheduleAtFixedRate(
+				new SessionPinger(this), NetworkConstants.PING_TIMEOUT_IN_SECS,
+				NetworkConstants.PING_TIMEOUT_IN_SECS, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -2738,13 +2711,13 @@ public class Session implements StatusConstants {
 			ipThread.interrupt();
 			ipThread = null;
 		}
-		
+
 		// Remove our pinger Runnable from scheduler
 		if (pingerFuture != null) {
 			pingerFuture.cancel(false);
 			pingerFuture = null;
 		}
-		
+
 		eventDispatchQueue.kill();
 		// If the network is open, close it
 		network.close();
