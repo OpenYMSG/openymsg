@@ -2873,16 +2873,16 @@ public class Session implements StatusConstants {
 				final long longStatus = Long
 						.parseLong(pkt.getNthValue("10", i));
 				final String friend = pkt.getNthValue("7", i);
-				final Status status = logoff ? Status.OFFLINE : Status
+				final Status newStatus = logoff ? Status.OFFLINE : Status
 						.getStatus(longStatus);
 				if (pkt.exists("17")) {
 					final boolean onChat = pkt.getNthValue("17", i).equals("1");
 					final boolean onPager = pkt.getNthValue("13", i)
 							.equals("1");
-					yu.update(friend, status, onChat, onPager);
+					yu.update(friend, newStatus, onChat, onPager);
 				} else {
 					final String visibility = pkt.getNthValue("13", i);
-					yu.update(friend, status, visibility);
+					yu.update(friend, newStatus, visibility);
 				}
 
 				// Custom message? 19=Custom status 47=Custom message

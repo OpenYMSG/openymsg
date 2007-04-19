@@ -92,21 +92,21 @@ public class ChatroomManager {
 	 * @param parentCategory
 	 *            Parent Category to which the child categories are to be
 	 *            appended.
-	 * @param cLine
+	 * @param cookieLine
 	 *            Cookie-lines to determine what categories and/or rooms to
 	 *            load.
 	 */
 	@SuppressWarnings("unchecked")
 	private void recursiveLoad(Element parentElement,
-			YahooChatCategory parentCategory, String cLine) {
+			YahooChatCategory parentCategory, String cookieLine) {
 		List<Element> childCategories = parentElement.getChildren("category");
 
 		for (Element e : childCategories) {
 			final long id = Long.parseLong(e.getAttributeValue("id"));
 			final String name = e.getAttributeValue("name");
 			final YahooChatCategory yahooCategory = new YahooChatCategory(id,
-					name, cLine, localePrefix);
-			recursiveLoad(e, yahooCategory, cLine);
+					name, cookieLine, localePrefix);
+			recursiveLoad(e, yahooCategory, cookieLine);
 			parentCategory.addSubcategory(yahooCategory);
 		}
 	}
