@@ -29,80 +29,106 @@ package org.openymsg.network.event;
 @SuppressWarnings("unused")
 public class SessionAdapter implements SessionListener {
 	public void fileTransferReceived(SessionFileTransferEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void connectionClosed(SessionEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void listReceived(SessionEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void messageReceived(SessionEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void buzzReceived(SessionEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void offlineMessageReceived(SessionEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void errorPacketReceived(SessionErrorEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void inputExceptionThrown(SessionExceptionEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void newMailReceived(SessionNewMailEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void notifyReceived(SessionNotifyEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void contactRequestReceived(SessionEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void contactRejectionReceived(SessionEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void conferenceInviteReceived(SessionConferenceEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void conferenceInviteDeclinedReceived(SessionConferenceEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void conferenceLogonReceived(SessionConferenceEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void conferenceLogoffReceived(SessionConferenceEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void conferenceMessageReceived(SessionConferenceEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void friendsUpdateReceived(SessionFriendEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void friendAddedReceived(SessionFriendEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void friendRemovedReceived(SessionFriendEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void groupRenameReceived(SessionGroupEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void chatJoinReceived(SessionChatEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void chatExitReceived(SessionChatEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void chatMessageReceived(SessionChatEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void chatUserUpdateReceived(SessionChatEvent event) {
+		// override this function if you want to do something with it.
 	}
 
 	public void chatConnectionClosed(SessionEvent event) {
+		// override this function if you want to do something with it.
 	}
 }

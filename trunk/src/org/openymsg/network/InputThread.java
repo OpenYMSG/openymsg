@@ -200,9 +200,6 @@ public class InputThread extends Thread {
 		case NOTIFY:
 			parentSession.receiveNotify(pkt);
 			break;
-		case PING:
-			parentSession.receivePing(pkt);
-			break;
 		case USERSTAT:
 			parentSession.receiveUserStat(pkt);
 			break;

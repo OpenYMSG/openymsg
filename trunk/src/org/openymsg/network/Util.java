@@ -266,9 +266,6 @@ public abstract class Util implements PropertyConstants {
 		int[] c = new int[4];
 		int bpos = 0;
 
-		// For data streams which were not exactly divisible by three
-		// bytes, the below will result in an exception for the padding
-		// chars on the end of the string.
 		try {
 			for (int i = 0; i < s.length(); i += 4) {
 				for (int j = 0; i < c.length; j++)
@@ -279,6 +276,9 @@ public abstract class Util implements PropertyConstants {
 				bpos += 3;
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
+			// For data streams which were not exactly divisible by three
+			// bytes, this will result in an exception for the padding
+			// chars on the end of the string.
 		}
 		return buffer;
 	}
