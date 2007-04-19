@@ -263,13 +263,13 @@ public class YahooChatCategory {
 
 		final List<Element> rooms = chatRooms.getChildren("room");
 		for (Element room : rooms) {
-			final String type = room.getAttributeValue("type");
-			final long id = Long.parseLong(room.getAttributeValue("id"));
-			final String name = room.getAttributeValue("name");
-			final String topic = room.getAttributeValue("topic");
+			final String roomType = room.getAttributeValue("type");
+			final long roomId = Long.parseLong(room.getAttributeValue("id"));
+			final String roomName = room.getAttributeValue("name");
+			final String roomTopic = room.getAttributeValue("topic");
 
-			final YahooChatRoom yahooChatRoom = new YahooChatRoom(id, name,
-					topic, type.equals(PUBLIC_TYPE));
+			final YahooChatRoom yahooChatRoom = new YahooChatRoom(roomId,
+					roomName, roomTopic, roomType.equals(PUBLIC_TYPE));
 
 			final List<Element> lobbies = room.getChildren("lobby");
 			for (Element lobby : lobbies) {

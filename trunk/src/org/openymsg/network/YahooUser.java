@@ -170,19 +170,42 @@ public class YahooUser // Cannot be serialised
 		return hash;
 	}
 
-	// This is the new version, where 13=combined pager/chat
-	public void update(String id, Status status, String visibility) {
-		final int iVisibility = (visibility == null) ? 0 : Integer
-				.parseInt(visibility);
-		update(id, status, (iVisibility & 2) > 0, (iVisibility & 1) > 0);
+	/**
+	 * Updates the YahooUser with the new values.
+	 * 
+	 * @param newId
+	 *            replacement for current ID
+	 * @param newStatus
+	 *            replacement for current Status
+	 * @param newVisibility
+	 *            replacement for current onChat and onPager values
+	 */
+	public void update(String newId, Status newStatus, String newVisibility) {
+		// This is the new version, where 13=combined pager/chat
+		final int iVisibility = (newVisibility == null) ? 0 : Integer
+				.parseInt(newVisibility);
+		update(newId, newStatus, (iVisibility & 2) > 0, (iVisibility & 1) > 0);
 	}
 
-	// This is the old version, when 13=pager and 17=chat
-	public void update(String id, Status status, boolean onChat, boolean onPager) {
-		this.id = id;
-		this.status = status;
-		this.onChat = onChat;
-		this.onPager = onPager;
+	/**
+	 * Updates the YahooUser with the new values.
+	 * 
+	 * @param newId
+	 *            replacement for current ID.
+	 * @param newStatus
+	 *            replacement for current Status value
+	 * @param newOnChat
+	 *            replacement for current onChat value
+	 * @param newOnPager
+	 *            replacement for current onPager value
+	 */
+	public void update(String newId, Status newStatus, boolean newOnChat,
+			boolean newOnPager) {
+		// This is the old version, when 13=pager and 17=chat
+		this.id = newId;
+		this.status = newStatus;
+		this.onChat = newOnChat;
+		this.onPager = newOnPager;
 
 		if (this.status != Status.CUSTOM) {
 			customStatusMessage = null;

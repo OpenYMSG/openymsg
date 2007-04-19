@@ -545,15 +545,15 @@ public class MutableMessageElement extends MessageElement implements
 		}
 	}
 
-	private String _colIdx1(int idxColour, Stack<String> colStack) {
-		String tmp = esc + "3" + (char) ('0' + idxColour) + "m";
+	private String _colIdx1(int _idxColour, Stack<String> colStack) {
+		String tmp = esc + "3" + (char) ('0' + _idxColour) + "m";
 		if (colStack != null)
 			colStack.push(tmp);
 		return tmp;
 	}
 
-	private String _colAbs1(Color colour, Stack<String> colStack) {
-		String tmp = esc + "3#" + _to6HexDigits(colour) + "m";
+	private String _colAbs1(Color _colour, Stack<String> colStack) {
+		String tmp = esc + "3#" + _to6HexDigits(_colour) + "m";
 		if (colStack != null)
 			colStack.push(tmp);
 		return tmp;
