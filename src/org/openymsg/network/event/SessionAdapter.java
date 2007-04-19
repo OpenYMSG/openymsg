@@ -19,87 +19,90 @@
 package org.openymsg.network.event;
 
 /**
- * Empty-method implementation of the {@link SessionListener} interface.
+ * Empty-method implementation of the {@link SessionListener} interface. A
+ * typical usage of this class would be to extend it, and override just that one
+ * particular method that you're interested in.
  * 
+ * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
+@SuppressWarnings("unused")
 public class SessionAdapter implements SessionListener {
-	public void fileTransferReceived(SessionFileTransferEvent ev) {
+	public void fileTransferReceived(SessionFileTransferEvent event) {
 	}
 
-	public void connectionClosed(SessionEvent ev) {
+	public void connectionClosed(SessionEvent event) {
 	}
 
-	public void listReceived(SessionEvent ev) {
+	public void listReceived(SessionEvent event) {
 	}
 
-	public void messageReceived(SessionEvent ev) {
+	public void messageReceived(SessionEvent event) {
 	}
 
-	public void buzzReceived(SessionEvent ev) {
+	public void buzzReceived(SessionEvent event) {
 	}
 
-	public void offlineMessageReceived(SessionEvent ev) {
+	public void offlineMessageReceived(SessionEvent event) {
 	}
 
-	public void errorPacketReceived(SessionErrorEvent ev) {
+	public void errorPacketReceived(SessionErrorEvent event) {
 	}
 
-	public void inputExceptionThrown(SessionExceptionEvent ev) {
-		ev.getException().printStackTrace();
+	public void inputExceptionThrown(SessionExceptionEvent event) {
 	}
 
-	public void newMailReceived(SessionNewMailEvent ev) {
+	public void newMailReceived(SessionNewMailEvent event) {
 	}
 
-	public void notifyReceived(SessionNotifyEvent ev) {
+	public void notifyReceived(SessionNotifyEvent event) {
 	}
 
-	public void contactRequestReceived(SessionEvent ev) {
+	public void contactRequestReceived(SessionEvent event) {
 	}
 
-	public void contactRejectionReceived(SessionEvent ev) {
+	public void contactRejectionReceived(SessionEvent event) {
 	}
 
-	public void conferenceInviteReceived(SessionConferenceEvent ev) {
+	public void conferenceInviteReceived(SessionConferenceEvent event) {
 	}
 
-	public void conferenceInviteDeclinedReceived(SessionConferenceEvent ev) {
+	public void conferenceInviteDeclinedReceived(SessionConferenceEvent event) {
 	}
 
-	public void conferenceLogonReceived(SessionConferenceEvent ev) {
+	public void conferenceLogonReceived(SessionConferenceEvent event) {
 	}
 
-	public void conferenceLogoffReceived(SessionConferenceEvent ev) {
+	public void conferenceLogoffReceived(SessionConferenceEvent event) {
 	}
 
-	public void conferenceMessageReceived(SessionConferenceEvent ev) {
+	public void conferenceMessageReceived(SessionConferenceEvent event) {
 	}
 
-	public void friendsUpdateReceived(SessionFriendEvent ev) {
+	public void friendsUpdateReceived(SessionFriendEvent event) {
 	}
 
-	public void friendAddedReceived(SessionFriendEvent ev) {
+	public void friendAddedReceived(SessionFriendEvent event) {
 	}
 
-	public void friendRemovedReceived(SessionFriendEvent ev) {
+	public void friendRemovedReceived(SessionFriendEvent event) {
 	}
 
-	public void groupRenameReceived(SessionGroupEvent ev) {
+	public void groupRenameReceived(SessionGroupEvent event) {
 	}
 
-	public void chatJoinReceived(SessionChatEvent ev) {
+	public void chatJoinReceived(SessionChatEvent event) {
 	}
 
-	public void chatExitReceived(SessionChatEvent ev) {
+	public void chatExitReceived(SessionChatEvent event) {
 	}
 
-	public void chatMessageReceived(SessionChatEvent ev) {
+	public void chatMessageReceived(SessionChatEvent event) {
 	}
 
-	public void chatUserUpdateReceived(SessionChatEvent ev) {
+	public void chatUserUpdateReceived(SessionChatEvent event) {
 	}
 
-	public void chatConnectionClosed(SessionEvent ev) {
+	public void chatConnectionClosed(SessionEvent event) {
 	}
 }
