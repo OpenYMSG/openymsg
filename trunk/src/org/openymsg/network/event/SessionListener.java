@@ -124,7 +124,7 @@ public interface SessionListener {
 	public void conferenceMessageReceived(SessionConferenceEvent event);
 
 	// Friend's details have been updated
-	// friends - vector of updated YahooUser's
+	// friends - collection of updated YahooUser's
 	public void friendsUpdateReceived(SessionFriendEvent event);
 
 	// Successfully added a friend

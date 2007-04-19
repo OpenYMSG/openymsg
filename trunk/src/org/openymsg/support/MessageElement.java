@@ -19,9 +19,10 @@
 package org.openymsg.support;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.StringTokenizer;
-import java.util.Vector;
 
 /**
  * A message element represents a low level segment of a decoded message. The
@@ -63,7 +64,7 @@ public class MessageElement {
 
 	protected int type; // Type of section (see above)
 
-	protected Vector<MessageElement> children; // Contained sections
+	protected List<MessageElement> children; // Contained sections
 
 	protected int fontSize; // Attributes
 
@@ -89,7 +90,7 @@ public class MessageElement {
 	protected MessageElement(MessageDecoderSettings set, int t) {
 		settings = set;
 		type = t;
-		children = new Vector<MessageElement>();
+		children = new ArrayList<MessageElement>();
 	}
 
 	protected MessageElement(MessageDecoderSettings set, int t, String body) {
@@ -105,6 +106,7 @@ public class MessageElement {
 				try {
 					fontSize = Integer.parseInt(s);
 				} catch (NumberFormatException e) {
+					e.printStackTrace();
 				}
 			if (fontFace == null)
 				type = NULL;
@@ -197,7 +199,7 @@ public class MessageElement {
 	int childTextSize() {
 		int l = 0;
 		for (int i = 0; i < children.size(); i++) {
-			MessageElement e = children.elementAt(i);
+			MessageElement e = children.get(i);
 			if (e.type == TEXT)
 				l += e.text.length();
 			else
@@ -210,7 +212,7 @@ public class MessageElement {
 	 * Add a child to this section
 	 */
 	void addChild(MessageElement s) {
-		children.addElement(s);
+		children.add(s);
 	}
 
 	/**
@@ -257,7 +259,7 @@ public class MessageElement {
 			break;
 		}
 		for (int i = 0; i < children.size(); i++) {
-			MessageElement sc = children.elementAt(i);
+			MessageElement sc = children.get(i);
 			sc.toHTML(sb);
 		}
 		switch (type) {
@@ -302,8 +304,8 @@ public class MessageElement {
 	private void toText(StringBuffer sb) {
 		if (type == TEXT)
 			sb.append(text);
-		for (int i = 0; i < children.size(); i++) {
-			MessageElement sc = children.elementAt(i);
+
+		for (MessageElement sc : children) {
 			sc.toText(sb);
 		}
 	}

@@ -19,9 +19,9 @@
 package org.openymsg.network;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Vector;
 
 import org.openymsg.network.event.SessionChatEvent;
 import org.openymsg.network.event.SessionConferenceEvent;
@@ -57,7 +57,7 @@ public class EventDispatcher extends Thread {
 
 	public EventDispatcher() {
 		super("jYMSG Event Dispatcher thread");
-		listeners = new Vector<SessionListener>();
+		listeners = new HashSet<SessionListener>();
 		queue = new LinkedList<FireEvent>();
 	}
 

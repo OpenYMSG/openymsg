@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -1177,11 +1176,13 @@ public class Session implements StatusConstants {
 		body.addElement("1", yid);
 		body.addElement("51", user.getId());
 		body.addElement("57", room);
-		Vector<YahooUser> users = getConference(room).getUsers();
-		for (int i = 0; i < users.size(); i++)
-			body.addElement("52", (users.elementAt(i)).getId());
-		for (int i = 0; i < users.size(); i++)
-			body.addElement("53", (users.elementAt(i)).getId());
+
+		final Set<YahooUser> users = getConference(room).getUsers();
+		for (YahooUser u : users) {
+			body.addElement("52", u.getId());
+			body.addElement("53", u.getId());
+		}
+
 		body.addElement("58", msg);
 		body.addElement("13", "0"); // FIX : what's this for?
 		sendPacket(body, ServiceType.CONFADDINVITE); // 0x1c
@@ -1196,12 +1197,14 @@ public class Session implements StatusConstants {
 		// Flag this conference as now dead
 		YahooConference yc = getConference(room);
 		yc.closeConference();
-		Vector<YahooUser> users = yc.getUsers();
+		final Set<YahooUser> users = yc.getUsers();
 		// Send decline packet to Yahoo
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", yid);
-		for (int i = 0; i < users.size(); i++)
-			body.addElement("3", (users.elementAt(i)).getId());
+		for (YahooUser user : users) {
+			body.addElement("3", user.getId());
+		}
+
 		body.addElement("57", room);
 		body.addElement("14", msg);
 		sendPacket(body, ServiceType.CONFDECLINE); // 0x1a
@@ -1237,12 +1240,13 @@ public class Session implements StatusConstants {
 		// Flag this conference as now dead
 		YahooConference yc = getConference(room);
 		yc.closeConference();
-		Vector<YahooUser> users = yc.getUsers();
+		final Set<YahooUser> users = yc.getUsers();
 		// Send decline packet to Yahoo
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", yid);
-		for (int i = 0; i < users.size(); i++)
-			body.addElement("3", (users.elementAt(i)).getId());
+		for (YahooUser user : users) {
+			body.addElement("3", user.getId());
+		}
 		body.addElement("57", room);
 		sendPacket(body, ServiceType.CONFLOGOFF); // 0x1b
 	}
@@ -1254,12 +1258,12 @@ public class Session implements StatusConstants {
 	protected void transmitConfLogon(String room, String yid)
 			throws IOException, NoSuchConferenceException {
 		// Get a list of users for this conference
-		Vector<YahooUser> users = getConference(room).getUsers();
+		final Set<YahooUser> users = getConference(room).getUsers();
 		// Send accept packet to Yahoo
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", yid);
-		for (int i = 0; i < users.size(); i++)
-			body.addElement("3", (users.elementAt(i)).getId());
+		for (YahooUser user : users)
+			body.addElement("3", user.getId());
 		body.addElement("57", room);
 		sendPacket(body, ServiceType.CONFLOGON); // 0x19
 	}
@@ -1271,12 +1275,13 @@ public class Session implements StatusConstants {
 	protected void transmitConfMsg(String room, String yid, String msg)
 			throws IOException, NoSuchConferenceException {
 		// Get a list of users for this conference
-		Vector<YahooUser> users = getConference(room).getUsers();
+		final Set<YahooUser> users = getConference(room).getUsers();
 		// Send message packet to yahoo
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", yid);
-		for (int i = 0; i < users.size(); i++)
-			body.addElement("53", (users.elementAt(i)).getId());
+		for (YahooUser user : users) {
+			body.addElement("53", user.getId());
+		}
 		body.addElement("57", room);
 		body.addElement("14", msg);
 		if (Util.isUtf8(msg))
