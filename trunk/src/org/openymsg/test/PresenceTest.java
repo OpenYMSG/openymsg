@@ -19,11 +19,14 @@
 package org.openymsg.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.openymsg.network.Session;
 import org.openymsg.network.Status;
+import org.openymsg.network.event.SessionAdapter;
+import org.openymsg.network.event.SessionFriendEvent;
 
 /**
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
@@ -35,6 +38,12 @@ public class PresenceTest {
 
 	private static String PASSWORD = PropertiesAvailableTest
 			.getPassword(USERNAME);
+
+	private static String RECEIVER = PropertiesAvailableTest
+			.getUsername("presenceuser2");
+
+	private static String RECVPWD = PropertiesAvailableTest
+			.getPassword(RECEIVER);
 
 	@Test
 	public void testDefaultStatus() throws Exception {
@@ -177,6 +186,145 @@ public class PresenceTest {
 			} catch (Exception e) {
 				// ignore
 			}
+		}
+	}
+
+	@Test
+	public void testReceivePresence() throws Exception {
+		final Session sender = new Session();
+		final Session receiver = new Session();
+		
+		final ReceivePresenceUpdateAdaptor listener = new ReceivePresenceUpdateAdaptor();
+		receiver.addSessionListener(listener);
+		final long MAX_WAIT_IN_MILLIS = 1000; 
+		try {
+			receiver.login(RECEIVER, RECVPWD);
+			sender.login(USERNAME, PASSWORD);
+			SessionFriendEvent event = listener.waitForNextEvent(MAX_WAIT_IN_MILLIS);
+			assertNotNull(event);
+			assertEquals(Status.AVAILABLE, event.getFriend().getStatus());
+			assertEquals(null, event.getFriend().getCustomStatusMessage());
+			
+			sender.setStatus(Status.BUSY);
+			event = listener.waitForNextEvent(MAX_WAIT_IN_MILLIS);
+			assertNotNull(event);
+			assertEquals(event.getFriend().toString(), Status.BUSY, event.getFriend().getStatus());
+			assertEquals(null, event.getFriend().getCustomStatusMessage());
+			
+			Thread.sleep(1000);
+			sender.setStatus(Status.AVAILABLE);
+			event = listener.waitForNextEvent(MAX_WAIT_IN_MILLIS);
+			assertNotNull(event);
+			assertEquals(Status.AVAILABLE, event.getFriend().getStatus());
+			assertEquals(null, event.getFriend().getCustomStatusMessage());
+
+			Thread.sleep(1000);
+			sender.setStatus(Status.OUTTOLUNCH);
+			event = listener.waitForNextEvent(MAX_WAIT_IN_MILLIS);
+			assertNotNull(event);
+			assertEquals(Status.OUTTOLUNCH, event.getFriend().getStatus());
+			assertEquals(null, event.getFriend().getCustomStatusMessage());
+
+			Thread.sleep(1000);
+			sender.setStatus("This is my custom message!", false);
+			event = listener.waitForNextEvent(MAX_WAIT_IN_MILLIS);
+			assertNotNull(event);
+			assertEquals(Status.CUSTOM, event.getFriend().getStatus());
+			assertEquals("This is my custom message!", event.getFriend().getCustomStatusMessage());
+
+			Thread.sleep(1000);
+			sender.setStatus("This is my busy custom message!", false);
+			event = listener.waitForNextEvent(MAX_WAIT_IN_MILLIS);
+			assertNotNull(event);
+			assertEquals(Status.CUSTOM, event.getFriend().getStatus());
+			assertEquals("This is my busy custom message!", event.getFriend().getCustomStatusMessage());
+
+			Thread.sleep(1000);
+			sender.setStatus(Status.OUTTOLUNCH);
+			event = listener.waitForNextEvent(MAX_WAIT_IN_MILLIS);
+			assertNotNull(event);
+			assertEquals(Status.OUTTOLUNCH, event.getFriend().getStatus());
+			assertEquals(null, event.getFriend().getCustomStatusMessage());
+
+		} finally {
+			try {
+				sender.logout();
+			} catch (Exception e) {
+				// ignore
+			}
+
+			try {
+				receiver.logout();
+			} catch (Exception e) {
+				// ignore
+			}
+		}
+	}
+
+	/**
+	 * Utility class that lets you wait for a particular event.
+	 * 
+	 * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
+	 * 
+	 */
+	private class ReceivePresenceUpdateAdaptor extends SessionAdapter {
+		/**
+		 * The queued event.
+		 */
+		private SessionFriendEvent sessionEvent = null;
+
+		public ReceivePresenceUpdateAdaptor() {
+			// doesn't do much, but prevens synthetic accessor warnings.
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.openymsg.network.event.SessionAdapter#friendsUpdateReceived(org.openymsg.network.event.SessionFriendEvent)
+		 */
+		@Override
+		public void friendsUpdateReceived(SessionFriendEvent event) {
+			this.sessionEvent = event;
+		}
+
+		/**
+		 * Waits for a particular amount of time for the next event to arrive,
+		 * and then returns that event. If within the timeout no event has been
+		 * received, this method returns null.
+		 * 
+		 * @param timeout_in_millis
+		 *            The time (in milliseconds) to wait for the next event.
+		 * @return 'null' or the first event that arrived within the timeout
+		 *         value.
+		 */
+		public SessionFriendEvent waitForNextEvent(long timeout_in_millis) {
+			if (timeout_in_millis < 0) {
+				throw new IllegalArgumentException(
+						"Cannot use negative timeout values.");
+			}
+
+			if (sessionEvent != null) {
+				throw new IllegalStateException(
+						"There's already an event queued, before this method was called.");
+			}
+
+			final long STEP_IN_MILLIS = 100;
+			SessionFriendEvent result = null;
+			for (int i = 0; i < timeout_in_millis; i += STEP_IN_MILLIS) {
+				if (sessionEvent != null) {
+					result = sessionEvent;
+					break;
+				}
+
+				try {
+					Thread.sleep(STEP_IN_MILLIS);
+				} catch (InterruptedException e) {
+					// ignore
+				}
+			}
+
+			sessionEvent = null;
+			return result;
 		}
 	}
 }

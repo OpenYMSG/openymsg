@@ -2291,7 +2291,8 @@ public class Session implements StatusConstants {
 	 * {@link #receiveIsAway(YMSG9Packet)} and
 	 * {@link #receiveIsBack(YMSG9Packet)}.
 	 * 
-	 * @param pkt The V6_STATUS_UPDATE packet.
+	 * @param pkt
+	 *            The V6_STATUS_UPDATE packet.
 	 */
 	protected void receiveStatusUpdate(YMSG9Packet pkt) // 0xC6
 	{
@@ -2513,6 +2514,10 @@ public class Session implements StatusConstants {
 	protected void receiveLogon(YMSG9Packet pkt) throws IOException // 0x01
 	{
 		if (sessionStatus != SessionState.CONNECTED) {
+			/*
+			 * TODO: Wireshark hints that these packets might be related to
+			 * events like 'new mail' and 'pager logon'
+			 */
 			throw new IllegalStateException(
 					"I received a LOGON packet outside of the logging in proces. Don't know how to interpret this.");
 		}
