@@ -2657,15 +2657,6 @@ public class Session implements StatusConstants {
 	}
 
 	/**
-	 * Process and incoming PING packet. When logging in under v10, this packet
-	 * is sent appended to a LOGON. It contains only two fields, 143 and 144.
-	 * Purpose as yet unknown.
-	 */
-	protected void receivePing(YMSG9Packet pkt) // 0x12
-	{
-	}
-
-	/**
 	 * Process and incoming USERSTAT packet.
 	 */
 	protected void receiveUserStat(YMSG9Packet pkt) // 0x0a
