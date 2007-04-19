@@ -18,7 +18,8 @@
  */
 package org.openymsg.network;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is nothing more than a convenient data structure to hold the
@@ -187,7 +188,7 @@ class YMSG9Packet {
 	// appended to the end of this packet.
 	// FIX: Not thread safe (reading array while copies are taking place)
 	void merge(YMSG9Packet pkt, String[] concatFields) {
-		Vector<String> appendBuffer = new Vector<String>();
+		List<String> appendBuffer = new ArrayList<String>();
 
 		for (int i = 0; i < pkt.body.length; i += 2) {
 			// Get next key/value
@@ -208,23 +209,23 @@ class YMSG9Packet {
 					// No! Forget about the merge, just append to list
 					// FIX: what happens if two such fields appear in the same
 					// packet - one will overwrite the other? (Can this happen?)
-					appendBuffer.addElement(k);
-					appendBuffer.addElement(pkt.body[i + 1]);
+					appendBuffer.add(k);
+					appendBuffer.add(pkt.body[i + 1]);
 				} else {
 					// Yes! Merge!
 					body[idx + 1] = body[idx + 1] + v;
 				}
 			} else {
 				// Append new body field to current body field
-				appendBuffer.addElement(k);
-				appendBuffer.addElement(pkt.body[i + 1]);
+				appendBuffer.add(k);
+				appendBuffer.add(pkt.body[i + 1]);
 			}
 		}
 		if (appendBuffer.size() > 0) {
 			String[] arr = new String[body.length + appendBuffer.size()];
 			System.arraycopy(body, 0, arr, 0, body.length);
 			for (int i = 0; i < appendBuffer.size(); i++)
-				arr[body.length + i] = appendBuffer.elementAt(i);
+				arr[body.length + i] = appendBuffer.get(i);
 			body = arr;
 		}
 	}

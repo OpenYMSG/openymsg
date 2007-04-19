@@ -21,7 +21,8 @@ package org.openymsg.network;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A YMSG9 packet has a 20 byte fixed format header. The first four bytes are
@@ -80,7 +81,7 @@ public class YMSG9InputStream extends BufferedInputStream {
 			throw new IOException("Bad YMSG9 header");
 
 		// Read the body
-		Vector<String> v = new Vector<String>();
+		List<String> v = new ArrayList<String>();
 		byte[] body = new byte[p.length];
 		if (readBuffer(body) < 0)
 			return null;
@@ -95,9 +96,9 @@ public class YMSG9InputStream extends BufferedInputStream {
 				if (keyPos) {
 					s = cleanse(s);
 					if (isKey(s))
-						v.addElement(s);
+						v.add(s);
 				} else
-					v.addElement(s);
+					v.add(s);
 				keyPos = !keyPos;
 				// Skip over second byte in separator, reset string start
 				i++;
@@ -108,7 +109,7 @@ public class YMSG9InputStream extends BufferedInputStream {
 		// onto the end of some chat packets. This creates a key '0'
 		// without a value. So, check for odd size and delete last index.
 		if ((v.size() % 2) != 0)
-			v.removeElementAt(v.size() - 1);
+			v.remove(v.size() - 1);
 		// Convert the collection into an array
 		p.body = new String[v.size()];
 		p.body = v.toArray(p.body);

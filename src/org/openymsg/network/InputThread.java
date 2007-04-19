@@ -20,7 +20,7 @@ package org.openymsg.network;
 
 import java.io.IOException;
 import java.net.SocketException;
-import java.util.Vector;
+import java.util.Queue;
 
 import org.openymsg.network.event.SessionConferenceEvent;
 
@@ -209,7 +209,7 @@ public class InputThread extends Thread {
 		case Y6_STATUS_UPDATE:
 			parentSession.receiveStatusUpdate(pkt);
 			break;
-			
+
 		default:
 			throw new IllegalArgumentException(
 					"Don't know how to handle service type '" + pkt.service
@@ -285,9 +285,9 @@ public class InputThread extends Thread {
 				parentSession.fire(se, ServiceType.CONFINVITE);
 			// Set invited status and work through buffered conference
 			synchronized (yc) {
-				Vector<YMSG9Packet> v = yc.inviteReceived();
-				for (int i = 0; i < v.size(); i++) {
-					process(v.elementAt(i));
+				Queue<YMSG9Packet> buffer = yc.inviteReceived();
+				for (YMSG9Packet packet : buffer) {
+					process(packet);
 				}
 			}
 		} catch (Exception e) {

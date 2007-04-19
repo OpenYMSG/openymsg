@@ -18,7 +18,10 @@
  */
 package org.openymsg.network;
 
-import java.util.Vector;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
 
 /**
  * As conference packets can be received in an inconvenient order, this class
@@ -42,13 +45,13 @@ import java.util.Vector;
  */
 public class YahooConference // Cannot be serialised
 {
-	protected Vector<YahooUser> users; // YahooUser's in this conference
+	protected Set<YahooUser> users; // YahooUser's in this conference
 
 	protected String room; // Room name
 
 	private boolean closed; // Conference has been exited?
 
-	private Vector<YMSG9Packet> packetBuffer; // Buffer packets before invite
+	private Queue<YMSG9Packet> packetBuffer; // Buffer packets before invite
 
 	private Session parent; // Parent session object
 
@@ -66,12 +69,12 @@ public class YahooConference // Cannot be serialised
 			boolean b) {
 		userStore = us;
 		identity = yid;
-		users = new Vector<YahooUser>();
+		users = new HashSet<YahooUser>();
 		parent = ss;
 		room = r;
 		closed = false;
 		if (b)
-			packetBuffer = new Vector<YMSG9Packet>();
+			packetBuffer = new LinkedList<YMSG9Packet>();
 		else
 			packetBuffer = null;
 	}
@@ -99,8 +102,8 @@ public class YahooConference // Cannot be serialised
 		return closed;
 	}
 
-	public Vector<YahooUser> getMembers() {
-		return new Vector<YahooUser>(users);
+	public Set<YahooUser> getMembers() {
+		return new HashSet<YahooUser>(users);
 	}
 
 	public YahooIdentity getIdentity() {
@@ -125,53 +128,81 @@ public class YahooConference // Cannot be serialised
 	}
 
 	// We're received an invite, change status and return buffer
-	Vector<YMSG9Packet> inviteReceived() {
-		Vector<YMSG9Packet> v = packetBuffer;
+	Queue<YMSG9Packet> inviteReceived() {
+		Queue<YMSG9Packet> v = new LinkedList<YMSG9Packet>(packetBuffer);
 		packetBuffer = null;
 		return v;
 	}
 
 	// Add a packet to the buffer
-	void addPacket(YMSG9Packet ev) {
+	void addPacket(YMSG9Packet packet) {
 		if (packetBuffer == null)
 			throw new IllegalStateException(
 					"Cannot buffer packets, invite already received");
-		packetBuffer.addElement(ev);
+		packetBuffer.add(packet);
 	}
 
 	/**
-	 * Add to and get user list
+	 * Returns all users in this conference.
+	 * 
+	 * @return All users in this conference
 	 */
-	Vector<YahooUser> getUsers() {
+	public Set<YahooUser> getUsers() {
 		return users;
 	}
 
+	/**
+	 * Adds an array of users (based on their usernames) to this conference.
+	 * 
+	 * @param usernames
+	 *            Names of all users to add
+	 */
 	synchronized void addUsers(String[] usernames) {
 		for (String username : usernames)
 			addUser(username);
 	}
 
-	synchronized void addUser(String u) {
-		if (!exists(u) && !parent.isValidYahooID(u)) {
-			users.addElement(userStore.getOrCreate(u));
+	/**
+	 * Adds a user (based on his username) to this conference.
+	 * 
+	 * @param username
+	 *            Name of the user to add
+	 */
+	synchronized void addUser(String username) {
+		if (!exists(username) && !parent.isValidYahooID(username)) {
+			users.add(userStore.getOrCreate(username));
 		}
 	}
 
-	synchronized void removeUser(String u) {
-		for (int i = 0; i < users.size(); i++) {
-			if (users.elementAt(i).getId().equals(u)) {
-				users.removeElementAt(i);
-				return;
+	/**
+	 * Removes a user from this conference.
+	 * 
+	 * @param username
+	 *            Name of the user to remove
+	 */
+	synchronized void removeUser(String username) {
+		YahooUser removeMe = null;
+		for (YahooUser user : users) {
+			if (user.getId().equals(username)) {
+				removeMe = user;
+				break;
 			}
+		}
+
+		if (removeMe != null) {
+			users.remove(removeMe);
 		}
 	}
 
 	/**
 	 * Does a user exist (uses .equals() on user id)
+	 * 
+	 * @return ''true'' if a user matching the username exists in this
+	 *         conference, ''false'' otherwise.
 	 */
-	private boolean exists(String s) {
+	private boolean exists(String username) {
 		for (YahooUser user : users) {
-			if (user.getId().equals(s)) {
+			if (user.getId().equals(username)) {
 				return true;
 			}
 		}

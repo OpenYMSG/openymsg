@@ -421,8 +421,7 @@ public class MutableMessageElement extends MessageElement implements
 			break; // Not supported by IM ?
 		}
 		for (int i = 0; i < children.size(); i++) {
-			MutableMessageElement el = (MutableMessageElement) children
-					.elementAt(i);
+			MutableMessageElement el = (MutableMessageElement) children.get(i);
 			el.toYahooIM(sb, colStack);
 		}
 		switch (type) {
@@ -506,8 +505,7 @@ public class MutableMessageElement extends MessageElement implements
 			break;
 		}
 		for (int i = 0; i < children.size(); i++) {
-			MutableMessageElement el = (MutableMessageElement) children
-					.elementAt(i);
+			MutableMessageElement el = (MutableMessageElement) children.get(i);
 			el.toYahooChat(sb, colStack);
 		}
 		switch (type) {
