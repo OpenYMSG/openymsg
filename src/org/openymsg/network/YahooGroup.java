@@ -93,9 +93,10 @@ public class YahooGroup {
 
 	@Override
 	public boolean equals(Object other) {
-		if (other instanceof YahooGroup)
+		if (other instanceof YahooGroup) {
 			return ((YahooGroup) other).getName().equals(this.getName());
-		else return super.equals(other);
+		}
+		return super.equals(other);
 	}
 
 
