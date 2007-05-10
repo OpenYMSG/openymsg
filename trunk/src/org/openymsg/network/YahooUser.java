@@ -155,9 +155,10 @@ public class YahooUser // Cannot be serialised
 
 	@Override
 	public boolean equals(Object other) {
-		if (other instanceof YahooUser)
+		if (other instanceof YahooUser) {
 			return  ((YahooUser) other).getId().equals(this.getId());
-		else return super.equals(other);
+		}
+		return super.equals(other);
 	}
 
 

@@ -36,7 +36,7 @@ public class StatusTest extends YahooTest{
 	}
 	
 	@Test
-	public void testChangeStatus() throws IllegalArgumentException, IOException, InterruptedException {
+	public void testChangeStatus() throws IllegalArgumentException, IOException {
 
 		boolean existinList = false;
 		for (String contact: sess1.getUsers().keySet()) 
@@ -72,7 +72,7 @@ public class StatusTest extends YahooTest{
 		sess2.login(OTHERUSR, OTHERPWD);
 	}
 	
-	private void changeStatus(Status status) throws IllegalArgumentException, IOException, InterruptedException {
+	private void changeStatus(Status status) throws IllegalArgumentException, IOException {
 		listener1.clearEvents();
 		sess2.setStatus(status);
 		FireEvent event = listener1.waitForEvent(5,ServiceType.Y6_STATUS_UPDATE);
