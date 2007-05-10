@@ -69,8 +69,7 @@ public class MessageTest {
 			assertEquals(USERNAME, event.getFrom());
 			assertEquals(message, event.getMessage());
 
-			message = "ç ë and Japanese chars: "
-					+ new String("\u65e5\u672c\u8a9e\u6587\u5b57\u5217");
+			message = "ç ë and Japanese chars: \u65e5\u672c\u8a9e\u6587\u5b57\u5217";
 			sender.sendMessage(RECIPIENT, message);
 			event = listener.waitForNextEvent(10000);
 			assertNotNull(event);
