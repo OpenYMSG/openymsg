@@ -24,6 +24,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
+
 /**
  * A YMSG9 packet has a 20 byte fixed format header. The first four bytes are
  * the magic code "YMSG". The next four contain the protocol version 0x09000000.
@@ -46,6 +49,7 @@ import java.util.List;
  * @author S.E. Morris
  */
 public class YMSG9InputStream extends BufferedInputStream {
+	Logger log = Logger.getLogger("org.openymsg");
 	public YMSG9InputStream(InputStream in) {
 		super(in);
 	}
@@ -114,6 +118,7 @@ public class YMSG9InputStream extends BufferedInputStream {
 		p.body = new String[v.size()];
 		p.body = v.toArray(p.body);
 
+		log.debug(p.toString());
 		return p;
 	}
 

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.util.Queue;
 
+import org.apache.log4j.Logger;
 import org.openymsg.network.event.SessionConferenceEvent;
 
 /**
@@ -35,6 +36,8 @@ public class InputThread extends Thread {
 	private volatile boolean quit = false; // Exit run in J2 compliant way
 
 	private final Session parentSession;
+
+	private static Logger log = Logger.getLogger("org.openymsg");
 
 	/**
 	 * Constructs a new thread that starts processing immediately.
@@ -69,11 +72,11 @@ public class InputThread extends Thread {
 					return;
 				}
 
-				e.printStackTrace();
+				log.error("error on process packet", e);
 				try {
 					parentSession.sendExceptionEvent(e, "Source: InputThread");
 				} catch (Exception e2) {
-					e2.printStackTrace();
+					log.error("error on sendException to the session", e2);
 				}
 
 				// IO exceptions? Close the connection!
@@ -206,9 +209,15 @@ public class InputThread extends Thread {
 		case Y6_STATUS_UPDATE:
 			parentSession.receiveStatusUpdate(pkt);
 			break;
+		case GROUPRENAME:
+			parentSession.receiveGroupRename(pkt);
+			break;
+		case CONTACTREJECT:
+			parentSession.receiveContactRejected(pkt);
+			break;
 
 		default:
-			throw new IllegalArgumentException(
+			log .warn(
 					"Don't know how to handle service type '" + pkt.service
 							+ "'. The original packet was: " + pkt.toString());
 		}

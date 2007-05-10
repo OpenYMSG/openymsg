@@ -18,6 +18,8 @@
  */
 package org.openymsg.network.event;
 
+import org.openymsg.network.FireEvent;
+
 /**
  * Empty-method implementation of the {@link SessionListener} interface. A
  * typical usage of this class would be to extend it, and override just that one
@@ -130,5 +132,111 @@ public class SessionAdapter implements SessionListener {
 
 	public void chatConnectionClosed(SessionEvent event) {
 		// override this function if you want to do something with it.
+	}
+
+	/**
+	 * Dispatches an event immediately to all listeners, instead of queuing. it.
+	 * 
+	 * @param event
+	 *            The event to be dispatched.
+	 */
+	public void dispatch(FireEvent event) {
+		final SessionEvent ev = event.getEvent();
+
+			switch (event.getType()) {
+			case LOGOFF:
+				connectionClosed(ev);
+				break;
+			case Y6_STATUS_UPDATE:
+				friendsUpdateReceived((SessionFriendEvent) ev);
+				break;
+			case MESSAGE:
+				messageReceived(ev);
+				break;
+			case X_OFFLINE:
+				offlineMessageReceived(ev);
+				break;
+			case NEWMAIL:
+				newMailReceived((SessionNewMailEvent) ev);
+				break;
+			case CONTACTNEW:
+				contactRequestReceived(ev);
+				break;
+			case CONFDECLINE:
+				conferenceInviteDeclinedReceived((SessionConferenceEvent) ev);
+				break;
+			case CONFINVITE:
+				conferenceInviteReceived((SessionConferenceEvent) ev);
+				break;
+			case CONFLOGON:
+				conferenceLogonReceived((SessionConferenceEvent) ev);
+				break;
+			case CONFLOGOFF:
+				conferenceLogoffReceived((SessionConferenceEvent) ev);
+				break;
+			case CONFMSG:
+				conferenceMessageReceived((SessionConferenceEvent) ev);
+				break;
+			case FILETRANSFER:
+				fileTransferReceived((SessionFileTransferEvent) ev);
+				break;
+			case NOTIFY:
+				notifyReceived((SessionNotifyEvent) ev);
+				break;
+			case LIST:
+				listReceived(ev);
+				break;
+			case FRIENDADD:
+				friendAddedReceived((SessionFriendEvent) ev);
+				break;
+			case FRIENDREMOVE:
+				friendRemovedReceived((SessionFriendEvent) ev);
+				break;
+			case GOTGROUPRENAME:
+				groupRenameReceived((SessionGroupEvent) ev);
+				break;
+			case CONTACTREJECT:
+				contactRejectionReceived(ev);
+				break;
+			case CHATJOIN:
+				chatJoinReceived((SessionChatEvent) ev);
+				break;
+			case CHATEXIT:
+				chatExitReceived((SessionChatEvent) ev);
+				break;
+			case CHATDISCONNECT:
+				chatConnectionClosed(ev);
+				break;
+			case CHATMSG:
+				chatMessageReceived((SessionChatEvent) ev);
+				break;
+			case X_CHATUPDATE:
+				chatUserUpdateReceived((SessionChatEvent) ev);
+				break;
+			case X_ERROR:
+				errorPacketReceived((SessionErrorEvent) ev);
+				break;
+			case X_EXCEPTION:
+				inputExceptionThrown((SessionExceptionEvent) ev);
+				break;
+			case X_BUZZ:
+				buzzReceived(ev);
+				break;
+			case LOGON:
+				logonReceived(ev);
+				break;
+			default:
+				throw new IllegalArgumentException(
+						"Don't know how to handle service type '"
+								+ event.getType() + "'");
+			}
+	}
+
+	/**
+	 * @param ev
+	 */
+	private void logonReceived(SessionEvent ev) {
+		// TODO Auto-generated method stub
+		
 	}
 }

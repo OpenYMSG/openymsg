@@ -69,7 +69,7 @@ public class UserStore {
 	 * @return A user matching the ID.
 	 */
 	public YahooUser getOrCreate(String id) {
-		if (!contains(id))
+		if (!contains(id)) 
 			users.put(id, new YahooUser(id));
 		return get(id);
 	}

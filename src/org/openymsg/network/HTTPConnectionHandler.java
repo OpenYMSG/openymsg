@@ -28,12 +28,15 @@ import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Queue;
 
+import org.apache.log4j.Logger;
+
 /**
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
 public class HTTPConnectionHandler extends ConnectionHandler {
+	Logger log = Logger.getLogger("org.openymsg");
 	private final static long IDLE_TIMEOUT = 30 * 1000;
 
 	private static final String HTTP_HEADER_POST = "POST http://"
@@ -404,8 +407,7 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 					try {
 						session.transmitIdle();
 					} catch (IOException e) {
-						// FIX: what to do with this one?
-						e.printStackTrace();
+						log.error(e, e);
 					}
 				}
 			}
