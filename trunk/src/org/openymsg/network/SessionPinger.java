@@ -20,6 +20,8 @@ package org.openymsg.network;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
+
 /**
  * Runnable class that is responsible for sending ping packets to each session
  * component that needs to be pinged.
@@ -28,6 +30,7 @@ import java.io.IOException;
  */
 public class SessionPinger implements Runnable {
 
+	Logger log = Logger.getLogger("org.openymsg");
 	/**
 	 * The session to which the pings should be sent.
 	 */
@@ -54,7 +57,7 @@ public class SessionPinger implements Runnable {
 		try {
 			session.transmitPings();
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			log.error(ex,ex);
 		}
 	}
 }

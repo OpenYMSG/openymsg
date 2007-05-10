@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.apache.log4j.Logger;
+
 /**
  * A message element represents a low level segment of a decoded message. The
  * sections form a hierarchy, with zero or more sections nested inside a given
@@ -36,6 +38,7 @@ import java.util.StringTokenizer;
  * @author S.E. Morris
  */
 public class MessageElement {
+	Logger log = Logger.getLogger("org.openymsg");
 	public final static int NULL = -2; // No meaning
 
 	public final static int ROOT = -1; // Root section
@@ -106,7 +109,7 @@ public class MessageElement {
 				try {
 					fontSize = Integer.parseInt(s);
 				} catch (NumberFormatException e) {
-					e.printStackTrace();
+					log.error("size isn't a valid number",e);
 				}
 			if (fontFace == null)
 				type = NULL;

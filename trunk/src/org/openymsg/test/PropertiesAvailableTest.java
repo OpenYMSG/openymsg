@@ -25,6 +25,7 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.junit.Test;
 
 /**
@@ -39,6 +40,7 @@ public class PropertiesAvailableTest extends TestCase {
 			reader = new FileInputStream(
 					"resources/yahooAuthenticationForJUnitTests.properties");
 			props.load(reader);
+			PropertyConfigurator.configure("resources/log4j.properties");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

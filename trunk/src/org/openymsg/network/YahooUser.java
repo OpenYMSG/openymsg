@@ -18,6 +18,9 @@
  */
 package org.openymsg.network;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * This class represents a single canonical represenation of a user on Yahoo.
  * For each user there is only ever one single instance of this class - as
@@ -55,7 +58,7 @@ public class YahooUser // Cannot be serialised
 
 	protected boolean customStatusBusy; // Ditto
 
-	private int groupCount = 0; // Friends group count
+	private Set<YahooGroup> groups = new HashSet<YahooGroup>();
 
 	private long idleTime = -1; // Idle time (-1 = unknown)
 
@@ -93,8 +96,8 @@ public class YahooUser // Cannot be serialised
 		stealth = st;
 	}
 
-	public void adjustGroupCount(int inc) {
-		groupCount += inc;
+	public void addGroup(YahooGroup group) {
+		groups.add(group);
 	}
 
 	public String getId() {
@@ -138,7 +141,7 @@ public class YahooUser // Cannot be serialised
 	}
 
 	public boolean isFriend() {
-		return (groupCount > 0);
+		return (getGroups().size() > 0);
 	}
 
 	public long getIdleTime() {
@@ -147,28 +150,17 @@ public class YahooUser // Cannot be serialised
 
 	@Override
 	public String toString() {
-		return "YahooUser [ID=" + id + "]";
+		return "YahooUser [ID=" + id + ", status="+status.name()+", ignored="+ignored+", stealthBlock="+stealthBlock+", customStatusMessage="+customStatusMessage+", isFriend="+isFriend()+"]";
 	}
 
 	@Override
 	public boolean equals(Object other) {
-		if (this == other) {
-			return true;
-		}
-
-		if (!(other instanceof YahooUser)) {
-			return false;
-		}
-
-		return ((YahooUser) other).getId().equals(this.getId());
+		if (other instanceof YahooUser)
+			return  ((YahooUser) other).getId().equals(this.getId());
+		else return super.equals(other);
 	}
 
-	@Override
-	public int hashCode() {
-		int hash = 4133;
-		hash *= 37 + id.hashCode();
-		return hash;
-	}
+
 
 	/**
 	 * Updates the YahooUser with the new values.
@@ -212,4 +204,19 @@ public class YahooUser // Cannot be serialised
 			customStatusBusy = false;
 		}
 	}
+
+	/**
+	 * @return the groups
+	 */
+	public Set<YahooGroup> getGroups() {
+		return groups;
+	}
+
+	/**
+	 * @param groups the groups to set
+	 */
+	public void setGroups(Set<YahooGroup> groups) {
+		this.groups = groups;
+	}
+	
 }

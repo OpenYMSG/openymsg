@@ -18,6 +18,9 @@
  */
 package org.openymsg.network.event;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.openymsg.network.YahooUser;
 
 /**
@@ -28,25 +31,24 @@ import org.openymsg.network.YahooUser;
  * @author S.E. Morris
  */
 public class SessionFriendEvent extends SessionEvent {
-	protected YahooUser[] list;
+	protected Collection<YahooUser> users = new ArrayList<YahooUser>();
 
 	protected String group;
 
 	/**
 	 * CONSTRUCTORS
 	 */
-	public SessionFriendEvent(Object o, int sz) // Friends list update
+	public SessionFriendEvent(Object o) // Friends list update
 	{
 		super(o);
-		list = new YahooUser[sz];
 		group = null;
 	}
 
 	public SessionFriendEvent(Object o, YahooUser yu, String gp) // Friend
 	// added
 	{
-		this(o, 1);
-		setUser(0, yu);
+		this(o);
+		addUser(yu);
 		group = gp;
 	}
 
@@ -54,17 +56,25 @@ public class SessionFriendEvent extends SessionEvent {
 	 * Accessors
 	 */
 	// Friends update
-	public void setUser(int i, YahooUser yu) {
-		list[i] = yu;
+	public void addUser(YahooUser yu) {
+		users.add(yu);
 	}
 
-	public YahooUser[] getFriends() {
-		return list;
+	public Collection<YahooUser> getUsers() {
+		return users;
 	}
 
 	// Friend added
-	public YahooUser getFriend() {
-		return list[0];
+	public YahooUser getFirstUser() {
+		return users.iterator().next();
+	}
+	
+	public YahooUser getFriend(String id) {
+		for (YahooUser user: getUsers()) {
+			if(id.equals(user.getId()))
+				return user;
+		}
+		return null;
 	}
 
 	public String getGroup() {
@@ -73,16 +83,16 @@ public class SessionFriendEvent extends SessionEvent {
 
 	@Override
 	public String getFrom() {
-		return list[0].getId();
+		return getFirstUser().getId();
 	}
 
 	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer(super.toString());
-		if (list.length > 1)
-			sb.append(" list(size):").append(list.length);
+		if (users.size()> 1)
+			sb.append(" list(size):").append(users.size());
 		else
-			sb.append(" friend:").append(list[0].getId()).append(" group:")
+			sb.append(" friend:").append(getFirstUser().getId()).append(" group:")
 					.append(group);
 		return sb.toString();
 	}

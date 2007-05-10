@@ -66,20 +66,12 @@ public class YahooGroup {
 		users.add(yu);
 	}
 
-	public boolean contains(YahooUser yu) {
-		return users.contains(yu);
-	}
-
-	public void removeUser(YahooUser yu) {
-		users.remove(yu);
-	}
-
-	public boolean isEmpty() {
-		return users.isEmpty();
-	}
-
 	public String getName() {
 		return name;
+	}
+	
+	public void setName(String nm) {
+		name = nm;
 	}
 
 	public boolean isOpen() {
@@ -90,7 +82,7 @@ public class YahooGroup {
 		this.isOpen = isOpen;
 	}
 
-	public Set<YahooUser> getMembers() {
+	public Set<YahooUser> getUsers() {
 		return users;
 	}
 
@@ -101,23 +93,10 @@ public class YahooGroup {
 
 	@Override
 	public boolean equals(Object other) {
-		if (this == other) {
-			return true;
-		}
-
-		if (!(other instanceof YahooGroup)) {
-			return false;
-		}
-
-		return ((YahooGroup) other).getName().equals(this.getName());
+		if (other instanceof YahooGroup)
+			return ((YahooGroup) other).getName().equals(this.getName());
+		else return super.equals(other);
 	}
 
-	@Override
-	public int hashCode() {
-		int hash = 4133;
-		hash *= 37 + name.hashCode();
-		hash *= 37 + (isOpen ? 1231 : 1237);
-		hash *= 37 + users.hashCode();
-		return hash;
-	}
+
 }

@@ -45,6 +45,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
 import org.openymsg.network.chatroom.ChatroomManager;
 import org.openymsg.network.chatroom.YahooChatLobby;
@@ -78,7 +79,7 @@ public class Session implements StatusConstants {
 	private YahooIdentity loginID;
 
 	/** Map of alternative identities that can be used by this user. */
-	private final Map<String, YahooIdentity> identities = new HashMap<String, YahooIdentity>();
+	private Map<String, YahooIdentity> identities = new HashMap<String, YahooIdentity>();
 
 	/** Yahoo user password. */
 	private String password;
@@ -98,7 +99,7 @@ public class Session implements StatusConstants {
 	private boolean customStatusBusy;
 
 	/** Yahoo user's groups */
-	private final Set<YahooGroup> groups = new HashSet<YahooGroup>();
+	private Set<YahooGroup> groups = new HashSet<YahooGroup>();
 
 	/** Creating conference room names. */
 	private int conferenceCount;
@@ -130,16 +131,20 @@ public class Session implements StatusConstants {
 	/** For split packets in multiple parts */
 	private YMSG9Packet cachePacket;
 
-	private final ChatroomManager chatroomManager;
+	private  ChatroomManager chatroomManager;
 
 	/** Current conferences, hashed on room */
-	private final Hashtable<String, YahooConference> conferences = new Hashtable<String, YahooConference>();
+	private  Hashtable<String, YahooConference> conferences = new Hashtable<String, YahooConference>();
 
 	private SessionState chatSessionStatus;
 
 	private volatile YahooChatLobby currentLobby = null;
 
 	private YahooIdentity chatID;
+
+	private Set<SessionListener> sessionListeners = new HashSet<SessionListener>();
+
+	private static Logger log = Logger.getLogger("org.openymsg");
 
 	/**
 	 * Creates a new Session based on a ConnectionHandler as configured in the
@@ -183,9 +188,7 @@ public class Session implements StatusConstants {
 			}
 		}
 
-		chatroomManager = new ChatroomManager(null, null);
-		eventDispatchQueue = new EventDispatcher();
-		eventDispatchQueue.start();
+
 		status = Status.AVAILABLE;
 		sessionId = 0;
 		sessionStatus = SessionState.UNSTARTED;
@@ -207,7 +210,11 @@ public class Session implements StatusConstants {
 			throw new IllegalArgumentException(
 					"Argument 'sessionListener' cannot be null.");
 		}
-		eventDispatchQueue.addSessionListener(sessionListener);
+		sessionListeners.add(sessionListener);
+	}
+	
+	public Set<SessionListener> getSessionListeners(){
+		return sessionListeners ;
 	}
 
 	/**
@@ -222,7 +229,7 @@ public class Session implements StatusConstants {
 			throw new IllegalArgumentException(
 					"Argument 'sessionListener' cannot be null.");
 		}
-		eventDispatchQueue.removeSessionListener(sessionListener);
+		sessionListeners.remove(sessionListener);
 	}
 
 	/**
@@ -244,6 +251,15 @@ public class Session implements StatusConstants {
 	public void login(String username, String password)
 			throws IllegalStateException, IOException, AccountLockedException,
 			LoginRefusedException {
+		groups = new HashSet<YahooGroup>();
+		identities = new HashMap<String, YahooIdentity>();
+		conferences = new Hashtable<String, YahooConference>();
+		chatroomManager  = new ChatroomManager(null, null);
+		userStore = new UserStore();
+		if(eventDispatchQueue==null) { 
+			eventDispatchQueue = new EventDispatcher(this);		
+			eventDispatchQueue.start();
+		}
 		if (username == null || username.length() == 0) {
 			sessionStatus = SessionState.FAILED;
 			throw new IllegalArgumentException(
@@ -319,8 +335,13 @@ public class Session implements StatusConstants {
 	public synchronized void logout() throws IllegalStateException, IOException {
 		checkStatus();
 		sessionStatus = SessionState.UNSTARTED;
-		transmitLogoff();
-		network.close();
+		cachePacket = null;
+		try {
+			transmitLogoff();
+			network.close();
+		}finally {
+			closeSession();
+		}
 	}
 
 	/**
@@ -1442,7 +1463,7 @@ public class Session implements StatusConstants {
 		body.addElement("1", primaryID.getId()); // ???: effective id?
 		body.addElement("65", oldName);
 		body.addElement("67", newName);
-		sendPacket(body, ServiceType.GOTGROUPRENAME); // 0x13
+		sendPacket(body, ServiceType.GROUPRENAME); // 0x13
 	}
 
 	/**
@@ -1483,10 +1504,10 @@ public class Session implements StatusConstants {
 	 */
 	protected void transmitNewStatus() throws IOException {
 		final PacketBodyBuffer body = new PacketBodyBuffer();
-		body.addElement("10", String.valueOf(status.getValue()));
+		body.addElement("47", "1");
 		body.addElement("19", "");
-		body.addElement("97", "1");
-		sendPacket(body, ServiceType.Y6_STATUS_UPDATE, Status.AVAILABLE);
+		body.addElement("10", String.valueOf(status.getValue()));
+		sendPacket(body, ServiceType.Y6_STATUS_UPDATE);
 	}
 
 	/**
@@ -1496,11 +1517,8 @@ public class Session implements StatusConstants {
 	 */
 	protected void transmitNewCustomStatus() throws IOException {
 		final PacketBodyBuffer body = new PacketBodyBuffer();
-		body.addElement("10", "99");
 		body.addElement("19", customStatusMessage);
-		body.addElement("97", "1");
-		body.addElement("47", (customStatusBusy ? "1" : "0"));
-		body.addElement("187", "0");
+		body.addElement("10", "99");
 		sendPacket(body, ServiceType.Y6_STATUS_UPDATE, Status.AVAILABLE);
 	}
 
@@ -1565,10 +1583,25 @@ public class Session implements StatusConstants {
 	}
 
 	/**
+	 * notify to friend the typing start or end action
+	 * 
+	 * @param friend user whose sending message
+	 * @param isTyping true if start typing, false if typing end up 
+	 * @throws IOException
+	 */
+	public void sendTypingNotification(String friend, boolean isTyping) throws IOException {
+		transmitNotify(friend, primaryID.getId(), isTyping, " ", NOTIFY_TYPING);
+	}
+	/**
 	 * Transmit a NOTIFY packet. Could be used for all sorts of purposes, but
 	 * mainly games and typing notifications. Only typing is supported by this
 	 * API. The mode determines the type of notification, "TYPING" or "GAME";
-	 * msg holds the game name (or a single space if typing).
+	 * msg holds the game name (or a single space if typing).	 * @param friend
+	 * @param yid id
+	 * @param on true start typing, false stop typing
+	 * @param msg
+	 * @param mode 
+	 * @throws IOException
 	 */
 	protected void transmitNotify(String friend, String yid, boolean on,
 			String msg, String mode) throws IOException {
@@ -1889,7 +1922,7 @@ public class Session implements StatusConstants {
 			}
 			return; // ...to finally block
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("error on receveing Chat join ",e);
 			throw new YMSG9BadFormatException("chat login", pkt, e);
 		} finally {
 			// FIX: Not thread safe if multiple chatroom supported!
@@ -2098,9 +2131,9 @@ public class Session implements StatusConstants {
 				YahooUser yu = userStore.getOrCreate(n);
 				yu.setIgnored(ig);
 				// Fire event
-				SessionFriendEvent se = new SessionFriendEvent(this, 1);
-				se.setUser(0, yu);
-				eventDispatchQueue.append(se, ServiceType.ISAWAY);
+				SessionFriendEvent se = new SessionFriendEvent(this);
+				se.addUser(yu);
+				eventDispatchQueue.append(se, ServiceType.Y6_STATUS_UPDATE);
 			} else {
 				// Error
 				String m = "Contact ignore error: ";
@@ -2125,6 +2158,34 @@ public class Session implements StatusConstants {
 		}
 	}
 
+	protected void receiveContactRejected(YMSG9Packet pkt) {
+		String from = pkt.getValue("1");// from
+		log.debug(from+ " has rejected to been added like friend");
+		
+//		removeFriend(from);
+	}
+
+	/**
+	 * @param from
+	 */
+	private void removeFriend(String from) {
+		SessionEvent se = new SessionEvent(from	);
+		YahooUser user =  userStore.get(from);
+			if(user!=null) {
+				System.out.println("friend "+user.getId());
+				for(YahooGroup group: user.getGroups()) {
+					group.getUsers().remove(user);
+					if(group.getUsers().size()==0) {
+						getGroups().remove(group);
+						log.debug(group+ " removed");
+					}
+				}
+				userStore.getUsers().remove(from);
+				log.debug(from+ " removed");
+			}
+		log.debug("end removeFriend");
+		eventDispatchQueue.append(se, ServiceType.CONTACTREJECT);
+	}
 	/**
 	 * Process an incoming CONTACTNEW packet. We get one of these: (1) when
 	 * someone has added us to their friends list, giving us the chance to
@@ -2151,6 +2212,7 @@ public class Session implements StatusConstants {
 						pkt.getValue("3"), // from
 						pkt.getValue("14") // message
 				);
+				removeFriend(pkt.getValue("3"));
 				eventDispatchQueue.append(se, ServiceType.CONTACTREJECT);
 			} else
 			// Contact request
@@ -2266,10 +2328,15 @@ public class Session implements StatusConstants {
 		try {
 			String oldName = pkt.getValue("67");
 			String newName = pkt.getValue("65");
+			log.debug("old group:"+oldName+ " renamed in:"+newName);
 			if (oldName == null || newName == null)
 				return;
+			for (YahooGroup group : getGroups()) 
+				if(group.getName().equals(oldName))
+					group.setName(newName);
+			
 			SessionGroupEvent se = new SessionGroupEvent(this, oldName, newName);
-			eventDispatchQueue.append(se, ServiceType.GOTGROUPRENAME);
+			eventDispatchQueue.append(se, ServiceType.GROUPRENAME);
 		} catch (Exception e) {
 			throw new YMSG9BadFormatException("group rename", pkt, e);
 		}
@@ -2386,8 +2453,9 @@ public class Session implements StatusConstants {
 						final String k = st2.nextToken();
 						final YahooUser yu = userStore.getOrCreate(k);
 						group.addUser(yu);
-						yu.adjustGroupCount(+1);
+						yu.addGroup(group);
 					}
+					System.out.println("add new group from list "+group.toString());
 					groups.add(group);
 				}
 			}
@@ -2488,23 +2556,29 @@ public class Session implements StatusConstants {
 	 */
 	protected void receiveLogoff(YMSG9Packet pkt) // 0x02
 	{
-		// Is this packet about us, or one of our online friends?
-		if (!pkt.exists("7")) // About us
-		{
-			// Note: when this method returns, the input thread loop
-			// which called it exits.
-			sessionStatus = SessionState.UNSTARTED;
-			ipThread.stopMe();
-		} else
-		// About friends
-		{
-			// Process optional section, friends going offline
-			try {
-				updateFriendsStatus(pkt);
-			} catch (Exception e) {
-				throw new YMSG9BadFormatException("online friends in logoff",
-						pkt, e);
+		try {
+			// Is this packet about us, or one of our online friends?
+			if (!pkt.exists("7")) // About us
+			{
+				// Note: when this method returns, the input thread loop
+				// which called it exits.
+				sessionStatus = SessionState.UNSTARTED;
+				ipThread.stopMe();
+				eventDispatchQueue.append(ServiceType.LOGOFF);
+				closeSession();
+			} else
+			// About friends
+			{
+				// Process optional section, friends going offline
+				try {
+					updateFriendsStatus(pkt);
+				} catch (Exception e) {
+					throw new YMSG9BadFormatException("online friends in logoff",
+							pkt, e);
+				}
 			}
+		} catch (IOException e) {
+			log.error("error in receiveLogoff", e);
 		}
 	}
 
@@ -2523,8 +2597,9 @@ public class Session implements StatusConstants {
 			 * TODO: Wireshark hints that these packets might be related to
 			 * events like 'new mail' and 'pager logon'
 			 */
-			throw new IllegalStateException(
+			log.warn(
 					"I received a LOGON packet outside of the logging in proces. Don't know how to interpret this.");
+			return;
 		}
 		try {
 			// Is this packet about us, or one of our online friends?
@@ -2545,6 +2620,7 @@ public class Session implements StatusConstants {
 
 				sessionStatus = SessionState.LOGGED_ON;
 			}
+			eventDispatchQueue.append(ServiceType.LOGON);
 		}
 	}
 
@@ -2718,7 +2794,7 @@ public class Session implements StatusConstants {
 	/**
 	 * If the network isn't closed already, close it.
 	 */
-	void closeSession() throws IOException {
+	private void closeSession() throws IOException {
 		// Close the input thread (unless ipThread itself is calling us)
 		if (ipThread != null && Thread.currentThread() != ipThread) {
 			ipThread.stopMe();
@@ -2733,6 +2809,7 @@ public class Session implements StatusConstants {
 		}
 
 		eventDispatchQueue.kill();
+		eventDispatchQueue = null;
 		// If the network is open, close it
 		network.close();
 	}
@@ -2840,7 +2917,7 @@ public class Session implements StatusConstants {
 	 * ISBACK packets contain only one. Update the YahooUser details and fire
 	 * event.
 	 */
-	private void updateFriendsStatus(YMSG9Packet pkt) {
+	private  void updateFriendsStatus(YMSG9Packet pkt) {
 		// Online friends count, however count may be missing if == 1
 		// (Note: only LOGON packets have multiple friends)
 		String s = pkt.getValue("8");
@@ -2851,7 +2928,7 @@ public class Session implements StatusConstants {
 		// Process online friends data
 		if (s != null) {
 			int cnt = Integer.parseInt(s);
-			SessionFriendEvent se = new SessionFriendEvent(this, cnt);
+			SessionFriendEvent se = new SessionFriendEvent(this);
 			// Process each friend
 			for (int i = 0; i < cnt; i++) {
 				// Update user (do not create new user, as client may
@@ -2899,10 +2976,10 @@ public class Session implements StatusConstants {
 				// 192=Friends icon (checksum)
 				// ...
 				// Add to event object
-				se.setUser(i, yu);
+				se.addUser(yu);
 			}
 			// Fire event
-			eventDispatchQueue.append(se, ServiceType.ISAWAY);
+			eventDispatchQueue.append(se, ServiceType.Y6_STATUS_UPDATE);
 		}
 	}
 
@@ -2925,9 +3002,9 @@ public class Session implements StatusConstants {
 		}
 
 		// Add user if needs be
-		if (!addToThis.contains(yahooUser)) {
+		if (!addToThis.getUsers().contains(yahooUser)) {
 			addToThis.addUser(yahooUser);
-			yahooUser.adjustGroupCount(+1);
+			yahooUser.addGroup(addToThis);
 		}
 	}
 
@@ -2938,15 +3015,16 @@ public class Session implements StatusConstants {
 	private void deleteFriend(YahooUser user, String groupName) {
 		for (YahooGroup group : groups) {
 			if (group.getName().equalsIgnoreCase(groupName)) {
-				group.removeUser(user);
-				user.adjustGroupCount(-1);
+				group.getUsers().remove(user);
+				user.getGroups().remove(group);
 				// If the groups is empty, remove it too
-				if (group.isEmpty()) {
-					groups.remove(group);
-				}
+				if (group.getUsers().isEmpty()) 
+					if(!groups.remove(group))
+						log.debug(" group "+group.getName()+" not removed, check it!");
 				break;
 			}
 		}
+		userStore.getUsers().remove(user.getId());
 	}
 
 	/**

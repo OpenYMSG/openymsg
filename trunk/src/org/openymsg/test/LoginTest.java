@@ -23,9 +23,11 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.openymsg.network.LoginRefusedException;
+import org.openymsg.network.ServiceType;
 import org.openymsg.network.Session;
 import org.openymsg.network.SessionState;
 import org.openymsg.network.YahooException;
+import org.openymsg.network.event.WaitListener;
 
 /**
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
@@ -189,12 +191,16 @@ public class LoginTest {
 	public void testLoginLogoutAndLoginAgainUsingTheSameSessionObject()
 			throws Exception {
 		final Session session = new Session();
+		WaitListener wl = new WaitListener(session);
 		assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
 		session.login(USERNAME, PASSWORD);
+		wl.waitForEvent(5, ServiceType.LOGON);
 		assertEquals(SessionState.LOGGED_ON, session.getSessionStatus());
 		session.logout();
+		Thread.sleep(500);
 		assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
 		session.login(USERNAME, PASSWORD);
+		wl.waitForEvent(5, ServiceType.LOGON);
 		assertEquals(SessionState.LOGGED_ON, session.getSessionStatus());
 		session.logout();
 		assertEquals(SessionState.UNSTARTED, session.getSessionStatus());

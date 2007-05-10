@@ -18,22 +18,14 @@
  */
 package org.openymsg.network;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
-import org.openymsg.network.event.SessionChatEvent;
-import org.openymsg.network.event.SessionConferenceEvent;
-import org.openymsg.network.event.SessionErrorEvent;
+import org.apache.log4j.Logger;
 import org.openymsg.network.event.SessionEvent;
 import org.openymsg.network.event.SessionExceptionEvent;
-import org.openymsg.network.event.SessionFileTransferEvent;
-import org.openymsg.network.event.SessionFriendEvent;
-import org.openymsg.network.event.SessionGroupEvent;
 import org.openymsg.network.event.SessionListener;
-import org.openymsg.network.event.SessionNewMailEvent;
-import org.openymsg.network.event.SessionNotifyEvent;
 
 /**
  * Dispatcher for events that are fired. Events that get fired are broadcasted
@@ -49,43 +41,16 @@ import org.openymsg.network.event.SessionNotifyEvent;
 public class EventDispatcher extends Thread {
 	private volatile boolean quitFlag = false;
 
-	// registered event listeners
-	private volatile Collection<SessionListener> listeners;
+	Logger log = Logger.getLogger("org.openymsg");
 
 	// queue of events that are going to be fired.
-	private volatile Queue<FireEvent> queue;
+	private volatile BlockingQueue<FireEvent> queue = new ArrayBlockingQueue<FireEvent>(50);
 
-	public EventDispatcher() {
+	private Session session;
+
+	public EventDispatcher(Session session) {
 		super("jYMSG Event Dispatcher thread");
-		listeners = new HashSet<SessionListener>();
-		queue = new LinkedList<FireEvent>();
-	}
-
-	/**
-	 * Adds a session listener to the collection of listeners to which events
-	 * are dispatched.
-	 * 
-	 * @param sessionListener
-	 *            SessionListener to be added.
-	 * @return Returns ''true'' if this collection changed as a result of the
-	 *         call. (Returns false if this collection does not permit
-	 *         duplicates and already contains the specified element.)
-	 */
-	public boolean addSessionListener(SessionListener sessionListener) {
-		return listeners.add(sessionListener);
-	}
-
-	/**
-	 * Removes the listener from the collection of listeners to which events are
-	 * dispatched.
-	 * 
-	 * @param sessionListener
-	 *            The SessionListener to be removed
-	 * @return Returns ''true'' if this collection changed as a result of the
-	 *         call.
-	 */
-	public boolean removeSessionListener(SessionListener sessionListener) {
-		return listeners.remove(sessionListener);
+		this.session = session;
 	}
 
 	/**
@@ -93,10 +58,13 @@ public class EventDispatcher extends Thread {
 	 * events. No new events can be queued after calling this method.
 	 */
 	public void kill() {
-		synchronized (queue) {
-			quitFlag = true;
-			queue.notifyAll();
-		}
+		quitFlag = true;
+	}
+	
+	public void append(ServiceType type) {
+		if (!queue.offer(new FireEvent(null, type))) 
+			throw new IllegalStateException(
+			"Unable to offer an event to the eventqueue.");
 	}
 
 	/**
@@ -111,152 +79,53 @@ public class EventDispatcher extends Thread {
 	public void append(SessionEvent event, ServiceType type) {
 		if (event == null) {
 			throw new IllegalArgumentException(
-					"Argument 'event' cannot be null.");
+			"Argument 'event' cannot be null.");
 		}
 
 		if (type == null) {
 			throw new IllegalArgumentException(
-					"Argument 'type' cannot be null.");
+			"Argument 'type' cannot be null.");
 		}
 
 		if (quitFlag) {
 			throw new IllegalStateException(
-					"No new events can be queued, because the dispatcher is being closed.");
+			"No new events can be queued, because the dispatcher is being closed.");
 		}
 
-		synchronized (queue) {
-			if (!queue.offer(new FireEvent(event, type))) {
-				throw new IllegalStateException(
-						"Unable to offer an event to the eventqueue.");
-			}
-			queue.notifyAll();
-		}
+		if (!queue.offer(new FireEvent(event, type))) 
+			throw new IllegalStateException(
+			"Unable to offer an event to the eventqueue.");
 	}
 
-	/**
-	 * Dispatches an event immediately to all listeners, instead of queuing. it.
-	 * 
-	 * @param event
-	 *            The event to be dispatched.
-	 */
-	private void dispatch(FireEvent event) {
-		final SessionEvent ev = event.getEvent();
 
-		for (SessionListener l : listeners) {
-			switch (event.getType()) {
-			case LOGOFF:
-				l.connectionClosed(ev);
-				break;
-			case ISAWAY:
-				l.friendsUpdateReceived((SessionFriendEvent) ev);
-				break;
-			case MESSAGE:
-				l.messageReceived(ev);
-				break;
-			case X_OFFLINE:
-				l.offlineMessageReceived(ev);
-				break;
-			case NEWMAIL:
-				l.newMailReceived((SessionNewMailEvent) ev);
-				break;
-			case CONTACTNEW:
-				l.contactRequestReceived(ev);
-				break;
-			case CONFDECLINE:
-				l.conferenceInviteDeclinedReceived((SessionConferenceEvent) ev);
-				break;
-			case CONFINVITE:
-				l.conferenceInviteReceived((SessionConferenceEvent) ev);
-				break;
-			case CONFLOGON:
-				l.conferenceLogonReceived((SessionConferenceEvent) ev);
-				break;
-			case CONFLOGOFF:
-				l.conferenceLogoffReceived((SessionConferenceEvent) ev);
-				break;
-			case CONFMSG:
-				l.conferenceMessageReceived((SessionConferenceEvent) ev);
-				break;
-			case FILETRANSFER:
-				l.fileTransferReceived((SessionFileTransferEvent) ev);
-				break;
-			case NOTIFY:
-				l.notifyReceived((SessionNotifyEvent) ev);
-				break;
-			case LIST:
-				l.listReceived(ev);
-				break;
-			case FRIENDADD:
-				l.friendAddedReceived((SessionFriendEvent) ev);
-				break;
-			case FRIENDREMOVE:
-				l.friendRemovedReceived((SessionFriendEvent) ev);
-				break;
-			case GOTGROUPRENAME:
-				l.groupRenameReceived((SessionGroupEvent) ev);
-				break;
-			case CONTACTREJECT:
-				l.contactRejectionReceived(ev);
-				break;
-			case CHATJOIN:
-				l.chatJoinReceived((SessionChatEvent) ev);
-				break;
-			case CHATEXIT:
-				l.chatExitReceived((SessionChatEvent) ev);
-				break;
-			case CHATDISCONNECT:
-				l.chatConnectionClosed(ev);
-				break;
-			case CHATMSG:
-				l.chatMessageReceived((SessionChatEvent) ev);
-				break;
-			case X_CHATUPDATE:
-				l.chatUserUpdateReceived((SessionChatEvent) ev);
-				break;
-			case X_ERROR:
-				l.errorPacketReceived((SessionErrorEvent) ev);
-				break;
-			case X_EXCEPTION:
-				l.inputExceptionThrown((SessionExceptionEvent) ev);
-				break;
-			case X_BUZZ:
-				l.buzzReceived(ev);
-				break;
-			default:
-				throw new IllegalArgumentException(
-						"Don't know how to handle service type '"
-								+ event.getType() + "'");
-			}
-		}
-	}
 
 	@Override
 	public void run() {
-		synchronized (queue) {
-			while (!quitFlag) {
-				try {
-					// Sleep, surrendering lock on queue, until something to
-					// process
-					queue.wait();
-					// Acquire lock, and process queue, then clear it
-					FireEvent event;
-					while ((event = queue.poll()) != null) {
+		while (!quitFlag) {
+			FireEvent event;
+			try {
+				event = queue.poll(50,TimeUnit.MILLISECONDS);
+				if(event!= null) {
+					try {
+						for (SessionListener l : session.getSessionListeners()) 
+							l.dispatch(event);
+					} catch (Exception e) {
+						log.error(e, e);
 						try {
-							dispatch(event);
-						} catch (Exception e) {
-							try {
-								dispatch(new FireEvent(
+							for (SessionListener l : session.getSessionListeners()) {
+								l.dispatch(new FireEvent(
 										new SessionExceptionEvent(this,
 												"Source: EventDispatcher", e),
-										ServiceType.X_EXCEPTION));
-							} catch (Exception e2) {
-								e2.printStackTrace();
+												ServiceType.X_EXCEPTION));
+
 							}
+						} catch (Exception e2) {
+							log.error(e, e2);
 						}
 					}
-				} catch (InterruptedException e) {
-					// ignore
 				}
+			} catch (InterruptedException e) {
+				log.error(e, e);
 			}
 		}
 	}
