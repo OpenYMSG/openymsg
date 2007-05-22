@@ -22,6 +22,7 @@ import static junit.framework.Assert.assertNotNull;
 
 import java.util.Date;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.openymsg.network.chatroom.ChatroomManager;
 import org.openymsg.network.chatroom.YahooChatCategory;
@@ -32,6 +33,8 @@ import org.openymsg.network.chatroom.YahooChatRoom;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
 public class ChatroomManagerTest {
+	private static Logger log = Logger.getLogger(ChatroomManagerTest.class);
+	
 	@Test
 	public void testDefaultChatroomManager() throws Exception {
 		new ChatroomManager(null, null);
@@ -48,7 +51,7 @@ public class ChatroomManagerTest {
 		final Date start = new Date();
 		final ChatroomManager manager = new ChatroomManager(null, null);
 		final YahooChatCategory root = manager.loadCategories();
-		System.out.println("Loading categories in "
+		log.info("Loading categories in "
 				+ (new Date().getTime() - start.getTime()) + " milliseconds.");
 		testCategory(root);
 		// prettyPrint(root);
@@ -69,20 +72,20 @@ public class ChatroomManagerTest {
 
 	@SuppressWarnings("unused")
 	private void prettyPrint(YahooChatCategory category) throws Exception {
-		System.out.println(" ");
-		System.out.println(category.toString());
+		log.info(" ");
+		log.info(category.toString());
 		category.loadRooms();
 		for (YahooChatCategory subCategory : category.getSubcategories()) {
 			prettyPrint(subCategory);
 		}
 
 		if (category.getPrivateRooms().size() > 0) {
-			System.out.println("Private rooms:");
+			log.info("Private rooms:");
 			for (YahooChatRoom room : category.getPrivateRooms()) {
 				if (room.lobbyCount() > 0) {
-					System.out.println(" " + room.toString());
+					log.info(" " + room.toString());
 					for (YahooChatLobby lobby : room.getLobbies()) {
-						System.out.println("   " + lobby.getNetworkName()
+						log.info("   " + lobby.getNetworkName()
 								+ " users: " + lobby.getReportedUsers()
 								+ " voices: " + lobby.getReportedVoices()
 								+ " webcams: " + lobby.getReportedWebcams());
@@ -92,12 +95,12 @@ public class ChatroomManagerTest {
 		}
 
 		if (category.getPublicRooms().size() > 0) {
-			System.out.println("Public rooms:");
+			log.info("Public rooms:");
 			for (YahooChatRoom room : category.getPublicRooms()) {
 				if (room.lobbyCount() > 0) {
-					System.out.println(" " + room.toString());
+					log.info(" " + room.toString());
 					for (YahooChatLobby lobby : room.getLobbies()) {
-						System.out.println("   " + lobby.getNetworkName()
+						log.info("   " + lobby.getNetworkName()
 								+ " users: " + lobby.getReportedUsers()
 								+ " voices: " + lobby.getReportedVoices()
 								+ " webcams: " + lobby.getReportedWebcams());

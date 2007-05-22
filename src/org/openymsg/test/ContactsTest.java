@@ -12,6 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.openymsg.network.AccountLockedException;
 import org.openymsg.network.FireEvent;
@@ -26,15 +27,13 @@ import org.openymsg.network.YahooUser;
  */
 public class ContactsTest extends YahooTest{
 
-
-
+	private static Logger log = Logger.getLogger(ContactsTest.class);
 
 	@Test
 	public void testAddContact() throws IllegalStateException, IOException {
 		removeAll(sess1);
 		removeAll(sess2);
 		addfriend();
-
 	}
 
 	/**
@@ -68,7 +67,7 @@ public class ContactsTest extends YahooTest{
 		assertNotNull(listener1.waitForEvent(5,ServiceType.CONTACTREJECT));
 		boolean existinList = false;
 		for (String contact: sess1.getUsers().keySet()) {
-			System.out.println("still friend:"+contact);
+			log.info("still friend:"+contact);
 			if(contact.equals(OTHERUSR))
 				existinList=true;
 		}

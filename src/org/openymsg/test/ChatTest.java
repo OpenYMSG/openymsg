@@ -75,16 +75,16 @@ public class ChatTest extends YahooTest{
 //		YahooChatLobby find = findLobby(root);
 //		if(find!=null) {
 //			sess1.chatLogin(find);
-//			System.out.println(listener1.waitForEvent(5));
+//			log.info(listener1.waitForEvent(5));
 //		}
 //	}
 //	private YahooChatLobby findLobby(YahooChatCategory cat) throws Exception {
-//		System.out.println("category:"+cat.getName());
+//		log.info("category:"+cat.getName());
 //		YahooChatLobby ret = null;
 //		for (YahooChatCategory category : cat.getSubcategories()) {
 //			category.loadRooms();
 //			for (YahooChatRoom room : category.getPublicRooms()) {
-//				System.out.println("public rooms : "+room.getName());
+//				log.info("public rooms : "+room.getName());
 //				for (YahooChatLobby lobby : room.getLobbies()) {
 //					ret = lobby;
 //					break;
