@@ -2170,9 +2170,9 @@ public class Session implements StatusConstants {
 	 */
 	private void removeFriend(String from) {
 		SessionEvent se = new SessionEvent(from	);
-		YahooUser user =  userStore.get(from);
+		YahooUser user = userStore.get(from);
 			if(user!=null) {
-				System.out.println("friend "+user.getId());
+				log.debug("friend " + user.getId() + " being removed.");
 				for(YahooGroup group: user.getGroups()) {
 					group.getUsers().remove(user);
 					if(group.getUsers().size()==0) {
@@ -2455,7 +2455,7 @@ public class Session implements StatusConstants {
 						group.addUser(yu);
 						yu.addGroup(group);
 					}
-					System.out.println("add new group from list "+group.toString());
+					log.debug("add new group from list "+group.toString());
 					groups.add(group);
 				}
 			}
