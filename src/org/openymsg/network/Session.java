@@ -2170,9 +2170,9 @@ public class Session implements StatusConstants {
 	 */
 	private void removeFriend(String from) {
 		SessionEvent se = new SessionEvent(from	);
-		YahooUser user = userStore.get(from);
+		YahooUser user =  userStore.get(from);
 			if(user!=null) {
-				log.debug("friend " + user.getId() + " being removed.");
+				System.out.println("friend "+user.getId());
 				for(YahooGroup group: user.getGroups()) {
 					group.getUsers().remove(user);
 					if(group.getUsers().size()==0) {
@@ -2917,7 +2917,7 @@ public class Session implements StatusConstants {
 	 * ISBACK packets contain only one. Update the YahooUser details and fire
 	 * event.
 	 */
-	private  void updateFriendsStatus(YMSG9Packet pkt) {
+	public  void updateFriendsStatus(YMSG9Packet pkt) {
 		// Online friends count, however count may be missing if == 1
 		// (Note: only LOGON packets have multiple friends)
 		String s = pkt.getValue("8");
@@ -2933,7 +2933,11 @@ public class Session implements StatusConstants {
 			for (int i = 0; i < cnt; i++) {
 				// Update user (do not create new user, as client may
 				// still have reference to old)
-				YahooUser yu = userStore.get(pkt.getNthValue("7", i));
+				String val = pkt.getNthValue("7", i);
+				//prevent 'wrong' counter field
+				if(val==null)
+					continue;
+				YahooUser yu = userStore.get(val);
 				// When we add a friend, we get a status update before
 				// getting a confirmation FRIENDADD packet (crazy!)
 				if (yu == null) {
