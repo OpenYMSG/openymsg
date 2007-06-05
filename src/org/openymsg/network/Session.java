@@ -2172,7 +2172,6 @@ public class Session implements StatusConstants {
 		SessionEvent se = new SessionEvent(from	);
 		YahooUser user =  userStore.get(from);
 			if(user!=null) {
-				System.out.println("friend "+user.getId());
 				for(YahooGroup group: user.getGroups()) {
 					group.getUsers().remove(user);
 					if(group.getUsers().size()==0) {
