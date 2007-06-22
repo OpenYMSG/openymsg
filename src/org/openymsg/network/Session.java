@@ -2591,15 +2591,6 @@ public class Session implements StatusConstants {
 	 */
 	protected void receiveLogon(YMSG9Packet pkt) throws IOException // 0x01
 	{
-		if (sessionStatus != SessionState.CONNECTED) {
-			/*
-			 * TODO: Wireshark hints that these packets might be related to
-			 * events like 'new mail' and 'pager logon'
-			 */
-			log.warn(
-					"I received a LOGON packet outside of the logging in proces. Don't know how to interpret this.");
-			return;
-		}
 		try {
 			// Is this packet about us, or one of our online friends?
 			if (pkt.exists("7")) {
@@ -2618,8 +2609,8 @@ public class Session implements StatusConstants {
 				setStatus(status);
 
 				sessionStatus = SessionState.LOGGED_ON;
+				eventDispatchQueue.append(ServiceType.LOGON);
 			}
-			eventDispatchQueue.append(ServiceType.LOGON);
 		}
 	}
 

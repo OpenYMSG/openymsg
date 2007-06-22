@@ -76,6 +76,7 @@ public class YMSG9InputStream extends BufferedInputStream {
 		p.length = (u2i(header[8]) << 8) + (u2i(header[9]));
 		p.service = ServiceType.getServiceType((u2i(header[10]) << 8)
 				+ (u2i(header[11])));
+
 		p.status = (u2i(header[12]) << 24) + (u2i(header[13]) << 16)
 				+ (u2i(header[14]) << 8) + (u2i(header[15]));
 		p.sessionId = (u2i(header[16]) << 24) + (u2i(header[17]) << 16)
@@ -119,6 +120,8 @@ public class YMSG9InputStream extends BufferedInputStream {
 		p.body = v.toArray(p.body);
 
 		log.debug(p.toString());
+		if(p.service==null)
+			throw new UnknowServiceException(p);
 		return p;
 	}
 

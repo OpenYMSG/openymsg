@@ -18,6 +18,8 @@
  */
 package org.openymsg.network;
 
+import org.apache.log4j.Logger;
+
 /**
  * Enumeration of all ServiceType values, as found in the YMSG packets.
  * 
@@ -25,6 +27,9 @@ package org.openymsg.network;
  * @author S.E. Morris
  */
 public enum ServiceType {
+	/**
+	 * receive 'addFriend' command by an other user
+	 */
 	FRIENDADD(0x83),
 	ADDIDENT(0x10),
 	ADDIGNORE(0x11),
@@ -136,9 +141,10 @@ public enum ServiceType {
 			}
 		}
 
-		throw new IllegalArgumentException("No such ServiceType value '"
+		Logger.getLogger("org.openymsg").warn("No such ServiceType value '"
 				+ value + "' (which is '" + Integer.toHexString(value)
 				+ "' in hex).");
+		return null;
 	}
 
 	private final int value;

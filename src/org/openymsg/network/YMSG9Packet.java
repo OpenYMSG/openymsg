@@ -38,16 +38,16 @@ import java.util.List;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-class YMSG9Packet {
-	String magic; // Header 1
+public class YMSG9Packet {
+	public String magic; // Header 1
 
-	int version, length; // Header 2
+	public int version, length; // Header 2
 
-	ServiceType service;
+	public ServiceType service;
 
-	long status, sessionId; // Header 3
+	public long status, sessionId; // Header 3
 
-	String[] body; // Packet data body
+	public String[] body; // Packet data body
 
 	String quickSetAccessSeparator; // String used to break sets
 
