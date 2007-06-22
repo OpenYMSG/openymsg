@@ -66,6 +66,8 @@ public class InputThread extends Thread {
 		while (!quit) {
 			try {
 				process(parentSession.network.receivePacket());
+			}catch(UnknowServiceException e) {
+					log.warn("unknow packet: "+e.getPacket().toString());
 			} catch (Exception e) {
 				// ignore SocketExceptions if we're closing the thread.
 				if (quit && e instanceof SocketException) {
@@ -83,7 +85,7 @@ public class InputThread extends Thread {
 				if (e instanceof IOException) {
 					quit = true;
 				}
-			}
+			} 
 		}
 	}
 
