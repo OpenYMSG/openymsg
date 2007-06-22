@@ -18,6 +18,7 @@ import org.openymsg.network.AccountLockedException;
 import org.openymsg.network.FireEvent;
 import org.openymsg.network.LoginRefusedException;
 import org.openymsg.network.ServiceType;
+import org.openymsg.network.Status;
 import org.openymsg.network.YahooGroup;
 import org.openymsg.network.YahooUser;
 
@@ -29,11 +30,32 @@ public class ContactsTest extends YahooTest{
 
 	private static Logger log = Logger.getLogger(ContactsTest.class);
 
+
+
 	@Test
 	public void testAddContact() throws IllegalStateException, IOException {
 		removeAll(sess1);
 		removeAll(sess2);
 		addfriend();
+
+	}
+	
+	@Test
+	public void testReLoginFriendAndChangeStatusBuddy() throws IllegalStateException, IOException, AccountLockedException, LoginRefusedException, InterruptedException {
+		sess2.logout();
+		Thread.sleep(500);
+		YahooUser buddy = null;
+		for (String contact: sess1.getUsers().keySet()) 
+			if(contact.equals(OTHERUSR))
+				buddy = sess1.getUser(contact);
+		assertNotNull(buddy);
+		assertEquals(Status.OFFLINE, buddy.getStatus());
+		sess2.login(OTHERUSR, OTHERPWD);
+		Thread.sleep(500);
+		buddy = sess1.getUser(OTHERUSR);
+		assertNotNull(buddy);
+		assertEquals(Status.AVAILABLE, buddy.getStatus());
+		
 	}
 
 	/**
