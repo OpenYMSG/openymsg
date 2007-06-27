@@ -18,11 +18,8 @@
  */
 package org.openymsg.support;
 
-import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 
@@ -69,102 +66,37 @@ public class MessageElement {
 
 	protected List<MessageElement> children; // Contained sections
 
-	protected int fontSize; // Attributes
+	protected String text;
 
-	protected String fontFace, text; // Attributes
-
-	protected Color[] transition; // Fade/alt colours
-
-	protected Color colour;
-
-	private MessageDecoderSettings settings;
+	protected int colour;
 
 	static final String[] COLOUR_INDEXES = { "black", "blue", "cyan", "pink",
 			"green", "gray", "purple", "orange", "red", "brown", "yellow" };
 
-	static final Color[] COLOUR_OBJECTS = { Color.black, Color.blue,
-			Color.cyan, Color.pink, Color.green, Color.gray, Color.magenta,
-			Color.orange, Color.red, Color.lightGray, // FIX: ltGray
-			Color.yellow };
-
 	/**
 	 * CONSTRUCTORS
 	 */
-	protected MessageElement(MessageDecoderSettings set, int t) {
-		settings = set;
+	protected MessageElement(int t) {
 		type = t;
 		children = new ArrayList<MessageElement>();
 	}
 
-	protected MessageElement(MessageDecoderSettings set, int t, String body) {
-		this(set, t);
+	protected MessageElement(int t, String body) {
+		this(t);
 		switch (t) {
 		case TEXT:
 			text = body;
 			break;
-		case FONT:
-			fontFace = _attr(body, "face");
-			String s = _attr(body, "size");
-			if (s != null)
-				try {
-					fontSize = Integer.parseInt(s);
-				} catch (NumberFormatException e) {
-					log.error("size isn't a valid number",e);
-				}
-			if (fontFace == null)
-				type = NULL;
-			// Modify if conflicts with settings
-			if (settings != null) {
-				if (settings.overMaxFontSize >= 0
-						&& fontSize > settings.overMaxFontSize)
-					fontSize = settings.overMaxFontSize;
-				if (settings.overMinFontSize >= 0
-						&& fontSize < settings.overMinFontSize)
-					fontSize = settings.overMinFontSize;
-				if (settings.overFontFace != null)
-					fontFace = settings.overFontFace;
-			}
-			break;
-		case FADE:
-		case ALT:
-			StringTokenizer st = new StringTokenizer(body, ",");
-			transition = new Color[st.countTokens()];
-			int i = 0;
-			while (st.countTokens() > 0) {
-				String a = st.nextToken();
-				if (a.startsWith("#"))
-					a = a.substring(1);
-
-				try {
-					transition[i++] = new Color(Integer.parseInt(a, 16));
-				} catch (NumberFormatException e) {
-					transition[i - 1] = Color.black;
-				}
-			}
-			break;
-		case COLOUR_INDEX:
-			colour = COLOUR_OBJECTS[body.charAt(0) - '0'];
-			// Modify if conflicts with settings
-			if (settings != null && settings.overFg != null)
-				colour = settings.overFg;
-			break;
-		case COLOUR_ABS:
-			colour = new Color(Integer.parseInt(body, 16));
-			// Modify if conflicts with settings
-			if (settings != null && settings.overFg != null)
-				colour = settings.overFg;
-			break;
+		default:
+			// ignore all non-plain text stuff
 		}
 	}
 
-	protected MessageElement(MessageDecoderSettings def, int t, int num) {
-		this(def, t);
+	protected MessageElement(int t, int num) {
+		this(t);
 		switch (t) {
 		case COLOUR_NAME:
-			colour = COLOUR_OBJECTS[num];
-			// Modify if conflicts with settings
-			if (settings != null && settings.overFg != null)
-				colour = settings.overFg;
+			colour = num;
 			break;
 		}
 	}
@@ -172,21 +104,6 @@ public class MessageElement {
 	/**
 	 * Utility methods
 	 */
-	private String _attr(String haystack, String at) {
-		at = at + "=\"";
-		String lc = haystack.toLowerCase();
-
-		int idx = lc.indexOf(at);
-		if (idx >= 0) {
-			haystack = haystack.substring(idx + at.length());
-			idx = haystack.indexOf("\"");
-			if (idx >= 0)
-				haystack = haystack.substring(0, idx);
-			return haystack;
-		}
-		return null;
-	}
-
 	static int whichColourName(String n) {
 		for (int i = 0; i < COLOUR_INDEXES.length; i++) {
 			if (n.equals(COLOUR_INDEXES[i]))
@@ -196,19 +113,7 @@ public class MessageElement {
 	}
 
 	boolean colourEquals(int i) {
-		return (colour == COLOUR_OBJECTS[i]);
-	}
-
-	int childTextSize() {
-		int l = 0;
-		for (int i = 0; i < children.size(); i++) {
-			MessageElement e = children.get(i);
-			if (e.type == TEXT)
-				l += e.text.length();
-			else
-				l += e.childTextSize();
-		}
-		return l;
+		return (colour == i);
 	}
 
 	/**
@@ -218,88 +123,12 @@ public class MessageElement {
 		children.add(s);
 	}
 
-	/**
-	 * Translate to HTML
-	 */
-	public String toHTML() {
-		StringBuffer sb = new StringBuffer();
-		toHTML(sb);
-		return sb.toString();
-	}
-
-	private void toHTML(StringBuffer sb) {
-		switch (type) {
-		case NULL:
-			sb.append("<span>");
-			break;
-		case TEXT:
-			sb.append(text);
-			break;
-		case BOLD:
-			sb.append("<b>");
-			break;
-		case ITALIC:
-			sb.append("<i>");
-			break;
-		case COLOUR_INDEX:
-		case COLOUR_ABS:
-		case COLOUR_NAME:
-			sb.append("<font color=\"#").append("" + colour.getRGB()).append(
-					"\">");
-			break;
-		case UNDERLINE:
-			sb.append("<u>");
-			break;
-		case FONT:
-			sb.append("<font face=\"" + fontFace + "\" size=\"" + fontSize
-					+ "\">");
-			break;
-		case FADE:
-			sb.append("<span>");
-			break;
-		case ALT:
-			sb.append("<span>");
-			break;
-		}
-		for (int i = 0; i < children.size(); i++) {
-			MessageElement sc = children.get(i);
-			sc.toHTML(sb);
-		}
-		switch (type) {
-		case NULL:
-			sb.append("</span>");
-			break;
-		case BOLD:
-			sb.append("</b>");
-			break;
-		case ITALIC:
-			sb.append("</i>");
-			break;
-		case COLOUR_INDEX:
-		case COLOUR_ABS:
-		case COLOUR_NAME:
-			sb.append("</font>");
-			break;
-		case UNDERLINE:
-			sb.append("</u>");
-			break;
-		case FONT:
-			sb.append("</font>");
-			break;
-		case FADE:
-			sb.append("</span>");
-			break;
-		case ALT:
-			sb.append("</span>");
-			break;
-		}
-	}
 
 	/**
-	 * Translate to HTML
+	 * Translate to plain text
 	 */
 	public String toText() {
-		StringBuffer sb = new StringBuffer();
+		final StringBuffer sb = new StringBuffer();
 		toText(sb);
 		return sb.toString();
 	}
@@ -310,38 +139,6 @@ public class MessageElement {
 
 		for (MessageElement sc : children) {
 			sc.toText(sb);
-		}
-	}
-
-	@Override
-	public String toString() {
-		switch (type) {
-		case NULL:
-			return "[Null]";
-		case ROOT:
-			return "[Root]";
-		case TEXT:
-			return "Text:" + text;
-		case BOLD:
-			return "<b>";
-		case ITALIC:
-			return "<i>";
-		case COLOUR_INDEX:
-			return "<col @" + colour + ">";
-		case UNDERLINE:
-			return "<u>";
-		case FONT:
-			return "<font " + fontFace + ":" + fontSize + ">";
-		case FADE:
-			return "<fade " + Arrays.toString(transition) + ">";
-		case ALT:
-			return "<alt " + Arrays.toString(transition) + ">";
-		case COLOUR_ABS:
-			return "<col #" + colour + ">";
-		case COLOUR_NAME:
-			return "<col name #" + colour + ">";
-		default:
-			return "?";
 		}
 	}
 }
