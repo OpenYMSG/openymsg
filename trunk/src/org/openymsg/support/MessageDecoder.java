@@ -25,9 +25,8 @@ import java.util.Stack;
  * classes, accepting raw message strings from Yahoo, and translating them into
  * something a bit more Java-friendly.
  * 
- * Currently the decoder can translate messages into basic HTML (although fade
- * is not supported) and plain text (formatting stripped). It can also locate
- * smiley (or 'emoticon' as Yahoo calls them) text strings.
+ * Currently the decoder can translate messages into plain text only (formatting
+ * stripped).
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
@@ -41,8 +40,6 @@ public class MessageDecoder {
 
 	protected Stack<MessageElement> stack; // Element stack
 
-	private MessageDecoderSettings settings = null;
-
 	protected static final char ESC = 0x1b;
 
 	protected static final String ESC_SEQ = "\u001b[";
@@ -55,22 +52,6 @@ public class MessageDecoder {
 		stack = new Stack<MessageElement>();
 	}
 
-	public MessageDecoder(MessageDecoderSettings md) {
-		this();
-		settings = md;
-	}
-
-	/**
-	 * Accessors
-	 */
-	public void setDecoderSettings(MessageDecoderSettings md) {
-		settings = md;
-	}
-
-	public MessageDecoderSettings getDecoderSettings() {
-		return settings;
-	}
-
 	/**
 	 * Decode message
 	 */
@@ -80,8 +61,7 @@ public class MessageDecoder {
 		stack.removeAllElements();
 		pos = 0;
 
-		MessageElement section = new MessageElement(settings,
-				MessageElement.ROOT);
+		MessageElement section = new MessageElement(MessageElement.ROOT);
 		stack.push(section);
 
 		while (pos < msg.length) {
@@ -109,14 +89,6 @@ public class MessageDecoder {
 		return section;
 	}
 
-	/**
-	 * All-in-one decoder methods for convenience
-	 */
-	public String decodeToHTML(String m) {
-		MessageElement me = decode(m);
-		return me.toHTML();
-	}
-
 	public String decodeToText(String m) {
 		MessageElement me = decode(m);
 		return me.toText();
@@ -130,7 +102,7 @@ public class MessageDecoder {
 		pos += 6; // Skip over '<font '
 		int end = nextNonLiteral('>');
 		String s = new String(msg, pos, end - pos);
-		add(new MessageElement(settings, MessageElement.FONT, s));
+		add(new MessageElement(MessageElement.FONT, s));
 		pos = end;
 	}
 
@@ -139,7 +111,7 @@ public class MessageDecoder {
 		pos += 6; // Skip over '<FADE '
 		int end = nextNonLiteral('>');
 		String s = new String(msg, pos, end - pos);
-		add(new MessageElement(settings, MessageElement.FADE, s));
+		add(new MessageElement(MessageElement.FADE, s));
 		pos = nextNonLiteral('>');
 	}
 
@@ -148,7 +120,7 @@ public class MessageDecoder {
 		pos += 5; // Skip over '<ALT '
 		int end = nextNonLiteral('>');
 		String s = new String(msg, pos, end - pos);
-		add(new MessageElement(settings, MessageElement.ALT, s));
+		add(new MessageElement(MessageElement.ALT, s));
 		pos = nextNonLiteral('>');
 	}
 
@@ -164,17 +136,17 @@ public class MessageDecoder {
 			// Add a new section to stack
 			switch (c) {
 			case '1':
-				section = new MessageElement(settings, MessageElement.BOLD);
+				section = new MessageElement(MessageElement.BOLD);
 				break;
 			case '2':
-				section = new MessageElement(settings, MessageElement.ITALIC);
+				section = new MessageElement(MessageElement.ITALIC);
 				break;
 			case '3':
-				section = new MessageElement(settings,
-						MessageElement.COLOUR_INDEX, "" + msg[pos + 1]);
+				section = new MessageElement(MessageElement.COLOUR_INDEX, ""
+						+ msg[pos + 1]);
 				break;
 			case '4':
-				section = new MessageElement(settings, MessageElement.UNDERLINE);
+				section = new MessageElement(MessageElement.UNDERLINE);
 				break;
 			}
 			add(section);
@@ -200,7 +172,7 @@ public class MessageDecoder {
 		{
 			pos++;
 			String s = new String(msg, pos, 6);
-			section = new MessageElement(settings, MessageElement.COLOUR_ABS, s);
+			section = new MessageElement(MessageElement.COLOUR_ABS, s);
 			add(section);
 		}
 		pos = nextNonLiteral('m');
@@ -232,26 +204,26 @@ public class MessageDecoder {
 		// Is this a colour name? ie. <red> <blue> ...etc...
 		int i1 = MessageElement.whichColourName(s);
 		if (i1 >= 0) {
-			MessageElement section = new MessageElement(settings,
+			MessageElement section = new MessageElement(
 					MessageElement.COLOUR_NAME, i1);
 			add(section);
 			pos = end;
 		}
 		// Is this b i u or /b /i /u ?
 		else if (s.equals("b")) {
-			add(new MessageElement(settings, MessageElement.BOLD));
+			add(new MessageElement(MessageElement.BOLD));
 			pos++;
 		} else if (s.equals("/b")) {
 			remove(MessageElement.BOLD);
 			pos += 2;
 		} else if (s.equals("i")) {
-			add(new MessageElement(settings, MessageElement.ITALIC));
+			add(new MessageElement(MessageElement.ITALIC));
 			pos++;
 		} else if (s.equals("/i")) {
 			remove(MessageElement.ITALIC);
 			pos += 2;
 		} else if (s.equals("u")) {
-			add(new MessageElement(settings, MessageElement.UNDERLINE));
+			add(new MessageElement(MessageElement.UNDERLINE));
 			pos++;
 		} else if (s.equals("/u")) {
 			remove(MessageElement.UNDERLINE);
@@ -266,8 +238,7 @@ public class MessageDecoder {
 		}
 		// <#rrggbb> ?
 		else if (s.startsWith("#")) {
-			add(new MessageElement(settings, MessageElement.COLOUR_ABS, s
-					.substring(1)));
+			add(new MessageElement(MessageElement.COLOUR_ABS, s.substring(1)));
 			pos += 7;
 		} else {
 			// If we fail to identify the tag, put it out as text. We've
@@ -309,8 +280,8 @@ public class MessageDecoder {
 	private void addText() {
 		if (out.length() > 0) {
 			MessageElement me = stack.peek();
-			MessageElement me2 = new MessageElement(settings,
-					MessageElement.TEXT, out.toString());
+			MessageElement me2 = new MessageElement(MessageElement.TEXT, out
+					.toString());
 			me.addChild(me2);
 			out = new StringBuffer();
 		}
