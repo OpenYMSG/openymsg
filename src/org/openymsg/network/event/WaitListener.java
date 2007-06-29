@@ -36,9 +36,13 @@ public class WaitListener implements SessionListener {
 
 	/**
 	 * return the specific event based on type, waiting for max seconds time
+	 * 
 	 * @param seconds
+	 *            The amount of seconds to wait for the event.
 	 * @param type
-	 * @return
+	 *            The kind of event to wait for.
+	 * @return The Event that's received, or 'null' if no event was received
+	 *         within the specified time.
 	 */
 	public FireEvent waitForEvent(int seconds, ServiceType type){
 		try {
