@@ -18,8 +18,6 @@
  */
 package org.openymsg.network;
 
-import java.awt.Component;
-import java.awt.event.KeyEvent;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -121,8 +119,6 @@ public class Session implements StatusConstants {
 	private ScheduledFuture<?> pingerFuture;
 
 	private InputThread ipThread;
-
-	private final Hashtable<String, TypingNotifier> typingNotifiers = new Hashtable<String, TypingNotifier>();
 
 	private EventDispatcher eventDispatchQueue;
 
@@ -587,56 +583,6 @@ public class Session implements StatusConstants {
 			transmitIdActivate(yid.getId());
 		else
 			transmitIdDeactivate(yid.getId());
-	}
-
-	/**
-	 * Add/remove source AWT text component to use for TYPING packets sent to
-	 * the specified user, from a given identity. Each notifier is tied to both
-	 * target and source. Note: this method has now been changed so it no longer
-	 * needs an AWT component. 'com' can be null, with the API user employing
-	 * keyTyped() to manually send key strokes.
-	 * 
-	 * There's serious bug in Yahoo which means that even if you send a typing
-	 * notify packet with an alternate identity in it, Yahoo always delivers a
-	 * packet with the primary id. (Security/privacy bug?) For this reason these
-	 * methods do not *yet* support id's - however, as you'll see, the code is
-	 * all ready for an extra 'syid' parameter.
-	 * 
-	 * @param user
-	 * @param com
-	 */
-	public void addTypingNotification(String user, Component com) {
-		/* if(syid==null) syid=loginID */
-		final String syid = primaryID.getId();
-		final String key = "user" + "\n" + syid;
-		synchronized (typingNotifiers) {
-			if (typingNotifiers.containsKey(key))
-				return; // Aleady registered
-			typingNotifiers.put(key, new TypingNotifier(com, user, syid));
-		}
-	}
-
-	public void removeTypingNotification(String user) {
-		/* if(syid==null) syid=loginID */
-		final String syid = primaryID.getId();
-		final String key = "user" + "\n" + syid;
-		synchronized (typingNotifiers) {
-			final TypingNotifier tn = typingNotifiers.get(key);
-			if (tn == null)
-				return;
-			tn.quit = true;
-			tn.interrupt();
-			typingNotifiers.remove(key);
-		}
-	}
-
-	public void keyTyped(String user) {
-		/* if(syid==null) yid=loginID */
-		final String syid = primaryID.getId();
-		final String key = "user" + "\n" + syid;
-		final TypingNotifier tn = typingNotifiers.get(key);
-		if (tn != null)
-			tn.keyTyped();
 	}
 
 	/**
@@ -1575,11 +1521,6 @@ public class Session implements StatusConstants {
 		body.addElement("63", ";" + imvironment); // Not supported here!
 		body.addElement("64", "0");
 		sendPacket(body, ServiceType.MESSAGE, Status.OFFLINE); // 0x06
-
-		// If we have a typing notifier, inform it the typing has ended
-		TypingNotifier tn = typingNotifiers.get(to);
-		if (tn != null)
-			tn.stopTyping();
 	}
 
 	/**
@@ -2834,15 +2775,6 @@ public class Session implements StatusConstants {
 		conferences.clear();
 		groups.clear();
 		identities.clear();
-
-		synchronized (typingNotifiers) {
-			for (TypingNotifier notifier : typingNotifiers.values()) {
-				notifier.quit = true;
-				notifier.interrupt();
-			}
-			typingNotifiers.clear();
-		}
-
 		loginException = null;
 	}
 
@@ -3086,121 +3018,5 @@ public class Session implements StatusConstants {
 		}
 
 		eventDispatchQueue.append(event, type);
-	}
-
-	/**
-	 * Thread for sending typing start/stop packets There are two key components
-	 * here: The first is the keyPressed() method which timestamps the last
-	 * keypress from its source AWT component and sends typing start packets
-	 * when needed. The second is a thread which wakes infrequently to check if
-	 * the last timestamp is older than the timeout, and sends a typing end
-	 * packet if so.
-	 */
-	private class TypingNotifier extends java.awt.event.KeyAdapter implements
-			Runnable {
-		public volatile boolean quit = false; // Exit run in J2 compliant way
-
-		private volatile long lastKey; // Timestamp of last keypress
-
-		private volatile int timeout = 1000 * 30; // 30 second timeout
-
-		private volatile boolean typing = false; // Current typing mode
-
-		// (t=yes)
-
-		private Thread thread; // Timeout monitoring thread
-
-		private volatile Component typeSource; // Source of typing events
-
-		// private int listenerCnt=0; // Count how often we've been added
-		private volatile String target; // Yahoo id of target
-
-		private volatile String identity; // Yahoo id of sender
-
-		public TypingNotifier(Component com, String to, String from) {
-			typeSource = com;
-			target = to;
-			identity = from;
-			if (typeSource != null)
-				typeSource.addKeyListener(this);
-			thread = new Thread(this, "Typing Notification: " + from + "->"
-					+ to);
-			thread.setPriority(Thread.MIN_PRIORITY);
-			thread.start();
-		}
-
-		// KeyListener method
-		@Override
-		public void keyTyped(KeyEvent ev) {
-			keyTyped();
-		}
-
-		// Process a typed key
-		void keyTyped() {
-			// Just incase we get an event before the constructor finished
-			// or (more likely) we are actually connected to the network
-			if (!thread.isAlive() || sessionStatus != SessionState.LOGGED_ON)
-				return;
-			// Store time of key press and sent message is needed
-			lastKey = System.currentTimeMillis();
-			if (!typing) {
-				try {
-					transmitNotify(target, identity, true, " ", NOTIFY_TYPING);
-				} catch (IOException e) // IO problem? Event then exit thread
-				{
-					sendExceptionEvent(e, "Source: TypingNotifier");
-					quit = true;
-				}
-			}
-			typing = true;
-		}
-
-		// Thread to detect typing off (timeout)
-		public void run() {
-			try {
-				while (!quit) {
-					// Wake every second and check if typing ended
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						// ignore
-					}
-					// Currently typing, and timed out? (And logged on?)
-					if (sessionStatus == SessionState.LOGGED_ON && typing
-							&& System.currentTimeMillis() - lastKey > timeout) {
-						try {
-							transmitNotify(target, identity, false, " ",
-									NOTIFY_TYPING);
-						} catch (IOException e) // IO problem? Event then exit
-						// thread
-						{
-							sendExceptionEvent(e, "Source: TypingNotifier");
-							quit = true;
-						}
-						typing = false;
-					}
-				}
-			} finally {
-				if (typeSource != null)
-					typeSource.removeKeyListener(this);
-			}
-		}
-
-		public void interrupt() {
-			thread.interrupt();
-		}
-
-		public void stopTyping() {
-			if (typing) {
-				try {
-					transmitNotify(target, identity, false, " ", NOTIFY_TYPING);
-				} catch (IOException e) // IO problem? Event then exit thread
-				{
-					sendExceptionEvent(e, "Source: TypingNotifier");
-					quit = true;
-				}
-				typing = false;
-			}
-		}
 	}
 }
