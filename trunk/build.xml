@@ -47,32 +47,28 @@
 		</copy>
 	</target>
 
-	<!-- TARGET: Compile network code -->
-	<target name="network" depends="init" description="Compiles the protocol API.">
+	<!-- TARGET: Compile code -->
+	<target name="compile" depends="init" description="Compiles the protocol API.">
 		<javac debug="${gen_db}" srcdir="${src}/org/openymsg/network" destdir="${build}" source="${j_target}">
+			<classpath refid="openymsg.classpath" />
+		</javac>
+		<javac debug="${gen_db}" srcdir="${src}/org/openymsg/support" destdir="${build}" source="${j_target}">
 			<classpath refid="openymsg.classpath" />
 		</javac>
 		<copy file="${src}/org/openymsg/network/challenge.bin" todir="${build}/org/openymsg/network/" />
 	</target>
 
-	<!-- TARGET: Compile support code -->
-	<target name="support" depends="network" description="Compiles the support API.">
-		<javac debug="${gen_db}" srcdir="${src}/org/openymsg/support" destdir="${build}" source="${j_target}">
-			<classpath refid="openymsg.classpath" />
-		</javac>
-	</target>
 
-	<!-- TARGET: Compile test client code -->
-	<target name="client" depends="support" description="Compiles the test client.">
+	<!-- TARGET: Compile test code -->
+	<target name="compile-tests" depends="compile" description="Compiles the test code.">
 		<javac debug="${gen_db}" srcdir="${src}/org/openymsg/test" destdir="${build}" source="${j_target}">
 			<classpath refid="openymsg.classpath" />
 		</javac>
 	</target>
 
-	<!-- TARGET: Jar -->
-	<target name="jars" depends="client" description="Builds the Jar files.">
-		<jar destfile="${dist}/openymsg_network_${release}.jar" basedir="${build}" includes="org/openymsg/network/**,resources/**" />
-		<jar destfile="${dist}/openymsg_support_${release}.jar" basedir="${build}" includes="org/openymsg/support/**" />
+	<!-- TARGET: Jars -->
+	<target name="jars" depends="compile-tests" description="Builds the Jar file.">
+		<jar destfile="${dist}/openymsg_${release}.jar" basedir="${build}" includes="org/openymsg/network/**,org/openymsg/support/**,resources/**" />
 		<jar destfile="${dist}/openymsg_test_${release}.jar" basedir="${build}" includes="org/openymsg/test/**" />
 	</target>
 
