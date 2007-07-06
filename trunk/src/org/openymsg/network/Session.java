@@ -2839,73 +2839,73 @@ public class Session implements StatusConstants {
 	 * ISBACK packets contain only one. Update the YahooUser details and fire
 	 * event.
 	 */
-	public  void updateFriendsStatus(YMSG9Packet pkt) {
-		// Online friends count, however count may be missing if == 1
-		// (Note: only LOGON packets have multiple friends)
-		String s = pkt.getValue("8");
-		if (s == null && pkt.getValue("7") != null)
-			s = "1";
+	public void updateFriendsStatus(YMSG9Packet pkt) {
+		System.err.println("Enter");
 		// If LOGOFF packet, the packet's user status is wrong (available)
-		boolean logoff = (pkt.service == ServiceType.LOGOFF);
+		final boolean logoff = (pkt.service == ServiceType.LOGOFF);
 		// Process online friends data
-		if (s != null) {
-			int cnt = Integer.parseInt(s);
-			SessionFriendEvent se = new SessionFriendEvent(this);
-			// Process each friend
-			for (int i = 0; i < cnt; i++) {
-				// Update user (do not create new user, as client may
-				// still have reference to old)
-				String val = pkt.getNthValue("7", i);
-				//prevent 'wrong' counter field
-				if(val==null)
-					continue;
-				YahooUser yu = userStore.get(val);
-				// When we add a friend, we get a status update before
-				// getting a confirmation FRIENDADD packet (crazy!)
-				if (yu == null) {
-					String n = pkt.getNthValue("7", i);
-					yu = userStore.getOrCreate(n);
-				}
-
-				// 7=friend 10=status 17=chat 13=pager (old version)
-				// 7=friend 10=status 13=chat&pager (new version May 2005)
-				final long longStatus = Long
-						.parseLong(pkt.getNthValue("10", i));
-				final String friend = pkt.getNthValue("7", i);
-				final Status newStatus = logoff ? Status.OFFLINE : Status
-						.getStatus(longStatus);
-				if (pkt.exists("17")) {
-					final boolean onChat = pkt.getNthValue("17", i).equals("1");
-					final boolean onPager = pkt.getNthValue("13", i)
-							.equals("1");
-					yu.update(friend, newStatus, onChat, onPager);
-				} else {
-					final String visibility = pkt.getNthValue("13", i);
-					yu.update(friend, newStatus, visibility);
-				}
-
-				// Custom message? 19=Custom status 47=Custom message
-				if (pkt.getNthValue("19", i) != null
-						&& pkt.getNthValue("47", i) != null) {
-					yu.setCustom(pkt.getNthValue("19", i), pkt.getNthValue(
-							"47", i));
-				}
-				// 137=Idle time (seconds) 138=Clear idle time
-				s = pkt.getNthValue("138", i);
-				if (s != null)
-					yu.setIdleTime("-1");
-				s = pkt.getNthValue("137", i);
-				if (s != null)
-					yu.setIdleTime(s);
-				// 60=SMS
-				// 197=Avatars
-				// 192=Friends icon (checksum)
-				// ...
-				// Add to event object
-				se.addUser(yu);
+		SessionFriendEvent event = null;
+		// Process each friend
+		int i = -1;
+		while (pkt.getNthValue("7", ++i) != null) {
+			if (event == null) {
+				event = new SessionFriendEvent(this);
 			}
-			// Fire event
-			eventDispatchQueue.append(se, ServiceType.Y6_STATUS_UPDATE);
+
+			final String username = pkt.getNthValue("7", i);
+			YahooUser user = userStore.get(username);
+			// When we add a friend, we get a status update before
+			// getting a confirmation FRIENDADD packet (crazy!)
+			if (user == null) {
+				user = userStore.getOrCreate(username);
+			}
+
+			// 7=friend 10=status 17=chat 13=pager (old version)
+			// 7=friend 10=status 13=chat&pager (new version May 2005)
+			final long longStatus = Long.parseLong(pkt.getNthValue("10", i));
+
+			final Status newStatus = logoff ? Status.OFFLINE : Status
+					.getStatus(longStatus);
+			if (pkt.exists("17")) {
+				final boolean onChat = pkt.getNthValue("17", i).equals("1");
+				final boolean onPager = pkt.getNthValue("13", i).equals("1");
+				user.update(username, newStatus, onChat, onPager);
+			} else {
+				final String visibility = pkt.getNthValue("13", i);
+				user.update(username, newStatus, visibility);
+			}
+
+			// Custom message? 19=Custom status 47=Custom message
+			if (pkt.getNthValue("19", i) != null
+					&& pkt.getNthValue("47", i) != null) {
+				user.setCustom(pkt.getNthValue("19", i), pkt.getNthValue("47",
+						i));
+			}
+
+			// 138=Clear idle time
+			final String clearIdleTime = pkt.getNthValue("138", i);
+			if (clearIdleTime != null) {
+				user.setIdleTime("-1");
+			}
+
+			// 137=Idle time (seconds)
+			final String idleTime = pkt.getNthValue("137", i);
+			if (idleTime != null) {
+				user.setIdleTime(idleTime);
+			}
+
+			// 60=SMS
+			// 197=Avatars
+			// 192=Friends icon (checksum)
+			// ...
+			// Add to event object
+
+			event.addUser(user);
+		}
+		// Fire event
+		if (event != null) {
+System.err.println("send!");			
+			eventDispatchQueue.append(event, ServiceType.Y6_STATUS_UPDATE);
 		}
 	}
 
@@ -3018,5 +3018,14 @@ public class Session implements StatusConstants {
 		}
 
 		eventDispatchQueue.append(event, type);
+	}
+	
+	/**
+	 * Returns the ID for this session object.
+	 * 
+	 * @return Session object ID.
+	 */
+	public long getSessionID() {
+		return sessionId;
 	}
 }
