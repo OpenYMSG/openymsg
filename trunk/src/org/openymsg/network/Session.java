@@ -2840,7 +2840,6 @@ public class Session implements StatusConstants {
 	 * event.
 	 */
 	public void updateFriendsStatus(YMSG9Packet pkt) {
-		System.err.println("Enter");
 		// If LOGOFF packet, the packet's user status is wrong (available)
 		final boolean logoff = (pkt.service == ServiceType.LOGOFF);
 		// Process online friends data
@@ -2904,7 +2903,6 @@ public class Session implements StatusConstants {
 		}
 		// Fire event
 		if (event != null) {
-System.err.println("send!");			
 			eventDispatchQueue.append(event, ServiceType.Y6_STATUS_UPDATE);
 		}
 	}
