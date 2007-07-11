@@ -111,10 +111,21 @@ public class UserStore {
 	}
 
 	/**
+	 * Removes the user with the provided ID from the store.
+	 * 
+	 * @param id
+	 *            The ID of the user to remove from the store.
+	 */
+	public void remove(String id) {
+		users.remove(id);
+	}
+	
+	/**
 	 * Returns all YahooUsers in this store.
 	 * 
 	 * @return All YahooUsers in this store.
 	 */
+	@Deprecated
 	public Hashtable<String, YahooUser> getUsers() {
 		return users;
 	}
