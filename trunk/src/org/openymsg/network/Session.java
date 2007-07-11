@@ -34,6 +34,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -127,10 +128,10 @@ public class Session implements StatusConstants {
 	/** For split packets in multiple parts */
 	private YMSG9Packet cachePacket;
 
-	private  ChatroomManager chatroomManager;
+	private ChatroomManager chatroomManager;
 
 	/** Current conferences, hashed on room */
-	private  Hashtable<String, YahooConference> conferences = new Hashtable<String, YahooConference>();
+	private Hashtable<String, YahooConference> conferences = new Hashtable<String, YahooConference>();
 
 	private SessionState chatSessionStatus;
 
@@ -591,7 +592,7 @@ public class Session implements StatusConstants {
 	public Set<YahooGroup> getGroups() {
 		return groups;
 	}
-
+	
 	public Hashtable<String, YahooUser> getUsers() {
 		return new Hashtable<String, YahooUser>(userStore.getUsers());
 	}
@@ -1624,15 +1625,18 @@ public class Session implements StatusConstants {
 					"Received a response to an AUTH packet, outside the normal login flow. Current state: "
 							+ sessionStatus);
 		}
-		String v10 = pkt.getValue("13"); // '0'=v9, '1'=v10
-		String[] s;
+		// Value for key 13: '0'=v9, '1'=v10
+		boolean isV10OrOlder = pkt.getValue("13") != null && pkt.getValue("13").equals("1");
+		final String[] s;
 		try {
-			if (v10 != null && v10.equals("1"))
+			if (isV10OrOlder) {
 				s = ChallengeResponseV10.getStrings(loginID.getId(), password,
 						pkt.getValue("94"));
-			else
+			}
+			else {
 				s = ChallengeResponseV9.getStrings(loginID.getId(), password,
 						pkt.getValue("94"));
+			}
 		} catch (NoSuchAlgorithmException e) {
 			throw new YMSG9BadFormatException("auth", pkt, e);
 		} catch (IOException e) {
@@ -2110,22 +2114,26 @@ public class Session implements StatusConstants {
 	 * @param from
 	 */
 	private void removeFriend(String from) {
-		SessionEvent se = new SessionEvent(from	);
-		YahooUser user =  userStore.get(from);
-			if(user!=null) {
-				for(YahooGroup group: user.getGroups()) {
-					group.getUsers().remove(user);
-					if(group.getUsers().size()==0) {
-						getGroups().remove(group);
-						log.debug(group+ " removed");
-					}
+		final SessionEvent se = new SessionEvent(from);
+		final YahooUser user = userStore.get(from);
+		if (user != null) {
+			final Iterator<YahooGroup> iter = user.getGroups().iterator();
+			{
+				final YahooGroup group = iter.next();
+				group.getUsers().remove(user);
+				if (group.getUsers().size() == 0) {
+					iter.remove();
+					log.debug(group + " removed");
 				}
-				userStore.getUsers().remove(from);
-				log.debug(from+ " removed");
 			}
+			
+			userStore.remove(from);
+			log.debug(from + " removed");
+		}
 		log.debug("end removeFriend");
 		eventDispatchQueue.append(se, ServiceType.CONTACTREJECT);
 	}
+	
 	/**
 	 * Process an incoming CONTACTNEW packet. We get one of these: (1) when
 	 * someone has added us to their friends list, giving us the chance to
@@ -2565,7 +2573,9 @@ public class Session implements StatusConstants {
 			if (!pkt.exists("14")) {
 				// Contains no message?
 				return;
-			} else if (pkt.status == Status.NOTINOFFICE.getValue()) {
+			} 
+			
+			if (pkt.status == Status.NOTINOFFICE.getValue()) {
 				// Sent while we were offline
 				int i = 0;
 				// Read each message, until null
@@ -2948,7 +2958,7 @@ public class Session implements StatusConstants {
 				break;
 			}
 		}
-		userStore.getUsers().remove(user.getId());
+		userStore.remove(user.getId());
 	}
 
 	/**
@@ -3017,7 +3027,7 @@ public class Session implements StatusConstants {
 
 		eventDispatchQueue.append(event, type);
 	}
-	
+
 	/**
 	 * Returns the ID for this session object.
 	 * 
