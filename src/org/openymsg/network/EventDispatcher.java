@@ -18,13 +18,12 @@
  */
 package org.openymsg.network;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.openymsg.network.event.SessionEvent;
-import org.openymsg.network.event.SessionExceptionEvent;
 import org.openymsg.network.event.SessionListener;
 
 /**
@@ -44,11 +43,12 @@ public class EventDispatcher extends Thread {
 	Logger log = Logger.getLogger("org.openymsg");
 
 	// queue of events that are going to be fired.
-	private volatile BlockingQueue<FireEvent> queue = new ArrayBlockingQueue<FireEvent>(50);
+	private final List<FireEvent> queue = Collections
+			.synchronizedList(new LinkedList<FireEvent>());
 
-	private Session session;
+	private final Session session;
 
-	public EventDispatcher(Session session) {
+	public EventDispatcher(final Session session) {
 		super("jYMSG Event Dispatcher thread");
 		this.session = session;
 	}
@@ -59,12 +59,18 @@ public class EventDispatcher extends Thread {
 	 */
 	public void kill() {
 		quitFlag = true;
+		interrupt();
 	}
-	
-	public void append(ServiceType type) {
-		if (!queue.offer(new FireEvent(null, type))) 
-			throw new IllegalStateException(
-			"Unable to offer an event to the eventqueue.");
+
+	/**
+	 * Add an event to the dispatch queue. This causes the event to be
+	 * dispatched to all registered listeners.
+	 * 
+	 * @param type
+	 *            The service typ of the event that's being dispatched.
+	 */
+	public void append(final ServiceType type) {
+		append(null, type);
 	}
 
 	/**
@@ -76,56 +82,49 @@ public class EventDispatcher extends Thread {
 	 * @param type
 	 *            The service typ of the event that's being dispatched.
 	 */
-	public void append(SessionEvent event, ServiceType type) {
-		if (event == null) {
-			throw new IllegalArgumentException(
-			"Argument 'event' cannot be null.");
-		}
-
+	public void append(final SessionEvent event, final ServiceType type) {
 		if (type == null) {
 			throw new IllegalArgumentException(
-			"Argument 'type' cannot be null.");
+					"Argument 'type' cannot be null.");
 		}
 
 		if (quitFlag) {
 			throw new IllegalStateException(
-			"No new events can be queued, because the dispatcher is being closed.");
+					"No new events can be queued, because the dispatcher is being closed.");
 		}
 
-		if (!queue.offer(new FireEvent(event, type))) 
-			throw new IllegalStateException(
-			"Unable to offer an event to the eventqueue.");
+		queue.add(new FireEvent(event, type));
 	}
 
-
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Thread#run()
+	 */
 	@Override
 	public void run() {
 		while (!quitFlag) {
-			FireEvent event;
-			try {
-				event = queue.poll(50,TimeUnit.MILLISECONDS);
-				if(event!= null) {
-					try {
-						for (SessionListener l : session.getSessionListeners()) 
-							l.dispatch(event);
-					} catch (Exception e) {
-						log.error(e, e);
-						try {
-							for (SessionListener l : session.getSessionListeners()) {
-								l.dispatch(new FireEvent(
-										new SessionExceptionEvent(this,
-												"Source: EventDispatcher", e),
-												ServiceType.X_EXCEPTION));
 
-							}
-						} catch (Exception e2) {
-							log.error(e, e2);
-						}
-					}
-				}
+			try {
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
-				log.error(e, e);
+				// ignore.
+			}
+
+			while (!queue.isEmpty()) {
+				final FireEvent event = queue.remove(0);
+				if (event == null) {
+					continue;
+				}
+
+				try {
+					for (final SessionListener l : session
+							.getSessionListeners()) {
+						l.dispatch(event);
+					}
+				} catch (RuntimeException e) {
+					log.error(e);
+				}
 			}
 		}
 	}
