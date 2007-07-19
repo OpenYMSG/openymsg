@@ -21,8 +21,6 @@ package org.openymsg.support;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 /**
  * A message element represents a low level segment of a decoded message. The
  * sections form a hierarchy, with zero or more sections nested inside a given
@@ -35,7 +33,6 @@ import org.apache.log4j.Logger;
  * @author S.E. Morris
  */
 public class MessageElement {
-	Logger log = Logger.getLogger("org.openymsg");
 	public final static int NULL = -2; // No meaning
 
 	public final static int ROOT = -1; // Root section
