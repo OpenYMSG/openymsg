@@ -19,6 +19,7 @@
 package org.openymsg.network;
 
 import java.io.IOException;
+import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
@@ -28,9 +29,10 @@ import org.apache.log4j.Logger;
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
-public class SessionPinger implements Runnable {
+public class SessionPinger extends TimerTask {
 
 	Logger log = Logger.getLogger("org.openymsg");
+	
 	/**
 	 * The session to which the pings should be sent.
 	 */
@@ -53,6 +55,7 @@ public class SessionPinger implements Runnable {
 	/**
 	 * Tries to send the pings, then exits.
 	 */
+	@Override
 	public void run() {
 		try {
 			session.transmitPings();

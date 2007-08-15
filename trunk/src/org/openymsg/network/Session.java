@@ -39,6 +39,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -114,10 +116,10 @@ public class Session implements StatusConstants {
 
 	public volatile ConnectionHandler network;
 
-	private static final ScheduledExecutorService SCHEDULED_PINGER_SERVICE = new ScheduledThreadPoolExecutor(
-			0);
+	private static final Timer SCHEDULED_PINGER_SERVICE = new Timer(
+			"OpenYMSG session ping timer", true);
 
-	private ScheduledFuture<?> pingerFuture;
+	private TimerTask pingerTask;
 
 	private InputThread ipThread;
 
@@ -2726,10 +2728,11 @@ public class Session implements StatusConstants {
 		// Create a thread to handle input from network
 		ipThread = new InputThread(this);
 		ipThread.start();
-		// Add a Runnable to periodically send ping packets for our connection
-		pingerFuture = SCHEDULED_PINGER_SERVICE.scheduleAtFixedRate(
-				new SessionPinger(this), NetworkConstants.PING_TIMEOUT_IN_SECS,
-				NetworkConstants.PING_TIMEOUT_IN_SECS, TimeUnit.SECONDS);
+		// Add a TimerTask to periodically send ping packets for our connection
+		pingerTask = new SessionPinger(this);
+		SCHEDULED_PINGER_SERVICE.schedule(pingerTask,
+				NetworkConstants.PING_TIMEOUT_IN_SECS * 1000,
+				NetworkConstants.PING_TIMEOUT_IN_SECS * 1000);
 	}
 
 	/**
@@ -2743,10 +2746,10 @@ public class Session implements StatusConstants {
 			ipThread = null;
 		}
 
-		// Remove our pinger Runnable from scheduler
-		if (pingerFuture != null) {
-			pingerFuture.cancel(false);
-			pingerFuture = null;
+		// Remove our pinger task from the timer
+		if (pingerTask != null) {
+			pingerTask.cancel();
+			pingerTask = null;
 		}
 
 		eventDispatchQueue.kill();
