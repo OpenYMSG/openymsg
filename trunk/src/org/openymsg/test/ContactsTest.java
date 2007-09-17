@@ -49,6 +49,7 @@ public class ContactsTest extends YahooTest{
 			if(contact.equals(OTHERUSR))
 				buddy = sess1.getUser(contact);
 		assertNotNull(buddy);
+		
 		assertEquals(Status.OFFLINE, buddy.getStatus());
 		sess2.login(OTHERUSR, OTHERPWD);
 		Thread.sleep(500);
