@@ -455,11 +455,7 @@ public class Session implements StatusConstants {
 	 */
 	public synchronized void setStatus(Status status)
 			throws IllegalArgumentException, IOException {
-		if (sessionStatus == SessionState.UNSTARTED
-				&& !(status == Status.AVAILABLE || status == Status.INVISIBLE)) {
-			throw new IllegalArgumentException(
-					"Unstarted sessions can be available or invisible only");
-		}
+
 
 		if (status == Status.CUSTOM) {
 			throw new IllegalArgumentException(
