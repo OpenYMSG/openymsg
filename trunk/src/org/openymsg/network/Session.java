@@ -2748,10 +2748,10 @@ public class Session implements StatusConstants {
 			pingerTask = null;
 		}
 
-		eventDispatchQueue.kill();
-		eventDispatchQueue = null;
 		// If the network is open, close it
 		network.close();
+		eventDispatchQueue.kill();
+		eventDispatchQueue = null;
 	}
 
 	/**
@@ -2848,7 +2848,7 @@ public class Session implements StatusConstants {
 	 * ISBACK packets contain only one. Update the YahooUser details and fire
 	 * event.
 	 */
-	public void updateFriendsStatus(YMSG9Packet pkt) {
+	protected void updateFriendsStatus(YMSG9Packet pkt) {
 		// If LOGOFF packet, the packet's user status is wrong (available)
 		final boolean logoff = (pkt.service == ServiceType.LOGOFF);
 		// Process online friends data
@@ -2911,7 +2911,7 @@ public class Session implements StatusConstants {
 			event.addUser(user);
 		}
 		// Fire event
-		if (event != null) {
+		if (event != null && eventDispatchQueue!=null) {
 			eventDispatchQueue.append(event, ServiceType.Y6_STATUS_UPDATE);
 		}
 	}
