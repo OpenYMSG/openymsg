@@ -2676,7 +2676,11 @@ public class Session implements StatusConstants {
 	 */
 	protected void receiveUserStat(YMSG9Packet pkt) // 0x0a
 	{
-		status = Status.getStatus(pkt.status);
+		try {
+			status = Status.getStatus(pkt.status);
+		}catch (IllegalArgumentException e) {
+			// unknow status
+		}
 	}
 
 	/**
@@ -2872,8 +2876,12 @@ public class Session implements StatusConstants {
 			// 7=friend 10=status 13=chat&pager (new version May 2005)
 			final long longStatus = Long.parseLong(pkt.getNthValue("10", i));
 
-			final Status newStatus = logoff ? Status.OFFLINE : Status
-					.getStatus(longStatus);
+			Status newStatus = Status.AVAILABLE;
+			try {
+				newStatus = logoff ? Status.OFFLINE : Status.getStatus(longStatus);
+			}catch (IllegalArgumentException e) {
+				// unknow status
+			}
 			if (pkt.exists("17")) {
 				final boolean onChat = pkt.getNthValue("17", i).equals("1");
 				final boolean onPager = pkt.getNthValue("13", i).equals("1");
