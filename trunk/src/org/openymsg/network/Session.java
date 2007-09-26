@@ -592,7 +592,12 @@ public class Session implements StatusConstants {
 	}
 	
 	public Hashtable<String, YahooUser> getUsers() {
-		return new Hashtable<String, YahooUser>(userStore.getUsers());
+		Hashtable<String, YahooUser> ret = new Hashtable<String, YahooUser>();
+		if(groups!=null)
+			for(YahooGroup group: groups) 
+				for (YahooUser user : group.getUsers()) 
+					ret.put(user.getId(), user);
+		return ret;
 	}
 
 	public YahooUser getUser(String id) {
