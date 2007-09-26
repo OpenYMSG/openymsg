@@ -129,7 +129,11 @@ public class YahooConference // Cannot be serialised
 
 	// We're received an invite, change status and return buffer
 	Queue<YMSG9Packet> inviteReceived() {
-		Queue<YMSG9Packet> v = new LinkedList<YMSG9Packet>(packetBuffer);
+		Queue<YMSG9Packet> v = null;
+		if(packetBuffer!=null) {
+			v = new LinkedList<YMSG9Packet>(packetBuffer);
+		} else
+			v= new LinkedList<YMSG9Packet>();
 		packetBuffer = null;
 		return v;
 	}
