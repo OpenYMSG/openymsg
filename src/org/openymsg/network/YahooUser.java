@@ -153,16 +153,46 @@ public class YahooUser // Cannot be serialised
 		return "YahooUser [ID=" + id + ", status="+status.name()+", ignored="+ignored+", stealthBlock="+stealthBlock+", customStatusMessage="+customStatusMessage+", isFriend="+isFriend()+"]";
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
-	public boolean equals(Object other) {
-		if (other instanceof YahooUser) {
-			return  ((YahooUser) other).getId().equals(this.getId());
-		}
-		return super.equals(other);
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
 	}
 
-
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof YahooUser)) {
+			return false;
+		}
+		final YahooUser other = (YahooUser) obj;
+		if (id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		} else if (!id.equals(other.id)) {
+			return false;
+		}
+		return true;
+	}
+	
 	/**
 	 * Updates the YahooUser with the new values.
 	 * 
@@ -219,5 +249,4 @@ public class YahooUser // Cannot be serialised
 	public void setGroups(Set<YahooGroup> groups) {
 		this.groups = groups;
 	}
-	
 }
