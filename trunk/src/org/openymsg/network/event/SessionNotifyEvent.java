@@ -24,7 +24,9 @@ import org.openymsg.network.StatusConstants;
  * This event is used to convey Yahoo notification events, like typing on/off
  * from other Yahoo users we're communicating with.
  * 
- * To From Message Type Mode notifyReceived y y y y y
+ * Notification events contain two major identifiers: a 'type', that denotes the
+ * type of event for which a notification is sent, and a 'mode', which tells us
+ * if the activity has started or ended.
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
