@@ -30,6 +30,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -96,7 +97,7 @@ public class Session implements StatusConstants {
 	private boolean customStatusBusy;
 
 	/** Yahoo user's groups */
-	private Set<YahooGroup> groups = new HashSet<YahooGroup>();
+	private final Set<YahooGroup> groups = new HashSet<YahooGroup>();
 
 	/** Creating conference room names. */
 	private int conferenceCount;
@@ -246,7 +247,7 @@ public class Session implements StatusConstants {
 	public void login(String username, String password)
 			throws IllegalStateException, IOException, AccountLockedException,
 			LoginRefusedException {
-		groups = new HashSet<YahooGroup>();
+		groups.clear();
 		identities = new HashMap<String, YahooIdentity>();
 		conferences = new Hashtable<String, YahooConference>();
 		chatroomManager  = new ChatroomManager(null, null);
@@ -581,18 +582,23 @@ public class Session implements StatusConstants {
 	}
 
 	/**
-	 * Return lists for friends tree menu
+	 * Returns an unmodifiable collection that holds the groups. Note that you
+	 * cannot delete or create groups by modifying the return value of this
+	 * method.
+	 * 
+	 * @return All groups, or an empty set (never 'null').
 	 */
 	public Set<YahooGroup> getGroups() {
-		return groups;
+		return Collections.unmodifiableSet(groups);
 	}
 	
 	public Hashtable<String, YahooUser> getUsers() {
 		Hashtable<String, YahooUser> ret = new Hashtable<String, YahooUser>();
-		if(groups!=null)
-			for(YahooGroup group: groups) 
-				for (YahooUser user : group.getUsers()) 
-					ret.put(user.getId(), user);
+		for (YahooGroup group : groups) {
+			for (YahooUser user : group.getUsers()) {
+				ret.put(user.getId(), user);
+			}
+		}
 		return ret;
 	}
 
