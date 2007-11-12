@@ -1865,7 +1865,7 @@ public class Session implements StatusConstants {
 				chatSessionStatus = SessionState.LOGGED_ON;
 			}
 			return; // ...to finally block
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			log.error("error on receveing Chat join ",e);
 			throw new YMSG9BadFormatException("chat login", pkt, e);
 		} finally {
