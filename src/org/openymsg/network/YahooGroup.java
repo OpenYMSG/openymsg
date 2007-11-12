@@ -69,7 +69,7 @@ public class YahooGroup {
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String nm) {
 		name = nm;
 	}
@@ -91,13 +91,43 @@ public class YahooGroup {
 		return "YahooGroup [name=" + name + "]";
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
-	public boolean equals(Object other) {
-		if (other instanceof YahooGroup) {
-			return ((YahooGroup) other).getName().equals(this.getName());
-		}
-		return super.equals(other);
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
 	}
 
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof YahooGroup)) {
+			return false;
+		}
+		final YahooGroup other = (YahooGroup) obj;
+		if (name == null) {
+			if (other.name != null) {
+				return false;
+			}
+		} else if (!name.equals(other.name)) {
+			return false;
+		}
+		return true;
+	}
 }
