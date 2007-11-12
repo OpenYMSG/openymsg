@@ -42,7 +42,7 @@ public class ChatTest extends YahooTest{
 		assertNotNull(event);
 		SessionNotifyEvent sne = (SessionNotifyEvent) event.getEvent();
 		assertTrue(sne.isTyping());
-		assertTrue(sne.getMode()==1);
+		assertTrue(sne.isOn());
 		sess1.sendMessage(OTHERUSR, CHATMESSAGE,sess1.getLoginIdentity());
 		event = listener2.waitForEvent(5, ServiceType.MESSAGE);
 		assertNotNull(event);
@@ -59,7 +59,7 @@ public class ChatTest extends YahooTest{
 		assertNotNull(event);		
 		SessionNotifyEvent sne = (SessionNotifyEvent) event.getEvent();
 		assertTrue(sne.isTyping());
-		assertTrue(sne.getMode()==0);
+		assertTrue(sne.isOff());
 		sess1.sendMessage(OTHERUSR, CHATMESSAGE,sess1.getLoginIdentity());
 		event = listener2.waitForEvent(5, ServiceType.MESSAGE);
 		assertNotNull(event);

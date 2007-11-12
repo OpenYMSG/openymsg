@@ -2648,22 +2648,22 @@ public class Session implements StatusConstants {
 	}
 
 	/**
-	 * Process an incoming NOTIFY packet. "Typing" for example. (Why these
-	 * things needs to be sent is beyond me!)
+	 * Process an incoming NOTIFY packet. "Typing" for example.
 	 */
 	protected void receiveNotify(YMSG9Packet pkt) // 0x4b
 	{
 		try {
-			if (pkt.status == 0x01) // FIX: documentation says this should be
-			// Status.TYPING (0x16)
+			// FIX: documentation says this should be Status.TYPING (0x16)
+			if (pkt.status == 0x01) 
 			{
-				SessionNotifyEvent se = new SessionNotifyEvent(this, pkt
-						.getValue("5"), // to
-						pkt.getValue("4"), // from
-						pkt.getValue("14"), // message (game)
-						pkt.getValue("49"), // type (typing/game)
-						pkt.getValue("13") // mode (on/off)
-				);
+				SessionNotifyEvent se = SessionNotifyEvent
+						.createSessionNotifyEvent(this, 
+								pkt.getValue("5"),  // to
+								pkt.getValue("4"),  // from
+								pkt.getValue("14"), // message (game)
+								pkt.getValue("49"), // type (typing/game)
+								pkt.getValue("13")  // mode (on/off)
+						);
 				se.setStatus(pkt.status);
 				eventDispatchQueue.append(se, ServiceType.NOTIFY);
 			}
