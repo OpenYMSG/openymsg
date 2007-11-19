@@ -2507,7 +2507,7 @@ public class Session implements StatusConstants {
 	 * using a second client, I noticed the Yahoo server sent one of these (just
 	 * a header, no contents) and closed the socket.
 	 */
-	protected void receiveLogoff(YMSG9Packet pkt) // 0x02
+	public void receiveLogoff(YMSG9Packet pkt) // 0x02
 	{
 		try {
 			// Is this packet about us, or one of our online friends?
@@ -2881,7 +2881,13 @@ public class Session implements StatusConstants {
 
 			// 7=friend 10=status 17=chat 13=pager (old version)
 			// 7=friend 10=status 13=chat&pager (new version May 2005)
-			final long longStatus = Long.parseLong(pkt.getNthValue("10", i));
+			long longStatus =0;
+			String customMsg = null; 
+			try {
+				longStatus = Long.parseLong(pkt.getNthValue("10", i));
+			}catch(NumberFormatException e) {
+				customMsg=pkt.getNthValue("10", i);
+			}
 
 			Status newStatus = Status.AVAILABLE;
 			try {
@@ -2899,10 +2905,11 @@ public class Session implements StatusConstants {
 			}
 
 			// Custom message? 19=Custom status 47=Custom message
-			if (pkt.getNthValue("19", i) != null
-					&& pkt.getNthValue("47", i) != null) {
-				user.setCustom(pkt.getNthValue("19", i), pkt.getNthValue("47",
-						i));
+			if (pkt.getNthValue("19", i) != null	) {
+				if(pkt.getNthValue("47", i) != null) 
+					user.setCustom(pkt.getNthValue("19", i), pkt.getNthValue("47",	i));
+				else if(customMsg!=null)
+					user.setCustom(pkt.getNthValue("19", i), customMsg);
 			}
 
 			// 138=Clear idle time
