@@ -2899,7 +2899,7 @@ public class Session implements StatusConstants {
 				final boolean onChat = pkt.getNthValue("17", i).equals("1");
 				final boolean onPager = pkt.getNthValue("13", i).equals("1");
 				user.update(username, newStatus, onChat, onPager);
-			} else {
+			} else { 
 				final String visibility = pkt.getNthValue("13", i);
 				user.update(username, newStatus, visibility);
 			}
