@@ -123,7 +123,7 @@ public class EventDispatcher extends Thread {
 						l.dispatch(event);
 					}
 				} catch (RuntimeException e) {
-					log.error(e);
+					log.error("error during the event dispatch",e);
 				}
 			}
 		}
