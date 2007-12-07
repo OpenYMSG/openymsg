@@ -11,6 +11,32 @@
 		OpenYMSG is an Java library that implements the Yahoo Instant
 		Messenger protocol.
 	</description>
+	<inceptionYear>2007</inceptionYear>
+	<licenses>
+		<license>
+			<name>GNU General Public License Version2</name>
+			<url>
+				http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+			</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<connection>
+			scm:svn:https://svn.igniterealtime.org/svn/repos/openymsg
+		</connection>
+		<developerConnection>
+			scm:svn:https://svn.igniterealtime.org/svn/repos/openymsg
+		</developerConnection>
+		<tag>trunk</tag>
+		<url>
+			http://www.igniterealtime.org/fisheye/browse/svn-org/openymsg
+		</url>
+	</scm>
+	<issueManagement>
+		<system>Jira</system>
+		<url>http://www.igniterealtime.org/issues/browse/YMSG</url>
+	</issueManagement>
 	<build>
 		<plugins>
 			<plugin>
