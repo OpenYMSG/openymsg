@@ -41,14 +41,23 @@ please review the jYMSG home page.</p>
 
 <div id="building"><a name="building"></a>
 <h2>Building instructions</h2>
-<p>The recommended way to build the OpenYMSG library is by using <a
-	href="http://ant.apache.org/">Apache Ant</a>. An Ant build script has
-been included in the root directory of the project.</p>
-<p>The default target of the Ant script, which you would run by
-executing <code>ant</code> from a command line interface in the root
-directory of this project, builds the complete library. Other targets
-are available. A list of them can be retrieved by issuing <code>ant
--projecthelp</code>, again in the parent directory of this project.</p>
+<p>The OpenYMSG library project is managed by<a
+	href="http://maven.apache.org/">Apache Maven 2</a>. A Maven POM has
+been included that should be used to build the library.</p>
+<p>The default way to build a package of the project is by executing
+<tt>mvn&nbsp;clean&nbsp;package</tt> which you would run from a command
+line interface in the root directory of this project.</p>
+<p>By default, Maven runs all unit test. As the unit tests included
+in OpenYMSG depend on responses from the Yahoo network, some of them can
+fail, which will cause the package process to halt. You can skip the
+tests by adding an extra argument to the Maven executable like this: <tt>mvn&nbsp;-Dmaven.test.skip&nbsp;clean&nbsp;package</tt>
+</p>
+<p>The default jar will not include the dependencies of the project.
+If you'd like those included in a jar file, execute Maven like this
+instead: <tt>mvn&nbsp;clean&nbsp;assembly:assembly</tt> (the optional <tt>-Dmaven.test.skip</tt>
+flag can be used here as well, of course).</p>
+<p>For more information on Maven usage, please refer to <a
+	href="http://maven.apache.org/">http://maven.apache.org/</a></p>
 </div>
 
 <div id="testing"><a name="testing"></a>
