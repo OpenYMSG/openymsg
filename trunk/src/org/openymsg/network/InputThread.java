@@ -217,7 +217,9 @@ public class InputThread extends Thread {
 		case CONTACTREJECT:
 			parentSession.receiveContactRejected(pkt);
 			break;
-
+        case PICTURE : 
+        	parentSession.receivePicture(pkt); 
+        	break;
 		default:
 			log .warn(
 					"Don't know how to handle service type '" + pkt.service

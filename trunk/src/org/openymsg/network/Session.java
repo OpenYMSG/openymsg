@@ -59,6 +59,8 @@ import org.openymsg.network.event.SessionGroupEvent;
 import org.openymsg.network.event.SessionListener;
 import org.openymsg.network.event.SessionNewMailEvent;
 import org.openymsg.network.event.SessionNotifyEvent;
+import org.openymsg.network.event.SessionPictureEvent;
+import org.openymsg.network.event.SessionPictureHandler;
 
 /**
  * Written by FISH, Feb 2003 , Copyright FISH 2003 - 2007
@@ -140,6 +142,8 @@ public class Session implements StatusConstants {
 
 	private Set<SessionListener> sessionListeners = new HashSet<SessionListener>();
 
+	private SessionPictureHandler pictureHandler = null;
+
 	private static Logger log = Logger.getLogger("org.openymsg");
 
 	/**
@@ -184,7 +188,6 @@ public class Session implements StatusConstants {
 			}
 		}
 
-
 		status = Status.AVAILABLE;
 		sessionId = 0;
 		sessionStatus = SessionState.UNSTARTED;
@@ -208,9 +211,9 @@ public class Session implements StatusConstants {
 		}
 		sessionListeners.add(sessionListener);
 	}
-	
-	public Set<SessionListener> getSessionListeners(){
-		return sessionListeners ;
+
+	public Set<SessionListener> getSessionListeners() {
+		return sessionListeners;
 	}
 
 	/**
@@ -250,10 +253,10 @@ public class Session implements StatusConstants {
 		groups.clear();
 		identities = new HashMap<String, YahooIdentity>();
 		conferences = new Hashtable<String, YahooConference>();
-		chatroomManager  = new ChatroomManager(null, null);
+		chatroomManager = new ChatroomManager(null, null);
 		userStore = new UserStore();
-		if(eventDispatchQueue==null) { 
-			eventDispatchQueue = new EventDispatcher(this);		
+		if (eventDispatchQueue == null) {
+			eventDispatchQueue = new EventDispatcher(this);
 			eventDispatchQueue.start();
 		}
 		if (username == null || username.length() == 0) {
@@ -335,7 +338,7 @@ public class Session implements StatusConstants {
 		try {
 			transmitLogoff();
 			network.close();
-		}finally {
+		} finally {
 			closeSession();
 		}
 	}
@@ -456,7 +459,6 @@ public class Session implements StatusConstants {
 	 */
 	public synchronized void setStatus(Status status)
 			throws IllegalArgumentException, IOException {
-
 
 		if (status == Status.CUSTOM) {
 			throw new IllegalArgumentException(
@@ -591,7 +593,7 @@ public class Session implements StatusConstants {
 	public Set<YahooGroup> getGroups() {
 		return Collections.unmodifiableSet(groups);
 	}
-	
+
 	public Hashtable<String, YahooUser> getUsers() {
 		Hashtable<String, YahooUser> ret = new Hashtable<String, YahooUser>();
 		for (YahooGroup group : groups) {
@@ -1012,6 +1014,12 @@ public class Session implements StatusConstants {
 		body.addElement("135", "6,0,0,1710"); // Needed for v12(?)
 		body.addElement("2", "1");
 		body.addElement("1", loginID.getId());
+
+		// add our picture checksum, if it's available
+		if (pictureHandler != null
+				&& pictureHandler.getPictureChecksum() != null) {
+			body.addElement("192", pictureHandler.getPictureChecksum());
+		}
 		sendPacket(body, ServiceType.AUTHRESP, status); // 0x54
 	}
 
@@ -1532,22 +1540,30 @@ public class Session implements StatusConstants {
 	/**
 	 * notify to friend the typing start or end action
 	 * 
-	 * @param friend user whose sending message
-	 * @param isTyping true if start typing, false if typing end up 
+	 * @param friend
+	 *            user whose sending message
+	 * @param isTyping
+	 *            true if start typing, false if typing end up
 	 * @throws IOException
 	 */
-	public void sendTypingNotification(String friend, boolean isTyping) throws IOException {
+	public void sendTypingNotification(String friend, boolean isTyping)
+			throws IOException {
 		transmitNotify(friend, primaryID.getId(), isTyping, " ", NOTIFY_TYPING);
 	}
+
 	/**
 	 * Transmit a NOTIFY packet. Could be used for all sorts of purposes, but
 	 * mainly games and typing notifications. Only typing is supported by this
 	 * API. The mode determines the type of notification, "TYPING" or "GAME";
-	 * msg holds the game name (or a single space if typing).	 * @param friend
-	 * @param yid id
-	 * @param on true start typing, false stop typing
+	 * msg holds the game name (or a single space if typing). *
+	 * 
+	 * @param friend
+	 * @param yid
+	 *            id
+	 * @param on
+	 *            true start typing, false stop typing
 	 * @param msg
-	 * @param mode 
+	 * @param mode
 	 * @throws IOException
 	 */
 	protected void transmitNotify(String friend, String yid, boolean on,
@@ -1631,14 +1647,14 @@ public class Session implements StatusConstants {
 							+ sessionStatus);
 		}
 		// Value for key 13: '0'=v9, '1'=v10
-		boolean isV10OrOlder = pkt.getValue("13") != null && pkt.getValue("13").equals("1");
+		boolean isV10OrOlder = pkt.getValue("13") != null
+				&& pkt.getValue("13").equals("1");
 		final String[] s;
 		try {
 			if (isV10OrOlder) {
 				s = ChallengeResponseV10.getStrings(loginID.getId(), password,
 						pkt.getValue("94"));
-			}
-			else {
+			} else {
 				s = ChallengeResponseV9.getStrings(loginID.getId(), password,
 						pkt.getValue("94"));
 			}
@@ -1872,7 +1888,7 @@ public class Session implements StatusConstants {
 			}
 			return; // ...to finally block
 		} catch (RuntimeException e) {
-			log.error("error on receveing Chat join ",e);
+			log.error("error on receveing Chat join ", e);
 			throw new YMSG9BadFormatException("chat login", pkt, e);
 		} finally {
 			// FIX: Not thread safe if multiple chatroom supported!
@@ -2110,9 +2126,9 @@ public class Session implements StatusConstants {
 
 	protected void receiveContactRejected(YMSG9Packet pkt) {
 		String from = pkt.getValue("1");// from
-		log.debug(from+ " has rejected to been added like friend");
-		
-//		removeFriend(from);
+		log.debug(from + " has rejected to been added like friend");
+
+		// removeFriend(from);
 	}
 
 	/**
@@ -2131,14 +2147,14 @@ public class Session implements StatusConstants {
 					log.debug(group + " removed");
 				}
 			}
-			
+
 			userStore.remove(from);
 			log.debug(from + " removed");
 		}
 		log.debug("end removeFriend");
 		eventDispatchQueue.append(se, ServiceType.CONTACTREJECT);
 	}
-	
+
 	/**
 	 * Process an incoming CONTACTNEW packet. We get one of these: (1) when
 	 * someone has added us to their friends list, giving us the chance to
@@ -2281,13 +2297,13 @@ public class Session implements StatusConstants {
 		try {
 			String oldName = pkt.getValue("67");
 			String newName = pkt.getValue("65");
-			log.debug("old group:"+oldName+ " renamed in:"+newName);
+			log.debug("old group:" + oldName + " renamed in:" + newName);
 			if (oldName == null || newName == null)
 				return;
-			for (YahooGroup group : getGroups()) 
-				if(group.getName().equals(oldName))
+			for (YahooGroup group : getGroups())
+				if (group.getName().equals(oldName))
 					group.setName(newName);
-			
+
 			SessionGroupEvent se = new SessionGroupEvent(this, oldName, newName);
 			eventDispatchQueue.append(se, ServiceType.GROUPRENAME);
 		} catch (Exception e) {
@@ -2408,7 +2424,7 @@ public class Session implements StatusConstants {
 						group.addUser(yu);
 						yu.addGroup(group);
 					}
-					log.debug("add new group from list "+group.toString());
+					log.debug("add new group from list " + group.toString());
 					groups.add(group);
 				}
 			}
@@ -2526,8 +2542,8 @@ public class Session implements StatusConstants {
 				try {
 					updateFriendsStatus(pkt);
 				} catch (Exception e) {
-					throw new YMSG9BadFormatException("online friends in logoff",
-							pkt, e);
+					throw new YMSG9BadFormatException(
+							"online friends in logoff", pkt, e);
 				}
 			}
 		} catch (IOException e) {
@@ -2578,8 +2594,8 @@ public class Session implements StatusConstants {
 			if (!pkt.exists("14")) {
 				// Contains no message?
 				return;
-			} 
-			
+			}
+
 			if (pkt.status == Status.NOTINOFFICE.getValue()) {
 				// Sent while we were offline
 				int i = 0;
@@ -2660,15 +2676,13 @@ public class Session implements StatusConstants {
 	{
 		try {
 			// FIX: documentation says this should be Status.TYPING (0x16)
-			if (pkt.status == 0x01) 
-			{
+			if (pkt.status == 0x01) {
 				SessionNotifyEvent se = SessionNotifyEvent
-						.createSessionNotifyEvent(this, 
-								pkt.getValue("5"),  // to
-								pkt.getValue("4"),  // from
+						.createSessionNotifyEvent(this, pkt.getValue("5"), // to
+								pkt.getValue("4"), // from
 								pkt.getValue("14"), // message (game)
 								pkt.getValue("49"), // type (typing/game)
-								pkt.getValue("13")  // mode (on/off)
+								pkt.getValue("13") // mode (on/off)
 						);
 				se.setStatus(pkt.status);
 				eventDispatchQueue.append(se, ServiceType.NOTIFY);
@@ -2685,7 +2699,7 @@ public class Session implements StatusConstants {
 	{
 		try {
 			status = Status.getStatus(pkt.status);
-		}catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			// unknow status
 		}
 	}
@@ -2881,34 +2895,36 @@ public class Session implements StatusConstants {
 
 			// 7=friend 10=status 17=chat 13=pager (old version)
 			// 7=friend 10=status 13=chat&pager (new version May 2005)
-			long longStatus =0;
-			String customMsg = null; 
+			long longStatus = 0;
+			String customMsg = null;
 			try {
 				longStatus = Long.parseLong(pkt.getNthValue("10", i));
-			}catch(NumberFormatException e) {
-				customMsg=pkt.getNthValue("10", i);
+			} catch (NumberFormatException e) {
+				customMsg = pkt.getNthValue("10", i);
 			}
 
 			Status newStatus = Status.AVAILABLE;
 			try {
-				newStatus = logoff ? Status.OFFLINE : Status.getStatus(longStatus);
-			}catch (IllegalArgumentException e) {
+				newStatus = logoff ? Status.OFFLINE : Status
+						.getStatus(longStatus);
+			} catch (IllegalArgumentException e) {
 				// unknow status
 			}
 			if (pkt.exists("17")) {
 				final boolean onChat = pkt.getNthValue("17", i).equals("1");
 				final boolean onPager = pkt.getNthValue("13", i).equals("1");
 				user.update(username, newStatus, onChat, onPager);
-			} else { 
+			} else {
 				final String visibility = pkt.getNthValue("13", i);
 				user.update(username, newStatus, visibility);
 			}
 
 			// Custom message? 19=Custom status 47=Custom message
-			if (pkt.getNthValue("19", i) != null	) {
-				if(pkt.getNthValue("47", i) != null) 
-					user.setCustom(pkt.getNthValue("19", i), pkt.getNthValue("47",	i));
-				else if(customMsg!=null)
+			if (pkt.getNthValue("19", i) != null) {
+				if (pkt.getNthValue("47", i) != null)
+					user.setCustom(pkt.getNthValue("19", i), pkt.getNthValue(
+							"47", i));
+				else if (customMsg != null)
 					user.setCustom(pkt.getNthValue("19", i), customMsg);
 			}
 
@@ -2933,7 +2949,7 @@ public class Session implements StatusConstants {
 			event.addUser(user);
 		}
 		// Fire event
-		if (event != null && eventDispatchQueue!=null) {
+		if (event != null && eventDispatchQueue != null) {
 			eventDispatchQueue.append(event, ServiceType.Y6_STATUS_UPDATE);
 		}
 	}
@@ -2973,9 +2989,10 @@ public class Session implements StatusConstants {
 				group.getUsers().remove(user);
 				user.getGroups().remove(group);
 				// If the groups is empty, remove it too
-				if (group.getUsers().isEmpty()) 
-					if(!groups.remove(group))
-						log.debug(" group "+group.getName()+" not removed, check it!");
+				if (group.getUsers().isEmpty())
+					if (!groups.remove(group))
+						log.debug(" group " + group.getName()
+								+ " not removed, check it!");
 				break;
 			}
 		}
@@ -3057,4 +3074,83 @@ public class Session implements StatusConstants {
 	public long getSessionID() {
 		return sessionId;
 	}
+
+	/**
+	 * Sends out a request to receive a picture (avatar) from a contact
+	 * 
+	 * @param friend
+	 *            The name of the contact for which a picture is requested.
+	 * @throws IOException
+	 */
+	public void requestPicture(final String friend) throws IOException {
+		final PacketBodyBuffer body = new PacketBodyBuffer();
+		body.addElement("4", loginID.getId());
+		body.addElement("5", friend);
+		body.addElement("13", "1");
+		sendPacket(body, ServiceType.PICTURE);
+	}
+
+	/**
+	 * Processes an incoming 'PICTURE' packet, which contains avatar-like
+	 * information of a contact.
+	 * 
+	 * @param pkt
+	 *            The packet to parse.
+	 */
+	protected void receivePicture(YMSG9Packet pkt) // 0xbe
+	{
+		final String imgUrlStr = pkt.getValue("20");
+
+		if (imgUrlStr == null) {
+			return;
+		}
+
+		InputStream imgIn = null;
+		try {
+			final URL imgUrl = new URL(imgUrlStr);
+
+			imgIn = imgUrl.openStream();
+			final ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+			final byte[] buff = new byte[1024];
+			int bytesRead;
+			while ((bytesRead = imgIn.read(buff)) > 0) {
+				out.write(buff, 0, bytesRead);
+			}
+
+			final SessionPictureEvent se = new SessionPictureEvent(this, pkt
+					.getValue("5"), // to / us
+					pkt.getValue("4"), // from
+					out.toByteArray() // data
+			);
+
+			eventDispatchQueue.append(se, ServiceType.NOTIFY);
+
+		} catch (MalformedURLException ex) {
+			log.warn("Received a picture, but it appears to contain "
+					+ "an invalid image location.", ex);
+		} catch (IOException ex) {
+			log.warn("Received a picture, but reading its data caused "
+					+ "an unexpected exception.", ex);
+		} finally {
+			if (imgIn == null) {
+				return;
+			}
+			try {
+				imgIn.close();
+			} catch (IOException ex) {
+				log.warn("Unable to close the image stream object.", ex);
+			}
+		}
+	}
+
+	/**
+	 * Sets the SessionPictureHandler for this session.
+	 * 
+	 * @param pictureHandler
+	 */
+	public void setSessionPictureHandler(SessionPictureHandler pictureHandler) {
+		this.pictureHandler = pictureHandler;
+	}
+
 }

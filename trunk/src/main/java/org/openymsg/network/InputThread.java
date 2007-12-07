@@ -217,6 +217,9 @@ public class InputThread extends Thread {
 		case CONTACTREJECT:
 			parentSession.receiveContactRejected(pkt);
 			break;
+        case PICTURE : 
+        	parentSession.receivePicture(pkt); 
+        	break;			
 		case PING:
 			// As we're sending pings back, it's probably safe to ignore the
 			// incoming pings from Yahoo.
