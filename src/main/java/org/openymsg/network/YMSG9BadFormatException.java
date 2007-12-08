@@ -31,7 +31,7 @@ public class YMSG9BadFormatException extends RuntimeException {
 	/**
 	 * The packet of which parsing caused this exception to be thrown.
 	 */
-	private final YMSG9Packet packet;
+	private final transient YMSG9Packet packet;
 
 	/**
 	 * Constructs a new YMSG9BadFormatException with the specified detail
