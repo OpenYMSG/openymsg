@@ -1199,7 +1199,7 @@ public class Session implements StatusConstants {
 			String msg) throws IOException {
 		// Create a new conference object
 		conferences.put(room, new YahooConference(userStore, identities
-				.get(yid), room, this, false));
+				.get(yid.toLowerCase()), room, this, false));
 		// Send request to Yahoo
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", yid);
@@ -2456,7 +2456,7 @@ public class Session implements StatusConstants {
 				StringTokenizer st = new StringTokenizer(s, ",");
 				identities.clear();
 				while (st.hasMoreTokens()) {
-					final String id = st.nextToken();
+					final String id = st.nextToken().toLowerCase();
 					identities.put(id, new YahooIdentity(id));
 				}
 			}
@@ -3034,7 +3034,7 @@ public class Session implements StatusConstants {
 
 	YahooConference getOrCreateConference(YMSG9Packet pkt) {
 		String room = pkt.getValue("57");
-		YahooIdentity yid = identities.get(pkt.getValue("1"));
+		YahooIdentity yid = identities.get(pkt.getValue("1").toLowerCase());
 		YahooConference yc = conferences.get(room);
 		if (yc == null) {
 			yc = new YahooConference(userStore, yid, room, this);

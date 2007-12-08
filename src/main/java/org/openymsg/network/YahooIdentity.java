@@ -44,7 +44,7 @@ package org.openymsg.network;
  */
 public class YahooIdentity // Cannot be serialised
 {
-	protected String id; // Yahoo id
+	protected final String id; // Yahoo id
 
 	private boolean primary, login; // Is primary or login id?
 
@@ -53,8 +53,8 @@ public class YahooIdentity // Cannot be serialised
 	/**
 	 * CONSTRUCTOR
 	 */
-	public YahooIdentity(String i) {
-		id = i;
+	public YahooIdentity(final String id) {
+		this.id = id.toLowerCase();
 		active = true;
 	}
 
