@@ -36,14 +36,7 @@ public class SessionFriendEvent extends SessionEvent {
 	/**
 	 * CONSTRUCTORS
 	 */
-	public SessionFriendEvent(Object o) // Friends list update
-	{
-		this(o, null, null);
-	}
-
-	public SessionFriendEvent(Object o, YahooUser yu, String gp) // Friend
-	// added
-	{
+	public SessionFriendEvent(Object o, YahooUser yu, String gp) {
 		super(o);
 		user = yu;
 		group = gp;

@@ -56,11 +56,13 @@ import org.openymsg.network.event.SessionExceptionEvent;
 import org.openymsg.network.event.SessionFileTransferEvent;
 import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.network.event.SessionGroupEvent;
+import org.openymsg.network.event.SessionListEvent;
 import org.openymsg.network.event.SessionListener;
 import org.openymsg.network.event.SessionNewMailEvent;
 import org.openymsg.network.event.SessionNotifyEvent;
 import org.openymsg.network.event.SessionPictureEvent;
 import org.openymsg.network.event.SessionPictureHandler;
+import org.openymsg.roster.Roster;
 
 /**
  * Written by FISH, Feb 2003 , Copyright FISH 2003 - 2007
@@ -100,6 +102,8 @@ public class Session implements StatusConstants {
 
 	/** Yahoo user's groups */
 	private final Set<YahooGroup> groups = new HashSet<YahooGroup>();
+
+	private Roster roster = new Roster();
 
 	/** Creating conference room names. */
 	private int conferenceCount;
@@ -284,6 +288,9 @@ public class Session implements StatusConstants {
 
 		// Reset session and init some variables
 		resetData();
+		
+		roster = new Roster();
+		this.addSessionListener(roster);
 		loginID = new YahooIdentity(username);
 		primaryID = null;
 		this.password = password;
@@ -1198,8 +1205,8 @@ public class Session implements StatusConstants {
 	protected void transmitConfInvite(String[] users, String yid, String room,
 			String msg) throws IOException {
 		// Create a new conference object
-		conferences.put(room, new YahooConference(userStore, identities
-				.get(yid.toLowerCase()), room, this, false));
+		conferences.put(room, new YahooConference(userStore, identities.get(yid
+				.toLowerCase()), room, this, false));
 		// Send request to Yahoo
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", yid);
@@ -2405,6 +2412,7 @@ public class Session implements StatusConstants {
 		try {
 			final String grps = pkt.getValue("87"); // Value for key "87"
 			if (grps != null) {
+				final Set<YahooUser> usersOnList = new HashSet<YahooUser>();
 				final StringTokenizer st1 = new StringTokenizer(grps, "\n");
 
 				// Extract each group.
@@ -2422,9 +2430,17 @@ public class Session implements StatusConstants {
 						final YahooUser yu = userStore.getOrCreate(k);
 						group.addUser(yu);
 						yu.addGroup(group);
+						usersOnList.add(yu);
 					}
 					log.debug("add new group from list " + group.toString());
 					groups.add(group);
+				}
+
+				if (!usersOnList.isEmpty()) {
+					// trigger listeners
+					eventDispatchQueue.append(new SessionListEvent(this,
+							ContactListType.Friends, usersOnList),
+							ServiceType.LIST);
 				}
 			}
 		} catch (Exception e) {
@@ -2435,12 +2451,22 @@ public class Session implements StatusConstants {
 		try {
 			String s = pkt.getValue("88"); // Value for key "88"
 			if (s != null) {
+				final Set<YahooUser> usersOnList = new HashSet<YahooUser>();
+
 				// Comma separated list (?)
 				StringTokenizer st = new StringTokenizer(s, ",");
 				while (st.hasMoreTokens()) {
 					s = st.nextToken();
 					YahooUser yu = userStore.getOrCreate(s);
 					yu.setIgnored(true);
+					usersOnList.add(yu);
+				}
+
+				if (!usersOnList.isEmpty()) {
+					// trigger listeners
+					eventDispatchQueue.append(new SessionListEvent(this,
+							ContactListType.Ignored, usersOnList),
+							ServiceType.LIST);
 				}
 			}
 		} catch (Exception e) {
@@ -2467,12 +2493,22 @@ public class Session implements StatusConstants {
 		try {
 			String s = pkt.getValue("185"); // Value for key "185"
 			if (s != null) {
+				final Set<YahooUser> usersOnList = new HashSet<YahooUser>();
+
 				// Comma separated list (?)
 				StringTokenizer st = new StringTokenizer(s, ",");
 				while (st.hasMoreTokens()) {
 					s = st.nextToken();
 					YahooUser yu = userStore.getOrCreate(s);
 					yu.setStealthBlocked(true);
+					usersOnList.add(yu);
+				}
+
+				if (!usersOnList.isEmpty()) {
+					// trigger listeners
+					eventDispatchQueue.append(new SessionListEvent(this,
+							ContactListType.StealthBlocked, usersOnList),
+							ServiceType.LIST);
 				}
 			}
 		} catch (Exception e) {
@@ -2505,15 +2541,6 @@ public class Session implements StatusConstants {
 		// Set the primary and login flags on the relevant YahooIdentity objects
 		primaryID.setPrimaryIdentity(true);
 		loginID.setLoginIdentity(true);
-
-		// If this was sent outside the login process, send an event
-		// FIX: Leidson Campos (PlanetaMessenger.org) informs me that with
-		// the condition left in he doesn't get this even. Presumably because
-		// Yahoo are now sending these packets before login over??? This
-		// needs investigation.
-		/* if(loginOver) */
-
-		eventDispatchQueue.append(new SessionEvent(this), ServiceType.LIST);
 	}
 
 	/**
@@ -2806,6 +2833,8 @@ public class Session implements StatusConstants {
 		customStatusMessage = null;
 		customStatusBusy = false;
 		conferences.clear();
+		removeSessionListener(roster);
+		roster = null;
 		groups.clear();
 		identities.clear();
 		loginException = null;
@@ -2876,7 +2905,7 @@ public class Session implements StatusConstants {
 		// If LOGOFF packet, the packet's user status is wrong (available)
 		final boolean logoff = (pkt.service == ServiceType.LOGOFF);
 		// Process online friends data
-		
+
 		// Process each friend
 		int i = -1;
 		while (pkt.getNthValue("7", ++i) != null) {
@@ -2940,8 +2969,9 @@ public class Session implements StatusConstants {
 			// 192=Friends icon (checksum)
 			// ...
 			// Add to event object
-			
-			final SessionFriendEvent event = new SessionFriendEvent(this, user, null);
+
+			final SessionFriendEvent event = new SessionFriendEvent(this, user,
+					null);
 			// Fire event
 			if (eventDispatchQueue != null) {
 				eventDispatchQueue.append(event, ServiceType.Y6_STATUS_UPDATE);
@@ -3148,4 +3178,14 @@ public class Session implements StatusConstants {
 		this.pictureHandler = pictureHandler;
 	}
 
+	/**
+	 * Returns the roster that contains the list of friends. The roster will be
+	 * represented by a new object after each call to
+	 * {@link Session#login(String, String)}
+	 * 
+	 * @return the roster that belongs to this Session
+	 */
+	public Roster getRoster() {
+		return roster;
+	}
 }
