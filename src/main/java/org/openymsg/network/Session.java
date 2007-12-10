@@ -2083,7 +2083,7 @@ public class Session implements StatusConstants {
 
 	/**
 	 * Process an incoming CONTACTIGNORE packet. We get one of these to confirm
-	 * an outgoing CONTACTIGNORE - an ADDIGNORE packet may preceed this, but
+	 * an outgoing CONTACTIGNORE - an ADDIGNORE packet may precede this, but
 	 * only if the ignore status has genuinely changed state.
 	 */
 	protected void receiveContactIgnore(YMSG9Packet pkt) // 0x85
@@ -2097,8 +2097,7 @@ public class Session implements StatusConstants {
 				YahooUser yu = userStore.getOrCreate(n);
 				yu.setIgnored(ig);
 				// Fire event
-				SessionFriendEvent se = new SessionFriendEvent(this);
-				se.addUser(yu);
+				SessionFriendEvent se = new SessionFriendEvent(this, yu, null);
 				eventDispatchQueue.append(se, ServiceType.Y6_STATUS_UPDATE);
 			} else {
 				// Error
@@ -2877,14 +2876,10 @@ public class Session implements StatusConstants {
 		// If LOGOFF packet, the packet's user status is wrong (available)
 		final boolean logoff = (pkt.service == ServiceType.LOGOFF);
 		// Process online friends data
-		SessionFriendEvent event = null;
+		
 		// Process each friend
 		int i = -1;
 		while (pkt.getNthValue("7", ++i) != null) {
-			if (event == null) {
-				event = new SessionFriendEvent(this);
-			}
-
 			final String username = pkt.getNthValue("7", i);
 			YahooUser user = userStore.get(username);
 			// When we add a friend, we get a status update before
@@ -2908,7 +2903,7 @@ public class Session implements StatusConstants {
 				newStatus = logoff ? Status.OFFLINE : Status
 						.getStatus(longStatus);
 			} catch (IllegalArgumentException e) {
-				// unknow status
+				// unknown status
 			}
 			if (pkt.exists("17")) {
 				final boolean onChat = pkt.getNthValue("17", i).equals("1");
@@ -2945,12 +2940,12 @@ public class Session implements StatusConstants {
 			// 192=Friends icon (checksum)
 			// ...
 			// Add to event object
-
-			event.addUser(user);
-		}
-		// Fire event
-		if (event != null && eventDispatchQueue != null) {
-			eventDispatchQueue.append(event, ServiceType.Y6_STATUS_UPDATE);
+			
+			final SessionFriendEvent event = new SessionFriendEvent(this, user, null);
+			// Fire event
+			if (eventDispatchQueue != null) {
+				eventDispatchQueue.append(event, ServiceType.Y6_STATUS_UPDATE);
+			}
 		}
 	}
 

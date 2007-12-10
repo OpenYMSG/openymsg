@@ -218,43 +218,43 @@ public class PresenceTest {
 			sender.setStatus(Status.BUSY);
 			SessionFriendEvent event = (SessionFriendEvent) wl.waitForEvent(5, ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
-			assertEquals(event.getFirstUser().toString(), Status.BUSY, event.getFriend(USERNAME).getStatus());
-			assertEquals(null, event.getFirstUser().getCustomStatusMessage());
+			assertEquals(event.getUser().toString(), Status.BUSY, event.getUser().getStatus());
+			assertEquals(null, event.getUser().getCustomStatusMessage());
 			
 			Thread.sleep(1000);
 			sender.setStatus(Status.AVAILABLE);
 			event = (SessionFriendEvent) wl.waitForEvent(5, ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
-			assertEquals(Status.AVAILABLE, event.getFriend(USERNAME).getStatus());
-			assertEquals(null, event.getFirstUser().getCustomStatusMessage());
+			assertEquals(Status.AVAILABLE, event.getUser().getStatus());
+			assertEquals(null, event.getUser().getCustomStatusMessage());
 
 			Thread.sleep(1000);
 			sender.setStatus(Status.OUTTOLUNCH);
 			event = (SessionFriendEvent) wl.waitForEvent(5, ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
-			assertEquals(Status.OUTTOLUNCH, event.getFirstUser().getStatus());
-			assertEquals(null, event.getFriend(USERNAME).getCustomStatusMessage());
+			assertEquals(Status.OUTTOLUNCH, event.getUser().getStatus());
+			assertEquals(null, event.getUser().getCustomStatusMessage());
 
 			Thread.sleep(1000);
 			sender.setStatus("This is my custom message!", false);
 			event = (SessionFriendEvent) wl.waitForEvent(5, ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
-			assertEquals(Status.CUSTOM, event.getFriend(USERNAME).getStatus());
-			assertEquals("This is my custom message!", event.getFriend(USERNAME).getCustomStatusMessage());
+			assertEquals(Status.CUSTOM, event.getUser().getStatus());
+			assertEquals("This is my custom message!", event.getUser().getCustomStatusMessage());
 
 			Thread.sleep(1000);
 			sender.setStatus("This is my busy custom message!", false);
 			event = (SessionFriendEvent) wl.waitForEvent(5, ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
-			assertEquals(Status.CUSTOM, event.getFriend(USERNAME).getStatus());
-			assertEquals("This is my busy custom message!", event.getFirstUser().getCustomStatusMessage());
+			assertEquals(Status.CUSTOM, event.getUser().getStatus());
+			assertEquals("This is my busy custom message!", event.getUser().getCustomStatusMessage());
 
 			Thread.sleep(1000);
 			sender.setStatus(Status.OUTTOLUNCH);
 			event = (SessionFriendEvent) wl.waitForEvent(5, ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
-			assertEquals(Status.OUTTOLUNCH, event.getFriend(USERNAME).getStatus());
-			assertEquals(null, event.getFriend(USERNAME).getCustomStatusMessage());
+			assertEquals(Status.OUTTOLUNCH, event.getUser().getStatus());
+			assertEquals(null, event.getUser().getCustomStatusMessage());
 
 		} finally {
 			try {

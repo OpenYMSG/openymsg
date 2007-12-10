@@ -69,8 +69,8 @@ public class StatusTest extends YahooTestAbstract{
 		assertNotNull(event);
 		System.out.println(event);
 		SessionFriendEvent sfe = (SessionFriendEvent) event.getEvent();
-		assertEquals(sfe.getFirstUser().getId(), OTHERUSR);
-		assertEquals(sfe.getFirstUser().getStatus(),Status.OFFLINE);
+		assertEquals(sfe.getUser().getId(), OTHERUSR);
+		assertEquals(sfe.getUser().getStatus(),Status.OFFLINE);
 		sess2.login(OTHERUSR, OTHERPWD);
 	}
 	
@@ -80,8 +80,8 @@ public class StatusTest extends YahooTestAbstract{
 		FireEvent event = listener1.waitForEvent(5,ServiceType.Y6_STATUS_UPDATE);
 		assertNotNull(event);
 		SessionFriendEvent sfe = (SessionFriendEvent) event.getEvent();
-		assertEquals(sfe.getFirstUser().getId(), OTHERUSR);
-		assertEquals(sfe.getFirstUser().getStatus(),status);
+		assertEquals(sfe.getUser().getId(), OTHERUSR);
+		assertEquals(sfe.getUser().getStatus(),status);
 	}
 	
 	@Test

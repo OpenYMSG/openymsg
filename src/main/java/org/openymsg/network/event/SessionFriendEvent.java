@@ -18,63 +18,39 @@
  */
 package org.openymsg.network.event;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.openymsg.network.YahooUser;
 
 /**
- * From Friend Friends Group friendsUpdateReceived y y y n friendAddedReceived y
- * y y y friendRemovedReceived y y y y
+ * Represents an event triggered by a change in the presence or roster change of
+ * a session. This Event typically gets thrown after a friend has been added,
+ * removed or updated.
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
 public class SessionFriendEvent extends SessionEvent {
-	protected Collection<YahooUser> users = new ArrayList<YahooUser>();
+	protected final YahooUser user;
 
-	protected String group;
+	protected final String group;
 
 	/**
 	 * CONSTRUCTORS
 	 */
 	public SessionFriendEvent(Object o) // Friends list update
 	{
-		super(o);
-		group = null;
+		this(o, null, null);
 	}
 
 	public SessionFriendEvent(Object o, YahooUser yu, String gp) // Friend
 	// added
 	{
-		this(o);
-		addUser(yu);
+		super(o);
+		user = yu;
 		group = gp;
 	}
 
-	/**
-	 * Accessors
-	 */
-	// Friends update
-	public void addUser(YahooUser yu) {
-		users.add(yu);
-	}
-
-	public Collection<YahooUser> getUsers() {
-		return users;
-	}
-
-	// Friend added
-	public YahooUser getFirstUser() {
-		return users.iterator().next();
-	}
-	
-	public YahooUser getFriend(String id) {
-		for (YahooUser user: getUsers()) {
-			if(id.equals(user.getId()))
-				return user;
-		}
-		return null;
+	public YahooUser getUser() {
+		return user;
 	}
 
 	public String getGroup() {
@@ -83,17 +59,14 @@ public class SessionFriendEvent extends SessionEvent {
 
 	@Override
 	public String getFrom() {
-		return getFirstUser().getId();
+		return user.getId();
 	}
 
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer(super.toString());
-		if (users.size()> 1)
-			sb.append(" list(size):").append(users.size());
-		else
-			sb.append(" friend:").append(getFirstUser().getId()).append(" group:")
-					.append(group);
+		final StringBuffer sb = new StringBuffer(super.toString());
+		sb.append(" friend:").append(getUser().getId()).append(" group:")
+				.append(group);
 		return sb.toString();
 	}
 }
