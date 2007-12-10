@@ -91,7 +91,7 @@ public class UserStore {
 			return users.put(id, new YahooUser(id, status, onChat, onPager));
 		}
 
-		get(id).update(id, status, onChat, onPager);
+		get(id).update(status, onChat, onPager);
 		return get(id);
 	}
 
