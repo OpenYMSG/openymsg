@@ -27,27 +27,19 @@ import java.util.Date;
  * contactRequestReceived y y y y messageReceived y y y n buzzReceived y y y n
  * offlineMessageReceived y y y y listReceived n n n n logoffReceived n n n n
  * 
- * Note: this class originally subclassed java.util,EventObject - but for some
- * unknown reason EventObject is Serializable, and because jYMSG events carry
- * live IM data it isn't prudent to make them capable of being freeze dried.
- * I've removed EventObject as a subclass, therefore.
- * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class SessionEvent // extends java.util.EventObject
-{
+public class SessionEvent extends java.util.EventObject {
 	private final String to;
 
 	private final String from;
 
 	protected String message;
 
-	private final Date timestamp;
+	private final long timestamp;
 
 	private long status = 0;
-
-	private Object source;
 
 	public SessionEvent(Object source) {
 		this(source, null, null, null, 0);
@@ -61,15 +53,11 @@ public class SessionEvent // extends java.util.EventObject
 	// Offline message
 	public SessionEvent(Object source, String to, String from, String message,
 			long timestampInMillis) {
-		this.source = source;
+		super(source);
 		this.to = to;
 		this.from = from;
 		this.message = message;
-		this.timestamp = new Date(timestampInMillis);
-	}
-
-	public Object getSource() {
-		return source;
+		this.timestamp = timestampInMillis;
 	}
 
 	/**
@@ -88,7 +76,7 @@ public class SessionEvent // extends java.util.EventObject
 	}
 
 	public Date getTimestamp() {
-		return timestamp;
+		return new Date(timestamp);
 	}
 
 	public long getStatus() {

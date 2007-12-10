@@ -44,6 +44,7 @@ import java.util.Set;
  */
 public class YahooUser // Cannot be serialised
 {
+	// TODO: 'id' should be final (updating it isn't logical)
 	protected String id; // Yahoo id
 
 	protected Status status; // Status (away, etc)
@@ -150,7 +151,10 @@ public class YahooUser // Cannot be serialised
 
 	@Override
 	public String toString() {
-		return "YahooUser [ID=" + id + ", status="+status.name()+", ignored="+ignored+", stealthBlock="+stealthBlock+", customStatusMessage="+customStatusMessage+", isFriend="+isFriend()+"]";
+		return "YahooUser [ID=" + id + ", status=" + status.name()
+				+ ", ignored=" + ignored + ", stealthBlock=" + stealthBlock
+				+ ", customStatusMessage=" + customStatusMessage
+				+ ", isFriend=" + isFriend() + "]";
 	}
 
 	/*
@@ -192,7 +196,7 @@ public class YahooUser // Cannot be serialised
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Updates the YahooUser with the new values.
 	 * 
@@ -244,7 +248,8 @@ public class YahooUser // Cannot be serialised
 	}
 
 	/**
-	 * @param groups the groups to set
+	 * @param groups
+	 *            the groups to set
 	 */
 	public void setGroups(Set<YahooGroup> groups) {
 		this.groups = groups;
