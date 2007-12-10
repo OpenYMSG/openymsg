@@ -18,29 +18,28 @@
  */
 package org.openymsg.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import junitx.extensions.EqualsHashCodeTestCase;
 
-import org.junit.Test;
 import org.openymsg.network.YahooGroup;
-import org.openymsg.network.YahooUser;
 
 /**
+ * Basic Equality and HashCode contract checks.
+ * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
-public class YahooGroupTest {
+public class YahooGroupTest extends EqualsHashCodeTestCase {
 
-	@Test
-	public void testEqualsObject() {
-		final YahooGroup group1 = new YahooGroup("same");
-		final YahooGroup group2 = new YahooGroup("same");
-		final YahooGroup group3 = new YahooGroup("different");
-
-		assertFalse(group1.equals(null));
-		assertEquals(group1, group2);
-		assertFalse(group1.equals(group3));
-		assertFalse(group1.equals(new YahooUser("same")));
-
+	public YahooGroupTest() {
+		super(YahooGroupTest.class.getName());
 	}
 
+	@Override
+	protected Object createInstance() throws Exception {
+		return new YahooGroup("same");
+	}
+
+	@Override
+	protected Object createNotEqualInstance() throws Exception {
+		return new YahooGroup("different");
+	}
 }
