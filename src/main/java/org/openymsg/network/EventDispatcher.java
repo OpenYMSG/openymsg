@@ -122,8 +122,9 @@ public class EventDispatcher extends Thread {
 							.getSessionListeners()) {
 						l.dispatch(event);
 					}
-				} catch (RuntimeException e) {
-					log.error("error during the event dispatch",e);
+				} catch (RuntimeException ex) {
+					log.error("error during the dispatch of event: " + event,
+							ex);
 				}
 			}
 		}

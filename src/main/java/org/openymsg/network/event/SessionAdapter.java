@@ -38,7 +38,7 @@ public class SessionAdapter implements SessionListener {
 		// override this function if you want to do something with it.
 	}
 
-	public void listReceived(SessionEvent event) {
+	public void listReceived(SessionListEvent event) {
 		// override this function if you want to do something with it.
 	}
 
@@ -184,7 +184,7 @@ public class SessionAdapter implements SessionListener {
 				notifyReceived((SessionNotifyEvent) ev);
 				break;
 			case LIST:
-				listReceived(ev);
+				listReceived((SessionListEvent) ev);
 				break;
 			case FRIENDADD:
 				friendAddedReceived((SessionFriendEvent) ev);
