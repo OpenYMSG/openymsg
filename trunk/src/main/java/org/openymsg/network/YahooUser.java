@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * This class represents a single canonical represenation of a user on Yahoo.
+ * This class represents a single canonical representation of a user on Yahoo.
  * For each user there is only ever one single instance of this class - as
  * updated details arrive, an existing object is sought for and updated. This is
  * to prevent code holding onto YahooUser references from pointing to stale
@@ -44,8 +44,7 @@ import java.util.Set;
  */
 public class YahooUser // Cannot be serialised
 {
-	// TODO: 'id' should be final (updating it isn't logical)
-	protected String id; // Yahoo id
+	protected final String id; // Yahoo id
 
 	protected Status status; // Status (away, etc)
 
@@ -69,7 +68,8 @@ public class YahooUser // Cannot be serialised
 	 * so the user objects are correctly added to that cache.
 	 */
 	public YahooUser(String id, Status status, boolean onChat, boolean onPager) {
-		update(id, status, onChat, onPager);
+		this.id = id;
+		update(status, onChat, onPager);
 	}
 
 	public YahooUser(String id) {
@@ -200,25 +200,21 @@ public class YahooUser // Cannot be serialised
 	/**
 	 * Updates the YahooUser with the new values.
 	 * 
-	 * @param newId
-	 *            replacement for current ID
 	 * @param newStatus
 	 *            replacement for current Status
 	 * @param newVisibility
 	 *            replacement for current onChat and onPager values
 	 */
-	public void update(String newId, Status newStatus, String newVisibility) {
+	public void update(Status newStatus, String newVisibility) {
 		// This is the new version, where 13=combined pager/chat
 		final int iVisibility = (newVisibility == null) ? 0 : Integer
 				.parseInt(newVisibility);
-		update(newId, newStatus, (iVisibility & 2) > 0, (iVisibility & 1) > 0);
+		update(newStatus, (iVisibility & 2) > 0, (iVisibility & 1) > 0);
 	}
 
 	/**
 	 * Updates the YahooUser with the new values.
 	 * 
-	 * @param newId
-	 *            replacement for current ID.
 	 * @param newStatus
 	 *            replacement for current Status value
 	 * @param newOnChat
@@ -226,10 +222,8 @@ public class YahooUser // Cannot be serialised
 	 * @param newOnPager
 	 *            replacement for current onPager value
 	 */
-	public void update(String newId, Status newStatus, boolean newOnChat,
-			boolean newOnPager) {
+	public void update(Status newStatus, boolean newOnChat, boolean newOnPager) {
 		// This is the old version, when 13=pager and 17=chat
-		this.id = newId;
 		this.status = newStatus;
 		this.onChat = newOnChat;
 		this.onPager = newOnPager;

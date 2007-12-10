@@ -2937,10 +2937,10 @@ public class Session implements StatusConstants {
 			if (pkt.exists("17")) {
 				final boolean onChat = pkt.getNthValue("17", i).equals("1");
 				final boolean onPager = pkt.getNthValue("13", i).equals("1");
-				user.update(username, newStatus, onChat, onPager);
+				user.update(newStatus, onChat, onPager);
 			} else {
 				final String visibility = pkt.getNthValue("13", i);
-				user.update(username, newStatus, visibility);
+				user.update(newStatus, visibility);
 			}
 
 			// Custom message? 19=Custom status 47=Custom message
