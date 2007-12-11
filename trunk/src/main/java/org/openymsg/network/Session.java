@@ -2426,7 +2426,7 @@ public class Session implements StatusConstants {
 						user.addGroup(groupId);
 						usersOnList.add(user);
 					}
-					log.debug("add new group from list " + groupId.toString());
+					log.debug("add new group from list " + groupId);
 					groups.add(group);
 				}
 
