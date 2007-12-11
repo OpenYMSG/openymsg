@@ -141,7 +141,7 @@ public enum ServiceType {
 			}
 		}
 
-		Logger.getLogger("org.openymsg").warn("No such ServiceType value '"
+		Logger.getLogger(ServiceType.class).warn("No such ServiceType value '"
 				+ value + "' (which is '" + Integer.toHexString(value)
 				+ "' in hex).");
 		return null;

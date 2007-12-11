@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  */
 public class SessionPinger extends TimerTask {
 
-	Logger log = Logger.getLogger("org.openymsg");
+	private static final Logger log = Logger.getLogger(SessionPinger.class);
 	
 	/**
 	 * The session to which the pings should be sent.

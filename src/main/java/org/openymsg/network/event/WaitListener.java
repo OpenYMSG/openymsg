@@ -19,7 +19,7 @@ import org.openymsg.network.Session;
 public class WaitListener implements SessionListener {
 
 	BlockingQueue<FireEvent> events = new ArrayBlockingQueue<FireEvent>(50);
-	Logger log = Logger.getLogger("org.openymsg");
+	private static final Logger log = Logger.getLogger(WaitListener.class);
 	private Session session;
 
 	public WaitListener(Session session) {

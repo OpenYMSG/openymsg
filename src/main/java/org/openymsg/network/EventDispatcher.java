@@ -40,7 +40,7 @@ import org.openymsg.network.event.SessionListener;
 public class EventDispatcher extends Thread {
 	private volatile boolean quitFlag = false;
 
-	Logger log = Logger.getLogger("org.openymsg");
+	private static final Logger log = Logger.getLogger(EventDispatcher.class);
 
 	// queue of events that are going to be fired.
 	private final List<FireEvent> queue = Collections
