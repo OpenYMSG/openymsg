@@ -39,7 +39,7 @@ public class InputThread extends Thread {
 
 	private final Session parentSession;
 
-	private static Logger log = Logger.getLogger("org.openymsg");
+	private static Logger log = Logger.getLogger(InputThread.class);
 
 	/**
 	 * Constructs a new thread that starts processing immediately.

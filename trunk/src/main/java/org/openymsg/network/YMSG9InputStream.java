@@ -49,7 +49,7 @@ import org.apache.log4j.Logger;
  * @author S.E. Morris
  */
 public class YMSG9InputStream extends BufferedInputStream {
-	Logger log = Logger.getLogger("org.openymsg");
+	private static final Logger log = Logger.getLogger(YMSG9InputStream.class);
 	public YMSG9InputStream(InputStream in) {
 		super(in);
 	}

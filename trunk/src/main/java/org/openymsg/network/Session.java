@@ -145,7 +145,7 @@ public class Session implements StatusConstants {
 
 	private SessionPictureHandler pictureHandler = null;
 
-	private static Logger log = Logger.getLogger("org.openymsg");
+	private static Logger log = Logger.getLogger(Session.class);
 
 	/**
 	 * Creates a new Session based on a ConnectionHandler as configured in the
