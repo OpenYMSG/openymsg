@@ -446,6 +446,24 @@ public class Roster implements Set<YahooUser>, SessionListener {
 		};
 	}
 
+	/**
+	 * Returns the user specified by the provided ID, or null if no such user
+	 * exists on the roster.
+	 * 
+	 * @param userId
+	 *            the ID of the user to return.
+	 * @return the User matched by the ID, or null if no such user exists on
+	 *         this roster.
+	 */
+	public YahooUser getUser(final String userId) {
+		if (userId == null || userId.length() == 0) {
+			throw new IllegalArgumentException(
+					"Argument 'userId' cannot be null or an empty String.");
+		}
+
+		return usersById.get(userId);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -548,6 +566,7 @@ public class Roster implements Set<YahooUser>, SessionListener {
 			syncedAdd(user);
 			break;
 
+		case CONTACTREJECT:
 		case FRIENDREMOVE:
 			Log.trace("Removing user from roster as triggered by "
 					+ "SessionFriendEvent: " + event);

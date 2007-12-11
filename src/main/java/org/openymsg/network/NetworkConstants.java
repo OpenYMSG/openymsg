@@ -25,10 +25,8 @@ package org.openymsg.network;
  * @author S.E. Morris
  */
 public abstract class NetworkConstants {
-	// Header constants
-	// Note: between versions 10 and 12 the version field appears to have
-	// swapped endian-ness, from 0x0a00 to 0x000c
-	public final static byte PROTOCOL = 0x0c; // Protocol version 10 (YMSG 10)
+	
+	public final static byte PROTOCOL = 0x0c; 
 
 	final static byte[] MAGIC = { 'Y', 'M', 'S', 'G' };
 

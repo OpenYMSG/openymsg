@@ -31,23 +31,18 @@ import org.openymsg.network.YahooUser;
 public class SessionFriendEvent extends SessionEvent {
 	protected final YahooUser user;
 
-	protected final String group;
+	public SessionFriendEvent(Object source, YahooUser user) {
+		super(source);
 
-	/**
-	 * CONSTRUCTORS
-	 */
-	public SessionFriendEvent(Object o, YahooUser yu, String gp) {
-		super(o);
-		user = yu;
-		group = gp;
+		if (user == null) {
+			throw new IllegalArgumentException(
+					"Argument 'user' cannot be null.");
+		}
+		this.user = user;
 	}
 
 	public YahooUser getUser() {
 		return user;
-	}
-
-	public String getGroup() {
-		return group;
 	}
 
 	@Override
@@ -58,8 +53,8 @@ public class SessionFriendEvent extends SessionEvent {
 	@Override
 	public String toString() {
 		final StringBuffer sb = new StringBuffer(super.toString());
-		sb.append(" friend:").append(getUser().getId()).append(" group:")
-				.append(group);
+		sb.append(" friend:");
+		sb.append(user.getId());
 		return sb.toString();
 	}
 }
