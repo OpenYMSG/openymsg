@@ -74,7 +74,7 @@ public class SessionAdapter implements SessionListener {
 		// override this function if you want to do something with it.
 	}
 
-	public void contactRejectionReceived(SessionEvent event) {
+	public void contactRejectionReceived(SessionFriendRejectedEvent event) {
 		// override this function if you want to do something with it.
 	}
 
@@ -196,7 +196,7 @@ public class SessionAdapter implements SessionListener {
 				groupRenameReceived((SessionGroupEvent) ev);
 				break;
 			case CONTACTREJECT:
-				contactRejectionReceived(ev);
+				contactRejectionReceived((SessionFriendRejectedEvent) ev);
 				break;
 			case CHATJOIN:
 				chatJoinReceived((SessionChatEvent) ev);

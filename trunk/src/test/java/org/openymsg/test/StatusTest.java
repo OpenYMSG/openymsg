@@ -18,7 +18,7 @@ import org.openymsg.network.Status;
 import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.network.event.WaitListener;
 
-public class StatusTest extends YahooTestAbstract{
+public class StatusTest extends YahooTestAbstract {
 
 	/**
 	 * Checks if every Status long value is unique.
@@ -34,15 +34,11 @@ public class StatusTest extends YahooTestAbstract{
 			checkedValues.add(statusLongValue);
 		}
 	}
-	
-//	@Test
-	public void testChangeStatus() throws IllegalArgumentException, IOException {
 
-		boolean existinList = false;
-		for (String contact: sess1.getUsers().keySet()) 
-			if(contact.equals(OTHERUSR))
-				existinList=true;
-		if(!existinList) {
+	// @Test
+	public void testChangeStatus() throws IllegalArgumentException, IOException {
+		final boolean existinList = sess1.getRoster().containsUser(OTHERUSR);
+		if (!existinList) {
 			sess1.addFriend(OTHERUSR, "group");
 			listener1.waitForEvent(5, ServiceType.FRIENDADD);
 		}
@@ -60,39 +56,46 @@ public class StatusTest extends YahooTestAbstract{
 		changeStatus(Status.OFFLINE);
 		changeStatus(Status.AVAILABLE);
 	}
-	
-//	@Test
-	// TODO: this test fails because the two user are not subscribed to each other.
-	public void testReceiveLogoutStatus() throws IllegalStateException, IOException, AccountLockedException, LoginRefusedException {
+
+	// @Test
+	// TODO: this test fails because the two user are not subscribed to each
+	// other.
+	public void testReceiveLogoutStatus() throws IllegalStateException,
+			IOException, AccountLockedException, LoginRefusedException {
 		sess2.logout();
-		FireEvent event = listener1.waitForEvent(5 ,ServiceType.Y6_STATUS_UPDATE);
+		FireEvent event = listener1.waitForEvent(5,
+				ServiceType.Y6_STATUS_UPDATE);
 		assertNotNull(event);
 		System.out.println(event);
 		SessionFriendEvent sfe = (SessionFriendEvent) event.getEvent();
 		assertEquals(sfe.getUser().getId(), OTHERUSR);
-		assertEquals(sfe.getUser().getStatus(),Status.OFFLINE);
+		assertEquals(sfe.getUser().getStatus(), Status.OFFLINE);
 		sess2.login(OTHERUSR, OTHERPWD);
 	}
-	
-	private void changeStatus(Status status) throws IllegalArgumentException, IOException {
+
+	private void changeStatus(Status status) throws IllegalArgumentException,
+			IOException {
 		listener1.clearEvents();
 		sess2.setStatus(status);
-		FireEvent event = listener1.waitForEvent(5,ServiceType.Y6_STATUS_UPDATE);
+		FireEvent event = listener1.waitForEvent(5,
+				ServiceType.Y6_STATUS_UPDATE);
 		assertNotNull(event);
 		SessionFriendEvent sfe = (SessionFriendEvent) event.getEvent();
 		assertEquals(sfe.getUser().getId(), OTHERUSR);
-		assertEquals(sfe.getUser().getStatus(),status);
+		assertEquals(sfe.getUser().getStatus(), status);
 	}
-	
+
 	@Test
-	public void testServerBanYouout4AnotherLoginWithSameUser() throws AccountLockedException, IllegalStateException, LoginRefusedException, IOException, InterruptedException {
+	public void testServerBanYouout4AnotherLoginWithSameUser()
+			throws AccountLockedException, IllegalStateException,
+			LoginRefusedException, IOException, InterruptedException {
 		Session sessKiller = new Session();
 		listener2.clearEvents();
 		Thread.sleep(500);
 		WaitListener sl = new WaitListener(sessKiller);
 		sessKiller.login(OTHERUSR, OTHERPWD);
 		sl.waitForEvent(5, ServiceType.LOGON);
-		FireEvent event = listener2.waitForEvent(5,ServiceType.LOGOFF);
+		FireEvent event = listener2.waitForEvent(5, ServiceType.LOGOFF);
 		assertNotNull(event);
 		sess2.login(OTHERUSR, OTHERPWD);
 		listener2.waitForEvent(5, ServiceType.LOGON);

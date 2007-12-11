@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.Session;
 import org.openymsg.network.Status;
-import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.SessionAdapter;
 import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.network.event.WaitListener;
@@ -53,7 +52,7 @@ public class PresenceTest {
 		assertEquals(Status.AVAILABLE, new Session().getStatus());
 	}
 
-//	@Test
+	// @Test
 	public void testSetInitalStatus() throws Exception {
 		// test initial state: set your state before logging in.
 		for (final Status status : Status.values()) {
@@ -78,7 +77,7 @@ public class PresenceTest {
 		}
 	}
 
-//	@Test
+	// @Test
 	public void testReSetInitalStatus() throws Exception {
 		final Session session = new Session();
 		try {
@@ -192,11 +191,11 @@ public class PresenceTest {
 		}
 	}
 
-//	@Test
+	// @Test
 	public void testReceivePresence() throws Exception {
 		final Session sender = new Session();
 		final Session receiver = new Session();
-		
+
 		final ReceivePresenceUpdateAdaptor listener = new ReceivePresenceUpdateAdaptor();
 		WaitListener wl = new WaitListener(receiver);
 		receiver.addSessionListener(listener);
@@ -205,53 +204,59 @@ public class PresenceTest {
 			sender.login(USERNAME, PASSWORD);
 			assertEquals(Status.AVAILABLE, receiver.getStatus());
 			assertEquals(null, receiver.getCustomStatusMessage());
-			boolean exist = false;
-			for(YahooUser user:receiver.getUsers().values()) {
-				if(user.getId().equals(RECEIVER))
-					exist = true;
-			}
-			if(!exist) {
+
+			final boolean exists = receiver.getRoster().containsUser(RECEIVER);
+			if (!exists) {
 				receiver.addFriend(USERNAME, "Friends");
 				wl.waitForEvent(4, ServiceType.FRIENDADD);
 			}
-			
+
 			sender.setStatus(Status.BUSY);
-			SessionFriendEvent event = (SessionFriendEvent) wl.waitForEvent(5, ServiceType.Y6_STATUS_UPDATE).getEvent();
+			SessionFriendEvent event = (SessionFriendEvent) wl.waitForEvent(5,
+					ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
-			assertEquals(event.getUser().toString(), Status.BUSY, event.getUser().getStatus());
+			assertEquals(event.getUser().toString(), Status.BUSY, event
+					.getUser().getStatus());
 			assertEquals(null, event.getUser().getCustomStatusMessage());
-			
+
 			Thread.sleep(1000);
 			sender.setStatus(Status.AVAILABLE);
-			event = (SessionFriendEvent) wl.waitForEvent(5, ServiceType.Y6_STATUS_UPDATE).getEvent();
+			event = (SessionFriendEvent) wl.waitForEvent(5,
+					ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
 			assertEquals(Status.AVAILABLE, event.getUser().getStatus());
 			assertEquals(null, event.getUser().getCustomStatusMessage());
 
 			Thread.sleep(1000);
 			sender.setStatus(Status.OUTTOLUNCH);
-			event = (SessionFriendEvent) wl.waitForEvent(5, ServiceType.Y6_STATUS_UPDATE).getEvent();
+			event = (SessionFriendEvent) wl.waitForEvent(5,
+					ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
 			assertEquals(Status.OUTTOLUNCH, event.getUser().getStatus());
 			assertEquals(null, event.getUser().getCustomStatusMessage());
 
 			Thread.sleep(1000);
 			sender.setStatus("This is my custom message!", false);
-			event = (SessionFriendEvent) wl.waitForEvent(5, ServiceType.Y6_STATUS_UPDATE).getEvent();
+			event = (SessionFriendEvent) wl.waitForEvent(5,
+					ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
 			assertEquals(Status.CUSTOM, event.getUser().getStatus());
-			assertEquals("This is my custom message!", event.getUser().getCustomStatusMessage());
+			assertEquals("This is my custom message!", event.getUser()
+					.getCustomStatusMessage());
 
 			Thread.sleep(1000);
 			sender.setStatus("This is my busy custom message!", false);
-			event = (SessionFriendEvent) wl.waitForEvent(5, ServiceType.Y6_STATUS_UPDATE).getEvent();
+			event = (SessionFriendEvent) wl.waitForEvent(5,
+					ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
 			assertEquals(Status.CUSTOM, event.getUser().getStatus());
-			assertEquals("This is my busy custom message!", event.getUser().getCustomStatusMessage());
+			assertEquals("This is my busy custom message!", event.getUser()
+					.getCustomStatusMessage());
 
 			Thread.sleep(1000);
 			sender.setStatus(Status.OUTTOLUNCH);
-			event = (SessionFriendEvent) wl.waitForEvent(5, ServiceType.Y6_STATUS_UPDATE).getEvent();
+			event = (SessionFriendEvent) wl.waitForEvent(5,
+					ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
 			assertEquals(Status.OUTTOLUNCH, event.getUser().getStatus());
 			assertEquals(null, event.getUser().getCustomStatusMessage());
@@ -286,7 +291,7 @@ public class PresenceTest {
 		public ReceivePresenceUpdateAdaptor() {
 			// doesn't do much, but prevens synthetic accessor warnings.
 		}
-		
+
 		/*
 		 * (non-Javadoc)
 		 * 

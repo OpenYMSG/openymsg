@@ -20,7 +20,9 @@ package org.openymsg.network;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.util.HashSet;
 import java.util.Queue;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.openymsg.network.event.SessionConferenceEvent;
@@ -66,8 +68,8 @@ public class InputThread extends Thread {
 		while (!quit) {
 			try {
 				process(parentSession.network.receivePacket());
-			}catch(UnknowServiceException e) {
-					log.warn("unknow packet: "+e.getPacket().toString());
+			} catch (UnknowServiceException e) {
+				log.warn("unknow packet: " + e.getPacket().toString());
 			} catch (Exception e) {
 				// ignore SocketExceptions if we're closing the thread.
 				if (quit && e instanceof SocketException) {
@@ -85,7 +87,7 @@ public class InputThread extends Thread {
 				if (e instanceof IOException) {
 					quit = true;
 				}
-			} 
+			}
 		}
 	}
 
@@ -217,18 +219,17 @@ public class InputThread extends Thread {
 		case CONTACTREJECT:
 			parentSession.receiveContactRejected(pkt);
 			break;
-        case PICTURE : 
-        	parentSession.receivePicture(pkt); 
-        	break;			
+		case PICTURE:
+			parentSession.receivePicture(pkt);
+			break;
 		case PING:
 			// As we're sending pings back, it's probably safe to ignore the
 			// incoming pings from Yahoo.
 			log.info("Received PING (but ignoring it).");
 			break;
 		default:
-			log .warn(
-					"Don't know how to handle service type '" + pkt.service
-							+ "'. The original packet was: " + pkt.toString());
+			log.warn("Don't know how to handle service type '" + pkt.service
+					+ "'. The original packet was: " + pkt.toString());
 		}
 	}
 
@@ -282,15 +283,26 @@ public class InputThread extends Thread {
 	private void receiveConfInvite(YMSG9Packet pkt) // 0x18
 	{
 		try {
-			YahooConference yc = parentSession.getOrCreateConference(pkt);
-			String[] users = pkt.getValues("52");
+			final YahooConference yc = parentSession.getOrCreateConference(pkt);
+			final String[] users = pkt.getValues("52");
+			final Set<YahooUser> conferenceUsers = new HashSet<YahooUser>();
+			for (final String userId : users) {
+				YahooUser user = parentSession.getRoster().getUser(userId);
+				if (user == null) {
+					user = new YahooUser(userId);
+				}
+				conferenceUsers.add(user);
+			}
+
 			// Create event
-			SessionConferenceEvent se = new SessionConferenceEvent(this, pkt
-					.getValue("1"), // to (effective id)
+			final SessionConferenceEvent se = new SessionConferenceEvent(this,
+					pkt.getValue("1"), // to (effective id)
 					pkt.getValue("50"), // from
 					pkt.getValue("58"), // message (topic)
 					yc, // room
-					parentSession.userStore.toUserArray(users) // users array
+					conferenceUsers.toArray(new YahooUser[conferenceUsers
+							.size()]) // users
+			// array
 			);
 			// Add the users
 			yc.addUsers(users);

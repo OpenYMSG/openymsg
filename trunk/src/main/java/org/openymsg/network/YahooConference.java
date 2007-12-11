@@ -57,17 +57,13 @@ public class YahooConference // Cannot be serialised
 
 	private YahooIdentity identity; // Yahoo identity for this conf.
 
-	private UserStore userStore; // Canonical user list
-
 	/**
 	 * CONSTRUCTOR Note: the first constructor is used when *we* create a
 	 * conference, the second is used when we are invited to someone else's
 	 * conference. When *we* create a conference, there is no need to buffer
 	 * packets prior to an invite.
 	 */
-	YahooConference(UserStore us, YahooIdentity yid, String r, Session ss,
-			boolean b) {
-		userStore = us;
+	YahooConference(YahooIdentity yid, String r, Session ss, boolean b) {
 		identity = yid;
 		users = new HashSet<YahooUser>();
 		parent = ss;
@@ -79,8 +75,8 @@ public class YahooConference // Cannot be serialised
 			packetBuffer = null;
 	}
 
-	YahooConference(UserStore us, YahooIdentity yid, String r, Session ss) {
-		this(us, yid, r, ss, true);
+	YahooConference(YahooIdentity yid, String r, Session ss) {
+		this(yid, r, ss, true);
 	}
 
 	/**
@@ -130,10 +126,10 @@ public class YahooConference // Cannot be serialised
 	// We're received an invite, change status and return buffer
 	Queue<YMSG9Packet> inviteReceived() {
 		Queue<YMSG9Packet> v = null;
-		if(packetBuffer!=null) {
+		if (packetBuffer != null) {
 			v = new LinkedList<YMSG9Packet>(packetBuffer);
 		} else
-			v= new LinkedList<YMSG9Packet>();
+			v = new LinkedList<YMSG9Packet>();
 		packetBuffer = null;
 		return v;
 	}
@@ -174,7 +170,7 @@ public class YahooConference // Cannot be serialised
 	 */
 	synchronized void addUser(String username) {
 		if (!exists(username) && !parent.isValidYahooID(username)) {
-			users.add(userStore.getOrCreate(username));
+			users.add(new YahooUser(username));
 		}
 	}
 

@@ -38,6 +38,8 @@ class PacketBodyBuffer {
 	protected ByteArrayOutputStream baos;
 
 	private final static int[] SEPARATOR = { 0xc0, 0x80 }; // Yahoo separator
+	private final static String SEPARATOR_STRING = new String(new byte[] {
+			(byte) 0xc0, (byte) 0x80 });
 
 	private String charEncoding; // Character encoding
 
@@ -84,5 +86,15 @@ class PacketBodyBuffer {
 	 */
 	void reset() {
 		baos.reset();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return new String(baos.toByteArray()).replace(SEPARATOR_STRING, " ");
 	}
 }

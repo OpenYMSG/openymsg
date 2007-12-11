@@ -35,7 +35,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -55,6 +54,7 @@ import org.openymsg.network.event.SessionEvent;
 import org.openymsg.network.event.SessionExceptionEvent;
 import org.openymsg.network.event.SessionFileTransferEvent;
 import org.openymsg.network.event.SessionFriendEvent;
+import org.openymsg.network.event.SessionFriendRejectedEvent;
 import org.openymsg.network.event.SessionGroupEvent;
 import org.openymsg.network.event.SessionListEvent;
 import org.openymsg.network.event.SessionListener;
@@ -107,9 +107,6 @@ public class Session implements StatusConstants {
 
 	/** Creating conference room names. */
 	private int conferenceCount;
-
-	/** Canonical (we hope) set of YahooUsers. */
-	UserStore userStore;
 
 	/** Status of session (see StatusConstants) */
 	private volatile SessionState sessionStatus;
@@ -195,7 +192,6 @@ public class Session implements StatusConstants {
 		status = Status.AVAILABLE;
 		sessionId = 0;
 		sessionStatus = SessionState.UNSTARTED;
-		userStore = new UserStore();
 
 		network.install(this);
 
@@ -258,7 +254,6 @@ public class Session implements StatusConstants {
 		identities = new HashMap<String, YahooIdentity>();
 		conferences = new Hashtable<String, YahooConference>();
 		chatroomManager = new ChatroomManager(null, null);
-		userStore = new UserStore();
 		if (eventDispatchQueue == null) {
 			eventDispatchQueue = new EventDispatcher(this);
 			eventDispatchQueue.start();
@@ -288,7 +283,7 @@ public class Session implements StatusConstants {
 
 		// Reset session and init some variables
 		resetData();
-		
+
 		roster = new Roster();
 		this.addSessionListener(roster);
 		loginID = new YahooIdentity(username);
@@ -299,9 +294,11 @@ public class Session implements StatusConstants {
 		try {
 			// Create the socket and threads (ipThread, sessionPingRunnable and
 			// maybe eventDispatchQueue)
+			log.trace("Opening session...");
 			openSession();
 
 			// Begin login process
+			log.trace("Transmitting auth...");
 			transmitAuth();
 
 			// Wait until connection or timeout
@@ -599,20 +596,6 @@ public class Session implements StatusConstants {
 	 */
 	public Set<YahooGroup> getGroups() {
 		return Collections.unmodifiableSet(groups);
-	}
-
-	public Hashtable<String, YahooUser> getUsers() {
-		Hashtable<String, YahooUser> ret = new Hashtable<String, YahooUser>();
-		for (YahooGroup group : groups) {
-			for (YahooUser user : group.getUsers()) {
-				ret.put(user.getId(), user);
-			}
-		}
-		return ret;
-	}
-
-	public YahooUser getUser(String id) {
-		return userStore.get(id);
 	}
 
 	/**
@@ -993,11 +976,11 @@ public class Session implements StatusConstants {
 							+ sessionStatus);
 		}
 
-		PacketBodyBuffer body = new PacketBodyBuffer();
-		body.addElement("0", loginID.getId()); // FIX: only req. for
-		// HTTPConnectionHandler ?
+		final PacketBodyBuffer body = new PacketBodyBuffer();
+		// FIX: only req. for HTTPConnectionHandler ?
+		// body.addElement("0", loginID.getId());
 		body.addElement("1", loginID.getId());
-		sendPacket(body, ServiceType.AUTH); // 0x57
+		sendPacket(body, ServiceType.AUTH);
 	}
 
 	/**
@@ -1012,9 +995,7 @@ public class Session implements StatusConstants {
 					"Cannot transmit an AUTHRESP packet if you're not completely unconnected to the Yahoo Network. Current state: "
 							+ sessionStatus);
 		}
-		sessionStatus = SessionState.CONNECTED;
-
-		PacketBodyBuffer body = new PacketBodyBuffer();
+		final PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("0", loginID.getId());
 		body.addElement("6", plp);
 		body.addElement("96", crp);
@@ -1205,7 +1186,7 @@ public class Session implements StatusConstants {
 	protected void transmitConfInvite(String[] users, String yid, String room,
 			String msg) throws IOException {
 		// Create a new conference object
-		conferences.put(room, new YahooConference(userStore, identities.get(yid
+		conferences.put(room, new YahooConference(identities.get(yid
 				.toLowerCase()), room, this, false));
 		// Send request to Yahoo
 		PacketBodyBuffer body = new PacketBodyBuffer();
@@ -1394,7 +1375,7 @@ public class Session implements StatusConstants {
 	 */
 	protected void transmitFriendAdd(String friend, String group)
 			throws IOException {
-		PacketBodyBuffer body = new PacketBodyBuffer();
+		final PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", primaryID.getId()); // ???: effective id?
 		body.addElement("7", friend);
 		body.addElement("65", group);
@@ -1641,10 +1622,13 @@ public class Session implements StatusConstants {
 
 	/**
 	 * Process an incoming AUTH packet (in response to the AUTH packet we
-	 * transmitted to the server). Format: "1" <loginID> "94" <challenge string
-	 * (24 chars)> Note: for YMSG10 Yahoo sneakily changed the
-	 * challenge/response method dependant upon a switch in field '13'. If this
-	 * field is 0 use v9, if 1 then use v10.
+	 * transmitted to the server).
+	 * <p>
+	 * Format: <tt>"1" <loginID> "94" <challenge string * (24 chars)></tt>
+	 * <p>
+	 * Note: for YMSG10 and later, Yahoo sneakily changed the challenge/response
+	 * method dependent upon a switch in field '13'. If this field is absent or
+	 * 0, use v9, if 1 or 2, then use v10.
 	 */
 	protected void receiveAuth(YMSG9Packet pkt) // 0x57
 			throws IOException {
@@ -1653,16 +1637,19 @@ public class Session implements StatusConstants {
 					"Received a response to an AUTH packet, outside the normal login flow. Current state: "
 							+ sessionStatus);
 		}
+		log.trace("Received AUTH from server. Going to parse challenge...");
 		// Value for key 13: '0'=v9, '1'=v10
-		boolean isV10OrOlder = pkt.getValue("13") != null
-				&& pkt.getValue("13").equals("1");
+		final boolean isV9 = pkt.getValue("13") == null
+				|| pkt.getValue("13").equals("0");
 		final String[] s;
 		try {
-			if (isV10OrOlder) {
-				s = ChallengeResponseV10.getStrings(loginID.getId(), password,
+			if (isV9) {
+				log.trace("Parsing V9 challenge...");
+				s = ChallengeResponseV9.getStrings(loginID.getId(), password,
 						pkt.getValue("94"));
 			} else {
-				s = ChallengeResponseV9.getStrings(loginID.getId(), password,
+				log.trace("Parsing V10 challenge...");
+				s = ChallengeResponseV10.getStrings(loginID.getId(), password,
 						pkt.getValue("94"));
 			}
 		} catch (NoSuchAlgorithmException e) {
@@ -1671,6 +1658,8 @@ public class Session implements StatusConstants {
 			throw new YMSG9BadFormatException("auth", pkt, e);
 		}
 		sessionStatus = SessionState.CONNECTED;
+		log
+				.trace("Going to transmit Auth response, containing the challenge...");
 		transmitAuthResp(s[0], s[1]);
 	}
 
@@ -1682,6 +1671,7 @@ public class Session implements StatusConstants {
 	 */
 	protected void receiveAuthResp(YMSG9Packet pkt) // 0x54
 	{
+		log.trace("Received AUTHRESP packet.");
 		try {
 			if (pkt.exists("66")) {
 				final long l = Long.parseLong(pkt.getValue("66"));
@@ -1696,6 +1686,8 @@ public class Session implements StatusConstants {
 					}
 					loginException = new AccountLockedException("User "
 							+ loginID + " has been locked out", u);
+					log.info("AUTHRESP says: authentication failed!",
+							loginException);
 					break;
 
 				// Bad login (password?)
@@ -1703,13 +1695,17 @@ public class Session implements StatusConstants {
 					loginException = new LoginRefusedException("User "
 							+ loginID + " refused login",
 							AuthenticationState.BAD);
+					log.info("AUTHRESP says: authentication failed!",
+							loginException);
 					break;
 
-				// unkown account?
+				// unknown account?
 				case BADUSERNAME:
 					loginException = new LoginRefusedException("User "
 							+ loginID + " unknown",
 							AuthenticationState.BADUSERNAME);
+					log.info("AUTHRESP says: authentication failed!",
+							loginException);
 					break;
 				}
 			}
@@ -2096,15 +2092,15 @@ public class Session implements StatusConstants {
 	protected void receiveContactIgnore(YMSG9Packet pkt) // 0x85
 	{
 		try {
-			String n = pkt.getValue("0");
-			boolean ig = pkt.getValue("13").charAt(0) == '1';
+			String userId = pkt.getValue("0");
+			boolean ignored = pkt.getValue("13").charAt(0) == '1';
 			int st = Integer.parseInt(pkt.getValue("66"));
 			if (st == 0) {
 				// Update ignore status, and fire friend changed event
-				YahooUser yu = userStore.getOrCreate(n);
-				yu.setIgnored(ig);
+				final YahooUser user = roster.getUser(userId);
+				user.setIgnored(ignored);
 				// Fire event
-				SessionFriendEvent se = new SessionFriendEvent(this, yu, null);
+				SessionFriendEvent se = new SessionFriendEvent(this, user);
 				eventDispatchQueue.append(se, ServiceType.Y6_STATUS_UPDATE);
 			} else {
 				// Error
@@ -2138,78 +2134,70 @@ public class Session implements StatusConstants {
 	}
 
 	/**
-	 * @param from
-	 */
-	private void removeFriend(String from) {
-		final SessionEvent se = new SessionEvent(from);
-		final YahooUser user = userStore.get(from);
-		if (user != null) {
-			final Iterator<YahooGroup> iter = user.getGroups().iterator();
-			{
-				final YahooGroup group = iter.next();
-				group.getUsers().remove(user);
-				if (group.getUsers().size() == 0) {
-					iter.remove();
-					log.debug(group + " removed");
-				}
-			}
-
-			userStore.remove(from);
-			log.debug(from + " removed");
-		}
-		log.debug("end removeFriend");
-		eventDispatchQueue.append(se, ServiceType.CONTACTREJECT);
-	}
-
-	/**
-	 * Process an incoming CONTACTNEW packet. We get one of these: (1) when
-	 * someone has added us to their friends list, giving us the chance to
-	 * refuse them; (2) when we add or remove a friend (see FRIENDADD/REMOVE
-	 * outgoing) as confirmation prior to the FRIENDADD/REMOVE packet being
-	 * echoed back to us - if the friend is online status info may be inc- luded
-	 * (supposedly for multiple friends, although given the circum- stances
-	 * probably always contains only one!); (3) when someone refuses a contact
-	 * request (add friend) from us.
+	 * Process an incoming CONTACTNEW packet. We get one of these:
+	 * <ol>
+	 * <li>when someone has added us to their friends list, giving us the
+	 * chance to refuse them;</li>
+	 * <li>when we add or remove a friend (see FRIENDADD/REMOVE outgoing) as
+	 * confirmation prior to the FRIENDADD/REMOVE packet being echoed back to us -
+	 * if the friend is online status info may be included (supposedly for
+	 * multiple friends, although given the circumstances probably always
+	 * contains only one!);</li>
+	 * <li>when someone refuses a contact request (add friend) from us.</li>
+	 * </ol>
 	 */
 	protected void receiveContactNew(YMSG9Packet pkt) // 0x0f
 	{
+		// Empty CONTACTNEW, response to FRIENDADD/REMOVE.
+		if (pkt.length <= 0) {
+			log.trace("Received an empty CONTACTNEW packet, which is "
+					+ "probably sent back to us after we transmitted "
+					+ "a FRIENDADD/REMOVE. Just ignore it.");
+			return;
+		}
+
 		try {
-			if (pkt.length <= 0) // Empty packet is received after
-			{
-				return; // we transmit FRIENDADD/REMOVE
-			} else if (pkt.exists("7")) // Ditto, except friend is online
-			{
+			// Ditto, except friend is online
+			if (pkt.exists("7")) {
+				log.trace("Received a CONTACTNEW packet, which is probably "
+						+ "sent back to us after we transmitted a "
+						+ "FRIENDADD/REMOVE. Pass it to updateFriendStatus.");
 				updateFriendsStatus(pkt);
 				return;
-			} else if (pkt.status == 0x07) // Conact refused
-			{
-				SessionEvent se = new SessionEvent(this, null, // to
-						pkt.getValue("3"), // from
-						pkt.getValue("14") // message
-				);
-				removeFriend(pkt.getValue("3"));
-				eventDispatchQueue.append(se, ServiceType.CONTACTREJECT);
-			} else
-			// Contact request
-			{
-				final String to = pkt.getValue("1");
-				final String from = pkt.getValue("3");
-				final String message = pkt.getValue("14");
-				final String timestamp = pkt.getValue("15");
-
-				final SessionEvent se;
-				if (timestamp == null || timestamp.length() == 0) {
-					se = new SessionEvent(this, to, from, message);
-				} else {
-					final long timestampInMillis = 1000 * Long
-							.parseLong(timestamp);
-					se = new SessionEvent(this, to, from, message,
-							timestampInMillis);
-				}
-				se.setStatus(pkt.status); // status!=0 means offline message
-				eventDispatchQueue.append(se, ServiceType.CONTACTNEW);
 			}
-		} catch (Exception e) {
+
+			final String userId = pkt.getValue("3");
+			final String message = pkt.getValue("14");
+
+			// Contact refused our subscription request.
+			if (pkt.status == 0x07) {
+				log.trace("A friend refused our subscription request: "
+						+ userId);
+				final YahooUser user = roster.getUser(userId);
+				final SessionFriendRejectedEvent se = new SessionFriendRejectedEvent(
+						this, user, message);
+				eventDispatchQueue.append(se, ServiceType.CONTACTREJECT);
+				return;
+			}
+
+			// Someone is sending us a subscription request.
+			log
+					.trace("Someone is sending us a subscription request: "
+							+ userId);
+			final String to = pkt.getValue("1");
+			final String timestamp = pkt.getValue("15");
+
+			final SessionEvent se;
+			if (timestamp == null || timestamp.length() == 0) {
+				se = new SessionEvent(this, to, userId, message);
+			} else {
+				final long timestampInMillis = 1000 * Long.parseLong(timestamp);
+				se = new SessionEvent(this, to, userId, message,
+						timestampInMillis);
+			}
+			se.setStatus(pkt.status); // status!=0 means offline message
+			eventDispatchQueue.append(se, ServiceType.CONTACTNEW);
+		} catch (RuntimeException e) {
 			throw new YMSG9BadFormatException("contact request", pkt, e);
 		}
 	}
@@ -2256,17 +2244,16 @@ public class Session implements StatusConstants {
 	protected void receiveFriendAdd(YMSG9Packet pkt) // 0x83
 	{
 		try {
-			// We probably got a CONTACTNEW before we got this packet, so
-			// check if the user hasn't already been created in users hash
-			// (if not, create!) then add to groups structure.
-			final String username = pkt.getValue("7");
-			// String s = pkt.getValue("66"),
-			final String groupname = pkt.getValue("65");
-			final YahooUser yu = userStore.getOrCreate(username);
-			insertFriend(yu, groupname);
+			// Sometimes, a status update arrives before the FRIENDADD
+			// confirmation. If that's the case, we'll already have this contact
+			// on our roster.
+			final String userId = pkt.getValue("7");
+			// String status = pkt.getValue("66"),
+			final String groupName = pkt.getValue("65");
+			final YahooUser user = new YahooUser(userId, groupName);
+
 			// Fire event : 7=friend, 66=status, 65=group name
-			final SessionFriendEvent se = new SessionFriendEvent(this, yu,
-					groupname);
+			final SessionFriendEvent se = new SessionFriendEvent(this, user);
 			eventDispatchQueue.append(se, ServiceType.FRIENDADD);
 		} catch (Exception e) {
 			throw new YMSG9BadFormatException("friend added", pkt, e);
@@ -2274,21 +2261,28 @@ public class Session implements StatusConstants {
 	}
 
 	/**
-	 * Process an incoming FRIENDADD packet. We get one of these after we've
+	 * Process an incoming FRIENDREMOVE packet. We get one of these after we've
 	 * sent a FRIENDREMOVE packet, as confirmation. It contains basic details of
 	 * the friend we've deleted.
 	 */
 	protected void receiveFriendRemove(YMSG9Packet pkt) // 0x84
 	{
 		try {
-			String n = pkt.getValue("7"), g = pkt.getValue("65");
-			YahooUser yu = userStore.get(n);
-			if (yu == null) {
+			final String userId = pkt.getValue("7");
+			// TODO: if this is a request to remove a user from one particular
+			// group, and that same user exists in another group, this might go
+			// terribly wrong...
+			// final String groupName = pkt.getValue("65");
+
+			final YahooUser user = roster.getUser(userId);
+
+			if (user == null) {
+				log.info("Unable to remove a user that's not on the roster: "
+						+ userId);
 				return;
 			}
-			deleteFriend(yu, g);
 			// Fire event : 7=friend, 66=status, 65=group name
-			SessionFriendEvent se = new SessionFriendEvent(this, yu, g);
+			SessionFriendEvent se = new SessionFriendEvent(this, user);
 			eventDispatchQueue.append(se, ServiceType.FRIENDREMOVE);
 		} catch (Exception e) {
 			throw new YMSG9BadFormatException("friend removed", pkt, e);
@@ -2419,20 +2413,20 @@ public class Session implements StatusConstants {
 				while (st1.hasMoreTokens()) {
 					final String s1 = st1.nextToken();
 					// Store group name and decoded friends list
-					final YahooGroup group = new YahooGroup(s1.substring(0, s1
-							.indexOf(":")));
+					final String groupId = s1.substring(0, s1.indexOf(":"));
+					final YahooGroup group = new YahooGroup(groupId);
 					final StringTokenizer st2 = new StringTokenizer(s1
 							.substring(s1.indexOf(":") + 1), ",");
 
 					// extract each user.
 					while (st2.hasMoreTokens()) {
-						final String k = st2.nextToken();
-						final YahooUser yu = userStore.getOrCreate(k);
-						group.addUser(yu);
-						yu.addGroup(group);
-						usersOnList.add(yu);
+						final String userId = st2.nextToken();
+						final YahooUser user = new YahooUser(userId);
+						group.addUser(user);
+						user.addGroup(groupId);
+						usersOnList.add(user);
 					}
-					log.debug("add new group from list " + group.toString());
+					log.debug("add new group from list " + groupId.toString());
 					groups.add(group);
 				}
 
@@ -2449,15 +2443,15 @@ public class Session implements StatusConstants {
 
 		// Ignored list (people we don't want to hear from!)
 		try {
-			String s = pkt.getValue("88"); // Value for key "88"
-			if (s != null) {
+			final String string = pkt.getValue("88"); // Value for key "88"
+			if (string != null) {
 				final Set<YahooUser> usersOnList = new HashSet<YahooUser>();
 
 				// Comma separated list (?)
-				StringTokenizer st = new StringTokenizer(s, ",");
+				final StringTokenizer st = new StringTokenizer(string, ",");
 				while (st.hasMoreTokens()) {
-					s = st.nextToken();
-					YahooUser yu = userStore.getOrCreate(s);
+					final String userId = st.nextToken();
+					final YahooUser yu = new YahooUser(userId);
 					yu.setIgnored(true);
 					usersOnList.add(yu);
 				}
@@ -2491,15 +2485,15 @@ public class Session implements StatusConstants {
 
 		// Stealth blocked list (people we don't want to see us!)
 		try {
-			String s = pkt.getValue("185"); // Value for key "185"
-			if (s != null) {
+			final String string = pkt.getValue("185"); // Value for key "185"
+			if (string != null) {
 				final Set<YahooUser> usersOnList = new HashSet<YahooUser>();
 
 				// Comma separated list (?)
-				StringTokenizer st = new StringTokenizer(s, ",");
+				final StringTokenizer st = new StringTokenizer(string, ",");
 				while (st.hasMoreTokens()) {
-					s = st.nextToken();
-					YahooUser yu = userStore.getOrCreate(s);
+					final String userId = st.nextToken();
+					final YahooUser yu = new YahooUser(userId);
 					yu.setStealthBlocked(true);
 					usersOnList.add(yu);
 				}
@@ -2751,6 +2745,9 @@ public class Session implements StatusConstants {
 	 */
 	protected void sendPacket(PacketBodyBuffer body, ServiceType service,
 			Status status) throws IOException {
+		log.trace("Sending packet on/to the network. SessionId[" + sessionId
+				+ "] ServiceType[" + service + "] Status[" + status + "] Body["
+				+ body + "]");
 		network.sendPacket(body, service, status.getValue(), sessionId);
 	}
 
@@ -2909,12 +2906,18 @@ public class Session implements StatusConstants {
 		// Process each friend
 		int i = -1;
 		while (pkt.getNthValue("7", ++i) != null) {
-			final String username = pkt.getNthValue("7", i);
-			YahooUser user = userStore.get(username);
+			final String userId = pkt.getNthValue("7", i);
+			YahooUser user = roster.getUser(userId);
 			// When we add a friend, we get a status update before
 			// getting a confirmation FRIENDADD packet (crazy!)
 			if (user == null) {
-				user = userStore.getOrCreate(username);
+				log.debug("Presence of a new friend seems to have arrived "
+						+ "before the details of the new friend. Adding "
+						+ "them now: " + userId);
+				// TODO: clean up the threading mess that can be caused by this.
+				roster.dispatch(new FireEvent(new SessionFriendEvent(this,
+						new YahooUser(userId)), ServiceType.FRIENDADD));
+				user = roster.getUser(userId);
 			}
 
 			// 7=friend 10=status 17=chat 13=pager (old version)
@@ -2955,13 +2958,13 @@ public class Session implements StatusConstants {
 			// 138=Clear idle time
 			final String clearIdleTime = pkt.getNthValue("138", i);
 			if (clearIdleTime != null) {
-				user.setIdleTime("-1");
+				user.setIdleTime(-1);
 			}
 
 			// 137=Idle time (seconds)
 			final String idleTime = pkt.getNthValue("137", i);
 			if (idleTime != null) {
-				user.setIdleTime(idleTime);
+				user.setIdleTime(Long.parseLong(idleTime));
 			}
 
 			// 60=SMS
@@ -2970,8 +2973,7 @@ public class Session implements StatusConstants {
 			// ...
 			// Add to event object
 
-			final SessionFriendEvent event = new SessionFriendEvent(this, user,
-					null);
+			final SessionFriendEvent event = new SessionFriendEvent(this, user);
 			// Fire event
 			if (eventDispatchQueue != null) {
 				eventDispatchQueue.append(event, ServiceType.Y6_STATUS_UPDATE);
@@ -2979,58 +2981,46 @@ public class Session implements StatusConstants {
 		}
 	}
 
-	/**
-	 * Inserts the given user into the desired group, if not already present.
-	 * Creates the group if not present.
-	 */
-	private void insertFriend(YahooUser yahooUser, String groupName) {
-		YahooGroup addToThis = null;
-		for (YahooGroup group : groups) {
-			if (group.getName().equalsIgnoreCase(groupName)) {
-				addToThis = group;
-				break;
-			}
-		}
-
-		if (addToThis == null) {
-			addToThis = new YahooGroup(groupName);
-			groups.add(addToThis);
-		}
-
-		// Add user if needs be
-		if (!addToThis.getUsers().contains(yahooUser)) {
-			addToThis.addUser(yahooUser);
-			yahooUser.addGroup(addToThis);
-		}
-	}
-
-	/**
-	 * Deletes a friend from the desired group, if present. Removes the group
-	 * too if now empty.
-	 */
-	private void deleteFriend(YahooUser user, String groupName) {
-		for (YahooGroup group : groups) {
-			if (group.getName().equalsIgnoreCase(groupName)) {
-				group.getUsers().remove(user);
-				user.getGroups().remove(group);
-				// If the groups is empty, remove it too
-				if (group.getUsers().isEmpty())
-					if (!groups.remove(group))
-						log.debug(" group " + group.getName()
-								+ " not removed, check it!");
-				break;
-			}
-		}
-		userStore.remove(user.getId());
-	}
+	// TODO: cleanup
+	// /**
+	// * Inserts the given user into the desired group, if not already present.
+	// * Creates the group if not present.
+	// */
+	// private void insertFriend(YahooUser yahooUser, String groupName) {
+	// YahooGroup addToThis = null;
+	// for (YahooGroup group : groups) {
+	// if (group.getName().equalsIgnoreCase(groupName)) {
+	// addToThis = group;
+	// break;
+	// }
+	// }
+	//
+	// if (addToThis == null) {
+	// addToThis = new YahooGroup(groupName);
+	// groups.add(addToThis);
+	// }
+	//
+	// // Add user if needs be
+	// if (!addToThis.getUsers().contains(yahooUser)) {
+	// addToThis.addUser(yahooUser);
+	// yahooUser.addGroup(groupName);
+	// }
+	// }
 
 	/**
-	 * Create chat user from a chat packet. Note: a YahooUser is create if
+	 * Create chat user from a chat packet. Note: a YahooUser is created if
 	 * necessary.
 	 */
 	private YahooChatUser createChatUser(YMSG9Packet pkt, int i) {
 		pkt.generateQuickSetAccessors("109");
-		final YahooUser yu = userStore.getOrCreate(pkt.getNthValue("109", i));
+
+		final String userId = pkt.getNthValue("109", i);
+		final YahooUser user;
+		if (roster.containsUser(userId)) {
+			user = roster.getUser(userId);
+		} else {
+			user = new YahooUser(userId);
+		}
 
 		final int attributes = Integer.parseInt(pkt.getValueFromNthSetQA("113",
 				i));
@@ -3038,7 +3028,7 @@ public class Session implements StatusConstants {
 		final int age = Integer.parseInt(pkt.getValueFromNthSetQA("110", i));
 		final String location = pkt.getValueFromNthSetQA("142", i); // optional
 
-		return new YahooChatUser(yu, attributes, alias, age, location);
+		return new YahooChatUser(user, attributes, alias, age, location);
 	}
 
 	/**
@@ -3062,7 +3052,7 @@ public class Session implements StatusConstants {
 		YahooIdentity yid = identities.get(pkt.getValue("1").toLowerCase());
 		YahooConference yc = conferences.get(room);
 		if (yc == null) {
-			yc = new YahooConference(userStore, yid, room, this);
+			yc = new YahooConference(yid, room, this);
 			conferences.put(room, yc);
 		}
 		return yc;
