@@ -29,6 +29,15 @@ public class ContactsTest extends YahooTestAbstract {
 	public void testAddContact() throws Exception {
 		removeAllContacts(sess1);
 		removeAllContacts(sess2);
+		
+		if (!sess1.getRoster().isEmpty()) {
+			throw new IllegalStateException("Test setup problem. Roster1 should have been emptied by now.");
+		}
+
+		if (!sess2.getRoster().isEmpty()) {
+			throw new IllegalStateException("Test setup problem. Roster2 should have been emptied by now.");
+		}
+		
 		addfriend();
 	}
 
@@ -53,9 +62,9 @@ public class ContactsTest extends YahooTestAbstract {
 	 * @throws IOException
 	 */
 	private void addfriend() {
+
 		drain();
-		// sess1.addFriend(OTHERUSR,
-		// sess1.getGroups().iterator().next().getName());
+
 		sess1.getRoster().add(new YahooUser(OTHERUSR, "group"));
 		FireEvent event = listener2.waitForEvent(5, ServiceType.CONTACTNEW);
 		assertNotNull(event);
@@ -70,9 +79,12 @@ public class ContactsTest extends YahooTestAbstract {
 	public void testRejectContact() throws IOException, InterruptedException {
 		removeAllContacts(sess1);
 		sess1.getRoster().add(new YahooUser(OTHERUSR, "group"));
-		assertNotNull(listener1.waitForEvent(5, ServiceType.FRIENDADD));
+//		assertNotNull(listener1.waitForEvent(5, ServiceType.FRIENDADD));
 		Thread.sleep(500);
-		FireEvent event = listener2.waitForEvent(5, ServiceType.CONTACTNEW);
+		
+		final FireEvent event = listener2.waitForEvent(5, ServiceType.CONTACTNEW);
+		assertNotNull(event);
+		
 		sess2.rejectContact(event.getEvent(), "i don't want you");
 		assertNotNull(listener1.waitForEvent(5, ServiceType.CONTACTREJECT));
 

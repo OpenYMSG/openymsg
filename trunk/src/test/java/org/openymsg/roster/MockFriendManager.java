@@ -2,6 +2,7 @@ package org.openymsg.roster;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.openymsg.network.FriendManager;
 
 /**
@@ -12,6 +13,12 @@ import org.openymsg.network.FriendManager;
  */
 public class MockFriendManager implements FriendManager {
 
+	private static final Logger log = Logger.getLogger(MockFriendManager.class);
+	
+	private String friendId = null;
+	private String groupId = null;
+	private String method = null;
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -20,7 +27,11 @@ public class MockFriendManager implements FriendManager {
 	 */
 	public void removeFriendFromGroup(String friendId, String groupId)
 			throws IOException {
-		// intentionally left empty.
+		log.info("Mock removeFriendFromGroup triggered with friendId ["+friendId+"] and groupId ["+groupId+"]");
+		this.friendId = friendId;
+		this.groupId = groupId;
+		this.method = "removeFriendFromGroup";
+		
 	}
 
 	/*
@@ -31,6 +42,30 @@ public class MockFriendManager implements FriendManager {
 	 */
 	public void sendNewFriendRequest(String userId, String groupId)
 			throws IOException {
-		// intentionally left empty.
+		log.info("Mock sendNewFriendRequest triggered with friendId ["+userId+"] and groupId ["+groupId+"]");
+		this.friendId = userId;
+		this.groupId = groupId;
+		this.method = "sendNewFriendRequest";
+	}
+
+	/**
+	 * @return the friendId
+	 */
+	public String getFriendId() {
+		return friendId;
+	}
+
+	/**
+	 * @return the groupId
+	 */
+	public String getGroupId() {
+		return groupId;
+	}
+
+	/**
+	 * @return the method
+	 */
+	public String getMethod() {
+		return method;
 	}
 }

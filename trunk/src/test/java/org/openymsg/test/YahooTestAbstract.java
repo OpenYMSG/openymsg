@@ -56,7 +56,7 @@ public class YahooTestAbstract {
 			listener1.waitForEvent(2, ServiceType.LOGON);
 			listener2.waitForEvent(2, ServiceType.LOGON);
 			removeAllContacts(sess1);
-
+			removeAllContacts(sess2);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			throw e;
@@ -88,6 +88,7 @@ public class YahooTestAbstract {
 		drain();
 
 		final Roster roster = sess.getRoster();
+		
 		for (final YahooUser user : roster) {
 			// TODO: Set#remove() in a for-each loop? :S
 			roster.remove(user);
