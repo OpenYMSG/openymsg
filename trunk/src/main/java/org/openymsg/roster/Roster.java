@@ -1,5 +1,6 @@
 package org.openymsg.roster;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -10,6 +11,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.openymsg.network.ContactListType;
 import org.openymsg.network.FireEvent;
+import org.openymsg.network.FriendManager;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.SessionEvent;
@@ -40,16 +42,38 @@ public class Roster implements Set<YahooUser>, SessionListener {
 	 * The collection of RosterListener instances that will be notified of new
 	 * changes to the roster.
 	 */
-	final Collection<RosterListener> listeners = new LinkedList<RosterListener>();
+	private final Collection<RosterListener> listeners = new LinkedList<RosterListener>();
 
 	/**
 	 * A collection of all YahooUsers on the roster. The YahooUsers are mapped
 	 * by the value returned by {@link YahooUser.getId()}
 	 */
-	final Map<String, YahooUser> usersById = new Hashtable<String, YahooUser>();
+	private final Map<String, YahooUser> usersById = new Hashtable<String, YahooUser>();
+
+	/**
+	 * Interface used to relay changes to the roster to the Yahoo network.
+	 */
+	private final FriendManager friendManager;
+
+	/**
+	 * Creates a new roster object, that makes use of the provided manager to
+	 * transmit changes made to the roster to the Yahoo network.
+	 * 
+	 * @param manager
+	 *            The object used to relay changes made to this Roster to the
+	 *            Yahoo network.
+	 */
+	public Roster(final FriendManager manager) {
+		if (manager == null) {
+			throw new IllegalArgumentException(
+					"Argument 'manager' cannot be null");
+		}
+
+		friendManager = manager;
+	}
 
 	// Event Listening management methods
-
+	
 	/**
 	 * Adds a listener that will be notified of any roster changes. This
 	 * operation is thread safe.
@@ -141,11 +165,18 @@ public class Roster implements Set<YahooUser>, SessionListener {
 			throw new IllegalArgumentException(
 					"The user to be added must have a valid, non-empty String ID field set.");
 		}
+		
+		// TODO : input validation on userId/groupId?
 
-		// TODO: adding and removing users from the roster should result in
-		// subscription state changes.
-		throw new IllegalStateException("Pending implementation");
-		// return syncedAdd(user);
+		for(final String groupId : user.getGroupIds()) {
+			try {
+				friendManager.sendNewFriendRequest(user.getId(), groupId);
+			} catch (IOException ex) {
+				throw new RuntimeException("Unexpected exception.", ex);
+			}
+		}
+		// TODO: is this according to the 'set' contract? :S
+		return false;
 	}
 
 	/**
@@ -219,31 +250,20 @@ public class Roster implements Set<YahooUser>, SessionListener {
 			throw new ClassCastException("This method needs a YahooUser value.");
 		}
 
-		return removeUser(((YahooUser) userObject).getId());
-	}
+		final YahooUser user = (YahooUser) userObject;
+		// TODO : input validation on userId/groupId?
 
-	/**
-	 * Removes the user specified by the user ID from this roster if it is
-	 * present. Returns <tt>true</tt> if the roster contained the specified
-	 * user (or equivalently, if the roster changed as a result of the call).
-	 * The roster will not contain the specified user once the call returns.
-	 * 
-	 * @param userId
-	 *            ID of the user to be removed from this roster, if present.
-	 * @return <tt>true</tt> if the roster contained the specified user.
-	 * @throws IllegalArgumentException
-	 *             if the argument is null or an empty String.
-	 */
-	public boolean removeUser(String userId) {
-		if (userId == null || userId.length() == 0) {
-			throw new IllegalArgumentException(
-					"Argument 'userId' cannot be null or an empty String.");
+		for(final String groupId : user.getGroupIds()) {
+			try {
+				friendManager.sendNewFriendRequest(user.getId(), groupId);
+			} catch (IOException ex) {
+				throw new RuntimeException("Unexpected exception.", ex);
+			}
 		}
-
-		// TODO: adding and removing users from the roster should result in
-		// subscription state changes.
-		throw new IllegalStateException("Pending implementation");
-		// return syncedRemove(userId);
+		// TODO: is this according to the 'set' contract? :S
+		return false;
+		
+///		return removeUser(((YahooUser) userObject).getId());
 	}
 
 	/**

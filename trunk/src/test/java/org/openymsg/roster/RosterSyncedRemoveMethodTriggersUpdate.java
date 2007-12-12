@@ -25,7 +25,7 @@ public class RosterSyncedRemoveMethodTriggersUpdate {
 
 	@Before
 	public void setUp() throws Throwable {
-		roster = new Roster();
+		roster = new Roster(new MockFriendManager());
 		PrivateAccessor.invoke(roster, "syncedAdd",
 				new Class[] { YahooUser.class }, new Object[] { USER });
 	}

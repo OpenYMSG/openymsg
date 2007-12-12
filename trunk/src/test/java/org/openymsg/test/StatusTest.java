@@ -15,8 +15,10 @@ import org.openymsg.network.LoginRefusedException;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.Session;
 import org.openymsg.network.Status;
+import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.network.event.WaitListener;
+import org.openymsg.roster.Roster;
 
 public class StatusTest extends YahooTestAbstract {
 
@@ -37,9 +39,10 @@ public class StatusTest extends YahooTestAbstract {
 
 	// @Test
 	public void testChangeStatus() throws IllegalArgumentException, IOException {
-		final boolean existinList = sess1.getRoster().containsUser(OTHERUSR);
+		final Roster roster = sess1.getRoster();
+		final boolean existinList = roster.containsUser(OTHERUSR);
 		if (!existinList) {
-			sess1.addFriend(OTHERUSR, "group");
+			roster.add(new YahooUser(OTHERUSR, "group"));
 			listener1.waitForEvent(5, ServiceType.FRIENDADD);
 		}
 

@@ -27,7 +27,7 @@ public class RosterEventTest {
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testRosterEventArgumentValidationYahooUser() {
-		new RosterEvent(new Roster(), null, RosterEventType.add);
+		new RosterEvent(new Roster(new MockFriendManager()), null, RosterEventType.add);
 	}
 
 	/**
@@ -36,7 +36,7 @@ public class RosterEventTest {
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testRosterEventArgumentValidationType() {
-		new RosterEvent(new Roster(), new YahooUser("dummy"), null);
+		new RosterEvent(new Roster(new MockFriendManager()), new YahooUser("dummy"), null);
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class RosterEventTest {
 		// should work for all RosterEventTypes
 		for (final RosterEventType type : RosterEventType.values()) {
 			assertEquals("failed on type=" + type, user, new RosterEvent(
-					new Roster(), user, type).getUser());
+					new Roster(new MockFriendManager()), user, type).getUser());
 		}
 	}
 
@@ -59,7 +59,7 @@ public class RosterEventTest {
 	@Test
 	public void testGetType() {
 		for (final RosterEventType type : RosterEventType.values()) {
-			assertEquals(type, new RosterEvent(new Roster(), new YahooUser(
+			assertEquals(type, new RosterEvent(new Roster(new MockFriendManager()), new YahooUser(
 					"dummy"), type).getType());
 		}
 	}
@@ -69,7 +69,7 @@ public class RosterEventTest {
 	 */
 	@Test
 	public void testGetSource() {
-		final Roster roster = new Roster();
+		final Roster roster = new Roster(new MockFriendManager());
 		for (final RosterEventType type : RosterEventType.values()) {
 			assertEquals(roster, new RosterEvent(roster,
 					new YahooUser("dummy"), type).getSource());

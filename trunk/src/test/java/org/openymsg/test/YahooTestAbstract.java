@@ -4,6 +4,7 @@
 package org.openymsg.test;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -13,6 +14,7 @@ import org.openymsg.network.SessionState;
 import org.openymsg.network.YahooGroup;
 import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.WaitListener;
+import org.openymsg.roster.Roster;
 
 /**
  * @author Giancarlo Frison - Nimbuzz B.V. <giancarlo@nimbuzz.com>
@@ -85,13 +87,15 @@ public class YahooTestAbstract {
 	 * 
 	 * @throws IOException
 	 */
-	protected static void removeAllContacts(Session sess) throws IOException {
+	protected static void removeAllContacts(Session sess) {
 		drain();
-		for (YahooGroup group : sess.getGroups())
-			for (YahooUser user : group.getUsers()) {
-				sess1.removeFriend(user.getId(), group.getName());
-				listener1.waitForEvent(5, ServiceType.FRIENDREMOVE);
-			}
+		
+		final Roster roster = sess.getRoster();
+		for (final YahooUser user : roster) {
+			// TODO: Set#remove() in a for-each loop? :S
+			roster.remove(user);
+			listener1.waitForEvent(5, ServiceType.FRIENDREMOVE);
+		}
 	}
 
 	/**

@@ -32,7 +32,7 @@ public class RosterSyncedAdd {
 	 */
 	@Before
 	public void setUp() {
-		roster = new Roster();
+		roster = new Roster(new MockFriendManager());
 	}
 
 	/**
