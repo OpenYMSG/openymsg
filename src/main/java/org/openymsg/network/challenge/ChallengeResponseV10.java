@@ -16,7 +16,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network;
+package org.openymsg.network.challenge;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -64,21 +64,19 @@ import java.security.NoSuchAlgorithmException;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-class ChallengeResponseV10 extends ChallengeResponseUtility implements
+public class ChallengeResponseV10 extends ChallengeResponseUtility implements
 		ChallengeResponseV10Tables {
-	// These lookup tables are used in decoding the challenge string
-	private final static String ALPHANUM_LOOKUP = "qzec2tb3um1olpar8whx4dfgijknsvy5"; // 32
+	/**
+	 * These lookup tables are used in decoding the challenge string.
+	 */
+	private final static String ALPHANUM_LOOKUP = "qzec2tb3um1olpar8whx4dfgijknsvy5"; 
+	private final static String OPERATORS_LOOKUP = "+|&%/*^-";
 
-	// chars
-
-	private final static String OPERATORS_LOOKUP = "+|&%/*^-"; // 8 chars
-
-	// These lookup tables are used in encoding the response strings
-	private final static String ENCODE1_LOOKUP = "FBZDWAGHrJTLMNOPpRSKUVEXYChImkwQ"; // 32
-
-	// chars
-	private final static String ENCODE2_LOOKUP = "F0E1D2C3B4A59687abcdefghijklmnop"; // Ditto
-
+	/**
+	 * These lookup tables are used in encoding the response strings
+	 */
+	private final static String ENCODE1_LOOKUP = "FBZDWAGHrJTLMNOPpRSKUVEXYChImkwQ"; 
+	private final static String ENCODE2_LOOKUP = "F0E1D2C3B4A59687abcdefghijklmnop"; 
 	private final static String ENCODE3_LOOKUP = ",;";
 
 	private final static String BINARY_DATA = "/challenge.bin";
@@ -88,18 +86,31 @@ class ChallengeResponseV10 extends ChallengeResponseUtility implements
 
 	/**
 	 * Given a username, password and challenge string, this code returns the
-	 * two valid response strings needed to login to Yahoo
+	 * two valid response strings needed to login to Yahoo.
+	 * 
+	 * @param username
+	 *            Username of the session that is trying to authenticate
+	 * @param password
+	 *            Password that validates <tt>username</tt>
+	 * @param challenge
+	 *            The challenge as received from the Yahoo network.
+	 * @return The two valid response Strings needed to finish authenticating.
+	 * @throws NoSuchAlgorithmException
+	 * @throws IOException
 	 */
-	public static String[] getStrings(String username, String password,
-			String challenge) throws NoSuchAlgorithmException, IOException {
+	public static String[] getStrings(final String username,
+			final String password, final String challenge)
+			throws NoSuchAlgorithmException, IOException {
 		int operand = 0, i;
 
 		// Count the number of operator characters, as this determines the
 		// size of our magic bytes array
 		int cnt = 0;
-		for (i = 0; i < challenge.length(); i++)
-			if (isOperator(challenge.charAt(i)))
+		for (i = 0; i < challenge.length(); i++) {
+			if (isOperator(challenge.charAt(i))) {
 				cnt++;
+			}
+		}
 
 		int[] magic = new int[cnt];
 
@@ -110,18 +121,21 @@ class ChallengeResponseV10 extends ChallengeResponseUtility implements
 		for (i = 0; i < challenge.length(); i++) {
 			char c = challenge.charAt(i);
 			if (Character.isLetter(c) || Character.isDigit(c)) {
-				operand = ALPHANUM_LOOKUP.indexOf(c) << 3; // 0-31, shifted to
-				// high 5 bits
+				// 0-31, shifted to high 5 bits
+				operand = ALPHANUM_LOOKUP.indexOf(c) << 3; 
 			} else if (isOperator(c)) {
-				int a = OPERATORS_LOOKUP.indexOf(c); // 0-7
-				magic[cnt] = (operand | a) & 0xff; // Mask with operand
+				// 0-7
+				int a = OPERATORS_LOOKUP.indexOf(c);
+				// Mask with operand
+				magic[cnt] = (operand | a) & 0xff; 
 				cnt++;
 			}
 		}
 
 		// PART TWO : Monkey around with the data
 		for (i = magic.length - 2; i >= 0; i--) {
-			int a = magic[i], b = magic[i + 1];
+			int a = magic[i];
+			int b = magic[i + 1];
 			a = ((a * 0xcd) ^ b) & 0xff;
 			magic[i + 1] = a;
 		}
@@ -310,18 +324,6 @@ class ChallengeResponseV10 extends ChallengeResponseUtility implements
 
 	/**
 	 * Replaces the 'data' field with the data found in BINARY_DATA
-	 * 
-	 * Note that this method tries to circument a bug caused by
-	 * {@link #Class.getResource()} returning unescaped path Strings ('%20'
-	 * instead of spaces). This method works around this bug by first creating
-	 * an URI from the abstract pathname, then converting it to a File object.
-	 * This workaround is described at
-	 * {@link http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4466485}.
-	 * 
-	 * Of relevance to the workaround is
-	 * {@link http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4468322}. It
-	 * describes how to handle File to URI conversions where '\' characters are
-	 * part of the file name.
 	 * 
 	 * @throws IOException
 	 */

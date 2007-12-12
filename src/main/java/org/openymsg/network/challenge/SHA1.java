@@ -16,7 +16,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network;
+package org.openymsg.network.challenge;
 
 /**
  * This class is a port of the SHA-1 algorithm included with GAIM, which is a
@@ -27,7 +27,7 @@ package org.openymsg.network;
  * the SHA digest as it was being created. This code enabled jYMSG to regain
  * access to Yahoo within only a few days of the change.
  * 
- * For v0.6 I (FISH) have modified the source to standardise its style with the
+ * For v0.6 I (FISH) have modified the source to standardize its style with the
  * rest of the code in the jYMSG project (just for consistency), added comments
  * (more for my own benefit than anyone else's) and simplified it to remove test
  * code and objects when not actually being debugged (to reduce its deployment

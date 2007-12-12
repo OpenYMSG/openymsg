@@ -43,6 +43,8 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
+import org.openymsg.network.challenge.ChallengeResponseV10;
+import org.openymsg.network.challenge.ChallengeResponseV9;
 import org.openymsg.network.chatroom.ChatroomManager;
 import org.openymsg.network.chatroom.YahooChatLobby;
 import org.openymsg.network.chatroom.YahooChatUser;
