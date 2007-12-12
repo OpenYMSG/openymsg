@@ -16,7 +16,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network;
+package org.openymsg.network.challenge;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -26,7 +26,7 @@ import java.security.NoSuchAlgorithmException;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-class ChallengeResponseUtility {
+public class ChallengeResponseUtility {
 	private final static String Y64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 			+ "abcdefghijklmnopqrstuvwxyz" + "0123456789._";
 
@@ -40,13 +40,13 @@ class ChallengeResponseUtility {
 	 * In this fashion raw binary data can be expressed as valid 7 bit printable
 	 * ASCII - although the size of the data will expand by 25% - three bytes
 	 * (24 bits) taking up four ASCII characters. Now obviously the bit stream
-	 * will terminate mid way throught an ASCII character if the input array
+	 * will terminate mid way through an ASCII character if the input array
 	 * size isn't evenly divisible by 3. To flag this, either one or two dashes
 	 * are appended to the output. A single dash if we're two over, and two
 	 * dashes if we're only one over. (No dashes are appended if the input size
 	 * evenly divides by 3.)
 	 */
-	final static String yahoo64(byte[] buffer) {
+	public final static String yahoo64(byte[] buffer) {
 		int limit = buffer.length - (buffer.length % 3);
 		// int pos = 0;
 		StringBuffer out = new StringBuffer();
@@ -100,11 +100,11 @@ class ChallengeResponseUtility {
 	 * 
 	 * @throws NoSuchAlgorithmException
 	 */
-	final static byte[] md5(String s) throws NoSuchAlgorithmException {
+	public final static byte[] md5(String s) throws NoSuchAlgorithmException {
 		return md5(s.getBytes());
 	}
 
-	final synchronized static byte[] md5(byte[] buff)
+	public final synchronized static byte[] md5(byte[] buff)
 			throws NoSuchAlgorithmException {
 		MessageDigest md5Obj = MessageDigest.getInstance("MD5");
 		md5Obj.reset();
@@ -114,8 +114,9 @@ class ChallengeResponseUtility {
 	/**
 	 * Return the MD5Crypt of a string and salt
 	 */
-	final static byte[] md5Crypt(String k, String s)
+	// TODO: remove this wrapper.
+	public final static byte[] md5Crypt(String k, String s)
 			throws NoSuchAlgorithmException {
-		return UnixMD5Crypt.crypt(k, s).getBytes();
+		return UnixCrypt.crypt(k, s).getBytes();
 	}
 }

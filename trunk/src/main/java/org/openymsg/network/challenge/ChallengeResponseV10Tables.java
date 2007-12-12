@@ -16,7 +16,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network;
+package org.openymsg.network.challenge;
 
 /**
  * Tables for the post January 2004 Yahoo auth routines in ChallengeResponseV10 .
@@ -24,7 +24,7 @@ package org.openymsg.network;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-interface ChallengeResponseV10Tables {
+public interface ChallengeResponseV10Tables {
 	// Offsets of various tables in binary data (should be either 256 or 32
 	// bytes each).
 	public static final char[] TABLE_OFFSETS = {

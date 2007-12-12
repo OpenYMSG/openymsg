@@ -16,15 +16,16 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network;
+package org.openymsg.network.challenge;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 /**
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-class ChallengeResponseV9 extends ChallengeResponseUtility {
+public class ChallengeResponseV9 extends ChallengeResponseUtility {
 	final static int[] CHECKSUM_POS = { 7, 9, 15, 1, 3, 7, 9, 15 };
 
 	final static int USERNAME = 0, PASSWORD = 1, CHALLENGE = 2;
@@ -41,38 +42,65 @@ class ChallengeResponseV9 extends ChallengeResponseUtility {
 
 	/**
 	 * Given a username, password and challenge string, this code returns the
-	 * two valid response strings needed to login to Yahoo
+	 * two valid response strings needed to login to Yahoo.
+	 * 
+	 * @param username
+	 *            Username of the session that is trying to authenticate
+	 * @param password
+	 *            Password that validates <tt>username</tt>
+	 * @param challenge
+	 *            The challenge as received from the Yahoo network.
+	 * @return The two valid response Strings needed to finish authenticating.
+	 * @throws NoSuchAlgorithmException
+	 * @throws IOException
 	 */
-	static String[] getStrings(String username, String password,
-			String challenge) throws NoSuchAlgorithmException {
-		String[] s = new String[2];
+	public static String[] getStrings(final String username,
+			final String password, final String challenge)
+			throws NoSuchAlgorithmException {
+
+		final String[] s = new String[2];
 		s[0] = yahoo64(md5(password));
 		s[1] = yahoo64(md5(md5Crypt(password, "$1$_2S43d5f")));
 
+		// combination mode
 		int mode = challenge.charAt(15) % 8;
 
 		// The mode determines the 'checksum' character
-		char c = challenge.charAt(challenge.charAt(CHECKSUM_POS[mode]) % 16);
+		final char checksum = challenge.charAt(challenge
+				.charAt(CHECKSUM_POS[mode]) % 16);
 
 		// Depending upon the mode, the various strings are combined
 		// differently
-		s[0] = yahoo64(md5(c + combine(username, s[0], challenge, mode)));
-		s[1] = yahoo64(md5(c + combine(username, s[1], challenge, mode)));
+		s[0] = yahoo64(md5(checksum + combine(username, s[0], challenge, mode)));
+		s[1] = yahoo64(md5(checksum + combine(username, s[1], challenge, mode)));
 
 		return s;
 	}
 
 	/**
 	 * The 'mode' (see getStrings() above) determines the order the various
-	 * strings and the hashed/encyrpted password are concatenated. For
+	 * strings and the hashed/encrypted password are concatenated. For
 	 * efficiency I stuff all the values into an array and use a table to
 	 * determine the order they should be glued together.
+	 * 
+	 * @param username
+	 *            Username String
+	 * @param password
+	 *            Password String
+	 * @param challenge
+	 *            Challenge String
+	 * @param mode
+	 *            Combination mode identifier
+	 * @return combination of username, password and challenge, combined as
+	 *         suggested by the 'mode' parameter.
 	 */
-	private static String combine(String u, String p, String c, int mode) {
-		StringBuffer sb = new StringBuffer();
-		String[] sa = { u, p, c };
-		for (int i = 0; i < 3; i++)
+	private static String combine(final String username, final String password,
+			final String challenge, final int mode) {
+		final StringBuilder sb = new StringBuilder();
+		final String[] sa = { username, password, challenge };
+		for (int i = 0; i < 3; i++) {
 			sb.append(sa[STRING_ORDER[mode][i]]);
+		}
 		return sb.toString();
 	}
 }
