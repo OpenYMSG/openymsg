@@ -285,7 +285,7 @@ public class PresenceTest {
 	 * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
 	 * 
 	 */
-	private class ReceivePresenceUpdateAdaptor extends SessionAdapter {
+	private static class ReceivePresenceUpdateAdaptor extends SessionAdapter {
 		/**
 		 * The queued event.
 		 */

@@ -4,14 +4,12 @@
 package org.openymsg.test;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.Session;
 import org.openymsg.network.SessionState;
-import org.openymsg.network.YahooGroup;
 import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.WaitListener;
 import org.openymsg.roster.Roster;
@@ -24,23 +22,22 @@ public class YahooTestAbstract {
 
 	protected static final String CHATMESSAGE = "CHATMESSAGE";
 
-	protected static String USERNAME = PropertiesAvailableTest
+	protected static final String USERNAME = PropertiesAvailableTest
 			.getUsername("presenceuser1");
 
-	protected static String PASSWORD = PropertiesAvailableTest
+	protected static final String PASSWORD = PropertiesAvailableTest
 			.getPassword(USERNAME);
 
-	protected static String OTHERUSR = PropertiesAvailableTest
+	protected static final String OTHERUSR = PropertiesAvailableTest
 			.getUsername("logintestuser3");
 
-	protected static String OTHERPWD = PropertiesAvailableTest
+	protected static final String OTHERPWD = PropertiesAvailableTest
 			.getPassword(OTHERUSR);
-	protected static Session sess1;
-	protected static Session sess2;
-
-	protected static WaitListener listener1;
-
-	protected static WaitListener listener2;
+	
+	static Session sess1;
+	static Session sess2;
+	static WaitListener listener1;
+	static WaitListener listener2;
 
 	/**
 	 * @throws Throwable
@@ -89,7 +86,7 @@ public class YahooTestAbstract {
 	 */
 	protected static void removeAllContacts(Session sess) {
 		drain();
-		
+
 		final Roster roster = sess.getRoster();
 		for (final YahooUser user : roster) {
 			// TODO: Set#remove() in a for-each loop? :S
