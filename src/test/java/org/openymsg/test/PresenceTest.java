@@ -26,9 +26,11 @@ import org.junit.Test;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.Session;
 import org.openymsg.network.Status;
+import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.SessionAdapter;
 import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.network.event.WaitListener;
+import org.openymsg.roster.Roster;
 
 /**
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
@@ -205,9 +207,10 @@ public class PresenceTest {
 			assertEquals(Status.AVAILABLE, receiver.getStatus());
 			assertEquals(null, receiver.getCustomStatusMessage());
 
-			final boolean exists = receiver.getRoster().containsUser(RECEIVER);
+			final Roster roster = receiver.getRoster();
+			final boolean exists = roster.containsUser(RECEIVER);
 			if (!exists) {
-				receiver.addFriend(USERNAME, "Friends");
+				roster.add(new YahooUser(USERNAME, "Friends"));
 				wl.waitForEvent(4, ServiceType.FRIENDADD);
 			}
 

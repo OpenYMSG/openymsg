@@ -52,11 +52,11 @@ public class ContactsTest extends YahooTestAbstract {
 	/**
 	 * @throws IOException
 	 */
-	private void addfriend() throws IOException {
+	private void addfriend() {
 		drain();
 		// sess1.addFriend(OTHERUSR,
 		// sess1.getGroups().iterator().next().getName());
-		sess1.addFriend(OTHERUSR, "group");
+		sess1.getRoster().add(new YahooUser(OTHERUSR, "group"));
 		FireEvent event = listener2.waitForEvent(5, ServiceType.CONTACTNEW);
 		assertNotNull(event);
 		assertEquals(event.getType(), ServiceType.CONTACTNEW);
@@ -69,7 +69,7 @@ public class ContactsTest extends YahooTestAbstract {
 	@Test
 	public void testRejectContact() throws IOException, InterruptedException {
 		removeAllContacts(sess1);
-		sess1.addFriend(OTHERUSR, "group");
+		sess1.getRoster().add(new YahooUser(OTHERUSR, "group"));
 		assertNotNull(listener1.waitForEvent(5, ServiceType.FRIENDADD));
 		Thread.sleep(500);
 		FireEvent event = listener2.waitForEvent(5, ServiceType.CONTACTNEW);
@@ -80,8 +80,8 @@ public class ContactsTest extends YahooTestAbstract {
 	}
 
 	@Test
-	public void testRemoveUnknowContact() throws IOException {
-		sess1.removeFriend("ewrgergerg", CHATMESSAGE);
+	public void testRemoveUnknowContact() {
+		sess1.getRoster().remove(new YahooUser("ewrgergerg", CHATMESSAGE));
 		FireEvent event = listener1.waitForEvent(5);
 		assertNull(event);
 	}

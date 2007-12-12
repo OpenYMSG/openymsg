@@ -17,7 +17,7 @@ public class RosterListenerManagementTest {
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testCannotAddNull() {
-		new Roster().addRosterListener(null);
+		new Roster(new MockFriendManager()).addRosterListener(null);
 	}
 
 	/**
@@ -26,6 +26,6 @@ public class RosterListenerManagementTest {
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testCannotRemoveNull() {
-		new Roster().removeRosterListener(null);
+		new Roster(new MockFriendManager()).removeRosterListener(null);
 	}
 }

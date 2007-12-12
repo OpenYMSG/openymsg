@@ -30,7 +30,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,7 +72,7 @@ import org.openymsg.roster.Roster;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class Session implements StatusConstants {
+public class Session implements StatusConstants, FriendManager {
 	/** Primary Yahoo ID: the real account id. */
 	private YahooIdentity primaryID;
 
@@ -100,10 +99,7 @@ public class Session implements StatusConstants {
 	/** Available/Back=f, away=t */
 	private boolean customStatusBusy;
 
-	/** Yahoo user's groups */
-	private final Set<YahooGroup> groups = new HashSet<YahooGroup>();
-
-	private Roster roster = new Roster();
+	private Roster roster = new Roster(this);
 
 	/** Creating conference room names. */
 	private int conferenceCount;
@@ -250,7 +246,6 @@ public class Session implements StatusConstants {
 	public void login(String username, String password)
 			throws IllegalStateException, IOException, AccountLockedException,
 			LoginRefusedException {
-		groups.clear();
 		identities = new HashMap<String, YahooIdentity>();
 		conferences = new Hashtable<String, YahooConference>();
 		chatroomManager = new ChatroomManager(null, null);
@@ -284,7 +279,7 @@ public class Session implements StatusConstants {
 		// Reset session and init some variables
 		resetData();
 
-		roster = new Roster();
+		roster = new Roster(this);
 		this.addSessionListener(roster);
 		loginID = new YahooIdentity(username);
 		primaryID = null;
@@ -588,17 +583,6 @@ public class Session implements StatusConstants {
 	}
 
 	/**
-	 * Returns an unmodifiable collection that holds the groups. Note that you
-	 * cannot delete or create groups by modifying the return value of this
-	 * method.
-	 * 
-	 * @return All groups, or an empty set (never 'null').
-	 */
-	public Set<YahooGroup> getGroups() {
-		return Collections.unmodifiableSet(groups);
-	}
-
-	/**
 	 * General accessors
 	 */
 	public String getImvironment() {
@@ -701,19 +685,56 @@ public class Session implements StatusConstants {
 		transmitConfLogoff(room.getName(), room.getIdentity().getId());
 	}
 
+	// Friend Management code.
+
 	/**
-	 * Friends code
+	 * Sends a new request to become friends to the user. This is a subscription
+	 * request, to which to other user should reply to. Responses will arrive
+	 * asynchronously.
+	 * 
+	 * @param userId
+	 *            Yahoo id of user to add as a new friend.
+	 * @param groupId
+	 *            Name of the group to add the new friend to.
+	 * @throws IllegalArgumentException
+	 *             if one of the arguments is null or an empty String.
+	 * @throws IllegalStateException
+	 *             if this session is not logged onto the Yahoo network
+	 *             correctly.
+	 * @throws IOException
+	 *             if any problem occured related to creating or sending the
+	 *             request to the Yahoo network.
 	 */
-	public void addFriend(String friend, String group)
-			throws IllegalStateException, IOException {
-		checkStatus();
-		transmitFriendAdd(friend, group);
+	public void sendNewFriendRequest(final String userId, final String groupId)
+			throws IOException {
+		// TODO: perhaps we should check the roster to make sure that this
+		// friend does not already exist.
+		transmitFriendAdd(userId, groupId);
 	}
 
-	public void removeFriend(String friend, String group)
-			throws IllegalStateException, IOException {
-		checkStatus();
-		transmitFriendRemove(friend, group);
+	/**
+	 * Instructs the Yahoo network to remove this friend from the particular
+	 * group on the roster of the current user. If this is the last group that
+	 * the user is removed from, the user is effectively removed from the
+	 * roster.
+	 * 
+	 * @param friendId
+	 *            Yahoo IDof the contact to remove from a group.
+	 * @param groupId
+	 *            Group to remove the contact from.
+	 * @throws IllegalArgumentException
+	 *             if one of the arguments is null or an empty String.
+	 * @throws IllegalStateException
+	 *             if this session is not logged onto the Yahoo network
+	 *             correctly.
+	 * @throws IOException
+	 *             on any problem while trying to create or send the packet.
+	 */
+	public void removeFriendFromGroup(final String friendId,
+			final String groupId) throws IOException {
+		// TODO: we should check the roster to find out of this friend actually
+		// exists on the roster, in that particular group.
+		transmitFriendRemove(friendId, groupId);
 	}
 
 	public void renameGroup(String oldName, String newName)
@@ -1369,30 +1390,82 @@ public class Session implements StatusConstants {
 
 	/**
 	 * Transmit a FRIENDADD packet. If all goes well we'll get a FRIENDADD
-	 * packet back with the details of the friend to confirm the transation
-	 * (usually preceeded by a CONTACTNEW packet with well detailed info).
-	 * friend - Yahoo id of friend to add group - Group to add it to
+	 * packet back with the details of the friend to confirm the transaction
+	 * (usually preceded by a CONTACTNEW packet with well detailed info).
+	 * 
+	 * @param userId
+	 *            Yahoo id of friend to add group
+	 * @param groupId
+	 *            Group to add the new friend in
+	 * @throws IllegalArgumentException
+	 *             if one of the arguments is null or an empty String.
+	 * @throws IllegalStateException
+	 *             if this session is not logged onto the Yahoo network
+	 *             correctly.
+	 * @throws IOException
+	 *             on any problem while trying to create or send the packet.
 	 */
-	protected void transmitFriendAdd(String friend, String group)
+	protected void transmitFriendAdd(final String userId, final String groupId)
 			throws IOException {
+		if (userId == null || userId.length() == 0) {
+			throw new IllegalArgumentException(
+					"Argument 'userId' cannot be null or an empty String.");
+		}
+
+		if (groupId == null || groupId.length() == 0) {
+			throw new IllegalArgumentException(
+					"Argument 'groupId' cannot be null or an empty String.");
+		}
+
+		// check if the current Session state allows us to send anything.
+		checkStatus();
+
 		final PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", primaryID.getId()); // ???: effective id?
-		body.addElement("7", friend);
-		body.addElement("65", group);
+		body.addElement("7", userId);
+		body.addElement("65", groupId);
+
 		sendPacket(body, ServiceType.FRIENDADD); // 0x83
 	}
 
 	/**
 	 * Transmit a FRIENDREMOVE packet. We should get a FRIENDREMOVE packet back
-	 * (usually preceeded by a CONTACTNEW packet). friend - Yahoo id of friend
-	 * to remove group - Group to remove it from
+	 * (usually preceded by a CONTACTNEW packet).
+	 * <p>
+	 * Note that removing a user from all groups that it is in, equals removing
+	 * the user from the contact list completely.
+	 * 
+	 * @param friendId
+	 *            Yahoo IDof the contact to remove from a group.
+	 * @param groupId
+	 *            Group to remove the contact from.
+	 * @throws IllegalArgumentException
+	 *             if one of the arguments is null or an empty String.
+	 * @throws IllegalStateException
+	 *             if this session is not logged onto the Yahoo network
+	 *             correctly.
+	 * @throws IOException
+	 *             on any problem while trying to create or send the packet.
 	 */
-	protected void transmitFriendRemove(String friend, String group)
-			throws IOException {
-		PacketBodyBuffer body = new PacketBodyBuffer();
+	protected void transmitFriendRemove(final String friendId,
+			final String groupId) throws IOException {
+		if (friendId == null || friendId.length() == 0) {
+			throw new IllegalArgumentException(
+					"Argument 'friendId' cannot be null or an empty String.");
+		}
+
+		if (groupId == null || groupId.length() == 0) {
+			throw new IllegalArgumentException(
+					"Argument 'groupId' cannot be null or an empty String.");
+		}
+
+		// check if the current Session state allows us to send anything.
+		checkStatus();
+
+		final PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", primaryID.getId()); // ???: effective id?
-		body.addElement("7", friend);
-		body.addElement("65", group);
+		body.addElement("7", friendId);
+		body.addElement("65", groupId);
 		sendPacket(body, ServiceType.FRIENDREMOVE); // 0x84
 	}
 
@@ -2295,19 +2368,21 @@ public class Session implements StatusConstants {
 	protected void receiveGroupRename(YMSG9Packet pkt) // 0x13
 	{
 		try {
-			String oldName = pkt.getValue("67");
-			String newName = pkt.getValue("65");
-			log.debug("old group:" + oldName + " renamed in:" + newName);
-			if (oldName == null || newName == null)
+			final String oldName = pkt.getValue("67");
+			final String newName = pkt.getValue("65");
+			if (oldName == null || newName == null) {
 				return;
-			for (YahooGroup group : getGroups())
-				if (group.getName().equals(oldName))
-					group.setName(newName);
+			}
 
-			SessionGroupEvent se = new SessionGroupEvent(this, oldName, newName);
+			log.trace("Received a GROUPRENAME packet for group '" + oldName
+					+ "' which should be renamed to '" + newName + "'");
+
+			final SessionGroupEvent se = new SessionGroupEvent(this, oldName,
+					newName);
 			eventDispatchQueue.append(se, ServiceType.GROUPRENAME);
-		} catch (Exception e) {
-			throw new YMSG9BadFormatException("group rename", pkt, e);
+			// TODO: use this event to update the group.
+		} catch (RuntimeException ex) {
+			throw new YMSG9BadFormatException("group rename", pkt, ex);
 		}
 	}
 
@@ -2406,7 +2481,7 @@ public class Session implements StatusConstants {
 		try {
 			final String grps = pkt.getValue("87"); // Value for key "87"
 			if (grps != null) {
-				final Set<YahooUser> usersOnList = new HashSet<YahooUser>();
+				final Map<String, YahooUser> usersOnList = new Hashtable<String, YahooUser>();
 				final StringTokenizer st1 = new StringTokenizer(grps, "\n");
 
 				// Extract each group.
@@ -2414,31 +2489,41 @@ public class Session implements StatusConstants {
 					final String s1 = st1.nextToken();
 					// Store group name and decoded friends list
 					final String groupId = s1.substring(0, s1.indexOf(":"));
-					final YahooGroup group = new YahooGroup(groupId);
 					final StringTokenizer st2 = new StringTokenizer(s1
 							.substring(s1.indexOf(":") + 1), ",");
 
 					// extract each user.
 					while (st2.hasMoreTokens()) {
 						final String userId = st2.nextToken();
-						final YahooUser user = new YahooUser(userId);
-						group.addUser(user);
-						user.addGroup(groupId);
-						usersOnList.add(user);
+
+						// see if we previously added this user (as part of
+						// another group).
+						YahooUser user = usersOnList.get(userId);
+						if (user == null) {
+							// user wasn't created yet. Do it now.
+							user = new YahooUser(userId);
+						}
+
+						// add the user to the current group.
+						user.addGroupId(groupId);
+
+						usersOnList.put(userId, user);
 					}
 					log.debug("add new group from list " + groupId);
-					groups.add(group);
 				}
 
 				if (!usersOnList.isEmpty()) {
+					// create a Set of YahooUsers from the map.
+					final Set<YahooUser> users = new HashSet<YahooUser>(
+							usersOnList.values());
+
 					// trigger listeners
 					eventDispatchQueue.append(new SessionListEvent(this,
-							ContactListType.Friends, usersOnList),
-							ServiceType.LIST);
+							ContactListType.Friends, users), ServiceType.LIST);
 				}
 			}
-		} catch (Exception e) {
-			throw new YMSG9BadFormatException("friends list in list", pkt, e);
+		} catch (RuntimeException ex) {
+			throw new YMSG9BadFormatException("friends list in list", pkt, ex);
 		}
 
 		// Ignored list (people we don't want to hear from!)
@@ -2463,8 +2548,8 @@ public class Session implements StatusConstants {
 							ServiceType.LIST);
 				}
 			}
-		} catch (Exception e) {
-			throw new YMSG9BadFormatException("ignored list in list", pkt, e);
+		} catch (RuntimeException ex) {
+			throw new YMSG9BadFormatException("ignored list in list", pkt, ex);
 		}
 
 		// Identities list (alternative yahoo ids we can use!)
@@ -2479,8 +2564,9 @@ public class Session implements StatusConstants {
 					identities.put(id, new YahooIdentity(id));
 				}
 			}
-		} catch (Exception e) {
-			throw new YMSG9BadFormatException("identities list in list", pkt, e);
+		} catch (RuntimeException ex) {
+			throw new YMSG9BadFormatException("identities list in list", pkt,
+					ex);
 		}
 
 		// Stealth blocked list (people we don't want to see us!)
@@ -2505,8 +2591,8 @@ public class Session implements StatusConstants {
 							ServiceType.LIST);
 				}
 			}
-		} catch (Exception e) {
-			throw new YMSG9BadFormatException("ignored list in list", pkt, e);
+		} catch (RuntimeException ex) {
+			throw new YMSG9BadFormatException("ignored list in list", pkt, ex);
 		}
 
 		// Yahoo gives us three cookies, Y, T and C
@@ -2515,8 +2601,8 @@ public class Session implements StatusConstants {
 			cookieY = ck[NetworkConstants.COOKIE_Y]; // Y=<cookie>
 			cookieT = ck[NetworkConstants.COOKIE_T]; // T=<cookie>
 			cookieC = ck[NetworkConstants.COOKIE_C]; // C=<cookie>
-		} catch (Exception e) {
-			throw new YMSG9BadFormatException("cookies in list", pkt, e);
+		} catch (RuntimeException ex) {
+			throw new YMSG9BadFormatException("cookies in list", pkt, ex);
 		}
 
 		// Primary identity: the *real* Yahoo ID for this account.
@@ -2527,9 +2613,9 @@ public class Session implements StatusConstants {
 			} else {
 				primaryID = loginID;
 			}
-		} catch (Exception e) {
+		} catch (RuntimeException ex) {
 			throw new YMSG9BadFormatException("primary identity in list", pkt,
-					e);
+					ex);
 		}
 
 		// Set the primary and login flags on the relevant YahooIdentity objects
@@ -2798,8 +2884,11 @@ public class Session implements StatusConstants {
 
 		// If the network is open, close it
 		network.close();
-		eventDispatchQueue.kill();
-		eventDispatchQueue = null;
+
+		if (eventDispatchQueue != null) {
+			eventDispatchQueue.kill();
+			eventDispatchQueue = null;
+		}
 	}
 
 	/**
@@ -2832,7 +2921,6 @@ public class Session implements StatusConstants {
 		conferences.clear();
 		removeSessionListener(roster);
 		roster = null;
-		groups.clear();
 		identities.clear();
 		loginException = null;
 	}
@@ -2980,32 +3068,6 @@ public class Session implements StatusConstants {
 			}
 		}
 	}
-
-	// TODO: cleanup
-	// /**
-	// * Inserts the given user into the desired group, if not already present.
-	// * Creates the group if not present.
-	// */
-	// private void insertFriend(YahooUser yahooUser, String groupName) {
-	// YahooGroup addToThis = null;
-	// for (YahooGroup group : groups) {
-	// if (group.getName().equalsIgnoreCase(groupName)) {
-	// addToThis = group;
-	// break;
-	// }
-	// }
-	//
-	// if (addToThis == null) {
-	// addToThis = new YahooGroup(groupName);
-	// groups.add(addToThis);
-	// }
-	//
-	// // Add user if needs be
-	// if (!addToThis.getUsers().contains(yahooUser)) {
-	// addToThis.addUser(yahooUser);
-	// yahooUser.addGroup(groupName);
-	// }
-	// }
 
 	/**
 	 * Create chat user from a chat packet. Note: a YahooUser is created if
