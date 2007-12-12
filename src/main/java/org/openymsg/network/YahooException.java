@@ -25,13 +25,26 @@ package org.openymsg.network;
  * @author S.E. Morris
  */
 public abstract class YahooException extends Exception {
+
 	/**
-	 * Creates a new instance and adds a more detailled description to it.
+	 * Creates a new instance and adds a more detailed description to it.
 	 * 
 	 * @param message
 	 *            the detail message.
 	 */
 	public YahooException(String message) {
 		super(message);
+	}
+
+	/**
+	 * Creates a new instance and adds a more detailed description to it.
+	 * 
+	 * @param message
+	 *            the detail message.
+	 * @param cause
+	 *            the {@link Throwable} that caused this exception to be thrown.
+	 */
+	public YahooException(String message, Throwable cause) {
+		super(message, cause);
 	}
 }

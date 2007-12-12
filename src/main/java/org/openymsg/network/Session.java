@@ -1629,14 +1629,16 @@ public class Session implements StatusConstants, FriendManager {
 	 */
 	protected void transmitNotify(String friend, String yid, boolean on,
 			String msg, String mode) throws IOException {
-		PacketBodyBuffer body = new PacketBodyBuffer();
+		final PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("4", yid);
 		body.addElement("5", friend);
 		body.addElement("14", msg);
-		if (on)
+		if (on) {
 			body.addElement("13", "1");
-		else
+		}
+		else {
 			body.addElement("13", "0");
+		}
 		body.addElement("49", mode);
 		sendPacket(body, ServiceType.NOTIFY, Status.TYPING); // 0x4b
 	}
@@ -1707,8 +1709,8 @@ public class Session implements StatusConstants, FriendManager {
 			throws IOException {
 		if (sessionStatus != SessionState.CONNECTING) {
 			throw new IllegalStateException(
-					"Received a response to an AUTH packet, outside the normal login flow. Current state: "
-							+ sessionStatus);
+					"Received a response to an AUTH packet, outside the normal" +
+					" login flow. Current state: " + sessionStatus);
 		}
 		log.trace("Received AUTH from server. Going to parse challenge...");
 		// Value for key 13: '0'=v9, '1'=v10
@@ -1731,8 +1733,8 @@ public class Session implements StatusConstants, FriendManager {
 			throw new YMSG9BadFormatException("auth", pkt, e);
 		}
 		sessionStatus = SessionState.CONNECTED;
-		log
-				.trace("Going to transmit Auth response, containing the challenge...");
+		log.trace("Going to transmit Auth response, "
+				+ "containing the challenge...");
 		transmitAuthResp(s[0], s[1]);
 	}
 
@@ -1782,11 +1784,9 @@ public class Session implements StatusConstants, FriendManager {
 					break;
 				}
 			}
-		}
-		// FIX: Add exception chaining to all YahooException's
-		catch (NumberFormatException e) {
-			loginException = new LoginRefusedException(
-					"Number format exception" + e.toString());
+		} catch (IllegalArgumentException ex) {
+			loginException = new LoginRefusedException("User " + loginID
+					+ ": Login refused. The reason why is unrecognized.", ex);
 		} finally {
 			// When this method exits, the ipThread loop calling it will
 			// terminate.
