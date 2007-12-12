@@ -98,7 +98,7 @@ public class MessageTest {
 	 * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
 	 * 
 	 */
-	private class ReceiveMessageAdaptor extends SessionAdapter {
+	private static class ReceiveMessageAdaptor extends SessionAdapter {
 		/**
 		 * The queued event.
 		 */
