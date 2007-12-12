@@ -45,6 +45,19 @@ public class LoginRefusedException extends YahooException {
 
 	/**
 	 * Creates a new Exception that indicates a problem during logging into the
+	 * Yahoo network, caused by another exception.
+	 * 
+	 * @param message
+	 *            Message describing the exception.
+	 * @param cause
+	 *            The {@link Throwable} that caused this exception to be thrown.
+	 */
+	public LoginRefusedException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	/**
+	 * Creates a new Exception that indicates a problem during logging into the
 	 * Yahoo network.
 	 * 
 	 * @param message
