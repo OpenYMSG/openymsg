@@ -60,6 +60,10 @@ public class MessageTest {
 			sender.login(USERNAME, PASSWORD);
 			receiver.login(RECIPIENT, RECPWD);
 			Thread.sleep(1000); // wait for any offline messages to disappear.
+			
+			if (!receiver.getRoster().containsUser(USERNAME)) {
+				throw new IllegalStateException("For this test to work, both users must be friends.");
+			}
 			receiver.addSessionListener(listener);
 
 			String message = "test message";

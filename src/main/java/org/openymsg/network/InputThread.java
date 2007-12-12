@@ -103,17 +103,24 @@ public class InputThread extends Thread {
 			quit = true;
 			return;
 		}
+
 		// Process header
-		if (pkt.sessionId != 0) // Some chat packets send zero
-			parentSession.sessionId = pkt.sessionId; // Update sess id in
-		// outer class
+		if (pkt.sessionId != 0) {
+			// Some chat packets send zero
+
+			// Update session id in outer class
+			parentSession.sessionId = pkt.sessionId;
+		}
+
 		// Error header?
-		if (pkt.status == -1 && processError(pkt) == true)
+		if (pkt.status == -1 && processError(pkt) == true) {
 			return;
+		}
+
+		log.trace("Incoming packet: " + pkt);
+		
 		// Process payload
-		switch (pkt.service)
-		// Jump to service-specific code
-		{
+		switch (pkt.service) {
 		case ADDIGNORE:
 			parentSession.receiveAddIgnore(pkt);
 			break;

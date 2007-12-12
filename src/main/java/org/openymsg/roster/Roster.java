@@ -166,8 +166,10 @@ public class Roster implements Set<YahooUser>, SessionListener {
 					"The user to be added must have a valid, non-empty String ID field set.");
 		}
 		
+		Log.trace("Adding new user: " + user);
+		
 		// TODO : input validation on userId/groupId?
-
+		
 		for(final String groupId : user.getGroupIds()) {
 			try {
 				friendManager.sendNewFriendRequest(user.getId(), groupId);
@@ -175,8 +177,8 @@ public class Roster implements Set<YahooUser>, SessionListener {
 				throw new RuntimeException("Unexpected exception.", ex);
 			}
 		}
-		// TODO: is this according to the 'set' contract? :S
-		return false;
+
+		return syncedAdd(user);
 	}
 
 	/**
@@ -251,19 +253,21 @@ public class Roster implements Set<YahooUser>, SessionListener {
 		}
 
 		final YahooUser user = (YahooUser) userObject;
-		// TODO : input validation on userId/groupId?
-
+		
+		if (!contains(user)) {
+			Log.trace("Cannot remove a user, because it's not on this roster: " + user);
+			return false;
+		}
+		Log.trace("Removing a user: " + user);
+		
 		for(final String groupId : user.getGroupIds()) {
 			try {
-				friendManager.sendNewFriendRequest(user.getId(), groupId);
+				friendManager.removeFriendFromGroup(user.getId(), groupId);
 			} catch (IOException ex) {
 				throw new RuntimeException("Unexpected exception.", ex);
 			}
 		}
-		// TODO: is this according to the 'set' contract? :S
-		return false;
-		
-///		return removeUser(((YahooUser) userObject).getId());
+		return syncedRemove(user.getId());
 	}
 
 	/**
