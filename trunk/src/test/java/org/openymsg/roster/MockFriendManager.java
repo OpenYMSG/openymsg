@@ -49,6 +49,15 @@ public class MockFriendManager implements FriendManager {
 	}
 
 	/**
+	 * Resets the data by setting them to <tt>null</tt>
+	 */
+	public void reset() {
+		friendId = null;
+		groupId = null;
+		method = null;
+	}
+	
+	/**
 	 * @return the friendId
 	 */
 	public String getFriendId() {

@@ -27,11 +27,13 @@ public class RosterRemove {
 		final Roster roster = new Roster(manager);
 		final YahooUser user = new YahooUser("user", "group");
 		roster.add(user);
-
+		manager.reset();
+		
 		// execution
-		roster.remove(user);
+		final boolean result = roster.remove(user);
 
 		// validation
+		assertTrue(result);
 		assertEquals("removeFriendFromGroup", manager.getMethod());
 		assertEquals("user", manager.getFriendId());
 		assertEquals("group", manager.getGroupId());
@@ -49,9 +51,10 @@ public class RosterRemove {
 		final YahooUser user = new YahooUser("user", "group");
 
 		// execution
-		roster.remove(user);
+		final boolean result = roster.remove(user);
 
 		// validation
+		assertFalse(result);
 		assertNull(manager.getMethod());
 		assertNull(manager.getFriendId());
 		assertNull(manager.getGroupId());
