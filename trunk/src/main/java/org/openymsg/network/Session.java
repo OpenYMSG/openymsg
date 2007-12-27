@@ -1637,8 +1637,7 @@ public class Session implements StatusConstants, FriendManager {
 		body.addElement("14", msg);
 		if (on) {
 			body.addElement("13", "1");
-		}
-		else {
+		} else {
 			body.addElement("13", "0");
 		}
 		body.addElement("49", mode);
@@ -1646,9 +1645,33 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
+	 * Transmits a Keep-Alive packet to the Yahoo network.
+	 * 
+	 * At the time of implementation, this packet gets sent by the official
+	 * Yahoo client once every 60 seconds, and seems to replace the older PING
+	 * service type (although this service type is still received by the client
+	 * just after authentication).
+	 * 
+	 * The keep-alive does not appear to be sent to a Yahoo Chatrooms.
+	 * 
+	 * @throws IOException
+	 */
+	protected void transmitKeepAlive() throws IOException {
+		final PacketBodyBuffer body = new PacketBodyBuffer();
+		body.addElement("0", primaryID.getId());
+		sendPacket(body, ServiceType.KEEPALIVE);
+	}
+
+	/**
 	 * Transmit a PING packet always and a CHATPING packet, if the user is
 	 * logged into a lobby.
+	 * 
+	 * @deprecated It appears that the transmission of PING packets from the
+	 *             client to the Yahoo network has been replaced by sending
+	 *             KEEPALIVE packets.
+	 * @see #transmitKeepAlive()             
 	 */
+	@Deprecated
 	protected void transmitPings() throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		sendPacket(body, ServiceType.PING); // 0x12
@@ -1711,8 +1734,8 @@ public class Session implements StatusConstants, FriendManager {
 			throws IOException {
 		if (sessionStatus != SessionState.CONNECTING) {
 			throw new IllegalStateException(
-					"Received a response to an AUTH packet, outside the normal" +
-					" login flow. Current state: " + sessionStatus);
+					"Received a response to an AUTH packet, outside the normal"
+							+ " login flow. Current state: " + sessionStatus);
 		}
 		log.trace("Received AUTH from server. Going to parse challenge...");
 		// Value for key 13: '0'=v9, '1'=v10

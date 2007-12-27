@@ -73,6 +73,7 @@ public enum ServiceType {
 	IDLE(0x5),
 	ISAWAY(0x3),
 	ISBACK(0x4),
+	KEEPALIVE(0x8a),
 	LIST(0x55),
 	LOGOFF(0x2),
 	LOGON(0x1),
