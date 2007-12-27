@@ -24,17 +24,17 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
 /**
- * Runnable class that is responsible for sending ping packets to each session
- * component that needs to be pinged.
+ * Runnable class that is responsible for sending keep-alive packets to the
+ * Yahoo! network for each session instance that's currently logged on.
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
 public class SessionPinger extends TimerTask {
 
 	private static final Logger log = Logger.getLogger(SessionPinger.class);
-	
+
 	/**
-	 * The session to which the pings should be sent.
+	 * The session on which behalf the keep-alive packet should be sent.
 	 */
 	final Session session;
 
@@ -42,7 +42,7 @@ public class SessionPinger extends TimerTask {
 	 * Creates a new instance which is linked to a particular session.
 	 * 
 	 * @param session
-	 *            The session for which to send out pings.
+	 *            The session for which to send out a keep-alive packet.
 	 */
 	public SessionPinger(Session session) {
 		if (session == null) {
@@ -53,14 +53,14 @@ public class SessionPinger extends TimerTask {
 	}
 
 	/**
-	 * Tries to send the pings, then exits.
+	 * Tries to send the keep-alive packet, then exits.
 	 */
 	@Override
 	public void run() {
 		try {
-			session.transmitPings();
+			session.transmitKeepAlive();
 		} catch (IOException ex) {
-			log.error(ex,ex);
+			log.error("Could not send keep-alive!", ex);
 		}
 	}
 }

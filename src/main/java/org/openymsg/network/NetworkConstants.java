@@ -83,9 +83,9 @@ public abstract class NetworkConstants {
 	public final static int LOGIN_TIMEOUT = 60;
 
 	/**
-	 * Amount of seconds between sending subsequent PING packets.
+	 * Amount of seconds between sending subsequent keep-alive packets.
 	 */
-	public final static int PING_TIMEOUT_IN_SECS = 60 * 20; // 20 minutes
+	public final static int PING_TIMEOUT_IN_SECS = 60; // 1 minute
 
 	// Buzz string
 	public final static String BUZZ = "<ding>";
