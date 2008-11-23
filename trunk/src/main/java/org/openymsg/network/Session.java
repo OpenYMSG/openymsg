@@ -1818,7 +1818,8 @@ public class Session implements StatusConstants, FriendManager {
 			ipThread.stopMe();
 			// Notify login() calling thread of failure
 			sessionStatus = SessionState.FAILED;
-		}
+                        eventDispatchQueue.append(ServiceType.LOGOFF);
+        }
 	}
 
 	/**
@@ -2966,7 +2967,8 @@ public class Session implements StatusConstants, FriendManager {
 	 * Handy method: alert application to exception via event
 	 */
 	void sendExceptionEvent(Exception e, String msg) {
-		SessionExceptionEvent se = new SessionExceptionEvent(Session.this, msg,
+            sessionStatus = SessionState.FAILED;
+            SessionExceptionEvent se = new SessionExceptionEvent(Session.this, msg,
 				e);
 		eventDispatchQueue.append(se, ServiceType.X_EXCEPTION);
 	}
