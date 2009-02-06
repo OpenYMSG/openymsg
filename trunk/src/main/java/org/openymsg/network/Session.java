@@ -114,7 +114,7 @@ public class Session implements StatusConstants, FriendManager {
 
 	public volatile ConnectionHandler network;
 
-	private static final Timer SCHEDULED_PINGER_SERVICE = new Timer(
+	private final Timer SCHEDULED_PINGER_SERVICE = new Timer(
 			"OpenYMSG session ping timer", true);
 
 	private TimerTask pingerTask;
