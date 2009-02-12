@@ -40,7 +40,7 @@ public class PropertiesAvailableTest {
 		final InputStream is;
 		final InputStream ip;
 		try {
-			me = Class.forName("org.openymsg.test.PropertiesAvailableTest");
+			me = Class.forName("org.openymsg.network.PropertiesAvailableTest");
 			is = me
 					.getResourceAsStream("/yahooAuthenticationForJUnitTests.properties");
 			ip = me.getResourceAsStream("/log4j.properties");
