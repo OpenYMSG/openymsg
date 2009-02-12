@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openymsg.test;
+package org.openymsg.network;
 
 import java.io.IOException;
 
