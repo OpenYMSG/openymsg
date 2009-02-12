@@ -1,4 +1,4 @@
-package org.openymsg.test;
+package org.openymsg.network;
 
 import static org.junit.Assert.assertFalse;
 

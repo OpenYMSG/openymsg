@@ -16,25 +16,30 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.test;
+package org.openymsg.network;
 
-import org.junit.Test;
-import org.openymsg.network.Session;
-import org.openymsg.network.event.SessionAdapter;
+import junitx.extensions.EqualsHashCodeTestCase;
+
+import org.openymsg.network.YahooIdentity;
 
 /**
+ * Basic Equality and HashCode contract checks.
+ * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
-public class EventListenerTest {
-	@Test
-	public void testAddEventListenerBeforeLoggingIn() throws Exception {
-		final Session session = new Session();
-		session.addSessionListener(new SessionAdapter());
+public class YahooIdentityTest extends EqualsHashCodeTestCase {
+
+	public YahooIdentityTest() {
+		super(YahooIdentityTest.class.getName());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testAddNull() throws Exception {
-		final Session session = new Session();
-		session.addSessionListener(null);
+	@Override
+	protected Object createInstance() throws Exception {
+		return new YahooIdentity("same");
+	}
+
+	@Override
+	protected Object createNotEqualInstance() throws Exception {
+		return new YahooIdentity("different");
 	}
 }
