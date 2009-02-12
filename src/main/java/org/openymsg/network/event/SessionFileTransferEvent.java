@@ -28,6 +28,7 @@ import java.net.URL;
  * @author S.E. Morris
  */
 public class SessionFileTransferEvent extends SessionEvent {
+	private static final long serialVersionUID = 961716420630362828L;
 	protected URL location = null;
 
 	/**

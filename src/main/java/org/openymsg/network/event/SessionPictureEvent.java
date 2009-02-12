@@ -6,6 +6,7 @@ package org.openymsg.network.event;
  * @author Damian Minkov (damencho)
  */
 public class SessionPictureEvent extends SessionEvent {
+	private static final long serialVersionUID = -8869449546291406992L;
 	protected byte[] data;
 
 	/**

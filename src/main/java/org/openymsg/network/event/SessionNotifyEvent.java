@@ -32,6 +32,7 @@ import org.openymsg.network.StatusConstants;
  * @author S.E. Morris
  */
 public class SessionNotifyEvent extends SessionEvent {
+	private static final long serialVersionUID = -943743298762485982L;
 
 	protected String type;
 

@@ -28,7 +28,6 @@ import org.openymsg.network.FireEvent;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-@SuppressWarnings("unused")
 public class SessionAdapter implements SessionListener {
 	public void fileTransferReceived(SessionFileTransferEvent event) {
 		// override this function if you want to do something with it.

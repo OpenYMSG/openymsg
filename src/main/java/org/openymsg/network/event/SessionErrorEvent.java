@@ -27,6 +27,8 @@ import org.openymsg.network.ServiceType;
  * @author S.E. Morris
  */
 public class SessionErrorEvent extends SessionEvent {
+	private static final long serialVersionUID = -1394777141619835808L;
+
 	protected int code = -1;
 
 	protected ServiceType service;

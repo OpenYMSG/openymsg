@@ -37,6 +37,8 @@ import org.openymsg.network.chatroom.YahooChatUser;
  * @author S.E. Morris
  */
 public class SessionChatEvent extends SessionEvent {
+	private static final long serialVersionUID = 4699554402846984208L;
+
 	protected YahooChatUser[] users;
 
 	protected YahooChatLobby lobby;
