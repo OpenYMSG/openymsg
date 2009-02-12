@@ -25,6 +25,8 @@ package org.openymsg.network.event;
  * @author S.E. Morris
  */
 public class SessionNewMailEvent extends SessionEvent {
+	private static final long serialVersionUID = 5384574485336907226L;
+
 	protected int mail;
 
 	protected String subject, address;

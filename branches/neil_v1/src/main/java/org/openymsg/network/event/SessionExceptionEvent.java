@@ -28,6 +28,7 @@ package org.openymsg.network.event;
  * @author S.E. Morris
  */
 public class SessionExceptionEvent extends SessionEvent {
+	private static final long serialVersionUID = -5999099588327589758L;
 	protected Exception exception;
 
 	/**

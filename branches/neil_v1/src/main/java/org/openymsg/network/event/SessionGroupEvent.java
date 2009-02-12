@@ -25,6 +25,7 @@ package org.openymsg.network.event;
  * @author S.E. Morris
  */
 public class SessionGroupEvent extends SessionEvent {
+	private static final long serialVersionUID = -627204256664262069L;
 	protected String oldName, newName;
 
 	/**
