@@ -16,9 +16,12 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network;
+package org.openymsg.v1.network;
 
 import java.io.IOException;
+
+import org.openymsg.network.NetworkConstants;
+import org.openymsg.network.ServiceType;
 
 /**
  * 
@@ -26,7 +29,7 @@ import java.io.IOException;
  * @author S.E. Morris
  */
 public abstract class ConnectionHandler {
-	abstract void install(Session session);
+	abstract void install(SessionV1 session);
 
 	abstract void open() throws IOException;
 

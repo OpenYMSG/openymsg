@@ -16,13 +16,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network;
+package org.openymsg.v1.network;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.openymsg.network.FireEvent;
+import org.openymsg.network.ServiceType;
 import org.openymsg.network.event.SessionEvent;
 import org.openymsg.network.event.SessionListener;
 
@@ -46,9 +48,9 @@ public class EventDispatcher extends Thread {
 	private final List<FireEvent> queue = Collections
 			.synchronizedList(new LinkedList<FireEvent>());
 
-	private final Session session;
+	private final SessionV1 session;
 
-	public EventDispatcher(final Session session) {
+	public EventDispatcher(final SessionV1 session) {
 		super("jYMSG Event Dispatcher thread");
 		this.session = session;
 	}

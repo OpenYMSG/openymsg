@@ -1,6 +1,8 @@
-package org.openymsg.network.event;
+package org.openymsg.v1.network.event;
 
-import org.openymsg.network.YahooUser;
+import org.openymsg.network.event.SessionFriendRejectedEvent;
+import org.openymsg.v1.network.YahooUserV1;
+
 
 /**
  * A more specific SesionFriendEvent that gets thrown if a previous request to
@@ -8,7 +10,7 @@ import org.openymsg.network.YahooUser;
  * 
  * @author Guus der Kinderen, guus@nimbuzz.com
  */
-public class SessionFriendRejectedEvent extends SessionFriendEvent {
+public class SessionFriendRejectedEventV1 extends SessionFriendEventV1 implements SessionFriendRejectedEvent<YahooUserV1> {
 	private static final long serialVersionUID = 3415551157526861773L;
 
 	/**
@@ -21,9 +23,8 @@ public class SessionFriendRejectedEvent extends SessionFriendEvent {
 	 * @param message
 	 *            An optional message, describing the event.s
 	 */
-	public SessionFriendRejectedEvent(Object source, YahooUser user,
+	public SessionFriendRejectedEventV1(Object source, YahooUserV1 user,
 			String message) {
-		super(source, user);
-		this.message = message;
+		super(source, message, user);
 	}
 }

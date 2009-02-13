@@ -1,10 +1,12 @@
-package org.openymsg.network.event;
+package org.openymsg.v1.network.event;
 
 import java.util.Collections;
 import java.util.Set;
 
 import org.openymsg.network.ContactListType;
-import org.openymsg.network.YahooUser;
+import org.openymsg.network.event.DefaultSessionEvent;
+import org.openymsg.network.event.SessionListEvent;
+import org.openymsg.v1.network.YahooUserV1;
 
 /**
  * Event that is triggered right after the session receives an entire list of
@@ -13,13 +15,13 @@ import org.openymsg.network.YahooUser;
  * @author Guus der Kinderen, guus@nimbuzz.com
  * 
  */
-public class SessionListEvent extends SessionEvent {
+public class SessionListEventV1 extends DefaultSessionEvent implements SessionListEvent<YahooUserV1> {
 
 	private static final long serialVersionUID = 8418335191110496114L;
 
 	private final ContactListType type;
 
-	private final Set<YahooUser> contacts;
+	private final Set<YahooUserV1> contacts;
 
 	/**
 	 * Constructs a new instance, based on the provided arguments.
@@ -31,8 +33,8 @@ public class SessionListEvent extends SessionEvent {
 	 * @param contacts
 	 *            The users that make up the (complete) list.
 	 */
-	public SessionListEvent(Object source, ContactListType type,
-			Set<YahooUser> contacts) {
+	public SessionListEventV1(Object source, ContactListType type,
+			Set<YahooUserV1> contacts) {
 		super(source);
 		this.type = type;
 		this.contacts = Collections.unmodifiableSet(contacts);
@@ -52,7 +54,7 @@ public class SessionListEvent extends SessionEvent {
 	 * 
 	 * @return The users that make up the (complete) list.
 	 */
-	public Set<YahooUser> getContacts() {
+	public Set<YahooUserV1> getContacts() {
 		return contacts;
 	}
 

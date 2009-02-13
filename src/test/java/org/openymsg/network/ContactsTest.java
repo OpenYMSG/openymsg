@@ -18,6 +18,7 @@ import org.openymsg.network.LoginRefusedException;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.Status;
 import org.openymsg.network.YahooUser;
+import org.openymsg.v1.network.YahooUserV1;
 
 /**
  * @author Giancarlo Frison - Nimbuzz B.V. <giancarlo@nimbuzz.com>
@@ -65,7 +66,7 @@ public class ContactsTest extends YahooTestAbstract {
 
 		drain();
 
-		sess1.getRoster().add(new YahooUser(OTHERUSR, "group"));
+		sess1.getRoster().add(new YahooUserV1(OTHERUSR, "group"));
 		FireEvent event = listener2.waitForEvent(5, ServiceType.CONTACTNEW);
 		assertNotNull(event);
 		assertEquals(event.getType(), ServiceType.CONTACTNEW);
@@ -78,7 +79,7 @@ public class ContactsTest extends YahooTestAbstract {
 	@Test
 	public void testRejectContact() throws IOException, InterruptedException {
 		removeAllContacts(sess1);
-		sess1.getRoster().add(new YahooUser(OTHERUSR, "group"));
+		sess1.getRoster().add(new YahooUserV1(OTHERUSR, "group"));
 //		assertNotNull(listener1.waitForEvent(5, ServiceType.FRIENDADD));
 		Thread.sleep(500);
 		
@@ -93,7 +94,7 @@ public class ContactsTest extends YahooTestAbstract {
 
 	@Test
 	public void testRemoveUnknowContact() {
-		sess1.getRoster().remove(new YahooUser("ewrgergerg", CHATMESSAGE));
+		sess1.getRoster().remove(new YahooUserV1("ewrgergerg", CHATMESSAGE));
 		FireEvent event = listener1.waitForEvent(5);
 		assertNull(event);
 	}

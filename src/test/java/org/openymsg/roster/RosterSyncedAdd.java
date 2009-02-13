@@ -12,6 +12,8 @@ import junitx.util.PrivateAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.openymsg.network.YahooUser;
+import org.openymsg.v1.network.YahooUserV1;
+import org.openymsg.v1.roster.RosterV1;
 
 /**
  * Test method for
@@ -24,7 +26,7 @@ import org.openymsg.network.YahooUser;
  */
 public class RosterSyncedAdd {
 
-	private final static YahooUser USER = new YahooUser("dummy");
+	private final static YahooUser USER = new YahooUserV1("dummy");
 	private Roster roster;
 
 	/**
@@ -32,7 +34,7 @@ public class RosterSyncedAdd {
 	 */
 	@Before
 	public void setUp() {
-		roster = new Roster(new MockFriendManager());
+		roster = new RosterV1(new MockFriendManager());
 	}
 
 	/**

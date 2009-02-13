@@ -46,7 +46,7 @@ public abstract class Util implements PropertyConstants {
 	}
 
 	// Read openymsg.network.directHosts, or use default
-	static int[] directPorts() {
+	public static int[] directPorts() {
 		String s = System.getProperty(DIRECT_PORTS);
 		if (s == null) {
 			return DIRECT_PORTS_DEFAULT;

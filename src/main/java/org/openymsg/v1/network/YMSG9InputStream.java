@@ -16,7 +16,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network;
+package org.openymsg.v1.network;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
+import org.openymsg.network.ServiceType;
 
 
 /**
@@ -36,7 +38,7 @@ import org.apache.log4j.Logger;
  * session code, which should always parrot in outgoing packets the last
  * incoming packet (it can switch mid-session, apparently!)
  * 
- * The body is a set of ASCII strings terninated by the byte sequence 0xc080 .
+ * The body is a set of ASCII strings terminated by the byte sequence 0xc080 .
  * Some of these strings are 'instructions' written as numbers, which appear to
  * dictate the type and/or meaning of the data which follows in the next
  * section. In a way they are like key/value pairs, except that not all keys

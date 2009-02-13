@@ -20,7 +20,7 @@ package org.openymsg.network;
 
 import junitx.extensions.EqualsHashCodeTestCase;
 
-import org.openymsg.network.YahooGroup;
+import org.openymsg.v1.network.YahooGroupV1;
 
 /**
  * Basic Equality and HashCode contract checks.
@@ -35,11 +35,11 @@ public class YahooGroupTest extends EqualsHashCodeTestCase {
 
 	@Override
 	protected Object createInstance() throws Exception {
-		return new YahooGroup("same");
+		return new YahooGroupV1("same");
 	}
 
 	@Override
 	protected Object createNotEqualInstance() throws Exception {
-		return new YahooGroup("different");
+		return new YahooGroupV1("different");
 	}
 }

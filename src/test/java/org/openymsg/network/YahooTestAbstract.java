@@ -12,7 +12,8 @@ import org.openymsg.network.Session;
 import org.openymsg.network.SessionState;
 import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.WaitListener;
-import org.openymsg.roster.Roster;
+import org.openymsg.v1.network.SessionV1;
+import org.openymsg.v1.roster.RosterV1;
 
 /**
  * @author Giancarlo Frison - Nimbuzz B.V. <giancarlo@nimbuzz.com>
@@ -34,8 +35,8 @@ public class YahooTestAbstract {
 	protected static final String OTHERPWD = PropertiesAvailableTest
 			.getPassword(OTHERUSR);
 	
-	static Session sess1;
-	static Session sess2;
+	static Session<RosterV1> sess1;
+	static Session<RosterV1> sess2;
 	static WaitListener listener1;
 	static WaitListener listener2;
 
@@ -45,8 +46,8 @@ public class YahooTestAbstract {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Throwable {
 		try {
-			sess1 = new Session();
-			sess2 = new Session();
+			sess1 = createSession();
+			sess2 = createSession();
 			listener1 = new WaitListener(sess1);
 			listener2 = new WaitListener(sess2);
 			sess1.login(USERNAME, PASSWORD);
@@ -61,6 +62,10 @@ public class YahooTestAbstract {
 			e.printStackTrace();
 			throw e;
 		}
+	}
+
+	protected static Session<RosterV1> createSession() {
+		return new SessionV1();
 	}
 
 	/**
@@ -84,10 +89,10 @@ public class YahooTestAbstract {
 	 * 
 	 * @throws IOException
 	 */
-	protected static void removeAllContacts(Session sess) {
+	protected static void removeAllContacts(Session<RosterV1> sess) {
 		drain();
 
-		final Roster roster = sess.getRoster();
+		final RosterV1 roster = sess.getRoster();
 		
 		for (final YahooUser user : roster) {
 			// TODO: Set#remove() in a for-each loop? :S

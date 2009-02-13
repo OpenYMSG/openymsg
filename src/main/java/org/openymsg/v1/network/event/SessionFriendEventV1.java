@@ -16,9 +16,13 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network.event;
+package org.openymsg.v1.network.event;
 
 import org.openymsg.network.YahooUser;
+import org.openymsg.network.event.DefaultSessionEvent;
+import org.openymsg.network.event.SessionFriendEvent;
+import org.openymsg.v1.network.YahooUserV1;
+
 
 /**
  * Represents an event triggered by a change in the presence or roster change of
@@ -28,12 +32,16 @@ import org.openymsg.network.YahooUser;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class SessionFriendEvent extends SessionEvent {
+public class SessionFriendEventV1 extends DefaultSessionEvent implements SessionFriendEvent<YahooUserV1> {
 	private static final long serialVersionUID = -2887428479487414186L;
-	protected final YahooUser user;
+	protected final YahooUserV1 user;
 
-	public SessionFriendEvent(Object source, YahooUser user) {
-		super(source);
+	public SessionFriendEventV1(Object source, YahooUserV1 user) {
+		this(source, null, user);
+	}
+
+	protected SessionFriendEventV1(Object source, String message, YahooUserV1 user) {
+		super(source, message);
 
 		if (user == null) {
 			throw new IllegalArgumentException(
@@ -42,7 +50,7 @@ public class SessionFriendEvent extends SessionEvent {
 		this.user = user;
 	}
 
-	public YahooUser getUser() {
+	public YahooUserV1 getUser() {
 		return user;
 	}
 

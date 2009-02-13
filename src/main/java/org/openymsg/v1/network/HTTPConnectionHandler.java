@@ -16,7 +16,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network;
+package org.openymsg.v1.network;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -29,6 +29,11 @@ import java.util.Properties;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
+import org.openymsg.network.NetworkConstants;
+import org.openymsg.network.PropertyConstants;
+import org.openymsg.network.ServiceType;
+import org.openymsg.network.SessionState;
+import org.openymsg.network.Util;
 
 /**
  * 
@@ -51,7 +56,7 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 	private static final String HTTP_HEADER_PROXY_AUTH = "Proxy-Authorization: "
 			+ Util.httpProxyAuth() + NetworkConstants.END;
 
-	private Session session; // Associated session object
+	private SessionV1 session; // Associated session object
 
 	private String proxyHost; // HTTP proxy host name
 
@@ -154,7 +159,7 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 	 * Session calls this when a connection handler is installed
 	 */
 	@Override
-	void install(Session session) {
+	void install(SessionV1 session) {
 		this.session = session;
 	}
 

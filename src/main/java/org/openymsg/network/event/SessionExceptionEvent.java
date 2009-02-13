@@ -27,7 +27,7 @@ package org.openymsg.network.event;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class SessionExceptionEvent extends SessionEvent {
+public class SessionExceptionEvent extends DefaultSessionEvent {
 	private static final long serialVersionUID = -5999099588327589758L;
 	protected Exception exception;
 
@@ -35,8 +35,7 @@ public class SessionExceptionEvent extends SessionEvent {
 	 * CONSTRUCTORS
 	 */
 	public SessionExceptionEvent(Object o, String m, Exception e) {
-		super(o);
-		message = m;
+		super(o, m);
 		exception = e;
 	}
 
@@ -47,7 +46,7 @@ public class SessionExceptionEvent extends SessionEvent {
 	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer("Exception: message=\"").append(
-				message).append("\" type=").append(exception.toString());
+				this.getMessage()).append("\" type=").append(exception.toString());
 		return sb.toString();
 	}
 }

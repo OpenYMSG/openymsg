@@ -21,6 +21,7 @@ package org.openymsg.network.event;
 import org.openymsg.network.YahooConference;
 import org.openymsg.network.YahooUser;
 
+
 /**
  * From To Message Room Users User conferenceInviteReceived y y y(top.) y y n
  * conferenceLogonReceived y y n y n y conferenceLogoffReceived y y n y n y
@@ -29,7 +30,7 @@ import org.openymsg.network.YahooUser;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class SessionConferenceEvent extends SessionEvent {
+public class SessionConferenceEvent extends DefaultSessionEvent {
 	private static final long serialVersionUID = 6550109967442109240L;
 
 	private YahooConference room;

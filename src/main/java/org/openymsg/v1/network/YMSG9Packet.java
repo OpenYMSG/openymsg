@@ -16,10 +16,12 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network;
+package org.openymsg.v1.network;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.openymsg.network.ServiceType;
 
 /**
  * This class is nothing more than a convenient data structure to hold the

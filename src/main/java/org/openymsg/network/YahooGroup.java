@@ -18,7 +18,6 @@
  */
 package org.openymsg.network;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -31,103 +30,18 @@ import java.util.Set;
  * TODO: manipulating the group should also cause relevant packets to be sent to
  * the network.
  */
-public class YahooGroup {
-	private String name;
+public interface YahooGroup {
 
-	private boolean isOpen;
+	void addUser(YahooUser yu);
 
-	private Set<YahooUser> users;
+	String getName();
 
-	/**
-	 * Creates a new YahooGroup instance.
-	 * 
-	 * @param name
-	 *            Name of the group.
-	 * @param isOpen
-	 *            ''true'' the create an open group, ''false'' otherwise.
-	 */
-	public YahooGroup(String name, boolean isOpen) {
-		this.name = name;
-		this.isOpen = isOpen;
-		users = new HashSet<YahooUser>();
-	}
+	void setName(String nm);
+	
+	boolean isOpen();
 
-	/**
-	 * Creates a new, open group.
-	 * 
-	 * @param name
-	 *            Name of the group.
-	 */
-	public YahooGroup(String name) {
-		this(name, true);
-	}
+	void setOpen(boolean isOpen);
 
-	public void addUser(YahooUser yu) {
-		users.add(yu);
-	}
+	Set<YahooUser> getUsers();
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String nm) {
-		name = nm;
-	}
-
-	public boolean isOpen() {
-		return isOpen;
-	}
-
-	public void setOpen(boolean isOpen) {
-		this.isOpen = isOpen;
-	}
-
-	public Set<YahooUser> getUsers() {
-		return users;
-	}
-
-	@Override
-	public String toString() {
-		return "YahooGroup [name=" + name + "]";
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof YahooGroup)) {
-			return false;
-		}
-		final YahooGroup other = (YahooGroup) obj;
-		if (name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!name.equals(other.name)) {
-			return false;
-		}
-		return true;
-	}
 }

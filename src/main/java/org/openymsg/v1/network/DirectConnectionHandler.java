@@ -16,13 +16,17 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network;
+package org.openymsg.v1.network;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
+
+import org.openymsg.network.NetworkConstants;
+import org.openymsg.network.ServiceType;
+import org.openymsg.network.Util;
 
 /**
  * 
@@ -74,7 +78,7 @@ public class DirectConnectionHandler extends ConnectionHandler {
 	 * Session calls this when a connection handler is installed
 	 */
 	@Override
-	void install(Session ss) {
+	void install(SessionV1 ss) {
 		// session=ss;
 	}
 

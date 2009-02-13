@@ -18,7 +18,8 @@
  */
 package org.openymsg.network.chatroom;
 
-import org.openymsg.network.YahooUser;
+import org.openymsg.v1.network.YahooUserV1;
+
 
 /**
  * This class wraps a regular YahooUser to provide the extra information
@@ -30,7 +31,7 @@ import org.openymsg.network.YahooUser;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class YahooChatUser extends YahooUser // Cannot be serialised
+public class YahooChatUser extends YahooUserV1 // Cannot be serialised
 {
 	private int age, attributes; // Age and flags
 
@@ -42,7 +43,7 @@ public class YahooChatUser extends YahooUser // Cannot be serialised
 
 	private final static int WEBCAM_ATTR = 0x00010;
 
-	public YahooChatUser(YahooUser yahooUser, int attributes, String alias,
+	public YahooChatUser(YahooUserV1 yahooUser, int attributes, String alias,
 			int age, String location) {
 		super(yahooUser.getId());
 		this.attributes = attributes;

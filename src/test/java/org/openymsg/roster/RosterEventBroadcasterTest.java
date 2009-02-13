@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.openymsg.network.YahooUser;
+import org.openymsg.v1.network.YahooUserV1;
+import org.openymsg.v1.roster.RosterV1;
 
 /**
  * Tests to check the functionality of the mechanism that should broadcast any
@@ -17,11 +19,11 @@ import org.openymsg.network.YahooUser;
  */
 public class RosterEventBroadcasterTest {
 
-	private Roster roster;
+	private RosterV1 roster;
 
 	@Before
 	public void setUp() {
-		roster = new Roster(new MockFriendManager());
+		roster = new RosterV1(new MockFriendManager());
 	}
 
 	/**
@@ -32,7 +34,7 @@ public class RosterEventBroadcasterTest {
 	public void testReceiveOnOneRegisteredListener() {
 		final MockRosterListener listener = new MockRosterListener();
 		roster.addRosterListener(listener);
-		roster.broadcastEvent(new RosterEvent(roster, new YahooUser("dummy"),
+		roster.broadcastEvent(new RosterEvent(roster, new YahooUserV1("dummy"),
 				RosterEventType.add));
 		assertEquals(1, listener.getEventCount());
 	}
@@ -47,7 +49,7 @@ public class RosterEventBroadcasterTest {
 		final MockRosterListener listenerTwo = new MockRosterListener();
 		roster.addRosterListener(listenerOne);
 		roster.addRosterListener(listenerTwo);
-		roster.broadcastEvent(new RosterEvent(roster, new YahooUser("dummy"),
+		roster.broadcastEvent(new RosterEvent(roster, new YahooUserV1("dummy"),
 				RosterEventType.add));
 		assertEquals(1, listenerOne.getEventCount());
 		assertEquals(1, listenerTwo.getEventCount());
@@ -60,7 +62,7 @@ public class RosterEventBroadcasterTest {
 	@Test
 	public void testDontReceiveOnUnregisteredListener() {
 		final MockRosterListener listener = new MockRosterListener();
-		roster.broadcastEvent(new RosterEvent(roster, new YahooUser("dummy"),
+		roster.broadcastEvent(new RosterEvent(roster, new YahooUserV1("dummy"),
 				RosterEventType.add));
 		assertEquals(0, listener.getEventCount());
 	}
@@ -74,7 +76,7 @@ public class RosterEventBroadcasterTest {
 		final MockRosterListener listener = new MockRosterListener();
 		final MockRosterListener nonlistener = new MockRosterListener();
 		roster.addRosterListener(listener);
-		roster.broadcastEvent(new RosterEvent(roster, new YahooUser("dummy"),
+		roster.broadcastEvent(new RosterEvent(roster, new YahooUserV1("dummy"),
 				RosterEventType.add));
 		assertEquals(1, listener.getEventCount());
 		assertEquals(0, nonlistener.getEventCount());

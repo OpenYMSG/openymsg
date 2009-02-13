@@ -20,6 +20,8 @@ package org.openymsg.network.event;
 
 import java.util.Date;
 
+import org.openymsg.network.event.SessionEvent;
+
 /**
  * This class is the parent of all event classes in this package.
  * 
@@ -30,30 +32,34 @@ import java.util.Date;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class SessionEvent extends java.util.EventObject {
+public class DefaultSessionEvent extends java.util.EventObject implements SessionEvent {
 	private static final long serialVersionUID = -128672051097761320L;
 
 	private final String to;
 
 	private final String from;
 
-	protected String message;
+	private String message;
 
 	private final long timestamp;
 
 	private long status = 0;
 
-	public SessionEvent(Object source) {
+	public DefaultSessionEvent(Object source) {
 		this(source, null, null, null, 0);
 	}
 
+	protected DefaultSessionEvent(Object source, String message) {
+		this(source, null, null, message, 0);
+	}
+
 	// Online message
-	public SessionEvent(Object source, String to, String from, String message) {
+	public DefaultSessionEvent(Object source, String to, String from, String message) {
 		this(source, to, from, message, 0);
 	}
 
 	// Offline message
-	public SessionEvent(Object source, String to, String from, String message,
+	public DefaultSessionEvent(Object source, String to, String from, String message,
 			long timestampInMillis) {
 		super(source);
 		this.to = to;

@@ -4,6 +4,7 @@ import java.util.EventObject;
 
 import org.openymsg.network.YahooUser;
 
+
 /**
  * A RosterEvent will be forwarded to any registered {@link RosterListener} if a
  * {@link Roster} object gets changed.
@@ -25,7 +26,7 @@ public class RosterEvent extends EventObject {
 	 * @param type
 	 * @param source
 	 */
-	public RosterEvent(final Roster source, final YahooUser user,
+	public RosterEvent(final Roster<? extends YahooUser> source, final YahooUser user,
 			final RosterEventType type) {
 		super(source);
 
@@ -61,9 +62,10 @@ public class RosterEvent extends EventObject {
 	 * 
 	 * @return The object on which the Event initially occurred.
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Roster getSource() {
-		return (Roster) source;
+	public Roster<? extends YahooUser> getSource() {
+		return (Roster<? extends YahooUser>) source;
 	}
 
 	/**

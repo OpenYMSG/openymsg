@@ -16,7 +16,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network;
+package org.openymsg.v1.network;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -25,6 +25,8 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.openymsg.network.ServiceType;
+import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.SessionConferenceEvent;
 
 /**
@@ -37,7 +39,7 @@ import org.openymsg.network.event.SessionConferenceEvent;
 public class InputThread extends Thread {
 	private volatile boolean quit = false; // Exit run in J2 compliant way
 
-	private final Session parentSession;
+	private final SessionV1 parentSession;
 
 	private static Logger log = Logger.getLogger(InputThread.class);
 
@@ -47,7 +49,7 @@ public class InputThread extends Thread {
 	 * @param parentSession
 	 *            the parent session of this thread.
 	 */
-	public InputThread(Session parentSession) {
+	public InputThread(SessionV1 parentSession) {
 		super("jYMSG Network Input thread");
 		this.parentSession = parentSession;
 	}
@@ -290,13 +292,13 @@ public class InputThread extends Thread {
 	private void receiveConfInvite(YMSG9Packet pkt) // 0x18
 	{
 		try {
-			final YahooConference yc = parentSession.getOrCreateConference(pkt);
+			final YahooConferenceV1 yc = parentSession.getOrCreateConference(pkt);
 			final String[] users = pkt.getValues("52");
 			final Set<YahooUser> conferenceUsers = new HashSet<YahooUser>();
 			for (final String userId : users) {
 				YahooUser user = parentSession.getRoster().getUser(userId);
 				if (user == null) {
-					user = new YahooUser(userId);
+					user = new YahooUserV1(userId);
 				}
 				conferenceUsers.add(user);
 			}
