@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openymsg.network;
+package org.openymsg.v1.network;
 
 /**
  * @author Giancarlo Frison - Nimbuzz B.V. <giancarlo@nimbuzz.com>

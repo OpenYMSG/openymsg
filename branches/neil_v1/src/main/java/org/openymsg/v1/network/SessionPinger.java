@@ -16,7 +16,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network;
+package org.openymsg.v1.network;
 
 import java.io.IOException;
 import java.util.TimerTask;
@@ -36,7 +36,7 @@ public class SessionPinger extends TimerTask {
 	/**
 	 * The session on which behalf the keep-alive packet should be sent.
 	 */
-	final Session session;
+	final SessionV1 session;
 
 	/**
 	 * Creates a new instance which is linked to a particular session.
@@ -44,7 +44,7 @@ public class SessionPinger extends TimerTask {
 	 * @param session
 	 *            The session for which to send out a keep-alive packet.
 	 */
-	public SessionPinger(Session session) {
+	public SessionPinger(SessionV1 session) {
 		if (session == null) {
 			throw new IllegalArgumentException(
 					"Argument 'session' cannot be null.");

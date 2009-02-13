@@ -28,11 +28,11 @@ public abstract class NetworkConstants {
 	
 	public final static byte PROTOCOL = 0x0c; 
 
-	final static byte[] MAGIC = { 'Y', 'M', 'S', 'G' };
+	public final static byte[] MAGIC = { 'Y', 'M', 'S', 'G' };
 
-	final static byte[] VERSION = { 0x00, PROTOCOL, 0x00, 0x00 };
+	public final static byte[] VERSION = { 0x00, PROTOCOL, 0x00, 0x00 };
 
-	final static byte[] VERSION_HTTP = { PROTOCOL, 0x00, (byte) 0xc8, 0x00 };
+	public final static byte[] VERSION_HTTP = { PROTOCOL, 0x00, (byte) 0xc8, 0x00 };
 
 	public final static int YMSG9_HEADER_SIZE = 20;
 

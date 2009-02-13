@@ -27,7 +27,7 @@ import java.net.URL;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class SessionFileTransferEvent extends SessionEvent {
+public class SessionFileTransferEvent extends DefaultSessionEvent {
 	private static final long serialVersionUID = 961716420630362828L;
 	protected URL location = null;
 

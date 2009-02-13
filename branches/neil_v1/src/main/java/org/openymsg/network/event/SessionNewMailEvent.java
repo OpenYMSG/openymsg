@@ -24,7 +24,7 @@ package org.openymsg.network.event;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class SessionNewMailEvent extends SessionEvent {
+public class SessionNewMailEvent extends DefaultSessionEvent {
 	private static final long serialVersionUID = 5384574485336907226L;
 
 	protected int mail;

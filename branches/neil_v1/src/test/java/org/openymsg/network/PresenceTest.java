@@ -26,11 +26,13 @@ import org.junit.Test;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.Session;
 import org.openymsg.network.Status;
-import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.SessionAdapter;
 import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.network.event.WaitListener;
 import org.openymsg.roster.Roster;
+import org.openymsg.v1.network.SessionV1;
+import org.openymsg.v1.network.YahooUserV1;
+import org.openymsg.v1.roster.RosterV1;
 
 /**
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
@@ -49,16 +51,21 @@ public class PresenceTest {
 	private static String RECVPWD = PropertiesAvailableTest
 			.getPassword(RECEIVER);
 
+	protected static Session<RosterV1> createSession() {
+		return new SessionV1();
+	}
+
+
 	@Test
 	public void testDefaultStatus() throws Exception {
-		assertEquals(Status.AVAILABLE, new Session().getStatus());
+		assertEquals(Status.AVAILABLE, createSession().getStatus());
 	}
 
 	// @Test
 	public void testSetInitalStatus() throws Exception {
 		// test initial state: set your state before logging in.
 		for (final Status status : Status.values()) {
-			final Session session = new Session();
+			final Session session = createSession();
 			if (status == Status.AVAILABLE || status == Status.INVISIBLE) {
 				try {
 					session.setStatus(status);
@@ -81,7 +88,7 @@ public class PresenceTest {
 
 	// @Test
 	public void testReSetInitalStatus() throws Exception {
-		final Session session = new Session();
+		final Session session = createSession();
 		try {
 			session.setStatus(Status.AVAILABLE);
 			assertEquals(Status.AVAILABLE, session.getStatus());
@@ -115,7 +122,7 @@ public class PresenceTest {
 	@Test
 	public void testSetCustomInitialStatus() throws Exception {
 		try {
-			final Session session = new Session();
+			final Session session = createSession();
 			session.setStatus(null, true);
 			fail("An IllegalArgumentException should have been thrown before this point.");
 		} catch (IllegalArgumentException e) {
@@ -123,7 +130,7 @@ public class PresenceTest {
 		}
 
 		try {
-			final Session session = new Session();
+			final Session session = createSession();
 			session.setStatus(null, false);
 			fail("An IllegalArgumentException should have been thrown before this point.");
 		} catch (IllegalArgumentException e) {
@@ -131,7 +138,7 @@ public class PresenceTest {
 		}
 
 		try {
-			final Session session = new Session();
+			final Session session = createSession();
 			session.setStatus("", true);
 			fail("An IllegalArgumentException should have been thrown before this point.");
 		} catch (IllegalArgumentException e) {
@@ -139,7 +146,7 @@ public class PresenceTest {
 		}
 
 		try {
-			final Session session = new Session();
+			final Session session = createSession();
 			session.setStatus("", false);
 			fail("An IllegalArgumentException should have been thrown before this point.");
 		} catch (IllegalArgumentException e) {
@@ -147,7 +154,7 @@ public class PresenceTest {
 		}
 
 		try {
-			final Session session = new Session();
+			final Session session = createSession();
 			session.setStatus("test", true);
 			fail("An IllegalArgumentException should have been thrown before this point.");
 		} catch (IllegalArgumentException e) {
@@ -155,7 +162,7 @@ public class PresenceTest {
 		}
 
 		try {
-			final Session session = new Session();
+			final Session session = createSession();
 			session.setStatus("test", false);
 			fail("An IllegalArgumentException should have been thrown before this point.");
 		} catch (IllegalArgumentException e) {
@@ -165,7 +172,7 @@ public class PresenceTest {
 
 	@Test
 	public void testActualLogin() throws Exception {
-		final Session sender = new Session();
+		final Session sender = createSession();
 		try {
 			sender.login(USERNAME, PASSWORD);
 
@@ -195,8 +202,8 @@ public class PresenceTest {
 
 	// @Test
 	public void testReceivePresence() throws Exception {
-		final Session sender = new Session();
-		final Session receiver = new Session();
+		final Session sender = createSession();
+		final Session receiver = createSession();
 
 		final ReceivePresenceUpdateAdaptor listener = new ReceivePresenceUpdateAdaptor();
 		WaitListener wl = new WaitListener(receiver);
@@ -210,7 +217,7 @@ public class PresenceTest {
 			final Roster roster = receiver.getRoster();
 			final boolean exists = roster.containsUser(RECEIVER);
 			if (!exists) {
-				roster.add(new YahooUser(USERNAME, "Friends"));
+				roster.add(new YahooUserV1(USERNAME, "Friends"));
 				wl.waitForEvent(4, ServiceType.FRIENDADD);
 			}
 

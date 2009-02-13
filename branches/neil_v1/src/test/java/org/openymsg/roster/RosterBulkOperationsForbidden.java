@@ -9,6 +9,8 @@ import junitx.util.PrivateAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.openymsg.network.YahooUser;
+import org.openymsg.v1.network.YahooUserV1;
+import org.openymsg.v1.roster.RosterV1;
 
 /**
  * Bulk operations on the Roster object are not allowed. This testcase tests if
@@ -24,15 +26,15 @@ public class RosterBulkOperationsForbidden {
 
 	@Before
 	public void setUp() throws Throwable {
-		roster = new Roster(new MockFriendManager());
+		roster = new RosterV1(new MockFriendManager());
 		PrivateAccessor.invoke(roster, "syncedAdd", new Class[] { YahooUser.class },
-				new Object[] { new YahooUser("on roster") });
+				new Object[] { new YahooUserV1("on roster") });
 		PrivateAccessor.invoke(roster, "syncedAdd", new Class[] { YahooUser.class },
-				new Object[] { new YahooUser("on roster as well") });
+				new Object[] { new YahooUserV1("on roster as well") });
 
 		testUsers = new HashSet<YahooUser>();
-		testUsers.add(new YahooUser("test"));
-		testUsers.add(new YahooUser("user"));
+		testUsers.add(new YahooUserV1("test"));
+		testUsers.add(new YahooUserV1("user"));
 	}
 
 	/**

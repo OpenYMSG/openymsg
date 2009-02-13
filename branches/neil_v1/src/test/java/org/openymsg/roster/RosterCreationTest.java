@@ -1,6 +1,7 @@
 package org.openymsg.roster;
 
 import org.junit.Test;
+import org.openymsg.v1.roster.RosterV1;
 
 /**
  * Test case for the constructor(s) of the {@link Roster} class.
@@ -14,7 +15,7 @@ public class RosterCreationTest {
 	 */
 	@Test
 	public void testRosterConstructor() {
-		new Roster(new MockFriendManager());
+		new RosterV1(new MockFriendManager());
 	}
 
 	/**
@@ -23,7 +24,7 @@ public class RosterCreationTest {
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testRosterConstructorWithNullFriendManager() {
-		new Roster(null);
+		new RosterV1(null);
 	}
 
 }

@@ -31,7 +31,7 @@ import org.openymsg.network.StatusConstants;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class SessionNotifyEvent extends SessionEvent {
+public class SessionNotifyEvent extends DefaultSessionEvent {
 	private static final long serialVersionUID = -943743298762485982L;
 
 	protected String type;

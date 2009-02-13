@@ -26,6 +26,8 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.openymsg.network.Session;
+import org.openymsg.v1.network.SessionV1;
+import org.openymsg.v1.roster.RosterV1;
 
 /**
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
@@ -33,7 +35,11 @@ import org.openymsg.network.Session;
 public class SessionTest {
 	@Test
 	public void testSession() throws Exception {
-		new Session();
+		createSession();
+	}
+
+	protected static Session<RosterV1> createSession() {
+		return new SessionV1();
 	}
 
 	@Test
@@ -41,7 +47,7 @@ public class SessionTest {
 		Set<Session> sessions = new HashSet<Session>();
 		final int max = 10;
 		for (int i = 0; i < max; i++) {
-			sessions.add(new Session());
+			sessions.add(createSession());
 		}
 
 		assertEquals(max, sessions.size());

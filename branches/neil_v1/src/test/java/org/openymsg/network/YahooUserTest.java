@@ -20,7 +20,7 @@ package org.openymsg.network;
 
 import junitx.extensions.EqualsHashCodeTestCase;
 
-import org.openymsg.network.YahooUser;
+import org.openymsg.v1.network.YahooUserV1;
 
 /**
  * Basic Equality and HashCode contract checks.
@@ -35,11 +35,11 @@ public class YahooUserTest extends EqualsHashCodeTestCase {
 
 	@Override
 	protected Object createInstance() throws Exception {
-		return new YahooUser("same");
+		return new YahooUserV1("same");
 	}
 
 	@Override
 	protected Object createNotEqualInstance() throws Exception {
-		return new YahooUser("different");
+		return new YahooUserV1("different");
 	}
 }

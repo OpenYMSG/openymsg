@@ -6,6 +6,8 @@ import junitx.util.PrivateAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.openymsg.network.YahooUser;
+import org.openymsg.v1.network.YahooUserV1;
+import org.openymsg.v1.roster.RosterV1;
 
 /**
  * Testcase to check if an 'syncedUpdate()' to a {@link Roster} triggers the
@@ -19,12 +21,12 @@ import org.openymsg.network.YahooUser;
  */
 public class RosterSyncedUpdateMethodTriggersUpdate {
 
-	private static final YahooUser USER = new YahooUser("dummy");
+	private static final YahooUser USER = new YahooUserV1("dummy");
 	private Roster roster;
 
 	@Before
 	public void setUp() throws Throwable {
-		roster = new Roster(new MockFriendManager());
+		roster = new RosterV1(new MockFriendManager());
 		PrivateAccessor.invoke(roster, "syncedAdd",
 				new Class[] { YahooUser.class }, new Object[] { USER });
 	}

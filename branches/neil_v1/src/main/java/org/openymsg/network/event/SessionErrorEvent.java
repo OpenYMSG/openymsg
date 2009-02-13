@@ -26,7 +26,7 @@ import org.openymsg.network.ServiceType;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class SessionErrorEvent extends SessionEvent {
+public class SessionErrorEvent extends DefaultSessionEvent {
 	private static final long serialVersionUID = -1394777141619835808L;
 
 	protected int code = -1;
@@ -37,8 +37,7 @@ public class SessionErrorEvent extends SessionEvent {
 	 * CONSTRUCTORS
 	 */
 	public SessionErrorEvent(Object o, String m, ServiceType sv) {
-		super(o);
-		message = m;
+		super(o, m);
 		service = sv;
 	}
 
@@ -56,7 +55,7 @@ public class SessionErrorEvent extends SessionEvent {
 
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer("Error: message=\"").append(message)
+		StringBuffer sb = new StringBuffer("Error: message=\"").append(this.getMessage())
 				.append("\" service=0x").append(
 						Integer.toHexString(service.getValue()));
 		return sb.toString();

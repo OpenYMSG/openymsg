@@ -19,6 +19,7 @@ import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.network.event.WaitListener;
 import org.openymsg.roster.Roster;
+import org.openymsg.v1.network.YahooUserV1;
 
 public class StatusTest extends YahooTestAbstract {
 
@@ -42,7 +43,7 @@ public class StatusTest extends YahooTestAbstract {
 		final Roster roster = sess1.getRoster();
 		final boolean existinList = roster.containsUser(OTHERUSR);
 		if (!existinList) {
-			roster.add(new YahooUser(OTHERUSR, "group"));
+			roster.add(new YahooUserV1(OTHERUSR, "group"));
 			listener1.waitForEvent(5, ServiceType.FRIENDADD);
 		}
 
@@ -92,7 +93,7 @@ public class StatusTest extends YahooTestAbstract {
 	public void testServerBanYouout4AnotherLoginWithSameUser()
 			throws AccountLockedException, IllegalStateException,
 			LoginRefusedException, IOException, InterruptedException {
-		Session sessKiller = new Session();
+		Session sessKiller = this.createSession();
 		listener2.clearEvents();
 		Thread.sleep(500);
 		WaitListener sl = new WaitListener(sessKiller);

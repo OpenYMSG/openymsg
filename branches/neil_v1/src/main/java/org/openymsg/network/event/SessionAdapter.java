@@ -19,6 +19,7 @@
 package org.openymsg.network.event;
 
 import org.openymsg.network.FireEvent;
+import org.openymsg.network.YahooUser;
 
 /**
  * Empty-method implementation of the {@link SessionListener} interface. A
@@ -28,7 +29,7 @@ import org.openymsg.network.FireEvent;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class SessionAdapter implements SessionListener {
+public class SessionAdapter<T extends YahooUser> implements SessionListener {
 	public void fileTransferReceived(SessionFileTransferEvent event) {
 		// override this function if you want to do something with it.
 	}
@@ -37,7 +38,7 @@ public class SessionAdapter implements SessionListener {
 		// override this function if you want to do something with it.
 	}
 
-	public void listReceived(SessionListEvent event) {
+	public void listReceived(SessionListEvent<T> event) {
 		// override this function if you want to do something with it.
 	}
 
@@ -97,15 +98,15 @@ public class SessionAdapter implements SessionListener {
 		// override this function if you want to do something with it.
 	}
 
-	public void friendsUpdateReceived(SessionFriendEvent event) {
+	public void friendsUpdateReceived(SessionFriendEvent<T> event) {
 		// override this function if you want to do something with it.
 	}
 
-	public void friendAddedReceived(SessionFriendEvent event) {
+	public void friendAddedReceived(SessionFriendEvent<T> event) {
 		// override this function if you want to do something with it.
 	}
 
-	public void friendRemovedReceived(SessionFriendEvent event) {
+	public void friendRemovedReceived(SessionFriendEvent<T> event) {
 		// override this function if you want to do something with it.
 	}
 
@@ -147,7 +148,7 @@ public class SessionAdapter implements SessionListener {
 				connectionClosed(ev);
 				break;
 			case Y6_STATUS_UPDATE:
-				friendsUpdateReceived((SessionFriendEvent) ev);
+				friendsUpdateReceived((SessionFriendEvent<T>) ev);
 				break;
 			case MESSAGE:
 				messageReceived(ev);
@@ -183,19 +184,19 @@ public class SessionAdapter implements SessionListener {
 				notifyReceived((SessionNotifyEvent) ev);
 				break;
 			case LIST:
-				listReceived((SessionListEvent) ev);
+				listReceived((SessionListEvent<T>) ev);
 				break;
 			case FRIENDADD:
-				friendAddedReceived((SessionFriendEvent) ev);
+				friendAddedReceived((SessionFriendEvent<T>) ev);
 				break;
 			case FRIENDREMOVE:
-				friendRemovedReceived((SessionFriendEvent) ev);
+				friendRemovedReceived((SessionFriendEvent<T>) ev);
 				break;
 			case GOTGROUPRENAME:
 				groupRenameReceived((SessionGroupEvent) ev);
 				break;
 			case CONTACTREJECT:
-				contactRejectionReceived((SessionFriendRejectedEvent) ev);
+				contactRejectionReceived((SessionFriendRejectedEvent<T>) ev);
 				break;
 			case CHATJOIN:
 				chatJoinReceived((SessionChatEvent) ev);

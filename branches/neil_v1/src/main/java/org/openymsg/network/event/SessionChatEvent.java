@@ -36,7 +36,7 @@ import org.openymsg.network.chatroom.YahooChatUser;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class SessionChatEvent extends SessionEvent {
+public class SessionChatEvent extends DefaultSessionEvent {
 	private static final long serialVersionUID = 4699554402846984208L;
 
 	protected YahooChatUser[] users;
@@ -45,14 +45,18 @@ public class SessionChatEvent extends SessionEvent {
 
 	protected boolean emote;
 
-	/**
+	/*
 	 * CONSTRUCTORS
 	 */
 	// Chat user joined/left
 	public SessionChatEvent(Object source, int size, YahooChatLobby ycl) {
-		super(source);
+		this(source, null);
 		users = new YahooChatUser[size];
 		lobby = ycl;
+	}
+	
+	protected SessionChatEvent(Object source, String message) {
+		super(source, message);
 	}
 
 	// Message received
@@ -60,7 +64,6 @@ public class SessionChatEvent extends SessionEvent {
 			String emote, YahooChatLobby ycl) {
 		this(source, 1, ycl);
 		setChatUser(0, ycu);
-		this.message = message;
 		this.emote = (emote != null && emote.equals("2"));
 	}
 

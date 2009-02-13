@@ -1,6 +1,7 @@
 package org.openymsg.roster;
 
 import org.junit.Test;
+import org.openymsg.v1.roster.RosterV1;
 
 /**
  * Checks if adding and removing RosterListeners to the Roster operates as
@@ -17,7 +18,7 @@ public class RosterListenerManagementTest {
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testCannotAddNull() {
-		new Roster(new MockFriendManager()).addRosterListener(null);
+		new RosterV1(new MockFriendManager()).addRosterListener(null);
 	}
 
 	/**
@@ -26,6 +27,6 @@ public class RosterListenerManagementTest {
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testCannotRemoveNull() {
-		new Roster(new MockFriendManager()).removeRosterListener(null);
+		new RosterV1(new MockFriendManager()).removeRosterListener(null);
 	}
 }
