@@ -18,7 +18,6 @@
  */
 package org.openymsg.v1.network.event;
 
-import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.DefaultSessionEvent;
 import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.v1.network.YahooUserV1;

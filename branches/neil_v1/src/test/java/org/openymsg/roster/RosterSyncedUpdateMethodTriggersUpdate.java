@@ -22,7 +22,7 @@ import org.openymsg.v1.roster.RosterV1;
 public class RosterSyncedUpdateMethodTriggersUpdate {
 
 	private static final YahooUser USER = new YahooUserV1("dummy");
-	private Roster roster;
+	private RosterV1 roster;
 
 	@Before
 	public void setUp() throws Throwable {

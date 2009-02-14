@@ -21,8 +21,8 @@ import org.openymsg.v1.roster.RosterV1;
  */
 public class RosterBulkOperationsForbidden {
 
-	private Roster roster;
-	private Set<YahooUser> testUsers;
+	private RosterV1 roster;
+	private Set<YahooUserV1> testUsers;
 
 	@Before
 	public void setUp() throws Throwable {
@@ -32,7 +32,7 @@ public class RosterBulkOperationsForbidden {
 		PrivateAccessor.invoke(roster, "syncedAdd", new Class[] { YahooUser.class },
 				new Object[] { new YahooUserV1("on roster as well") });
 
-		testUsers = new HashSet<YahooUser>();
+		testUsers = new HashSet<YahooUserV1>();
 		testUsers.add(new YahooUserV1("test"));
 		testUsers.add(new YahooUserV1("user"));
 	}
@@ -43,7 +43,7 @@ public class RosterBulkOperationsForbidden {
 	 */
 	@Test(expected = UnsupportedOperationException.class)
 	public void testIteratorDotRemove() {
-		final Iterator<YahooUser> iter = roster.iterator();
+		final Iterator<YahooUserV1> iter = roster.iterator();
 		iter.next();
 		iter.remove();
 	}

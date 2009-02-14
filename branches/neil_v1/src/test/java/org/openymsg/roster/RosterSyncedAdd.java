@@ -27,7 +27,7 @@ import org.openymsg.v1.roster.RosterV1;
 public class RosterSyncedAdd {
 
 	private final static YahooUser USER = new YahooUserV1("dummy");
-	private Roster roster;
+	private RosterV1 roster;
 
 	/**
 	 * Initializes the roster before each test.
@@ -95,7 +95,7 @@ public class RosterSyncedAdd {
 	public void testAddContainedInIterator() throws Throwable {
 		PrivateAccessor.invoke(roster, "syncedAdd",
 				new Class[] { YahooUser.class }, new Object[] { USER });
-		final Iterator<YahooUser> iter = roster.iterator();
+		final Iterator<YahooUserV1> iter = roster.iterator();
 		while (iter.hasNext()) {
 			if (iter.next().equals(USER)) {
 				return; // success

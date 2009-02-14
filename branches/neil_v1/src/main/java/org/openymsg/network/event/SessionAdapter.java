@@ -74,7 +74,7 @@ public class SessionAdapter<T extends YahooUser> implements SessionListener {
 		// override this function if you want to do something with it.
 	}
 
-	public void contactRejectionReceived(SessionFriendRejectedEvent event) {
+	public void contactRejectionReceived(SessionFriendRejectedEvent<?> event) {
 		// override this function if you want to do something with it.
 	}
 

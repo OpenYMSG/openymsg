@@ -27,7 +27,7 @@ import org.openymsg.v1.roster.RosterV1;
 public class RosterSyncedRemove {
 
 	private final static YahooUser USER = new YahooUserV1("dummy");
-	private Roster roster;
+	private Roster<YahooUserV1> roster;
 
 	/**
 	 * Initializes the roster before each test.
@@ -105,7 +105,7 @@ public class RosterSyncedRemove {
 		PrivateAccessor.invoke(roster, "syncedRemove",
 				new Class[] { String.class }, new Object[] { USER.getId() });
 
-		final Iterator<YahooUser> iter = roster.iterator();
+		final Iterator<YahooUserV1> iter = roster.iterator();
 		while (iter.hasNext()) {
 			if (iter.next().equals(USER)) {
 				fail("Iterator still includes the removed user.");

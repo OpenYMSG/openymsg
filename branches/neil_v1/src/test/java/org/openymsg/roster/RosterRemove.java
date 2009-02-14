@@ -3,7 +3,6 @@ package org.openymsg.roster;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.openymsg.network.YahooUser;
 import org.openymsg.v1.network.YahooUserV1;
 import org.openymsg.v1.roster.RosterV1;
 
@@ -26,8 +25,8 @@ public class RosterRemove {
 	public void testCallingRemoveTriggersFriendManager() {
 		// setup
 		final MockFriendManager manager = new MockFriendManager();
-		final Roster roster = new RosterV1(manager);
-		final YahooUser user = new YahooUserV1("user", "group");
+		final RosterV1 roster = new RosterV1(manager);
+		final YahooUserV1 user = new YahooUserV1("user", "group");
 		roster.add(user);
 		manager.reset();
 		
@@ -49,8 +48,8 @@ public class RosterRemove {
 	public void testCallingRemoveOnNonExistingUserDoesNotTriggerFriendManager() {
 		// setup
 		final MockFriendManager manager = new MockFriendManager();
-		final Roster roster = new RosterV1(manager);
-		final YahooUser user = new YahooUserV1("user", "group");
+		final RosterV1 roster = new RosterV1(manager);
+		final YahooUserV1 user = new YahooUserV1("user", "group");
 
 		// execution
 		final boolean result = roster.remove(user);

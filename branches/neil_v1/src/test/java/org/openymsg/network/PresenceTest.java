@@ -29,7 +29,6 @@ import org.openymsg.network.Status;
 import org.openymsg.network.event.SessionAdapter;
 import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.network.event.WaitListener;
-import org.openymsg.roster.Roster;
 import org.openymsg.v1.network.SessionV1;
 import org.openymsg.v1.network.YahooUserV1;
 import org.openymsg.v1.roster.RosterV1;
@@ -65,7 +64,7 @@ public class PresenceTest {
 	public void testSetInitalStatus() throws Exception {
 		// test initial state: set your state before logging in.
 		for (final Status status : Status.values()) {
-			final Session session = createSession();
+			final Session<RosterV1> session = createSession();
 			if (status == Status.AVAILABLE || status == Status.INVISIBLE) {
 				try {
 					session.setStatus(status);
@@ -88,7 +87,7 @@ public class PresenceTest {
 
 	// @Test
 	public void testReSetInitalStatus() throws Exception {
-		final Session session = createSession();
+		final Session<RosterV1> session = createSession();
 		try {
 			session.setStatus(Status.AVAILABLE);
 			assertEquals(Status.AVAILABLE, session.getStatus());
@@ -122,7 +121,7 @@ public class PresenceTest {
 	@Test
 	public void testSetCustomInitialStatus() throws Exception {
 		try {
-			final Session session = createSession();
+			final Session<RosterV1> session = createSession();
 			session.setStatus(null, true);
 			fail("An IllegalArgumentException should have been thrown before this point.");
 		} catch (IllegalArgumentException e) {
@@ -130,7 +129,7 @@ public class PresenceTest {
 		}
 
 		try {
-			final Session session = createSession();
+			final Session<RosterV1> session = createSession();
 			session.setStatus(null, false);
 			fail("An IllegalArgumentException should have been thrown before this point.");
 		} catch (IllegalArgumentException e) {
@@ -138,7 +137,7 @@ public class PresenceTest {
 		}
 
 		try {
-			final Session session = createSession();
+			final Session<RosterV1> session = createSession();
 			session.setStatus("", true);
 			fail("An IllegalArgumentException should have been thrown before this point.");
 		} catch (IllegalArgumentException e) {
@@ -146,7 +145,7 @@ public class PresenceTest {
 		}
 
 		try {
-			final Session session = createSession();
+			final Session<RosterV1> session = createSession();
 			session.setStatus("", false);
 			fail("An IllegalArgumentException should have been thrown before this point.");
 		} catch (IllegalArgumentException e) {
@@ -154,7 +153,7 @@ public class PresenceTest {
 		}
 
 		try {
-			final Session session = createSession();
+			final Session<RosterV1> session = createSession();
 			session.setStatus("test", true);
 			fail("An IllegalArgumentException should have been thrown before this point.");
 		} catch (IllegalArgumentException e) {
@@ -162,7 +161,7 @@ public class PresenceTest {
 		}
 
 		try {
-			final Session session = createSession();
+			final Session<RosterV1> session = createSession();
 			session.setStatus("test", false);
 			fail("An IllegalArgumentException should have been thrown before this point.");
 		} catch (IllegalArgumentException e) {
@@ -172,7 +171,7 @@ public class PresenceTest {
 
 	@Test
 	public void testActualLogin() throws Exception {
-		final Session sender = createSession();
+		final Session<RosterV1> sender = createSession();
 		try {
 			sender.login(USERNAME, PASSWORD);
 
@@ -202,8 +201,8 @@ public class PresenceTest {
 
 	// @Test
 	public void testReceivePresence() throws Exception {
-		final Session sender = createSession();
-		final Session receiver = createSession();
+		final Session<RosterV1> sender = createSession();
+		final Session<RosterV1> receiver = createSession();
 
 		final ReceivePresenceUpdateAdaptor listener = new ReceivePresenceUpdateAdaptor();
 		WaitListener wl = new WaitListener(receiver);
@@ -214,7 +213,7 @@ public class PresenceTest {
 			assertEquals(Status.AVAILABLE, receiver.getStatus());
 			assertEquals(null, receiver.getCustomStatusMessage());
 
-			final Roster roster = receiver.getRoster();
+			final RosterV1 roster = receiver.getRoster();
 			final boolean exists = roster.containsUser(RECEIVER);
 			if (!exists) {
 				roster.add(new YahooUserV1(USERNAME, "Friends"));
@@ -222,7 +221,7 @@ public class PresenceTest {
 			}
 
 			sender.setStatus(Status.BUSY);
-			SessionFriendEvent event = (SessionFriendEvent) wl.waitForEvent(5,
+			SessionFriendEvent<?> event = (SessionFriendEvent<?>) wl.waitForEvent(5,
 					ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
 			assertEquals(event.getUser().toString(), Status.BUSY, event
@@ -231,7 +230,7 @@ public class PresenceTest {
 
 			Thread.sleep(1000);
 			sender.setStatus(Status.AVAILABLE);
-			event = (SessionFriendEvent) wl.waitForEvent(5,
+			event = (SessionFriendEvent<?>) wl.waitForEvent(5,
 					ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
 			assertEquals(Status.AVAILABLE, event.getUser().getStatus());
@@ -239,7 +238,7 @@ public class PresenceTest {
 
 			Thread.sleep(1000);
 			sender.setStatus(Status.OUTTOLUNCH);
-			event = (SessionFriendEvent) wl.waitForEvent(5,
+			event = (SessionFriendEvent<?>) wl.waitForEvent(5,
 					ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
 			assertEquals(Status.OUTTOLUNCH, event.getUser().getStatus());
@@ -247,7 +246,7 @@ public class PresenceTest {
 
 			Thread.sleep(1000);
 			sender.setStatus("This is my custom message!", false);
-			event = (SessionFriendEvent) wl.waitForEvent(5,
+			event = (SessionFriendEvent<?>) wl.waitForEvent(5,
 					ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
 			assertEquals(Status.CUSTOM, event.getUser().getStatus());
@@ -256,7 +255,7 @@ public class PresenceTest {
 
 			Thread.sleep(1000);
 			sender.setStatus("This is my busy custom message!", false);
-			event = (SessionFriendEvent) wl.waitForEvent(5,
+			event = (SessionFriendEvent<?>) wl.waitForEvent(5,
 					ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
 			assertEquals(Status.CUSTOM, event.getUser().getStatus());
@@ -265,7 +264,7 @@ public class PresenceTest {
 
 			Thread.sleep(1000);
 			sender.setStatus(Status.OUTTOLUNCH);
-			event = (SessionFriendEvent) wl.waitForEvent(5,
+			event = (SessionFriendEvent<?>) wl.waitForEvent(5,
 					ServiceType.Y6_STATUS_UPDATE).getEvent();
 			assertNotNull(event);
 			assertEquals(Status.OUTTOLUNCH, event.getUser().getStatus());
@@ -292,11 +291,11 @@ public class PresenceTest {
 	 * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
 	 * 
 	 */
-	private static class ReceivePresenceUpdateAdaptor extends SessionAdapter {
+	private static class ReceivePresenceUpdateAdaptor extends SessionAdapter<YahooUser> {
 		/**
 		 * The queued event.
 		 */
-		private SessionFriendEvent sessionEvent = null;
+		private SessionFriendEvent<YahooUser> sessionEvent = null;
 
 		public ReceivePresenceUpdateAdaptor() {
 			// doesn't do much, but prevens synthetic accessor warnings.
@@ -308,7 +307,7 @@ public class PresenceTest {
 		 * @see org.openymsg.network.event.SessionAdapter#friendsUpdateReceived(org.openymsg.network.event.SessionFriendEvent)
 		 */
 		@Override
-		public void friendsUpdateReceived(SessionFriendEvent event) {
+		public void friendsUpdateReceived(SessionFriendEvent<YahooUser> event) {
 			this.sessionEvent = event;
 		}
 
@@ -322,7 +321,7 @@ public class PresenceTest {
 		 * @return 'null' or the first event that arrived within the timeout
 		 *         value.
 		 */
-		public SessionFriendEvent waitForNextEvent(long timeout_in_millis) {
+		public SessionFriendEvent<?> waitForNextEvent(long timeout_in_millis) {
 			if (timeout_in_millis < 0) {
 				throw new IllegalArgumentException(
 						"Cannot use negative timeout values.");
@@ -334,7 +333,7 @@ public class PresenceTest {
 			}
 
 			final long STEP_IN_MILLIS = 100;
-			SessionFriendEvent result = null;
+			SessionFriendEvent<?> result = null;
 			for (int i = 0; i < timeout_in_millis; i += STEP_IN_MILLIS) {
 				if (sessionEvent != null) {
 					result = sessionEvent;
