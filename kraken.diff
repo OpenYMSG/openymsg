@@ -1,0 +1,39 @@
+Index: src/java/net/sf/kraken/protocols/yahoo/YahooSession.java
+===================================================================
+--- src/java/net/sf/kraken/protocols/yahoo/YahooSession.java	(revision 38)
++++ src/java/net/sf/kraken/protocols/yahoo/YahooSession.java	(working copy)
+@@ -82,10 +82,10 @@
+     public void logIn(PresenceType presenceType, String verboseStatus) {
+         setPendingPresenceAndStatus(presenceType, verboseStatus);
+         if (!isLoggedIn()) {
+-            yahooSession = new Session(new DirectConnectionHandler(
++            yahooSession = SessionFactory.buildDirect(
+                     JiveGlobals.getProperty("plugin.gateway.yahoo.connecthost", "scs.msg.yahoo.com"),
+                     JiveGlobals.getIntProperty("plugin.gateway.yahoo.connectport", 5050)
+-            ));
++            );
+             yahooListener = new YahooListener(this);
+             yahooSession.addSessionListener(yahooListener);
+ 
+Index: src/java/net/sf/kraken/protocols/yahoo/YahooListener.java
+===================================================================
+--- src/java/net/sf/kraken/protocols/yahoo/YahooListener.java	(revision 38)
++++ src/java/net/sf/kraken/protocols/yahoo/YahooListener.java	(working copy)
+@@ -33,7 +33,7 @@
+  * @author Daniel Henninger
+  * Heavily inspired by Noah Campbell's work.
+  */
+-public class YahooListener extends SessionAdapter {
++public class YahooListener extends SessionAdapter<YahooUser> {
+ 
+     static Logger Log = Logger.getLogger(YahooListener.class);
+ 
+@@ -120,7 +120,7 @@
+     /**
+      * @see org.openymsg.network.event.SessionAdapter#friendsUpdateReceived(org.openymsg.network.event.SessionFriendEvent)
+      */
+-    public void friendsUpdateReceived(SessionFriendEvent event) {
++    public void friendsUpdateReceived(SessionFriendEvent<YahooUser> event) {
+         for (YahooUser user : event.getUsers()) {
+             if (getSession().getBuddyManager().isActivated()) {
+                 try {
