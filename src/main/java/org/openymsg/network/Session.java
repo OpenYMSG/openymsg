@@ -1,8 +1,11 @@
 package org.openymsg.network;
 
+import java.io.File;
 import java.io.IOException;
 
+import org.openymsg.network.event.SessionConferenceEvent;
 import org.openymsg.network.event.SessionEvent;
+import org.openymsg.network.event.SessionFileTransferEvent;
 import org.openymsg.network.event.SessionListener;
 import org.openymsg.roster.Roster;
 
@@ -37,4 +40,12 @@ public interface Session<T extends Roster<? extends YahooUser>> extends StatusCo
 	String getCustomStatusMessage();
 
 	void rejectContact(SessionEvent event, String string) throws IllegalArgumentException, IllegalStateException, IOException;
+
+	void sendFileTransfer(String contactName, File file, String fileDescription) throws IllegalStateException, FileTransferFailedException, IOException;
+
+	void saveFileTransferAs(SessionFileTransferEvent connectionInfo, String absolutePath) throws IllegalStateException, FileTransferFailedException, IOException;
+
+	void declineConferenceInvite(SessionConferenceEvent ev, String string) throws IllegalStateException, IOException, NoSuchConferenceException;
+
+	Object getConnectionHandler();
 }
