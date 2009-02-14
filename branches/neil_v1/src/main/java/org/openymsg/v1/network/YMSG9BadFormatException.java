@@ -18,13 +18,15 @@
  */
 package org.openymsg.v1.network;
 
+import org.openymsg.network.BadFormatException;
+
 /**
  * Exception indication an error during parsing of a YMSG9Packet.
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class YMSG9BadFormatException extends RuntimeException {
+public class YMSG9BadFormatException extends BadFormatException {
 
 	private static final long serialVersionUID = 2722272866191388316L;
 

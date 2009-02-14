@@ -140,6 +140,7 @@ public class SessionAdapter<T extends YahooUser> implements SessionListener {
 	 * @param event
 	 *            The event to be dispatched.
 	 */
+	@SuppressWarnings("unchecked")
 	public void dispatch(FireEvent event) {
 		final SessionEvent ev = event.getEvent();
 
