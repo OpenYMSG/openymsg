@@ -1,0 +1,118 @@
+Index: java/core/com/itbs/aimcer/commune/ymsg/YMsgOpenConnection.java
+===================================================================
+--- java/core/com/itbs/aimcer/commune/ymsg/YMsgOpenConnection.java	(revision 603)
++++ java/core/com/itbs/aimcer/commune/ymsg/YMsgOpenConnection.java	(working copy)
+@@ -8,6 +8,7 @@
+ import org.openymsg.network.*;
+ import org.openymsg.network.Status;
+ import org.openymsg.network.event.*;
++import org.openymsg.roster.Roster;
+ 
+ import java.io.IOException;
+ import java.io.InterruptedIOException;
+@@ -25,7 +26,7 @@
+     private static final Logger log = Logger.getLogger(YMsgOpenConnection.class.getName());
+ 
+     // -----The session object - our way into the Yahoo API
+-    private Session session;
++    private Session<Roster<YahooUser>> session;
+     private static String EMPTY_EMAIL_STATE = "Unread Email Count: 0";
+ //    private String emailState = EMPTY_EMAIL_STATE;
+ 
+@@ -51,9 +52,8 @@
+         // if the code is changed to change mode, need to inset that there instead.
+         // Doing it here allows us to overwrite it prior to use in connect().
+         if (PREFERRED_MODE == DIRECT) {
+-            DirectConnectionHandler dch = new DirectConnectionHandler();
+-            setServerName(dch.getHost());
+-            setServerPort(dch.getPort());
++            setServerName(Util.directHost());
++            setServerPort(Util.directPort());
+         }
+     }
+ 
+@@ -62,23 +62,22 @@
+         notifyConnectionInitiated();
+         // -----Set the connection handler as per command line
+         if (PREFERRED_MODE == SOCKS) {
+-            session = new Session(new SOCKSConnectionHandler("autoproxy", 1080));
++            session = SessionFactory.buildSOCKS("autoproxy", 1080);
+         } else if (PREFERRED_MODE == HTTP) {
+-            session = new Session(new HTTPConnectionHandler("http.pager.yahoo.com", 80));
++            session = SessionFactory.buildHTTP("http.pager.yahoo.com", 80);
+ //            session = new Session(new HTTPConnectionHandler("proxy", 8080));
+         } else if (PREFERRED_MODE == DIRECT) {
+             // The following line (while ugly) allows us to send japanese users to the right server,
+             // while perserving the ability to override servers for rest of the users.
+ //            String serverName = (getUserName()!=null && getUserName().endsWith(".jp"))?SERVER_JAPAN:getServerName();
+-            DirectConnectionHandler dch = new DirectConnectionHandler(getServerName(), getServerPort());
+-            session = new Session(dch);
++            session = SessionFactory.buildDirect(getServerName(), getServerPort());
+             // ports 5050,23,25,80
+         } else {
+-            session = new Session();
++            session = SessionFactory.build();
+         }
+         // -----Register a listener
+         session.addSessionListener(new YMsgOpenConnection.SessionHandler());
+-        log.fine(session.getConnectionHandler().toString());
++//        log.fine(session.getConnectionHandler().toString());
+ 
+ //        todo see about this later
+ //        session.addTypingNotification(inputTF,username);
+@@ -329,7 +328,7 @@
+     // *****************************************************************
+     // YMSG9 session handler
+     // *****************************************************************
+-    class SessionHandler extends SessionAdapter {
++    class SessionHandler extends SessionAdapter<YahooUser> {
+         public void messageReceived(SessionEvent ev) { //<font size="10">\u001B[30mk\u001B[x1m<font size="10">
+             String decodedMessage = "";
+             if (ev.getMessage()!=null)
+@@ -358,8 +357,8 @@
+         }
+ 
+         public void inputExceptionThrown(SessionExceptionEvent ev) {
+-            if (ev.getException() instanceof YMSG9BadFormatException) {
+-                YMSG9BadFormatException ex = (YMSG9BadFormatException) ev.getException();
++            if (ev.getException() instanceof BadFormatException) {
++                BadFormatException ex = (BadFormatException) ev.getException();
+                 log.log(Level.SEVERE, "", ex.getCause());
+                 for (ConnectionEventListener eventHandler : eventHandlers) {
+                     eventHandler.errorOccured("Input exception: " + ev.getMessage(), ev.getException());
+@@ -411,7 +410,7 @@
+             disconnect(false);
+         }
+ 
+-        public void listReceived(SessionListEvent event) {
++        public void listReceived(SessionListEvent<YahooUser> event) {
+             log.fine("List received.");
+             event.getContacts();
+             for (YahooUser yahooUser : event.getContacts()) {
+@@ -419,7 +418,7 @@
+             }
+         }
+ 
+-        public void friendsUpdateReceived(SessionFriendEvent ev) {
++        public void friendsUpdateReceived(SessionFriendEvent<YahooUser> ev) {
+             YahooUser yahooUser  = ev.getUser();
+             friendsUpdateReceived(yahooUser);
+         }
+@@ -436,7 +435,7 @@
+             notifyStatusChanged(contact, oldStatus);
+         }
+ 
+-        public void friendAddedReceived(SessionFriendEvent ev) {
++        public void friendAddedReceived(SessionFriendEvent<YahooUser> ev) {
+             log.fine("friendAddedReceived " + ev.toString());
+             Contact contact = getContactFactory().create(ev.getUser().getId(), YMsgOpenConnection.this);
+             Set<String> groups = ev.getUser().getGroupIds();
+@@ -448,7 +447,7 @@
+             notifyStatusChanged();
+         }
+ 
+-        public void friendRemovedReceived(SessionFriendEvent ev) {
++        public void friendRemovedReceived(SessionFriendEvent<YahooUser> ev) {
+             log.fine("friendRemovedReceived " + ev.toString());
+         }
+ 
