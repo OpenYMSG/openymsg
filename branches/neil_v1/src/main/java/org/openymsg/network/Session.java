@@ -47,5 +47,11 @@ public interface Session<T extends Roster<? extends YahooUser>> extends StatusCo
 
 	void declineConferenceInvite(SessionConferenceEvent ev, String string) throws IllegalStateException, IOException, NoSuchConferenceException;
 
-	Object getConnectionHandler();
+	void removeSessionListener(SessionListener sessionListener);
+
+	void sendBuzz(String to) throws IllegalStateException, IOException;
+	
+	void reset() throws IllegalStateException;
+	
+	void removeFriendFromGroup(String friendId, String groupId) throws IOException;
 }
