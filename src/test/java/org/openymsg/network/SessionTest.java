@@ -44,7 +44,7 @@ public class SessionTest {
 
 	@Test
 	public void testConcurrentSessions() throws Exception {
-		Set<Session> sessions = new HashSet<Session>();
+		Set<Session<?>> sessions = new HashSet<Session<?>>();
 		final int max = 10;
 		for (int i = 0; i < max; i++) {
 			sessions.add(createSession());
@@ -52,7 +52,7 @@ public class SessionTest {
 
 		assertEquals(max, sessions.size());
 
-		Iterator<Session> it = sessions.iterator();
+		Iterator<Session<?>> it = sessions.iterator();
 		int i = 0;
 		while (it.hasNext()) {
 			i++;

@@ -15,11 +15,10 @@ import org.openymsg.network.LoginRefusedException;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.Session;
 import org.openymsg.network.Status;
-import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.network.event.WaitListener;
-import org.openymsg.roster.Roster;
 import org.openymsg.v1.network.YahooUserV1;
+import org.openymsg.v1.roster.RosterV1;
 
 public class StatusTest extends YahooTestAbstract {
 
@@ -40,7 +39,7 @@ public class StatusTest extends YahooTestAbstract {
 
 	// @Test
 	public void testChangeStatus() throws IllegalArgumentException, IOException {
-		final Roster roster = sess1.getRoster();
+		final RosterV1 roster = sess1.getRoster();
 		final boolean existinList = roster.containsUser(OTHERUSR);
 		if (!existinList) {
 			roster.add(new YahooUserV1(OTHERUSR, "group"));
@@ -71,7 +70,7 @@ public class StatusTest extends YahooTestAbstract {
 				ServiceType.Y6_STATUS_UPDATE);
 		assertNotNull(event);
 		System.out.println(event);
-		SessionFriendEvent sfe = (SessionFriendEvent) event.getEvent();
+		SessionFriendEvent<?> sfe = (SessionFriendEvent<?>) event.getEvent();
 		assertEquals(sfe.getUser().getId(), OTHERUSR);
 		assertEquals(sfe.getUser().getStatus(), Status.OFFLINE);
 		sess2.login(OTHERUSR, OTHERPWD);
@@ -84,7 +83,7 @@ public class StatusTest extends YahooTestAbstract {
 		FireEvent event = listener1.waitForEvent(5,
 				ServiceType.Y6_STATUS_UPDATE);
 		assertNotNull(event);
-		SessionFriendEvent sfe = (SessionFriendEvent) event.getEvent();
+		SessionFriendEvent<?> sfe = (SessionFriendEvent<?>) event.getEvent();
 		assertEquals(sfe.getUser().getId(), OTHERUSR);
 		assertEquals(sfe.getUser().getStatus(), status);
 	}
@@ -93,7 +92,7 @@ public class StatusTest extends YahooTestAbstract {
 	public void testServerBanYouout4AnotherLoginWithSameUser()
 			throws AccountLockedException, IllegalStateException,
 			LoginRefusedException, IOException, InterruptedException {
-		Session sessKiller = this.createSession();
+		Session<RosterV1> sessKiller = createSession();
 		listener2.clearEvents();
 		Thread.sleep(500);
 		WaitListener sl = new WaitListener(sessKiller);

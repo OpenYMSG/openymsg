@@ -16,7 +16,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network.chatroom;
+package org.openymsg.v1.network.chatroom;
 
 import java.io.IOException;
 import java.net.URL;
@@ -30,6 +30,8 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.openymsg.network.Util;
+import org.openymsg.network.chatroom.ChatroomManager;
+import org.openymsg.network.chatroom.YahooChatCategory;
 
 /**
  * Categories are like directories. Each category may contain more categories
@@ -112,7 +114,7 @@ import org.openymsg.network.Util;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class YahooChatCategory {
+public class YahooChatCategoryV1 implements YahooChatCategory<YahooChatRoomV1, YahooChatCategoryV1>{
 	private final static String PUBLIC_TYPE = "yahoo";
 
 	private final static String CAT_URL = "insider.msg.yahoo.com/ycontent/?chatroom_";
@@ -123,18 +125,18 @@ public class YahooChatCategory {
 
 	private final String cookieLine; // Cookie HTTP header
 
-	private final Set<YahooChatCategory> subcategories;
+	private final Set<YahooChatCategoryV1> subcategories;
 
-	private final Set<YahooChatRoom> privateRooms;
+	private final Set<YahooChatRoomV1> privateRooms;
 
-	private final Set<YahooChatRoom> publicRooms;
+	private final Set<YahooChatRoomV1> publicRooms;
 
 	private final String localePrefix;
 
 	/**
 	 * Chatroom lobbies hashed by network name;
 	 */
-	private final Hashtable<String, YahooChatLobby> chatByNetName;
+	private final Hashtable<String, YahooChatLobbyV1> chatByNetName;
 
 	/**
 	 * Creates a new Category instance.
@@ -144,17 +146,17 @@ public class YahooChatCategory {
 	 * @param cookieLine
 	 * @param localePrefix
 	 */
-	public YahooChatCategory(long id, String rawName, String cookieLine,
+	public YahooChatCategoryV1(long id, String rawName, String cookieLine,
 			String localePrefix) {
 		this.id = id;
 		name = Util.entityDecode(rawName);
 		this.cookieLine = cookieLine;
 		this.localePrefix = localePrefix;
 
-		subcategories = new HashSet<YahooChatCategory>();
-		privateRooms = new HashSet<YahooChatRoom>();
-		publicRooms = new HashSet<YahooChatRoom>();
-		chatByNetName = new Hashtable<String, YahooChatLobby>();
+		subcategories = new HashSet<YahooChatCategoryV1>();
+		privateRooms = new HashSet<YahooChatRoomV1>();
+		publicRooms = new HashSet<YahooChatRoomV1>();
+		chatByNetName = new Hashtable<String, YahooChatLobbyV1>();
 	}
 
 	/**
@@ -163,7 +165,7 @@ public class YahooChatCategory {
 	 * @param category
 	 *            the new subcategory of this category.
 	 */
-	public void addSubcategory(YahooChatCategory category) {
+	public void addSubcategory(YahooChatCategoryV1 category) {
 		subcategories.add(category);
 	}
 
@@ -173,7 +175,7 @@ public class YahooChatCategory {
 	 * 
 	 * @return All public rooms.
 	 */
-	public Set<YahooChatRoom> getPublicRooms() {
+	public Set<YahooChatRoomV1> getPublicRooms() {
 		return publicRooms;
 	}
 
@@ -183,7 +185,7 @@ public class YahooChatCategory {
 	 * 
 	 * @return All private rooms.
 	 */
-	public Set<YahooChatRoom> getPrivateRooms() {
+	public Set<YahooChatRoomV1> getPrivateRooms() {
 		return privateRooms;
 	}
 
@@ -192,7 +194,7 @@ public class YahooChatCategory {
 	 * 
 	 * @return All subcategories.
 	 */
-	public Set<YahooChatCategory> getSubcategories() {
+	public Set<YahooChatCategoryV1> getSubcategories() {
 		return subcategories;
 	}
 
@@ -217,7 +219,7 @@ public class YahooChatCategory {
 	/**
 	 * Package level methods: get lobby object based upon network name
 	 */
-	public YahooChatLobby getLobby(String networkName) {
+	public YahooChatLobbyV1 getLobby(String networkName) {
 		return chatByNetName.get(networkName);
 	}
 
@@ -268,7 +270,7 @@ public class YahooChatCategory {
 			final String roomName = room.getAttributeValue("name");
 			final String roomTopic = room.getAttributeValue("topic");
 
-			final YahooChatRoom yahooChatRoom = new YahooChatRoom(roomId,
+			final YahooChatRoomV1 yahooChatRoom = new YahooChatRoomV1(roomId,
 					roomName, roomTopic, roomType.equals(PUBLIC_TYPE));
 
 			final List<Element> lobbies = room.getChildren("lobby");
@@ -282,7 +284,7 @@ public class YahooChatCategory {
 				final int reportedWebcams = Integer.parseInt(lobby
 						.getAttributeValue("webcams", "-1"));
 
-				final YahooChatLobby l = yahooChatRoom.createLobby(lobbyNumber);
+				final YahooChatLobbyV1 l = yahooChatRoom.createLobby(lobbyNumber);
 				l.setReportedUsers(reportedUsers);
 				l.setReportedVoices(reportedVoices);
 				l.setReportedWebcams(reportedWebcams);

@@ -16,8 +16,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network.chatroom;
+package org.openymsg.v1.network.chatroom;
 
+import org.openymsg.network.chatroom.YahooChatUser;
 import org.openymsg.v1.network.YahooUserV1;
 
 
@@ -31,7 +32,7 @@ import org.openymsg.v1.network.YahooUserV1;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class YahooChatUser extends YahooUserV1 // Cannot be serialised
+public class YahooChatUserV1 extends YahooUserV1 implements YahooChatUser // Cannot be serialised
 {
 	private int age, attributes; // Age and flags
 
@@ -43,7 +44,7 @@ public class YahooChatUser extends YahooUserV1 // Cannot be serialised
 
 	private final static int WEBCAM_ATTR = 0x00010;
 
-	public YahooChatUser(YahooUserV1 yahooUser, int attributes, String alias,
+	public YahooChatUserV1(YahooUserV1 yahooUser, int attributes, String alias,
 			int age, String location) {
 		super(yahooUser.getId());
 		this.attributes = attributes;

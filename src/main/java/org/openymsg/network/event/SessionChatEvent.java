@@ -41,7 +41,7 @@ public class SessionChatEvent extends DefaultSessionEvent {
 
 	protected YahooChatUser[] users;
 
-	protected YahooChatLobby lobby;
+	protected YahooChatLobby<?> lobby;
 
 	protected boolean emote;
 
@@ -49,7 +49,7 @@ public class SessionChatEvent extends DefaultSessionEvent {
 	 * CONSTRUCTORS
 	 */
 	// Chat user joined/left
-	public SessionChatEvent(Object source, int size, YahooChatLobby ycl) {
+	public SessionChatEvent(Object source, int size, YahooChatLobby<?> ycl) {
 		this(source, null);
 		users = new YahooChatUser[size];
 		lobby = ycl;
@@ -61,7 +61,7 @@ public class SessionChatEvent extends DefaultSessionEvent {
 
 	// Message received
 	public SessionChatEvent(Object source, YahooChatUser ycu, String message,
-			String emote, YahooChatLobby ycl) {
+			String emote, YahooChatLobby<?> ycl) {
 		this(source, 1, ycl);
 		setChatUser(0, ycu);
 		this.emote = (emote != null && emote.equals("2"));
@@ -83,7 +83,7 @@ public class SessionChatEvent extends DefaultSessionEvent {
 		return users;
 	}
 
-	public YahooChatLobby getLobby() {
+	public YahooChatLobby<?> getLobby() {
 		return lobby;
 	}
 

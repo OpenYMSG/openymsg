@@ -71,7 +71,7 @@ public class RosterEventTest {
 	 */
 	@Test
 	public void testGetSource() {
-		final Roster roster = new RosterV1(new MockFriendManager());
+		final RosterV1 roster = new RosterV1(new MockFriendManager());
 		for (final RosterEventType type : RosterEventType.values()) {
 			assertEquals(roster, new RosterEvent(roster,
 					new YahooUserV1("dummy"), type).getSource());

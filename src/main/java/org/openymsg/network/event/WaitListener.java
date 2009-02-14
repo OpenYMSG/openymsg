@@ -20,9 +20,9 @@ public class WaitListener implements SessionListener {
 
 	BlockingQueue<FireEvent> events = new ArrayBlockingQueue<FireEvent>(50);
 	private static final Logger log = Logger.getLogger(WaitListener.class);
-	private Session session;
+	private Session<?> session;
 
-	public WaitListener(Session session) {
+	public WaitListener(Session<?> session) {
 		this.session = session;
 		session.addSessionListener(this);
 	}

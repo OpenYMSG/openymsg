@@ -64,8 +64,6 @@ import org.openymsg.network.YahooIdentity;
 import org.openymsg.network.YahooUser;
 import org.openymsg.network.challenge.ChallengeResponseV10;
 import org.openymsg.network.challenge.ChallengeResponseV9;
-import org.openymsg.network.chatroom.ChatroomManager;
-import org.openymsg.network.chatroom.YahooChatLobby;
 import org.openymsg.network.chatroom.YahooChatUser;
 import org.openymsg.network.event.DefaultSessionEvent;
 import org.openymsg.network.event.SessionChatEvent;
@@ -80,6 +78,9 @@ import org.openymsg.network.event.SessionNewMailEvent;
 import org.openymsg.network.event.SessionNotifyEvent;
 import org.openymsg.network.event.SessionPictureEvent;
 import org.openymsg.network.event.SessionPictureHandler;
+import org.openymsg.v1.network.chatroom.ChatroomManagerV1;
+import org.openymsg.v1.network.chatroom.YahooChatLobbyV1;
+import org.openymsg.v1.network.chatroom.YahooChatUserV1;
 import org.openymsg.v1.network.event.SessionFriendEventV1;
 import org.openymsg.v1.network.event.SessionFriendRejectedEventV1;
 import org.openymsg.v1.network.event.SessionListEventV1;
@@ -148,14 +149,14 @@ public class SessionV1 implements Session<RosterV1> {
 	/** For split packets in multiple parts */
 	private YMSG9Packet cachePacket;
 
-	private ChatroomManager chatroomManager;
+	private ChatroomManagerV1 chatroomManager;
 
 	/** Current conferences, hashed on room */
 	private Hashtable<String, YahooConferenceV1> conferences = new Hashtable<String, YahooConferenceV1>();
 
 	private SessionState chatSessionStatus;
 
-	private volatile YahooChatLobby currentLobby = null;
+	private volatile YahooChatLobbyV1 currentLobby = null;
 
 	private YahooIdentity chatID;
 
@@ -270,7 +271,7 @@ public class SessionV1 implements Session<RosterV1> {
 			LoginRefusedException {
 		identities = new HashMap<String, YahooIdentity>();
 		conferences = new Hashtable<String, YahooConferenceV1>();
-		chatroomManager = new ChatroomManager(null, null);
+		chatroomManager = new ChatroomManagerV1(null, null);
 		if (eventDispatchQueue == null) {
 			eventDispatchQueue = new EventDispatcher(this);
 			eventDispatchQueue.start();
@@ -874,7 +875,7 @@ public class SessionV1 implements Session<RosterV1> {
 	 * @throws IOException
 	 * @throws LoginRefusedException
 	 */
-	public void chatLogin(YahooChatLobby lobby) throws IllegalStateException,
+	public void chatLogin(YahooChatLobbyV1 lobby) throws IllegalStateException,
 			IOException, LoginRefusedException {
 		chatLogin(lobby, loginID);
 	}
@@ -891,7 +892,7 @@ public class SessionV1 implements Session<RosterV1> {
 	 * @throws LoginRefusedException
 	 * @throws IllegalIdentityException
 	 */
-	public void chatLogin(YahooChatLobby lobby, YahooIdentity yahooId)
+	public void chatLogin(YahooChatLobbyV1 lobby, YahooIdentity yahooId)
 			throws IllegalStateException, IOException, LoginRefusedException,
 			IllegalIdentityException {
 		checkStatus();
@@ -993,7 +994,7 @@ public class SessionV1 implements Session<RosterV1> {
 		transmitChatMsg(currentLobby.getNetworkName(), emote, true);
 	}
 
-	public YahooChatLobby getCurrentChatLobby() {
+	public YahooChatLobbyV1 getCurrentChatLobby() {
 		return currentLobby;
 	}
 
@@ -1887,13 +1888,13 @@ public class SessionV1 implements Session<RosterV1> {
 		try {
 			String netname = pkt.getValue("104"); // room:lobby
 			String id = pkt.getValue("109"); // Yahoo id
-			YahooChatLobby ycl = chatroomManager.getLobby(netname);
+			YahooChatLobbyV1 ycl = chatroomManager.getLobby(netname);
 			if (ycl == null)
 				throw new NoSuchChatroomException("Chatroom/lobby " + netname
 						+ " not found.");
 			// Remove user from room (very very occassionally the user does
 			// not exist as a known member of this lobby, so ycu==null!!)
-			YahooChatUser ycu = ycl.getUser(id);
+			YahooChatUserV1 ycu = ycl.getUser(id);
 			if (ycu != null)
 				ycl.removeUser(ycu);
 			else
@@ -1940,7 +1941,7 @@ public class SessionV1 implements Session<RosterV1> {
 			// As we need to load a room to get at its lobby data so we
 			// can login, the next line *should* never fail... however :-)
 			String netname = pkt.getValue("104"); // room:lobby
-			YahooChatLobby ycl = chatroomManager.getLobby(netname);
+			YahooChatLobbyV1 ycl = chatroomManager.getLobby(netname);
 			if (ycl == null)
 				throw new NoSuchChatroomException("Chatroom/lobby " + netname
 						+ " not found.");
@@ -1952,7 +1953,7 @@ public class SessionV1 implements Session<RosterV1> {
 				cnt--;
 
 			// Is this an update packet, for an existing member?
-			YahooChatUser ycu = ycl.getUser(pkt.getValue("109"));
+			YahooChatUserV1 ycu = ycl.getUser(pkt.getValue("109"));
 			if (cnt == 1 && ycu != null) {
 				// Count is one and user exists - UPDATE
 				final int attributes = Integer.parseInt(pkt.getValue("113"));
@@ -1978,7 +1979,7 @@ public class SessionV1 implements Session<RosterV1> {
 
 			// When sent in muliple parts the login packet usually
 			// contains a high degree of duplicates. Remove using hash.
-			Hashtable<String, YahooChatUser> ht = new Hashtable<String, YahooChatUser>();
+			Hashtable<String, YahooChatUserV1> ht = new Hashtable<String, YahooChatUserV1>();
 			for (int i = 0; i < cnt; i++) {
 				// Note: automatically creates YahooUser if necessary
 				ycu = createChatUser(pkt, i);
@@ -1987,7 +1988,7 @@ public class SessionV1 implements Session<RosterV1> {
 			// Create event, add users
 			SessionChatEvent se = new SessionChatEvent(this, cnt, ycl);
 			int i = 0;
-			for (Enumeration<YahooChatUser> en = ht.elements(); en
+			for (Enumeration<YahooChatUserV1> en = ht.elements(); en
 					.hasMoreElements();) {
 				ycu = en.nextElement();
 				// Does this user exist already? (This should always be
@@ -2036,7 +2037,7 @@ public class SessionV1 implements Session<RosterV1> {
 
 		try {
 			String netname = pkt.getValue("104"); // room:lobby
-			YahooChatLobby ycl = chatroomManager.getLobby(netname);
+			YahooChatLobbyV1 ycl = chatroomManager.getLobby(netname);
 			if (ycl == null)
 				throw new NoSuchChatroomException("Chatroom/lobby " + netname
 						+ " not found.");
@@ -3120,7 +3121,7 @@ public class SessionV1 implements Session<RosterV1> {
 	 * Create chat user from a chat packet. Note: a YahooUser is created if
 	 * necessary.
 	 */
-	private YahooChatUser createChatUser(YMSG9Packet pkt, int i) {
+	private YahooChatUserV1 createChatUser(YMSG9Packet pkt, int i) {
 		pkt.generateQuickSetAccessors("109");
 
 		final String userId = pkt.getNthValue("109", i);
@@ -3137,7 +3138,7 @@ public class SessionV1 implements Session<RosterV1> {
 		final int age = Integer.parseInt(pkt.getValueFromNthSetQA("110", i));
 		final String location = pkt.getValueFromNthSetQA("142", i); // optional
 
-		return new YahooChatUser(user, attributes, alias, age, location);
+		return new YahooChatUserV1(user, attributes, alias, age, location);
 	}
 
 	/**

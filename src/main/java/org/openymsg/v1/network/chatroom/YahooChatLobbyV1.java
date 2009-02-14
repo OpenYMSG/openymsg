@@ -16,11 +16,13 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network.chatroom;
+package org.openymsg.v1.network.chatroom;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.openymsg.network.chatroom.YahooChatLobby;
 
 /**
  * Represents a single chat lobby. Yahoo chatrooms consist of one or more
@@ -33,14 +35,14 @@ import java.util.Map;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class YahooChatLobby {
+public class YahooChatLobbyV1 implements YahooChatLobby<YahooChatUserV1> {
 	private int lobbyNumber;
 
 	private final long parentRoomId;
 
 	private final String networkName;
 
-	private final Map<String, YahooChatUser> users;
+	private final Map<String, YahooChatUserV1> users;
 
 	private int reportedWebcams = -1;
 
@@ -63,11 +65,11 @@ public class YahooChatLobby {
 	 * @param lobbyNumber
 	 *            The number of this lobby.
 	 */
-	public YahooChatLobby(String parentRoomName, long parentRoomId,
+	public YahooChatLobbyV1(String parentRoomName, long parentRoomId,
 			int lobbyNumber) {
 		this.lobbyNumber = lobbyNumber;
 		this.parentRoomId = parentRoomId;
-		users = new HashMap<String, YahooChatUser>();
+		users = new HashMap<String, YahooChatUserV1>();
 		networkName = parentRoomName + ":" + this.lobbyNumber;
 	}
 
@@ -78,7 +80,7 @@ public class YahooChatLobby {
 	 * @param yahooChatUser
 	 *            The user to add to this lobby.
 	 */
-	public void addUser(YahooChatUser yahooChatUser) {
+	public void addUser(YahooChatUserV1 yahooChatUser) {
 		if (yahooChatUser == null) {
 			throw new IllegalArgumentException(
 					"Argument 'yahooChatUser' cannot be null.");
@@ -93,7 +95,7 @@ public class YahooChatLobby {
 	 * @param yahooChatUser
 	 *            The user to remove from this lobby.
 	 */
-	public void removeUser(YahooChatUser yahooChatUser) {
+	public void removeUser(YahooChatUserV1 yahooChatUser) {
 		users.remove(yahooChatUser.getId());
 	}
 
@@ -112,7 +114,7 @@ public class YahooChatLobby {
 	 * @return ''true'' if the supplied user exists in this lobby, ''false''
 	 *         otherwise.
 	 */
-	public boolean exists(YahooChatUser yahooChatUser) {
+	public boolean exists(YahooChatUserV1 yahooChatUser) {
 		return users.containsKey(yahooChatUser.getId());
 	}
 
@@ -124,7 +126,7 @@ public class YahooChatLobby {
 	 *            The ID of the user to return.
 	 * @return The user matching the ID, or ''null'' if no such user exists.
 	 */
-	public YahooChatUser getUser(String id) {
+	public YahooChatUserV1 getUser(String id) {
 		return users.get(id);
 	}
 
@@ -164,7 +166,7 @@ public class YahooChatLobby {
 	 * 
 	 * @return All users in this lobby.
 	 */
-	public Collection<YahooChatUser> getMembers() {
+	public Collection<YahooChatUserV1> getMembers() {
 		return users.values();
 	}
 

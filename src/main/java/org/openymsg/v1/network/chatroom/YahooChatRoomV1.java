@@ -16,12 +16,13 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network.chatroom;
+package org.openymsg.v1.network.chatroom;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.openymsg.network.Util;
+import org.openymsg.network.chatroom.YahooChatRoom;
 
 /**
  * Represents a single chat room, either public (Yahoo owned) or private (user
@@ -36,7 +37,7 @@ import org.openymsg.network.Util;
  * @see YahooChatLobby
  * @see YahooChatCategory
  */
-public class YahooChatRoom {
+public class YahooChatRoomV1 implements YahooChatRoom<YahooChatLobbyV1>{
 	private String name, rawName;
 
 	private String topic;
@@ -45,15 +46,15 @@ public class YahooChatRoom {
 
 	private boolean isPublic; // True=public, false=private
 
-	private Set<YahooChatLobby> lobbies; // YahooChatLobby objects
+	private Set<YahooChatLobbyV1> lobbies; // YahooChatLobby objects
 
-	public YahooChatRoom(long id, String rawName, String topic, boolean ac) {
+	public YahooChatRoomV1(long id, String rawName, String topic, boolean ac) {
 		this.id = id;
 		this.rawName = rawName;
 		this.name = Util.entityDecode(this.rawName);
 		this.topic = topic;
 		this.isPublic = ac;
-		lobbies = new HashSet<YahooChatLobby>();
+		lobbies = new HashSet<YahooChatLobbyV1>();
 	}
 
 	/**
@@ -62,8 +63,8 @@ public class YahooChatRoom {
 	 * @param lobbyNumber
 	 *            The number of the lobby.
 	 */
-	public YahooChatLobby createLobby(int lobbyNumber) {
-		final YahooChatLobby lobby = new YahooChatLobby(rawName, id,
+	public YahooChatLobbyV1 createLobby(int lobbyNumber) {
+		final YahooChatLobbyV1 lobby = new YahooChatLobbyV1(rawName, id,
 				lobbyNumber);
 		addLobby(lobby);
 		return lobby;
@@ -75,7 +76,7 @@ public class YahooChatRoom {
 	 * @param lobby
 	 *            The lobby to add to this room.
 	 */
-	public void addLobby(YahooChatLobby lobby) {
+	public void addLobby(YahooChatLobbyV1 lobby) {
 		lobbies.add(lobby);
 	}
 
@@ -87,7 +88,7 @@ public class YahooChatRoom {
 	 * @return ''true'' if the provided lobby exists in this room, ''false''
 	 *         otherwise.
 	 */
-	public boolean containsLobby(YahooChatLobby lobby) {
+	public boolean containsLobby(YahooChatLobbyV1 lobby) {
 		return lobbies.contains(lobby);
 	}
 
@@ -96,7 +97,7 @@ public class YahooChatRoom {
 	 * 
 	 * @return All lobbies of this room.
 	 */
-	public Set<YahooChatLobby> getLobbies() {
+	public Set<YahooChatLobbyV1> getLobbies() {
 		return lobbies;
 	}
 

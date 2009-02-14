@@ -24,10 +24,10 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.openymsg.network.chatroom.ChatroomManager;
-import org.openymsg.network.chatroom.YahooChatCategory;
-import org.openymsg.network.chatroom.YahooChatLobby;
-import org.openymsg.network.chatroom.YahooChatRoom;
+import org.openymsg.v1.network.chatroom.ChatroomManagerV1;
+import org.openymsg.v1.network.chatroom.YahooChatCategoryV1;
+import org.openymsg.v1.network.chatroom.YahooChatLobbyV1;
+import org.openymsg.v1.network.chatroom.YahooChatRoomV1;
 
 /**
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
@@ -37,27 +37,27 @@ public class ChatroomManagerTest {
 	
 	@Test
 	public void testDefaultChatroomManager() throws Exception {
-		new ChatroomManager(null, null);
+		new ChatroomManagerV1(null, null);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testDefaultChatroomManagerIsUnloaded() {
-		final ChatroomManager manager = new ChatroomManager(null, null);
+		final ChatroomManagerV1 manager = new ChatroomManagerV1(null, null);
 		manager.getLobby("should not be loaded and throw exception.");
 	}
 
 	@Test
 	public void testLoadCategories() throws Exception {
 		final Date start = new Date();
-		final ChatroomManager manager = new ChatroomManager(null, null);
-		final YahooChatCategory root = manager.loadCategories();
+		final ChatroomManagerV1 manager = new ChatroomManagerV1(null, null);
+		final YahooChatCategoryV1 root = manager.loadCategories();
 		log.info("Loading categories in "
 				+ (new Date().getTime() - start.getTime()) + " milliseconds.");
 		testCategory(root);
 		// prettyPrint(root);
 	}
 
-	private void testCategory(YahooChatCategory category) {
+	private void testCategory(YahooChatCategoryV1 category) {
 		assertNotNull(category);
 		assertNotNull(category.getId());
 		assertNotNull(category.getName());
@@ -65,26 +65,26 @@ public class ChatroomManagerTest {
 		assertNotNull(category.getPublicRooms());
 		assertNotNull(category.getSubcategories());
 
-		for (YahooChatCategory cat : category.getSubcategories()) {
+		for (YahooChatCategoryV1 cat : category.getSubcategories()) {
 			testCategory(cat);
 		}
 	}
 
 	@SuppressWarnings("unused")
-	private void prettyPrint(YahooChatCategory category) throws Exception {
+	private void prettyPrint(YahooChatCategoryV1 category) throws Exception {
 		log.info(" ");
 		log.info(category.toString());
 		category.loadRooms();
-		for (YahooChatCategory subCategory : category.getSubcategories()) {
+		for (YahooChatCategoryV1 subCategory : category.getSubcategories()) {
 			prettyPrint(subCategory);
 		}
 
 		if (category.getPrivateRooms().size() > 0) {
 			log.info("Private rooms:");
-			for (YahooChatRoom room : category.getPrivateRooms()) {
+			for (YahooChatRoomV1 room : category.getPrivateRooms()) {
 				if (room.lobbyCount() > 0) {
 					log.info(" " + room.toString());
-					for (YahooChatLobby lobby : room.getLobbies()) {
+					for (YahooChatLobbyV1 lobby : room.getLobbies()) {
 						log.info("   " + lobby.getNetworkName()
 								+ " users: " + lobby.getReportedUsers()
 								+ " voices: " + lobby.getReportedVoices()
@@ -96,10 +96,10 @@ public class ChatroomManagerTest {
 
 		if (category.getPublicRooms().size() > 0) {
 			log.info("Public rooms:");
-			for (YahooChatRoom room : category.getPublicRooms()) {
+			for (YahooChatRoomV1 room : category.getPublicRooms()) {
 				if (room.lobbyCount() > 0) {
 					log.info(" " + room.toString());
-					for (YahooChatLobby lobby : room.getLobbies()) {
+					for (YahooChatLobbyV1 lobby : room.getLobbies()) {
 						log.info("   " + lobby.getNetworkName()
 								+ " users: " + lobby.getReportedUsers()
 								+ " voices: " + lobby.getReportedVoices()
