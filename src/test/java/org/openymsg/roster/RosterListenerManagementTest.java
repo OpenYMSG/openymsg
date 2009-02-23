@@ -1,7 +1,8 @@
 package org.openymsg.roster;
 
 import org.junit.Test;
-import org.openymsg.v1.roster.RosterV1;
+import org.openymsg.network.FriendManager;
+import org.openymsg.network.YahooUser;
 
 /**
  * Checks if adding and removing RosterListeners to the Roster operates as
@@ -10,7 +11,7 @@ import org.openymsg.v1.roster.RosterV1;
  * @author Guus der Kinderen, guus@nimbuzz.com
  * 
  */
-public class RosterListenerManagementTest {
+public abstract class RosterListenerManagementTest<T extends Roster<? extends YahooUser>> {
 
 	/**
 	 * Trying to pass 'null' to {@link Roster#addRosterListener()} should throw
@@ -18,7 +19,7 @@ public class RosterListenerManagementTest {
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testCannotAddNull() {
-		new RosterV1(new MockFriendManager()).addRosterListener(null);
+		createRoster(new MockFriendManager()).addRosterListener(null);
 	}
 
 	/**
@@ -27,6 +28,9 @@ public class RosterListenerManagementTest {
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testCannotRemoveNull() {
-		new RosterV1(new MockFriendManager()).removeRosterListener(null);
+		createRoster(new MockFriendManager()).removeRosterListener(null);
 	}
+
+	protected abstract T createRoster(final FriendManager manager);
+
 }

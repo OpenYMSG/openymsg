@@ -28,13 +28,12 @@ import org.openymsg.network.Session;
 import org.openymsg.network.SessionState;
 import org.openymsg.network.YahooException;
 import org.openymsg.network.event.WaitListener;
-import org.openymsg.v1.network.SessionV1;
-import org.openymsg.v1.roster.RosterV1;
+import org.openymsg.roster.Roster;
 
 /**
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
-public class LoginTest {
+public abstract class LoginTest<T extends Roster<U>, U extends YahooUser> {
 	private static String USERNAME = PropertiesAvailableTest
 			.getUsername("logintestuser1");
 
@@ -47,14 +46,12 @@ public class LoginTest {
 	private static String OTHERPWD = PropertiesAvailableTest
 			.getPassword(OTHERUSR);
 
-	protected static Session<RosterV1> createSession() {
-		return new SessionV1();
-	}
+	protected abstract Session<T, U> createSession();
 
 
 	@Test
 	public void testFalseLogin() throws Exception {
-		Session<RosterV1> session = createSession();
+		Session<T, U> session = createSession();
 		assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
 		try {
 			session.login("sdfds", null);
@@ -99,7 +96,7 @@ public class LoginTest {
 
 	@Test
 	public void testLogin() throws Exception {
-		final Session<RosterV1> session = createSession();
+		final Session<T, U> session = createSession();
 		assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
 		try {
 			session.login(USERNAME, PASSWORD);
@@ -114,7 +111,7 @@ public class LoginTest {
 
 	// @Test // according to Jive, this should be possible, but it isn't?
 	public void testLoginWithUsernameAsEmail() throws Exception {
-		final Session<RosterV1> session = createSession();
+		final Session<T, U> session = createSession();
 		try {
 			session.login(USERNAME + "@yahoo.com", PASSWORD);
 		} catch (Exception e) {
@@ -130,7 +127,7 @@ public class LoginTest {
 
 	@Test
 	public void testLoginIncorrectPassword() throws Exception {
-		final Session<RosterV1> session = createSession();
+		final Session<T, U> session = createSession();
 		try {
 			session.login(USERNAME, "incorrect!");
 			session.logout();
@@ -145,8 +142,8 @@ public class LoginTest {
 	@Test
 	public void testDuplicateLogin() throws Exception {
 		// first session should login ok, the second session shouldn't.
-		final Session<RosterV1> sessionOne = createSession();
-		final Session<RosterV1> sessionTwo = createSession();
+		final Session<T, U> sessionOne = createSession();
+		final Session<T, U> sessionTwo = createSession();
 		sessionOne.login(USERNAME, PASSWORD);
 
 		sessionTwo.login(USERNAME, PASSWORD);
@@ -165,7 +162,7 @@ public class LoginTest {
 
 	@Test
 	public void testLoginTwiceOnSameSession() throws Exception {
-		final Session<RosterV1> session = createSession();
+		final Session<T, U> session = createSession();
 		session.login(USERNAME, PASSWORD);
 		try {
 			session.login(USERNAME, PASSWORD);
@@ -181,13 +178,14 @@ public class LoginTest {
 	@Test
 	public void testLoginLogoutAndLoginAgain() throws Exception {
 		// using two session objects
-		final Session<RosterV1> sessionOne = createSession();
+		Thread.sleep(500);
+		final Session<T, U> sessionOne = createSession();
 		sessionOne.login(USERNAME, PASSWORD);
 		assertEquals(SessionState.LOGGED_ON, sessionOne.getSessionStatus());
 		sessionOne.logout();
 		assertEquals(SessionState.UNSTARTED, sessionOne.getSessionStatus());
 
-		final Session<RosterV1> sessionTwo = createSession();
+		final Session<T, U> sessionTwo = createSession();
 		sessionTwo.login(USERNAME, PASSWORD);
 		assertEquals(SessionState.LOGGED_ON, sessionTwo.getSessionStatus());
 		sessionTwo.logout();
@@ -197,17 +195,18 @@ public class LoginTest {
 	@Test
 	public void testLoginLogoutAndLoginAgainUsingTheSameSessionObject()
 			throws Exception {
-		final Session<RosterV1> session = createSession();
+		Thread.sleep(500);
+		final Session<T, U> session = createSession();
 		WaitListener wl = new WaitListener(session);
 		assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
 		session.login(USERNAME, PASSWORD);
-		wl.waitForEvent(5, ServiceType.LOGON);
+		wl.waitForEvent(10, ServiceType.LOGON);
 		assertEquals(SessionState.LOGGED_ON, session.getSessionStatus());
 		session.logout();
 		Thread.sleep(500);
 		assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
 		session.login(USERNAME, PASSWORD);
-		wl.waitForEvent(5, ServiceType.LOGON);
+		wl.waitForEvent(10, ServiceType.LOGON);
 		assertEquals(SessionState.LOGGED_ON, session.getSessionStatus());
 		session.logout();
 		assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
@@ -215,8 +214,9 @@ public class LoginTest {
 
 	@Test
 	public void testDuplicateLogins() throws Exception {
-		final Session<RosterV1> sessionOne = createSession();
-		final Session<RosterV1> sessionTwo = createSession();
+		Thread.sleep(500);
+		final Session<T, U> sessionOne = createSession();
+		final Session<T, U> sessionTwo = createSession();
 		assertEquals(SessionState.UNSTARTED, sessionOne.getSessionStatus());
 		assertEquals(SessionState.UNSTARTED, sessionTwo.getSessionStatus());
 		sessionOne.login(USERNAME, PASSWORD);

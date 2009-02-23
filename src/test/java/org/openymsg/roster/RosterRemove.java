@@ -3,8 +3,8 @@ package org.openymsg.roster;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.openymsg.v1.network.YahooUserV1;
-import org.openymsg.v1.roster.RosterV1;
+import org.openymsg.network.FriendManager;
+import org.openymsg.network.YahooUser;
 
 /**
  * Checks for {@link Roster#remove(org.openymsg.network.YahooUser)}, calling
@@ -15,7 +15,7 @@ import org.openymsg.v1.roster.RosterV1;
  * 
  */
 
-public class RosterRemove {
+public abstract class RosterRemove<T extends Roster<U>, U extends YahooUser> {
 
 	/**
 	 * Roster makes use of a FriendManager to relay calls to Yahoo. This test
@@ -25,8 +25,8 @@ public class RosterRemove {
 	public void testCallingRemoveTriggersFriendManager() {
 		// setup
 		final MockFriendManager manager = new MockFriendManager();
-		final RosterV1 roster = new RosterV1(manager);
-		final YahooUserV1 user = new YahooUserV1("user", "group");
+		final T roster = createRoster(manager);
+		final U user = createUser("user", "group");
 		roster.add(user);
 		manager.reset();
 		
@@ -48,8 +48,8 @@ public class RosterRemove {
 	public void testCallingRemoveOnNonExistingUserDoesNotTriggerFriendManager() {
 		// setup
 		final MockFriendManager manager = new MockFriendManager();
-		final RosterV1 roster = new RosterV1(manager);
-		final YahooUserV1 user = new YahooUserV1("user", "group");
+		final T roster = createRoster(manager);
+		final U user = createUser("user", "group");
 
 		// execution
 		final boolean result = roster.remove(user);
@@ -60,5 +60,8 @@ public class RosterRemove {
 		assertNull(manager.getFriendId());
 		assertNull(manager.getGroupId());
 	}
+	
+	protected abstract T createRoster(final FriendManager manager);
 
+	protected abstract U createUser(String userId, String group);
 }

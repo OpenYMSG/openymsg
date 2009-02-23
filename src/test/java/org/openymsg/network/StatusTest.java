@@ -17,10 +17,9 @@ import org.openymsg.network.Session;
 import org.openymsg.network.Status;
 import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.network.event.WaitListener;
-import org.openymsg.v1.network.YahooUserV1;
-import org.openymsg.v1.roster.RosterV1;
+import org.openymsg.roster.Roster;
 
-public class StatusTest extends YahooTestAbstract {
+public abstract class StatusTest<T extends Roster<U>, U extends YahooUser> extends YahooTestAbstract<T, U> {
 
 	/**
 	 * Checks if every Status long value is unique.
@@ -39,10 +38,10 @@ public class StatusTest extends YahooTestAbstract {
 
 	// @Test
 	public void testChangeStatus() throws IllegalArgumentException, IOException {
-		final RosterV1 roster = sess1.getRoster();
-		final boolean existinList = roster.containsUser(OTHERUSR);
+		final T roster = sess1.getRoster();
+		final boolean existinList = roster.containsUser(TstSessions.OTHERUSR);
 		if (!existinList) {
-			roster.add(new YahooUserV1(OTHERUSR, "group"));
+			roster.add(createUser(TstSessions.OTHERUSR, "group"));
 			listener1.waitForEvent(5, ServiceType.FRIENDADD);
 		}
 
@@ -71,9 +70,9 @@ public class StatusTest extends YahooTestAbstract {
 		assertNotNull(event);
 		System.out.println(event);
 		SessionFriendEvent<?> sfe = (SessionFriendEvent<?>) event.getEvent();
-		assertEquals(sfe.getUser().getId(), OTHERUSR);
+		assertEquals(sfe.getUser().getId(), TstSessions.OTHERUSR);
 		assertEquals(sfe.getUser().getStatus(), Status.OFFLINE);
-		sess2.login(OTHERUSR, OTHERPWD);
+		sess2.login(TstSessions.OTHERUSR, TstSessions.OTHERPWD);
 	}
 
 	private void changeStatus(Status status) throws IllegalArgumentException,
@@ -84,7 +83,7 @@ public class StatusTest extends YahooTestAbstract {
 				ServiceType.Y6_STATUS_UPDATE);
 		assertNotNull(event);
 		SessionFriendEvent<?> sfe = (SessionFriendEvent<?>) event.getEvent();
-		assertEquals(sfe.getUser().getId(), OTHERUSR);
+		assertEquals(sfe.getUser().getId(), TstSessions.OTHERUSR);
 		assertEquals(sfe.getUser().getStatus(), status);
 	}
 
@@ -92,15 +91,15 @@ public class StatusTest extends YahooTestAbstract {
 	public void testServerBanYouout4AnotherLoginWithSameUser()
 			throws AccountLockedException, IllegalStateException,
 			LoginRefusedException, IOException, InterruptedException {
-		Session<RosterV1> sessKiller = createSession();
+		Session<T, U> sessKiller = testSession.createSession();
 		listener2.clearEvents();
 		Thread.sleep(500);
 		WaitListener sl = new WaitListener(sessKiller);
-		sessKiller.login(OTHERUSR, OTHERPWD);
+		sessKiller.login(TstSessions.OTHERUSR, TstSessions.OTHERPWD);
 		sl.waitForEvent(5, ServiceType.LOGON);
 		FireEvent event = listener2.waitForEvent(5, ServiceType.LOGOFF);
 		assertNotNull(event);
-		sess2.login(OTHERUSR, OTHERPWD);
+		sess2.login(TstSessions.OTHERUSR, TstSessions.OTHERPWD);
 		listener2.waitForEvent(5, ServiceType.LOGON);
 	}
 }

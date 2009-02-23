@@ -7,13 +7,10 @@ import static org.junit.Assert.fail;
 
 import java.util.Iterator;
 
-import junitx.util.PrivateAccessor;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.openymsg.network.FriendManager;
 import org.openymsg.network.YahooUser;
-import org.openymsg.v1.network.YahooUserV1;
-import org.openymsg.v1.roster.RosterV1;
 
 /**
  * Test method for
@@ -24,17 +21,18 @@ import org.openymsg.v1.roster.RosterV1;
  * @author Guus der Kinderen, guus@nimbuzz.com
  * 
  */
-public class RosterSyncedAdd {
+public abstract class RosterSyncedAdd<T extends Roster<U>, U extends YahooUser> {
 
-	private final static YahooUser USER = new YahooUserV1("dummy");
-	private RosterV1 roster;
+	private U user;
+	private T roster;
 
 	/**
 	 * Initializes the roster before each test.
 	 */
 	@Before
 	public void setUp() {
-		roster = new RosterV1(new MockFriendManager());
+		user = createUser("dummy");
+		roster = createRoster(new MockFriendManager());
 	}
 
 	/**
@@ -45,8 +43,7 @@ public class RosterSyncedAdd {
 	 */
 	@Test
 	public void testSimpleAdd() throws Throwable {
-		PrivateAccessor.invoke(roster, "syncedAdd",
-				new Class[] { YahooUser.class }, new Object[] { USER });
+		addUserToRoster(roster, user);
 	}
 
 	/**
@@ -54,9 +51,8 @@ public class RosterSyncedAdd {
 	 */
 	@Test
 	public void testReturnTrueAfterAddingNonExistingUser() throws Throwable {
-		final Object returnValue = PrivateAccessor.invoke(roster, "syncedAdd",
-				new Class[] { YahooUser.class }, new Object[] { USER });
-		assertTrue((Boolean) returnValue);
+		boolean returnValue = addUserToRoster(roster, user);
+		assertTrue(returnValue);
 	}
 
 	/**
@@ -66,11 +62,9 @@ public class RosterSyncedAdd {
 	 */
 	@Test
 	public void testReturnFalseAfterAddingExistingUser() throws Throwable {
-		PrivateAccessor.invoke(roster, "syncedAdd",
-				new Class[] { YahooUser.class }, new Object[] { USER });
-		final Object returnValue = PrivateAccessor.invoke(roster, "syncedAdd",
-				new Class[] { YahooUser.class }, new Object[] { USER });
-		assertFalse((Boolean) returnValue);
+		addUserToRoster(roster, user);
+		boolean returnValue = addUserToRoster(roster, user);
+		assertTrue(returnValue);
 	}
 
 	/**
@@ -81,8 +75,7 @@ public class RosterSyncedAdd {
 	@Test
 	public void testAddReflectedInSize() throws Throwable {
 		final int oldSize = roster.size();
-		PrivateAccessor.invoke(roster, "syncedAdd",
-				new Class[] { YahooUser.class }, new Object[] { USER });
+		addUserToRoster(roster, user);
 		assertEquals(oldSize + 1, roster.size());
 	}
 
@@ -93,11 +86,10 @@ public class RosterSyncedAdd {
 	 */
 	@Test
 	public void testAddContainedInIterator() throws Throwable {
-		PrivateAccessor.invoke(roster, "syncedAdd",
-				new Class[] { YahooUser.class }, new Object[] { USER });
-		final Iterator<YahooUserV1> iter = roster.iterator();
+		addUserToRoster(roster, user);
+		final Iterator<U> iter = roster.iterator();
 		while (iter.hasNext()) {
-			if (iter.next().equals(USER)) {
+			if (iter.next().equals(user)) {
 				return; // success
 			}
 		}
@@ -110,10 +102,9 @@ public class RosterSyncedAdd {
 	 */
 	@Test
 	public void testAddRecognizedByCointains() throws Throwable {
-		assertFalse(roster.contains(USER));
-		PrivateAccessor.invoke(roster, "syncedAdd",
-				new Class[] { YahooUser.class }, new Object[] { USER });
-		assertTrue(roster.contains(USER));
+		assertFalse(roster.contains(user));
+		addUserToRoster(roster, user);
+		assertTrue(roster.contains(user));
 	}
 
 	/**
@@ -123,9 +114,15 @@ public class RosterSyncedAdd {
 	 */
 	@Test
 	public void testAddRecognizedByCointainsUser() throws Throwable {
-		assertFalse(roster.containsUser(USER.getId()));
-		PrivateAccessor.invoke(roster, "syncedAdd",
-				new Class[] { YahooUser.class }, new Object[] { USER });
-		assertTrue(roster.containsUser(USER.getId()));
+		assertFalse(roster.containsUser(user.getId()));
+		addUserToRoster(roster, user);
+		assertTrue(roster.containsUser(user.getId()));
 	}
+
+	protected abstract boolean addUserToRoster(T roster, U user) throws Throwable;
+
+	protected abstract T createRoster(final FriendManager manager);
+
+	protected abstract U createUser(String userId);
+
 }
