@@ -1,13 +1,11 @@
 package org.openymsg.roster;
 
 import static org.junit.Assert.assertEquals;
-import junitx.util.PrivateAccessor;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openymsg.network.FriendManager;
 import org.openymsg.network.YahooUser;
-import org.openymsg.v1.network.YahooUserV1;
-import org.openymsg.v1.roster.RosterV1;
 
 /**
  * Testcase to check if an 'syncedAdd()' to a {@link Roster} triggers the
@@ -19,14 +17,15 @@ import org.openymsg.v1.roster.RosterV1;
  * 
  * @author Guus der Kinderen, guus@nimbuzz.com
  */
-public class RosterSyncedAddMethodTriggersUpdate {
+public abstract class RosterSyncedAddMethodTriggersUpdate<T extends Roster<U>, U extends YahooUser> {
 
-	private static final YahooUser USER = new YahooUserV1("dummy");
-	private RosterV1 roster;
+	private U user;
+	private T roster;
 
 	@Before
 	public void setUp() {
-		roster = new RosterV1(new MockFriendManager());
+		roster = createRoster(new MockFriendManager());
+		user = createUser("dummy");
 	}
 
 	/**
@@ -39,8 +38,7 @@ public class RosterSyncedAddMethodTriggersUpdate {
 	public void testReceiveOnOneRegisteredListener() throws Throwable {
 		final MockRosterListener listener = new MockRosterListener();
 		roster.addRosterListener(listener);
-		PrivateAccessor.invoke(roster, "syncedAdd",
-				new Class[] { YahooUser.class }, new Object[] { USER });
+		addUserToRoster(roster, user);
 		assertEquals(1, listener.getEventCount());
 	}
 
@@ -56,8 +54,7 @@ public class RosterSyncedAddMethodTriggersUpdate {
 		final MockRosterListener listenerTwo = new MockRosterListener();
 		roster.addRosterListener(listenerOne);
 		roster.addRosterListener(listenerTwo);
-		PrivateAccessor.invoke(roster, "syncedAdd",
-				new Class[] { YahooUser.class }, new Object[] { USER });
+		addUserToRoster(roster, user);
 		assertEquals(1, listenerOne.getEventCount());
 		assertEquals(1, listenerTwo.getEventCount());
 	}
@@ -71,8 +68,7 @@ public class RosterSyncedAddMethodTriggersUpdate {
 	@Test
 	public void testDontReceiveOnUnregisteredListener() throws Throwable {
 		final MockRosterListener listener = new MockRosterListener();
-		PrivateAccessor.invoke(roster, "syncedAdd",
-				new Class[] { YahooUser.class }, new Object[] { USER });
+		addUserToRoster(roster, user);
 		assertEquals(0, listener.getEventCount());
 	}
 
@@ -88,9 +84,15 @@ public class RosterSyncedAddMethodTriggersUpdate {
 		final MockRosterListener listener = new MockRosterListener();
 		final MockRosterListener nonlistener = new MockRosterListener();
 		roster.addRosterListener(listener);
-		PrivateAccessor.invoke(roster, "syncedAdd",
-				new Class[] { YahooUser.class }, new Object[] { USER });
+		addUserToRoster(roster, user);
 		assertEquals(1, listener.getEventCount());
 		assertEquals(0, nonlistener.getEventCount());
 	}
+	
+	protected abstract boolean addUserToRoster(T roster, U user) throws Throwable;
+
+	protected abstract T createRoster(final FriendManager manager);
+
+	protected abstract U createUser(String userId);
+
 }

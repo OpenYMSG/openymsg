@@ -21,26 +21,23 @@ package org.openymsg.network;
 import org.junit.Test;
 import org.openymsg.network.Session;
 import org.openymsg.network.event.SessionAdapter;
-import org.openymsg.v1.network.SessionV1;
-import org.openymsg.v1.roster.RosterV1;
+import org.openymsg.roster.Roster;
 
 /**
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
-public class EventListenerTest {
+public abstract class EventListenerTest<T extends Roster<U>, U extends YahooUser> {
 	@Test
 	public void testAddEventListenerBeforeLoggingIn() throws Exception {
-		final Session<RosterV1> session = createSession();
+		final Session<T, U> session = createSession();
 		session.addSessionListener(new SessionAdapter<YahooUser>());
 	}
 
-	private Session<RosterV1> createSession() {
-		return new SessionV1();
-	}
+	protected abstract Session<T, U> createSession();
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testAddNull() throws Exception {
-		final Session<RosterV1> session = createSession();
+		final Session<T, U> session = createSession();
 		session.addSessionListener(null);
 	}
 }

@@ -41,8 +41,7 @@ public class PropertiesAvailableTest {
 		final InputStream ip;
 		try {
 			me = Class.forName("org.openymsg.network.PropertiesAvailableTest");
-			is = me
-					.getResourceAsStream("/yahooAuthenticationForJUnitTests.properties");
+			is = me.getResourceAsStream("/yahooAuthenticationForJUnitTests.properties");
 			ip = me.getResourceAsStream("/log4j.properties");
 			props.load(is);
 
@@ -62,8 +61,7 @@ public class PropertiesAvailableTest {
 
 	@Test
 	public void testGetTestUser() throws Exception {
-		InputStream is = getClass().getResourceAsStream(
-				"/yahooAuthenticationForJUnitTests.properties");
+		InputStream is = getClass().getResourceAsStream("/yahooAuthenticationForJUnitTests.properties");
 		props.load(is);
 		final String[] user = getAccount("testuser");
 		assertNotNull(user);

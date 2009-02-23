@@ -26,25 +26,22 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.openymsg.network.Session;
-import org.openymsg.v1.network.SessionV1;
-import org.openymsg.v1.roster.RosterV1;
+import org.openymsg.roster.Roster;
 
 /**
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
-public class SessionTest {
+public abstract class SessionTest<T extends Roster<U>, U extends YahooUser> {
 	@Test
 	public void testSession() throws Exception {
 		createSession();
 	}
 
-	protected static Session<RosterV1> createSession() {
-		return new SessionV1();
-	}
+	protected abstract Session<T, U> createSession();
 
 	@Test
 	public void testConcurrentSessions() throws Exception {
-		Set<Session<?>> sessions = new HashSet<Session<?>>();
+		Set<Session<?, ?>> sessions = new HashSet<Session<?, ?>>();
 		final int max = 10;
 		for (int i = 0; i < max; i++) {
 			sessions.add(createSession());
@@ -52,7 +49,7 @@ public class SessionTest {
 
 		assertEquals(max, sessions.size());
 
-		Iterator<Session<?>> it = sessions.iterator();
+		Iterator<Session<?, ?>> it = sessions.iterator();
 		int i = 0;
 		while (it.hasNext()) {
 			i++;

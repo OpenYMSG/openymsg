@@ -204,7 +204,7 @@ public class RosterV1 implements Roster<YahooUserV1> {
 	 *             if some aspect of the specified user prevents it from being
 	 *             added to this set.
 	 */
-	private boolean syncedAdd(final YahooUserV1 user) {
+	public boolean syncedAdd(final YahooUserV1 user) {
 		if (user == null) {
 			throw new NullPointerException();
 		}
@@ -289,7 +289,7 @@ public class RosterV1 implements Roster<YahooUserV1> {
 	 * @throws IllegalArgumentException
 	 *             if the argument is null or an empty String.
 	 */
-	private boolean syncedRemove(final String userId) {
+	public boolean syncedRemove(final String userId) {
 		if (userId == null || userId.length() == 0) {
 			throw new IllegalArgumentException(
 					"Argument 'userId' cannot be null or an empty String.");
@@ -332,7 +332,7 @@ public class RosterV1 implements Roster<YahooUserV1> {
 	 *             roster.
 	 * 
 	 */
-	private void syncedUpdate(final String userId, final YahooUserV1 user) {
+	public void syncedUpdate(final String userId, final YahooUserV1 user) {
 		if (userId == null || userId.length() == 0) {
 			throw new IllegalArgumentException(
 					"Argument 'userId' cannot be null or an empty String.");

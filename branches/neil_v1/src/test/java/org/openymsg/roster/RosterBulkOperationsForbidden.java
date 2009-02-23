@@ -1,16 +1,14 @@
 package org.openymsg.roster;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import junitx.util.PrivateAccessor;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.openymsg.network.FriendManager;
 import org.openymsg.network.YahooUser;
-import org.openymsg.v1.network.YahooUserV1;
-import org.openymsg.v1.roster.RosterV1;
 
 /**
  * Bulk operations on the Roster object are not allowed. This testcase tests if
@@ -19,23 +17,23 @@ import org.openymsg.v1.roster.RosterV1;
  * 
  * @author Guus der Kinderen, guus@nimbuzz.com
  */
-public class RosterBulkOperationsForbidden {
+public abstract class RosterBulkOperationsForbidden<T extends Roster<U>, U extends YahooUser> {
 
-	private RosterV1 roster;
-	private Set<YahooUserV1> testUsers;
+	protected T roster;
+	private Set<U> testUsers;
 
 	@Before
 	public void setUp() throws Throwable {
-		roster = new RosterV1(new MockFriendManager());
-		PrivateAccessor.invoke(roster, "syncedAdd", new Class[] { YahooUser.class },
-				new Object[] { new YahooUserV1("on roster") });
-		PrivateAccessor.invoke(roster, "syncedAdd", new Class[] { YahooUser.class },
-				new Object[] { new YahooUserV1("on roster as well") });
+		roster = createRoster(new MockFriendManager());
 
-		testUsers = new HashSet<YahooUserV1>();
-		testUsers.add(new YahooUserV1("test"));
-		testUsers.add(new YahooUserV1("user"));
+		testUsers = new HashSet<U>();
+		testUsers.add(createUser("test"));
+		testUsers.add(createUser("user"));
 	}
+
+	protected abstract U createUser(String userId);
+	
+	protected abstract T createRoster(final FriendManager manager);
 
 	/**
 	 * Test method for {@link org.openymsg.roster.Roster#iterator()}. Changes
@@ -43,7 +41,7 @@ public class RosterBulkOperationsForbidden {
 	 */
 	@Test(expected = UnsupportedOperationException.class)
 	public void testIteratorDotRemove() {
-		final Iterator<YahooUserV1> iter = roster.iterator();
+		final Iterator<U> iter = roster.iterator();
 		iter.next();
 		iter.remove();
 	}
@@ -72,6 +70,6 @@ public class RosterBulkOperationsForbidden {
 	 */
 	@Test(expected = UnsupportedOperationException.class)
 	public void testAddAll() {
-		roster.addAll(testUsers);
+		roster.addAll((Collection<? extends U>) testUsers);
 	}
 }

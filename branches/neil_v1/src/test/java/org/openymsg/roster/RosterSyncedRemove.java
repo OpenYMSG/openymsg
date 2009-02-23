@@ -7,13 +7,10 @@ import static org.junit.Assert.fail;
 
 import java.util.Iterator;
 
-import junitx.util.PrivateAccessor;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.openymsg.network.FriendManager;
 import org.openymsg.network.YahooUser;
-import org.openymsg.v1.network.YahooUserV1;
-import org.openymsg.v1.roster.RosterV1;
 
 /**
  * Test method for
@@ -24,10 +21,10 @@ import org.openymsg.v1.roster.RosterV1;
  * @author Guus der Kinderen, guus@nimbuzz.com
  * 
  */
-public class RosterSyncedRemove {
+public abstract class RosterSyncedRemove<T extends Roster<U>, U extends YahooUser> {
 
-	private final static YahooUser USER = new YahooUserV1("dummy");
-	private Roster<YahooUserV1> roster;
+	private U user;
+	private T roster;
 
 	/**
 	 * Initializes the roster before each test.
@@ -36,9 +33,9 @@ public class RosterSyncedRemove {
 	 */
 	@Before
 	public void setUp() throws Throwable {
-		roster = new RosterV1(new MockFriendManager());
-		PrivateAccessor.invoke(roster, "syncedAdd",
-				new Class[] { YahooUser.class }, new Object[] { USER });
+		user = createUser("dummy");
+		roster = createRoster(new MockFriendManager());
+		addUserToRoster(roster, user);
 	}
 
 	/**
@@ -49,8 +46,7 @@ public class RosterSyncedRemove {
 	 */
 	@Test
 	public void testSimpleRemove() throws Throwable {
-		PrivateAccessor.invoke(roster, "syncedRemove",
-				new Class[] { String.class }, new Object[] { USER.getId() });
+		removeUserFromRoster(roster, user);
 	}
 
 	/**
@@ -60,11 +56,8 @@ public class RosterSyncedRemove {
 	 */
 	@Test
 	public void testReturnTrueAfterRemovingUser() throws Throwable {
-		final Object returnValue = PrivateAccessor.invoke(roster,
-				"syncedRemove", new Class[] { String.class },
-				new Object[] { USER.getId() });
-
-		assertTrue((Boolean) returnValue);
+		boolean returnValue = removeUserFromRoster(roster, user);
+		assertTrue(returnValue);
 	}
 
 	/**
@@ -74,10 +67,9 @@ public class RosterSyncedRemove {
 	 */
 	@Test
 	public void testReturnFalseAfterRemovingNonExistingUser() throws Throwable {
-		final Object returnValue = PrivateAccessor.invoke(roster,
-				"syncedRemove", new Class[] { String.class },
-				new Object[] { "doesntexist" });
-		assertFalse((Boolean) returnValue);
+		U otherUser = createUser("doesntexist");
+		boolean returnValue = removeUserFromRoster(roster, otherUser);
+		assertFalse(returnValue);
 	}
 
 	/**
@@ -89,8 +81,7 @@ public class RosterSyncedRemove {
 	@Test
 	public void testRemoveReflectedInSize() throws Throwable {
 		final int oldSize = roster.size();
-		PrivateAccessor.invoke(roster, "syncedRemove",
-				new Class[] { String.class }, new Object[] { USER.getId() });
+		removeUserFromRoster(roster, user);
 		assertEquals(oldSize - 1, roster.size());
 	}
 
@@ -102,12 +93,10 @@ public class RosterSyncedRemove {
 	 */
 	@Test
 	public void testRemoveContainedInIterator() throws Throwable {
-		PrivateAccessor.invoke(roster, "syncedRemove",
-				new Class[] { String.class }, new Object[] { USER.getId() });
-
-		final Iterator<YahooUserV1> iter = roster.iterator();
+		removeUserFromRoster(roster, user);
+		final Iterator<U> iter = roster.iterator();
 		while (iter.hasNext()) {
-			if (iter.next().equals(USER)) {
+			if (iter.next().equals(user)) {
 				fail("Iterator still includes the removed user.");
 			}
 		}
@@ -121,10 +110,9 @@ public class RosterSyncedRemove {
 	 */
 	@Test
 	public void testRemoveRecognizedByCointains() throws Throwable {
-		assertTrue(roster.contains(USER));
-		PrivateAccessor.invoke(roster, "syncedRemove",
-				new Class[] { String.class }, new Object[] { USER.getId() });
-		assertFalse(roster.contains(USER));
+		assertTrue(roster.contains(user));
+		removeUserFromRoster(roster, user);
+		assertFalse(roster.contains(user));
 	}
 
 	/**
@@ -134,9 +122,17 @@ public class RosterSyncedRemove {
 	 */
 	@Test
 	public void testRemoveRecognizedByCointainsUser() throws Throwable {
-		assertTrue(roster.containsUser(USER.getId()));
-		PrivateAccessor.invoke(roster, "syncedRemove",
-				new Class[] { String.class }, new Object[] { USER.getId() });
-		assertFalse(roster.containsUser(USER.getId()));
+		assertTrue(roster.containsUser(user.getId()));
+		removeUserFromRoster(roster, user);
+		assertFalse(roster.containsUser(user.getId()));
 	}
+
+	protected abstract boolean addUserToRoster(T roster, U user) throws Throwable;
+
+	protected abstract boolean removeUserFromRoster(T roster, U user) throws Throwable;
+
+	protected abstract T createRoster(final FriendManager manager);
+
+	protected abstract U createUser(String userId);
+
 }

@@ -13,15 +13,16 @@ import org.junit.Test;
 import org.openymsg.network.FireEvent;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.event.SessionNotifyEvent;
+import org.openymsg.roster.Roster;
 
 /**
  * @author Giancarlo Frison - Nimbuzz B.V. <giancarlo@nimbuzz.com>
  *
  */
-public class ChatTest extends YahooTestAbstract{
+public abstract class ChatTest<T extends Roster<U>, U extends YahooUser> extends YahooTestAbstract<T, U>{
 	@Test
 	public void testSendMessage() throws IOException {
-		sess1.sendMessage(OTHERUSR, CHATMESSAGE);
+		sess1.sendMessage(TstSessions.OTHERUSR, CHATMESSAGE);
 		FireEvent event = listener2.waitForEvent(5, ServiceType.MESSAGE);
 		assertNotNull(event);
 		assertEquals(event.getEvent().getMessage(), CHATMESSAGE);
@@ -29,7 +30,7 @@ public class ChatTest extends YahooTestAbstract{
 
 	@Test
 	public void testSendMessageIdentity() throws IOException {
-		sess1.sendMessage(OTHERUSR, CHATMESSAGE,sess1.getLoginIdentity());
+		sess1.sendMessage(TstSessions.OTHERUSR, CHATMESSAGE,sess1.getLoginIdentity());
 		FireEvent event = listener2.waitForEvent(5, ServiceType.MESSAGE);
 		assertNotNull(event);
 		assertEquals(event.getEvent().getMessage(), CHATMESSAGE);
@@ -37,13 +38,13 @@ public class ChatTest extends YahooTestAbstract{
 	
 	@Test
 	public void testSendReceiveStartNotifyTyping() throws IOException {
-		sess1.sendTypingNotification(OTHERUSR, true);
+		sess1.sendTypingNotification(TstSessions.OTHERUSR, true);
 		FireEvent event = listener2.waitForEvent(5, ServiceType.NOTIFY);
 		assertNotNull(event);
 		SessionNotifyEvent sne = (SessionNotifyEvent) event.getEvent();
 		assertTrue(sne.isTyping());
 		assertTrue(sne.isOn());
-		sess1.sendMessage(OTHERUSR, CHATMESSAGE,sess1.getLoginIdentity());
+		sess1.sendMessage(TstSessions.OTHERUSR, CHATMESSAGE,sess1.getLoginIdentity());
 		event = listener2.waitForEvent(5, ServiceType.MESSAGE);
 		assertNotNull(event);
 		assertEquals(event.getEvent().getMessage(), CHATMESSAGE);
@@ -51,16 +52,16 @@ public class ChatTest extends YahooTestAbstract{
 	
 	@Test
 	public void testSendReceiveStopNotifyTyping() throws IOException {
-		sess1.sendTypingNotification(OTHERUSR, true);
+		sess1.sendTypingNotification(TstSessions.OTHERUSR, true);
 		FireEvent event = listener2.waitForEvent(5, ServiceType.NOTIFY);
 		assertNotNull(event);		
-		sess1.sendTypingNotification(OTHERUSR, false);
+		sess1.sendTypingNotification(TstSessions.OTHERUSR, false);
 		event = listener2.waitForEvent(5, ServiceType.NOTIFY);
 		assertNotNull(event);		
 		SessionNotifyEvent sne = (SessionNotifyEvent) event.getEvent();
 		assertTrue(sne.isTyping());
 		assertTrue(sne.isOff());
-		sess1.sendMessage(OTHERUSR, CHATMESSAGE,sess1.getLoginIdentity());
+		sess1.sendMessage(TstSessions.OTHERUSR, CHATMESSAGE,sess1.getLoginIdentity());
 		event = listener2.waitForEvent(5, ServiceType.MESSAGE);
 		assertNotNull(event);
 		assertEquals(event.getEvent().getMessage(), CHATMESSAGE);

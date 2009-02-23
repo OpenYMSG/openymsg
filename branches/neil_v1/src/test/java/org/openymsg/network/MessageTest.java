@@ -25,15 +25,14 @@ import org.junit.Test;
 import org.openymsg.network.Session;
 import org.openymsg.network.event.SessionAdapter;
 import org.openymsg.network.event.SessionEvent;
-import org.openymsg.v1.network.SessionV1;
-import org.openymsg.v1.roster.RosterV1;
+import org.openymsg.roster.Roster;
 
 /**
  * Make sure that the users are subscribed to eachother!
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
-public class MessageTest {
+public abstract class MessageTest<T extends Roster<U>, U extends YahooUser> {
 	private static String USERNAME = PropertiesAvailableTest
 			.getUsername("messagetestuser1");
 
@@ -46,20 +45,18 @@ public class MessageTest {
 	private static String RECPWD = PropertiesAvailableTest
 			.getPassword(RECIPIENT);
 
-	protected static Session<RosterV1> createSession() {
-		return new SessionV1();
-	}
+	protected abstract Session<T, U> createSession();
 	
 	@Test(expected = IllegalStateException.class)
 	public void testSendMessageBeforeLoggingIn() throws Exception {
-		final Session<RosterV1> session = createSession();
+		final Session<T, U> session = createSession();
 		session.sendMessage(RECIPIENT, "test message");
 	}
 
 	@Test
 	public void testSendMessage() throws Exception {
-		final Session<RosterV1> sender = createSession();
-		final Session<RosterV1> receiver = createSession();
+		final Session<T, U> sender = createSession();
+		final Session<T, U> receiver = createSession();
 		try {
 			final ReceiveMessageAdaptor listener = new ReceiveMessageAdaptor();
 

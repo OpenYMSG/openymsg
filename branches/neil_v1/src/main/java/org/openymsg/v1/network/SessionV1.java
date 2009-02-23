@@ -95,7 +95,7 @@ import org.openymsg.v1.roster.RosterV1;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class SessionV1 implements Session<RosterV1> {
+public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 	/** Primary Yahoo ID: the real account id. */
 	private YahooIdentity primaryID;
 
@@ -3287,5 +3287,14 @@ public class SessionV1 implements Session<RosterV1> {
 	 */
 	public RosterV1 getRoster() {
 		return roster;
+	}
+
+	
+	public YahooUserV1 createUser(String userId) {
+		return new YahooUserV1(userId);
+	}
+	
+	public YahooUserV1 createUser(final String userId, final String groupId) {
+		return new YahooUserV1(userId, groupId);
 	}
 }

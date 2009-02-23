@@ -3,16 +3,15 @@ package org.openymsg.roster;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.openymsg.network.FriendManager;
 import org.openymsg.network.YahooUser;
-import org.openymsg.v1.network.YahooUserV1;
-import org.openymsg.v1.roster.RosterV1;
 
 /**
  * Testcase for the RosterEvent class. This testcase mainly checks argument validation.
  * 
  * @author Guus der Kinderen, guus@nimbuzz.com
  */
-public class RosterEventTest {
+public abstract class RosterEventTest<T extends Roster<U>, U extends YahooUser> {
 
 	/**
 	 * Argument 'source' of the constructor cannot be null. Test method for
@@ -20,7 +19,7 @@ public class RosterEventTest {
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testRosterEventArgumentValidationSource() {
-		new RosterEvent(null, new YahooUserV1("dummy"), RosterEventType.add);
+		new RosterEvent(null, createUser("dummy"), RosterEventType.add);
 	}
 
 	/**
@@ -29,7 +28,7 @@ public class RosterEventTest {
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testRosterEventArgumentValidationYahooUser() {
-		new RosterEvent(new RosterV1(new MockFriendManager()), null, RosterEventType.add);
+		new RosterEvent(createRoster(new MockFriendManager()), null, RosterEventType.add);
 	}
 
 	/**
@@ -38,7 +37,7 @@ public class RosterEventTest {
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testRosterEventArgumentValidationType() {
-		new RosterEvent(new RosterV1(new MockFriendManager()), new YahooUserV1("dummy"), null);
+		new RosterEvent(createRoster(new MockFriendManager()), createUser("dummy"), null);
 	}
 
 	/**
@@ -46,12 +45,12 @@ public class RosterEventTest {
 	 */
 	@Test
 	public void testGetUser() {
-		final YahooUser user = new YahooUserV1("dummy");
+		final YahooUser user = createUser("dummy");
 
 		// should work for all RosterEventTypes
 		for (final RosterEventType type : RosterEventType.values()) {
 			assertEquals("failed on type=" + type, user, new RosterEvent(
-					new RosterV1(new MockFriendManager()), user, type).getUser());
+					createRoster(new MockFriendManager()), user, type).getUser());
 		}
 	}
 
@@ -61,8 +60,8 @@ public class RosterEventTest {
 	@Test
 	public void testGetType() {
 		for (final RosterEventType type : RosterEventType.values()) {
-			assertEquals(type, new RosterEvent(new RosterV1(new MockFriendManager()), new YahooUserV1(
-					"dummy"), type).getType());
+			assertEquals(type, new RosterEvent(createRoster(new MockFriendManager()), 
+					createUser("dummy"), type).getType());
 		}
 	}
 
@@ -71,10 +70,15 @@ public class RosterEventTest {
 	 */
 	@Test
 	public void testGetSource() {
-		final RosterV1 roster = new RosterV1(new MockFriendManager());
+		final Roster<? extends YahooUser> roster = createRoster(new MockFriendManager());
 		for (final RosterEventType type : RosterEventType.values()) {
-			assertEquals(roster, new RosterEvent(roster,
-					new YahooUserV1("dummy"), type).getSource());
+			assertEquals(roster, new RosterEvent(roster, createUser("dummy"), type).getSource());
 		}
 	}
+	
+	protected abstract T createRoster(final FriendManager manager);
+
+	protected abstract U createUser(String userId);
+	
+
 }

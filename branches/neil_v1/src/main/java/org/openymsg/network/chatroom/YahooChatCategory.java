@@ -18,6 +18,7 @@
  */
 package org.openymsg.network.chatroom;
 
+import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -148,5 +149,20 @@ public interface YahooChatCategory<T extends YahooChatRoom<?>, U extends YahooCh
 	 * @return Category identifier.
 	 */
 	long getId();
+	
+	/**
+	 * The loadRooms() method loads both private and public rooms for this
+	 * category. The first time a category is inspected, we need to fetch the
+	 * data from Yahoo to populate it. If this method is called again, a
+	 * complete new tree of categories, rooms and lobbies will be created.
+	 * 
+	 * @throws IOException
+	 */
+	/*
+	 * TODO: recreation should be made impossible by adding this code to the
+	 * constructor. Instead of recreation, event handling should properly modify
+	 * the existing tree.
+	 */
+	void loadRooms() throws Exception;
 
 }

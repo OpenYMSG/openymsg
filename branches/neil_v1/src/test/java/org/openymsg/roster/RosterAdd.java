@@ -5,8 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.openymsg.v1.network.YahooUserV1;
-import org.openymsg.v1.roster.RosterV1;
+import org.openymsg.network.FriendManager;
+import org.openymsg.network.YahooUser;
 
 /**
  * Checks for {@link Roster#add(org.openymsg.network.YahooUser)}, calling which
@@ -16,7 +16,7 @@ import org.openymsg.v1.roster.RosterV1;
  * @author Guus der Kinderen, guus@nimbuzz.com
  * 
  */
-public class RosterAdd {
+public abstract class RosterAdd<T extends Roster<U>, U extends YahooUser> {
 
 	/**
 	 * Roster makes use of a FriendManager to relay calls to Yahoo. This test
@@ -26,8 +26,8 @@ public class RosterAdd {
 	public void testCallingAddTriggersFriendManager() {
 		// setup
 		final MockFriendManager manager = new MockFriendManager();
-		final RosterV1 roster = new RosterV1(manager);
-		final YahooUserV1 user = new YahooUserV1("user", "group");
+		final T roster = createRoster(manager);
+		final U user = createUser();
 
 		// execution
 		final boolean result = roster.add(user);
@@ -39,6 +39,10 @@ public class RosterAdd {
 		assertEquals("group", manager.getGroupId());
 	}
 
+	protected abstract U createUser();
+
+	protected abstract T createRoster(final FriendManager manager);
+
 	/**
 	 * Checks that adding a user to the roster that already exists on the roster
 	 * does not trigger the FriendManager.
@@ -47,8 +51,8 @@ public class RosterAdd {
 	public void testCallingAddTwiceDoesntTriggerFriendManager() {
 		// setup
 		final MockFriendManager manager = new MockFriendManager();
-		final RosterV1 roster = new RosterV1(manager);
-		final YahooUserV1 user = new YahooUserV1("user", "group");
+		final T roster = createRoster(manager);
+		final U user = createUser();
 		roster.add(user); // first time
 		manager.reset();
 
