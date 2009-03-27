@@ -16,17 +16,19 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.v1.network;
+package org.openymsg.network.connection;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
 import org.openymsg.network.ServiceType;
+import org.openymsg.network.connection.YMSGHeader;
 
 
 /**
@@ -50,29 +52,24 @@ import org.openymsg.network.ServiceType;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class YMSG9InputStream extends BufferedInputStream {
-	private static final Logger log = Logger.getLogger(YMSG9InputStream.class);
-	public YMSG9InputStream(InputStream in) {
+public class YMSGInputStream extends BufferedInputStream {
+	private static final Logger log = Logger.getLogger(YMSGInputStream.class);
+	
+	public YMSGInputStream(InputStream in) {
 		super(in);
 	}
 
-	/**
-	 * Read a complete packet, including headers. Returns null upon EOF, and
-	 * throws IOException when confused.
-	 */
-	public YMSG9Packet readPacket() throws IOException {
-		YMSG9Packet p = new YMSG9Packet();
-
-		String charEncoding = System.getProperty(
-				"openymsg.network.charEncoding", "UTF-8");
-
+	
+	public YMSGHeader createHeader() throws IOException {
+		YMSGHeader p = new YMSGHeader();
 		byte[] header = new byte[20];
-		if (readBuffer(header) <= 0)
+		if (readBuffer(header) <= 0) {
 			return null;
-		// Somewhat ineligant way to extract the header data
+		}
 		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++) {
 			sb.append((char) header[i]);
+		}
 		p.magic = sb.toString();
 		p.version = u2i(header[5]);
 		p.length = (u2i(header[8]) << 8) + (u2i(header[9]));
@@ -84,14 +81,21 @@ public class YMSG9InputStream extends BufferedInputStream {
 		p.sessionId = (u2i(header[16]) << 24) + (u2i(header[17]) << 16)
 				+ (u2i(header[18]) << 8) + (u2i(header[19]));
 		// Check the header
-		if (!p.magic.equals("YMSG"))
+		if (!p.magic.equals("YMSG")) {
 			throw new IOException("Bad YMSG9 header");
+		}
+		return p;
+	}
 
-		// Read the body
+
+	protected String[] createBody(YMSGHeader header) throws IOException,
+			UnsupportedEncodingException {
 		List<String> v = new ArrayList<String>();
-		byte[] body = new byte[p.length];
+		byte[] body = new byte[header.length];
 		if (readBuffer(body) < 0)
 			return null;
+
+		String charEncoding = System.getProperty("openymsg.network.charEncoding", "UTF-8");
 
 		// Now extract strings in the body
 		int start = 0;
@@ -115,16 +119,12 @@ public class YMSG9InputStream extends BufferedInputStream {
 		// There is an issue with Yahoo adding a terminating 0xc0 0x80 0c00
 		// onto the end of some chat packets. This creates a key '0'
 		// without a value. So, check for odd size and delete last index.
-		if ((v.size() % 2) != 0)
+		if ((v.size() % 2) != 0) {
 			v.remove(v.size() - 1);
+		}
 		// Convert the collection into an array
-		p.body = new String[v.size()];
-		p.body = v.toArray(p.body);
-
-		log.debug(p.toString());
-		if(p.service==null)
-			throw new UnknowServiceException(p);
-		return p;
+		String[] messageBody = v.toArray(new String[v.size()]);
+		return messageBody;
 	}
 
 	private int u2i(byte b) {

@@ -18,14 +18,11 @@
  */
 package org.openymsg.v1.network;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Set;
 
-import org.openymsg.network.YahooConference;
+import org.openymsg.network.AbstractYahooConference;
 import org.openymsg.network.YahooIdentity;
-import org.openymsg.network.YahooUser;
 
 /**
  * As conference packets can be received in an inconvenient order, this class
@@ -47,19 +44,9 @@ import org.openymsg.network.YahooUser;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class YahooConferenceV1 implements YahooConference
+public class YahooConferenceV1 extends AbstractYahooConference<YahooUserV1, SessionV1>
 {
-	protected Set<YahooUser> users; // YahooUser's in this conference
-
-	protected String room; // Room name
-
-	private boolean closed; // Conference has been exited?
-
 	private Queue<YMSG9Packet> packetBuffer; // Buffer packets before invite
-
-	private SessionV1 parent; // Parent session object
-
-	private YahooIdentity identity; // Yahoo identity for this conf.
 
 	/**
 	 * CONSTRUCTOR Note: the first constructor is used when *we* create a
@@ -68,11 +55,7 @@ public class YahooConferenceV1 implements YahooConference
 	 * packets prior to an invite.
 	 */
 	YahooConferenceV1(YahooIdentity yid, String r, SessionV1 ss, boolean b) {
-		identity = yid;
-		users = new HashSet<YahooUser>();
-		parent = ss;
-		room = r;
-		closed = false;
+		super(yid, r, ss, b);
 		if (b)
 			packetBuffer = new LinkedList<YMSG9Packet>();
 		else
@@ -83,40 +66,6 @@ public class YahooConferenceV1 implements YahooConference
 		this(yid, r, ss, true);
 	}
 
-	/**
-	 * The closed flag is set when this conference is exited. All further
-	 * packets from this conference should be ignored.
-	 */
-	void closeConference() {
-		closed = true;
-	}
-
-	/**
-	 * Public accessors
-	 */
-	public String getName() {
-		return room;
-	}
-
-	public boolean isClosed() {
-		return closed;
-	}
-
-	public Set<YahooUser> getMembers() {
-		return new HashSet<YahooUser>(users);
-	}
-
-	public YahooIdentity getIdentity() {
-		return identity;
-	}
-
-	@Override
-	public String toString() {
-		StringBuffer sb = new StringBuffer("name=").append(room).append(
-				" users=").append(users.size()).append(" id=").append(
-				identity.getId()).append(" closed?=").append(closed);
-		return sb.toString();
-	}
 
 	/**
 	 * The packetBuffer object is created when the conference is created and set
@@ -146,70 +95,4 @@ public class YahooConferenceV1 implements YahooConference
 		packetBuffer.add(packet);
 	}
 
-	/**
-	 * Returns all users in this conference.
-	 * 
-	 * @return All users in this conference
-	 */
-	public Set<YahooUser> getUsers() {
-		return users;
-	}
-
-	/**
-	 * Adds an array of users (based on their usernames) to this conference.
-	 * 
-	 * @param usernames
-	 *            Names of all users to add
-	 */
-	synchronized void addUsers(String[] usernames) {
-		for (String username : usernames)
-			addUser(username);
-	}
-
-	/**
-	 * Adds a user (based on his username) to this conference.
-	 * 
-	 * @param username
-	 *            Name of the user to add
-	 */
-	synchronized void addUser(String username) {
-		if (!exists(username) && !parent.isValidYahooID(username)) {
-			users.add(new YahooUserV1(username));
-		}
-	}
-
-	/**
-	 * Removes a user from this conference.
-	 * 
-	 * @param username
-	 *            Name of the user to remove
-	 */
-	synchronized void removeUser(String username) {
-		YahooUser removeMe = null;
-		for (YahooUser user : users) {
-			if (user.getId().equals(username)) {
-				removeMe = user;
-				break;
-			}
-		}
-
-		if (removeMe != null) {
-			users.remove(removeMe);
-		}
-	}
-
-	/**
-	 * Does a user exist (uses .equals() on user id)
-	 * 
-	 * @return ''true'' if a user matching the username exists in this
-	 *         conference, ''false'' otherwise.
-	 */
-	private boolean exists(String username) {
-		for (YahooUser user : users) {
-			if (user.getId().equals(username)) {
-				return true;
-			}
-		}
-		return false;
-	}
 }

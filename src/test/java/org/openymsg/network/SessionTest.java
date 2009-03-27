@@ -32,6 +32,7 @@ import org.openymsg.roster.Roster;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
 public abstract class SessionTest<T extends Roster<U>, U extends YahooUser> {
+	
 	@Test
 	public void testSession() throws Exception {
 		createSession();

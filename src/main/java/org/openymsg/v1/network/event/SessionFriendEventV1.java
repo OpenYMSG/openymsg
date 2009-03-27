@@ -18,8 +18,7 @@
  */
 package org.openymsg.v1.network.event;
 
-import org.openymsg.network.event.DefaultSessionEvent;
-import org.openymsg.network.event.SessionFriendEvent;
+import org.openymsg.network.event.AbstractSessionFriendEvent;
 import org.openymsg.v1.network.YahooUserV1;
 
 
@@ -31,38 +30,14 @@ import org.openymsg.v1.network.YahooUserV1;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class SessionFriendEventV1 extends DefaultSessionEvent implements SessionFriendEvent<YahooUserV1> {
+public class SessionFriendEventV1 extends AbstractSessionFriendEvent<YahooUserV1> {
 	private static final long serialVersionUID = -2887428479487414186L;
-	protected final YahooUserV1 user;
 
 	public SessionFriendEventV1(Object source, YahooUserV1 user) {
-		this(source, null, user);
+		super(source, user);
 	}
 
 	protected SessionFriendEventV1(Object source, String message, YahooUserV1 user) {
-		super(source, message);
-
-		if (user == null) {
-			throw new IllegalArgumentException(
-					"Argument 'user' cannot be null.");
-		}
-		this.user = user;
-	}
-
-	public YahooUserV1 getUser() {
-		return user;
-	}
-
-	@Override
-	public String getFrom() {
-		return user.getId();
-	}
-
-	@Override
-	public String toString() {
-		final StringBuffer sb = new StringBuffer(super.toString());
-		sb.append(" friend:");
-		sb.append(user.getId());
-		return sb.toString();
+		super(source, message, user);
 	}
 }

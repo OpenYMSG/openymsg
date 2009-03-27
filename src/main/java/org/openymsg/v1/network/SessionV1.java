@@ -43,6 +43,7 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
+import org.openymsg.network.AbstractSession;
 import org.openymsg.network.AccountLockedException;
 import org.openymsg.network.AuthenticationState;
 import org.openymsg.network.ContactListType;
@@ -54,7 +55,7 @@ import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.NoSuchChatroomException;
 import org.openymsg.network.NoSuchConferenceException;
 import org.openymsg.network.ServiceType;
-import org.openymsg.network.Session;
+import org.openymsg.network.SessionPinger;
 import org.openymsg.network.SessionState;
 import org.openymsg.network.Status;
 import org.openymsg.network.Util;
@@ -65,6 +66,8 @@ import org.openymsg.network.YahooUser;
 import org.openymsg.network.challenge.ChallengeResponseV10;
 import org.openymsg.network.challenge.ChallengeResponseV9;
 import org.openymsg.network.chatroom.YahooChatUser;
+import org.openymsg.network.connection.PacketBodyBuffer;
+import org.openymsg.network.connection.YMSGHeader;
 import org.openymsg.network.event.DefaultSessionEvent;
 import org.openymsg.network.event.SessionChatEvent;
 import org.openymsg.network.event.SessionConferenceEvent;
@@ -95,15 +98,12 @@ import org.openymsg.v1.roster.RosterV1;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class SessionV1 implements Session<RosterV1, YahooUserV1> {
+public class SessionV1 extends AbstractSession<RosterV1, YahooUserV1> {
 	/** Primary Yahoo ID: the real account id. */
 	private YahooIdentity primaryID;
 
 	/** Login Yahoo ID: we logged in under this. */
 	private YahooIdentity loginID;
-
-	/** Map of alternative identities that can be used by this user. */
-	private Map<String, YahooIdentity> identities = new HashMap<String, YahooIdentity>();
 
 	/** Yahoo user password. */
 	private String password;
@@ -113,46 +113,23 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 	/** IMvironment (decor, etc.) */
 	private String imvironment;
 
-	/** Yahoo status (presence) */
-	private Status status;
-
 	/** Message for custom status. */
 	private String customStatusMessage;
 
 	/** Available/Back=f, away=t */
 	private boolean customStatusBusy;
 
-	private RosterV1 roster = new RosterV1(this);
-
 	/** Creating conference room names. */
 	private int conferenceCount;
 
-	/** Status of session (see StatusConstants) */
-	private volatile SessionState sessionStatus;
-
-	/** Holds Yahoo's session id */
-	volatile long sessionId = 0;
-
 	public volatile ConnectionHandler network;
 
-	private final Timer SCHEDULED_PINGER_SERVICE = new Timer(
-			"OpenYMSG session ping timer", true);
-
-	private TimerTask pingerTask;
-
 	private InputThread ipThread;
-
-	private EventDispatcher eventDispatchQueue;
 
 	private YahooException loginException = null;
 
 	/** For split packets in multiple parts */
 	private YMSG9Packet cachePacket;
-
-	private ChatroomManagerV1 chatroomManager;
-
-	/** Current conferences, hashed on room */
-	private Hashtable<String, YahooConferenceV1> conferences = new Hashtable<String, YahooConferenceV1>();
 
 	private SessionState chatSessionStatus;
 
@@ -194,6 +171,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 	 */
 	public SessionV1(ConnectionHandler connectionHandler)
 			throws NumberFormatException {
+		this.roster = new RosterV1(this);
 		if (connectionHandler != null) {
 			network = connectionHandler;
 		} else {
@@ -276,13 +254,13 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 			eventDispatchQueue = new EventDispatcher(this);
 			eventDispatchQueue.start();
 		}
-		if (username == null || username.length() == 0) {
+		if (isNotEmptyNullSafe(username)) {
 			sessionStatus = SessionState.FAILED;
 			throw new IllegalArgumentException(
 					"Argument 'username' cannot be null or an empty String.");
 		}
 
-		if (password == null || password.length() == 0) {
+		if (isNotEmptyNullSafe(password)) {
 			sessionStatus = SessionState.FAILED;
 			throw new IllegalArgumentException(
 					"Argument 'password' cannot be null or an empty String.");
@@ -1190,7 +1168,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 		body.addElement("51", user.getId());
 		body.addElement("57", room);
 
-		final Set<YahooUser> users = getConference(room).getUsers();
+		final Set<YahooUserV1> users = getConference(room).getUsers();
 		for (YahooUser u : users) {
 			body.addElement("52", u.getId());
 			body.addElement("53", u.getId());
@@ -1210,7 +1188,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 		// Flag this conference as now dead
 		YahooConferenceV1 yc = getConference(room);
 		yc.closeConference();
-		final Set<YahooUser> users = yc.getUsers();
+		final Set<YahooUserV1> users = yc.getUsers();
 		// Send decline packet to Yahoo
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", yid);
@@ -1253,7 +1231,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 		// Flag this conference as now dead
 		YahooConferenceV1 yc = getConference(room);
 		yc.closeConference();
-		final Set<YahooUser> users = yc.getUsers();
+		final Set<YahooUserV1> users = yc.getUsers();
 		// Send decline packet to Yahoo
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", yid);
@@ -1271,7 +1249,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 	protected void transmitConfLogon(String room, String yid)
 			throws IOException, NoSuchConferenceException {
 		// Get a list of users for this conference
-		final Set<YahooUser> users = getConference(room).getUsers();
+		final Set<YahooUserV1> users = getConference(room).getUsers();
 		// Send accept packet to Yahoo
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", yid);
@@ -1288,7 +1266,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 	protected void transmitConfMsg(String room, String yid, String msg)
 			throws IOException, NoSuchConferenceException {
 		// Get a list of users for this conference
-		final Set<YahooUser> users = getConference(room).getUsers();
+		final Set<YahooUserV1> users = getConference(room).getUsers();
 		// Send message packet to yahoo
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", yid);
@@ -1366,8 +1344,8 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
-		dos.write(NetworkConstants.MAGIC, 0, 4);
-		dos.write(NetworkConstants.VERSION, 0, 4);
+		dos.write(ConnectionHandler.MAGIC, 0, 4);
+		dos.write(ConnectionHandler.VERSION, 0, 4);
 		dos.writeShort((packet.length + 4) & 0xFFFF);
 		dos.writeShort(ServiceType.FILETRANSFER.getValue() & 0xFFFF);
 		dos.writeInt((int) (status.getValue() & 0xFFFFFFFF));
@@ -1430,12 +1408,12 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 	 */
 	protected void transmitFriendAdd(final String userId, final String groupId)
 			throws IOException {
-		if (userId == null || userId.length() == 0) {
+		if (isNotEmptyNullSafe(userId)) {
 			throw new IllegalArgumentException(
 					"Argument 'userId' cannot be null or an empty String.");
 		}
 
-		if (groupId == null || groupId.length() == 0) {
+		if (isNotEmptyNullSafe(groupId)) {
 			throw new IllegalArgumentException(
 					"Argument 'groupId' cannot be null or an empty String.");
 		}
@@ -1472,12 +1450,12 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 	 */
 	protected void transmitFriendRemove(final String friendId,
 			final String groupId) throws IOException {
-		if (friendId == null || friendId.length() == 0) {
+		if (isNotEmptyNullSafe(friendId)) {
 			throw new IllegalArgumentException(
 					"Argument 'friendId' cannot be null or an empty String.");
 		}
 
-		if (groupId == null || groupId.length() == 0) {
+		if (isNotEmptyNullSafe(groupId)) {
 			throw new IllegalArgumentException(
 					"Argument 'groupId' cannot be null or an empty String.");
 		}
@@ -1598,7 +1576,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 	 */
 	protected void transmitMessage(String to, YahooIdentity yid, String msg)
 			throws IOException {
-		if (to == null || to.length() == 0) {
+		if (isNotEmptyNullSafe(to)) {
 			throw new IllegalArgumentException(
 					"Argument 'to' cannot be null or an empty String.");
 		}
@@ -1677,7 +1655,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 	 * 
 	 * @throws IOException
 	 */
-	protected void transmitKeepAlive() throws IOException {
+	public void transmitKeepAlive() throws IOException {
 		final PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("0", primaryID.getId());
 		sendPacket(body, ServiceType.KEEPALIVE);
@@ -2269,7 +2247,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 	protected void receiveContactNew(YMSG9Packet pkt) // 0x0f
 	{
 		// Empty CONTACTNEW, response to FRIENDADD/REMOVE.
-		if (pkt.length <= 0) {
+		if (pkt.getHeader().length <= 0) {
 			log.trace("Received an empty CONTACTNEW packet, which is "
 					+ "probably sent back to us after we transmitted "
 					+ "a FRIENDADD/REMOVE. Just ignore it.");
@@ -2290,7 +2268,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 			final String message = pkt.getValue("14");
 
 			// Contact refused our subscription request.
-			if (pkt.status == 0x07) {
+			if (pkt.getHeader().status == 0x07) {
 				log.trace("A friend refused our subscription request: "
 						+ userId);
 				final YahooUserV1 user = roster.getUser(userId);
@@ -2308,14 +2286,14 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 			final String timestamp = pkt.getValue("15");
 
 			final DefaultSessionEvent se;
-			if (timestamp == null || timestamp.length() == 0) {
+			if (isNotEmptyNullSafe(timestamp)) {
 				se = new DefaultSessionEvent(this, to, userId, message);
 			} else {
 				final long timestampInMillis = 1000 * Long.parseLong(timestamp);
 				se = new DefaultSessionEvent(this, to, userId, message,
 						timestampInMillis);
 			}
-			se.setStatus(pkt.status); // status!=0 means offline message
+			se.setStatus(pkt.getHeader().status); // status!=0 means offline message
 			eventDispatchQueue.append(se, ServiceType.CONTACTNEW);
 		} catch (RuntimeException e) {
 			throw new YMSG9BadFormatException("contact request", pkt, e);
@@ -2749,7 +2727,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 				return;
 			}
 
-			if (pkt.status == Status.NOTINOFFICE.getValue()) {
+			if (pkt.getHeader().status == Status.NOTINOFFICE.getValue()) {
 				// Sent while we were offline
 				int i = 0;
 				// Read each message, until null
@@ -2761,7 +2739,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 					final String message = pkt.getNthValue("14", i);
 					final String timestamp = pkt.getNthValue("15", i);
 
-					if (timestamp == null || timestamp.length() == 0) {
+					if (isNotEmptyNullSafe(timestamp)) {
 						se = new DefaultSessionEvent(this, to, from, message);
 					} else {
 						final long timestampInMillis = 1000 * Long
@@ -2769,7 +2747,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 						se = new DefaultSessionEvent(this, to, from, message,
 								timestampInMillis);
 					}
-					se.setStatus(pkt.status); // status!=0 means offline
+					se.setStatus(pkt.getHeader().status); // status!=0 means offline
 					// message
 
 					eventDispatchQueue.append(se, ServiceType.X_OFFLINE);
@@ -2829,7 +2807,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 	{
 		try {
 			// FIX: documentation says this should be Status.TYPING (0x16)
-			if (pkt.status == 0x01) {
+			if (pkt.getHeader().status == 0x01) {
 				SessionNotifyEvent se = SessionNotifyEvent
 						.createSessionNotifyEvent(this, pkt.getValue("5"), // to
 								pkt.getValue("4"), // from
@@ -2837,7 +2815,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 								pkt.getValue("49"), // type (typing/game)
 								pkt.getValue("13") // mode (on/off)
 						);
-				se.setStatus(pkt.status);
+				se.setStatus(pkt.getHeader().status);
 				eventDispatchQueue.append(se, ServiceType.NOTIFY);
 			}
 		} catch (Exception e) {
@@ -2851,7 +2829,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 	protected void receiveUserStat(YMSG9Packet pkt) // 0x0a
 	{
 		try {
-			status = Status.getStatus(pkt.status);
+			status = Status.getStatus(pkt.getHeader().status);
 		} catch (IllegalArgumentException e) {
 			// unknow status
 		}
@@ -2978,7 +2956,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 	void errorMessage(YMSG9Packet pkt, String m) {
 		if (m == null)
 			m = pkt.getValue("16");
-		SessionErrorEvent se = new SessionErrorEvent(this, m, pkt.service);
+		SessionErrorEvent se = new SessionErrorEvent(this, m, pkt.getHeader().service);
 		if (pkt.exists("114"))
 			se.setCode(Integer.parseInt(pkt.getValue("114").trim()));
 		eventDispatchQueue.append(se, ServiceType.X_ERROR);
@@ -3005,12 +2983,12 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 	 *         be returned.
 	 */
 	private YMSG9Packet compoundChatLoginPacket(YMSG9Packet pkt) {
-		if (pkt.status != 5 && pkt.status != 1) {
+		if (pkt.getHeader().status != 5 && pkt.getHeader().status != 1) {
 			throw new IllegalArgumentException("Status must be either 1 or 5.");
 		}
 
 		// Incomplete
-		if (pkt.status == 5) {
+		if (pkt.getHeader().status == 5) {
 			if (cachePacket == null) {
 				cachePacket = pkt;
 			} else {
@@ -3036,7 +3014,7 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 	 */
 	protected void updateFriendsStatus(YMSG9Packet pkt) {
 		// If LOGOFF packet, the packet's user status is wrong (available)
-		final boolean logoff = (pkt.service == ServiceType.LOGOFF);
+		final boolean logoff = (pkt.getHeader().service == ServiceType.LOGOFF);
 		// Process online friends data
 
 		// Process each friend
@@ -3296,5 +3274,15 @@ public class SessionV1 implements Session<RosterV1, YahooUserV1> {
 	
 	public YahooUserV1 createUser(final String userId, final String groupId) {
 		return new YahooUserV1(userId, groupId);
+	}
+
+	public void setSessionId(YMSGHeader header) {
+		// Process header
+		if (header.sessionId != 0) {
+			// Some chat packets send zero
+
+			// Update session id
+			this.sessionId = header.sessionId;
+		}
 	}
 }

@@ -27,6 +27,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.YahooUser;
+import org.openymsg.network.connection.YMSGHeader;
 import org.openymsg.network.event.SessionConferenceEvent;
 
 /**
@@ -105,24 +106,20 @@ public class InputThread extends Thread {
 			quit = true;
 			return;
 		}
+		
+		YMSGHeader header = pkt.getHeader();
 
-		// Process header
-		if (pkt.sessionId != 0) {
-			// Some chat packets send zero
-
-			// Update session id in outer class
-			parentSession.sessionId = pkt.sessionId;
-		}
+		parentSession.setSessionId(header);
 
 		// Error header?
-		if (pkt.status == -1 && processError(pkt) == true) {
+		if (header.status == -1 && processError(pkt) == true) {
 			return;
 		}
 
 		log.trace("Incoming packet: " + pkt);
 		
 		// Process payload
-		switch (pkt.service) {
+		switch (header.service) {
 		case ADDIGNORE:
 			parentSession.receiveAddIgnore(pkt);
 			break;
@@ -237,7 +234,7 @@ public class InputThread extends Thread {
 			log.info("Received PING (but ignoring it).");
 			break;
 		default:
-			log.warn("Don't know how to handle service type '" + pkt.service
+			log.warn("Don't know how to handle service type '" + header.service
 					+ "'. The original packet was: " + pkt.toString());
 		}
 	}
@@ -251,8 +248,10 @@ public class InputThread extends Thread {
 	 * @throws Exception
 	 */
 	private boolean processError(YMSG9Packet pkt) throws Exception {
+		YMSGHeader header = pkt.getHeader();
+
 		// Jump to service-specific code
-		switch (pkt.service) {
+		switch (header.service) {
 		case AUTHRESP:
 			parentSession.receiveAuthResp(pkt);
 			return true;
@@ -264,7 +263,7 @@ public class InputThread extends Thread {
 			return true;
 		default:
 			parentSession.errorMessage(pkt, null);
-			return (pkt.body.length <= 2);
+			return (pkt.getBody().length <= 2);
 		}
 	}
 

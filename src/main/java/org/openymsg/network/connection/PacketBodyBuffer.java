@@ -16,7 +16,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.v1.network;
+package org.openymsg.network.connection;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -34,7 +34,7 @@ import java.io.UnsupportedEncodingException;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-class PacketBodyBuffer {
+public class PacketBodyBuffer {
 	protected ByteArrayOutputStream baos;
 
 	private final static int[] SEPARATOR = { 0xc0, 0x80 }; // Yahoo separator
@@ -43,7 +43,7 @@ class PacketBodyBuffer {
 
 	private String charEncoding; // Character encoding
 
-	PacketBodyBuffer() {
+	public PacketBodyBuffer() {
 		baos = new ByteArrayOutputStream(1024); // 1K initial size
 		charEncoding = System.getProperty("openymsg.network.charEncoding",
 				"UTF-8");
@@ -56,7 +56,7 @@ class PacketBodyBuffer {
 	 * @throws IOException
 	 * @throws UnsupportedEncodingException
 	 */
-	void addString(String s) throws UnsupportedEncodingException, IOException {
+	public void addString(String s) throws UnsupportedEncodingException, IOException {
 		baos.write(s.getBytes(charEncoding));
 		baos.write(SEPARATOR[0]);
 		baos.write(SEPARATOR[1]);
@@ -68,7 +68,7 @@ class PacketBodyBuffer {
 	 * @throws IOException
 	 * @throws UnsupportedEncodingException
 	 */
-	void addElement(String key, String value)
+	public void addElement(String key, String value)
 			throws UnsupportedEncodingException, IOException {
 		addString(key);
 		addString(value);
@@ -77,14 +77,14 @@ class PacketBodyBuffer {
 	/**
 	 * Return buffer as byte array. Note: this method is NOT thread safe.
 	 */
-	synchronized byte[] getBuffer() {
+	public synchronized byte[] getBuffer() {
 		return baos.toByteArray();
 	}
 
 	/**
 	 * Reset (clear) buffer
 	 */
-	void reset() {
+	public void reset() {
 		baos.reset();
 	}
 

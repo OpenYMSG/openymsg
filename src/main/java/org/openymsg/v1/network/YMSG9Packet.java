@@ -21,7 +21,7 @@ package org.openymsg.v1.network;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openymsg.network.ServiceType;
+import org.openymsg.network.connection.YMSGHeader;
 
 /**
  * This class is nothing more than a convenient data structure to hold the
@@ -41,19 +41,19 @@ import org.openymsg.network.ServiceType;
  * @author S.E. Morris
  */
 public class YMSG9Packet {
-	public String magic; // Header 1
-
-	public int version, length; // Header 2
-
-	public ServiceType service;
-
-	public long status, sessionId; // Header 3
-
-	public String[] body; // Packet data body
+	private YMSGHeader header;
+	
+	private String[] body; // Packet data body
 
 	String quickSetAccessSeparator; // String used to break sets
 
 	int[] quickSetAccess = null; // Speeds multi-set access
+
+	public YMSG9Packet(YMSGHeader header, String[] body) {
+		this.header = header;
+		this.body = body;
+	}
+
 
 	/**
 	 * General body accessors
@@ -79,7 +79,7 @@ public class YMSG9Packet {
 	}
 
 	// Returns the first value of field of type k
-	String getValue(String k) {
+	public String getValue(String k) {
 		return getNthValue(k, 0);
 	}
 
@@ -113,7 +113,7 @@ public class YMSG9Packet {
 		return null;
 	}
 
-	boolean exists(String k) {
+	public boolean exists(String k) {
 		return (getValue(k) != null);
 	}
 
@@ -235,12 +235,7 @@ public class YMSG9Packet {
 	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
-		sb.append("Magic:").append(magic);
-		sb.append(" Version:").append(version);
-		sb.append(" Length:").append(length);
-		sb.append(" Service:").append(service);
-		sb.append(" Status:").append(status);
-		sb.append(" SessionId:0x").append(Long.toHexString(sessionId));
+		sb.append(this.header.toString());
 		sb.append(" ");
 		for (int i = 0; i < body.length; i++)
 			sb.append(" [" + body[i] + "]");
@@ -250,5 +245,15 @@ public class YMSG9Packet {
 				sb.append(quickSetAccess[i]).append(" ");
 		}
 		return sb.toString();
+	}
+
+
+	public YMSGHeader getHeader() {
+		return this.header;
+	}
+
+
+	public String[] getBody() {
+		return this.body;
 	}
 }

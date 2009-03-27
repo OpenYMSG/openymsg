@@ -18,15 +18,12 @@
  */
 package org.openymsg.v1.network;
 
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.net.SocketException;
 
-import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.Util;
+import org.openymsg.network.connection.PacketBodyBuffer;
 
 /**
  * 
@@ -34,44 +31,34 @@ import org.openymsg.network.Util;
  * @author S.E. Morris
  */
 public class DirectConnectionHandler extends ConnectionHandler {
-	private String host; // Yahoo IM host
-
-	private int port; // Yahoo IM port
-
-	private boolean dontUseFallbacks = false; // Don't use fallback port
-
-	private Socket socket; // Network connection
-
-	private YMSG9InputStream ips; // For receiving messages
-
-	private DataOutputStream ops; // For sending messages
+	private static final int[] EMPTY_FALLBACKS = new int[0];
+	private YMSG9Socket socket;
 
 	public DirectConnectionHandler(String h, int p) {
-		host = h;
-		port = p;
-		dontUseFallbacks = true;
+		this(h, p, EMPTY_FALLBACKS);
 	}
 
 	public DirectConnectionHandler(int p) {
 		this(Util.directHost(), p);
 	}
 
+	DirectConnectionHandler(String h, int p, int[] fallBackPorts) {
+		this.socket = new YMSG9Socket(h, p, fallBackPorts);
+	}
 	public DirectConnectionHandler(boolean fl) {
-		this();
-		dontUseFallbacks = fl;
+		this(Util.directHost(), Util.directPort(), fl ? Util.directPorts() : EMPTY_FALLBACKS);
 	}
 
 	public DirectConnectionHandler() {
-		this(Util.directHost(), Util.directPort());
-		dontUseFallbacks = false;
+		this(Util.directHost(), Util.directPort(), EMPTY_FALLBACKS);
 	}
 
 	public String getHost() {
-		return host;
+		return this.socket.getHost();
 	}
 
 	public int getPort() {
-		return port;
+		return this.socket.getPort();
 	}
 
 	/**
@@ -89,34 +76,13 @@ public class DirectConnectionHandler extends ConnectionHandler {
 	 */
 	@Override
 	void open() throws SocketException, IOException {
-		if (dontUseFallbacks) {
-			socket = new Socket(host, port);
-		} else {
-			int[] fallbackPorts = Util.directPorts();
-			int i = 0;
-			while (socket == null) {
-				try {
-					socket = new Socket(host, fallbackPorts[i]);
-					port = fallbackPorts[i];
-				} catch (SocketException e) {
-					socket = null;
-					i++;
-					if (i >= fallbackPorts.length)
-						throw e;
-				}
-			}
-		}
-
-		ips = new YMSG9InputStream(socket.getInputStream());
-		ops = new DataOutputStream(new BufferedOutputStream(socket
-				.getOutputStream()));
+		this.socket.open();
 	}
 
 	@Override
 	void close() throws IOException {
 		if (socket != null)
 			socket.close();
-		socket = null;
 	}
 
 	/**
@@ -133,26 +99,7 @@ public class DirectConnectionHandler extends ConnectionHandler {
 	@Override
 	protected void sendPacket(PacketBodyBuffer body, ServiceType service,
 			long status, long sessionId) throws IOException {
-		byte[] b = body.getBuffer();
-		// Because the buffer is held at class member level, this method
-		// is not automatically thread safe. Besides, we should be only
-		// sending one message at a time!
-		synchronized (ops) {
-			// 20 byte header
-			ops.write(NetworkConstants.MAGIC, 0, 4); // Magic code 'YMSG'
-			ops.write(NetworkConstants.VERSION, 0, 4); // Version
-			ops.writeShort(b.length & 0xFFFF); // Body length (16 bit unsigned)
-			ops.writeShort(service.getValue() & 0xFFFF); // Service ID (16
-			// bit unsigned
-			ops.writeInt((int) (status & 0xFFFFFFFF)); // Status (32 bit
-			// unsigned)
-			ops.writeInt((int) (sessionId & 0xFFFFFFFF)); // Session id (32
-			// bit unsigned)
-			// Then the body...
-			ops.write(b, 0, b.length);
-			// Now send the buffer
-			ops.flush();
-		}
+		this.socket.sendPacket(body, 12, service, status, sessionId);
 	}
 
 	/**
@@ -160,13 +107,13 @@ public class DirectConnectionHandler extends ConnectionHandler {
 	 */
 	@Override
 	protected YMSG9Packet receivePacket() throws IOException {
-		return ips.readPacket();
+		return this.socket.receivePacket();
 	}
 
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer("Direct connection: ").append(host)
-				.append(":").append(port);
+		StringBuffer sb = new StringBuffer("Direct connection: ").append(getHost())
+				.append(":").append(getPort());
 		return sb.toString();
 	}
 }

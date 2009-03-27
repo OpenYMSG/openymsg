@@ -21,10 +21,12 @@ package org.openymsg.v1.network;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.openymsg.network.FireEvent;
 import org.openymsg.network.ServiceType;
+import org.openymsg.network.Session;
 import org.openymsg.network.event.SessionEvent;
 import org.openymsg.network.event.SessionListener;
 
@@ -48,9 +50,9 @@ public class EventDispatcher extends Thread {
 	private final List<FireEvent> queue = Collections
 			.synchronizedList(new LinkedList<FireEvent>());
 
-	private final SessionV1 session;
+	private final Session session;
 
-	public EventDispatcher(final SessionV1 session) {
+	public EventDispatcher(final Session session) {
 		super("jYMSG Event Dispatcher thread");
 		this.session = session;
 	}
@@ -120,8 +122,7 @@ public class EventDispatcher extends Thread {
 				}
 
 				try {
-					for (final SessionListener l : session
-							.getSessionListeners()) {
+					for (final SessionListener l : (Set<SessionListener>) session.getSessionListeners()) {
 						l.dispatch(event);
 					}
 				} catch (RuntimeException ex) {
