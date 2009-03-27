@@ -2,6 +2,7 @@ package org.openymsg.network;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 import org.openymsg.network.event.SessionConferenceEvent;
 import org.openymsg.network.event.SessionEvent;
@@ -76,4 +77,8 @@ public interface Session<T extends Roster<U>, U extends YahooUser> extends Statu
 	 *            The ID of the group in which this user has been put.
 	 */
 	U createUser(final String userId, final String groupId);
+
+	Set<SessionListener> getSessionListeners();
+
+	void transmitKeepAlive() throws IOException;
 }

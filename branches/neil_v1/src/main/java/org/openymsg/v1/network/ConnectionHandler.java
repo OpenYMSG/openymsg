@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.ServiceType;
+import org.openymsg.network.connection.PacketBodyBuffer;
 
 /**
  * 
@@ -29,6 +30,16 @@ import org.openymsg.network.ServiceType;
  * @author S.E. Morris
  */
 public abstract class ConnectionHandler {
+	public final static byte PROTOCOL = 0x0c; 
+
+	public final static byte[] MAGIC = { 'Y', 'M', 'S', 'G' };
+
+	public final static byte[] VERSION = { 0x00, PROTOCOL, 0x00, 0x00 };
+
+	public final static byte[] VERSION_HTTP = { PROTOCOL, 0x00, (byte) 0xc8, 0x00 };
+
+	public final static int YMSG9_HEADER_SIZE = 20;
+
 	abstract void install(SessionV1 session);
 
 	abstract void open() throws IOException;

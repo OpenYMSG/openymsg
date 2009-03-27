@@ -88,6 +88,7 @@ public abstract class ContactsTest<T extends Roster<U>, U extends YahooUser> ext
 		
 		sess2.rejectContact(event.getEvent(), "i don't want you");
 		assertNotNull(listener1.waitForEvent(5, ServiceType.CONTACTREJECT));
+		Thread.sleep(100);
 
 		assertFalse(sess1.getRoster().containsUser(TstSessions.OTHERUSR));
 	}

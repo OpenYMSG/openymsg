@@ -34,6 +34,7 @@ import org.openymsg.network.PropertyConstants;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.SessionState;
 import org.openymsg.network.Util;
+import org.openymsg.network.connection.PacketBodyBuffer;
 
 /**
  * 
@@ -223,7 +224,7 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 		// HTTP header
 		dos.writeBytes(HTTP_HEADER_POST);
 		dos.writeBytes("Content-length: "
-				+ (b.length + NetworkConstants.YMSG9_HEADER_SIZE)
+				+ (b.length + YMSG9_HEADER_SIZE)
 				+ NetworkConstants.END);
 		dos.writeBytes(HTTP_HEADER_AGENT);
 		dos.writeBytes(HTTP_HEADER_HOST);
@@ -233,8 +234,8 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 			dos.writeBytes("Cookie: " + cookie + NetworkConstants.END);
 		dos.writeBytes(NetworkConstants.END);
 		// YMSG9 header
-		dos.write(NetworkConstants.MAGIC, 0, 4);
-		dos.write(NetworkConstants.VERSION_HTTP, 0, 4);
+		dos.write(MAGIC, 0, 4);
+		dos.write(VERSION_HTTP, 0, 4);
 		dos.writeShort(b.length & 0xffff);
 		dos.writeShort(service.getValue() & 0xffff);
 		dos.writeInt((int) (status & 0xffffffff));
@@ -349,7 +350,7 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 	}
 
 	private boolean filterInput(YMSG9Packet pkt) {
-		switch (pkt.service) {
+		switch (pkt.getHeader().service) {
 		case LIST:
 			// Remember cookie and send it in subsequent packets
 			String[] cookieArr = extractCookies(pkt);
@@ -365,8 +366,8 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 			// or containing the status tag (66) of friend we messaged.
 			if (pkt.getValue("14") == null) {
 				if (pkt.getValue("10") != null)
-					pkt.service = ServiceType.ISBACK;
-				else if (pkt.body.length == 0)
+					pkt.getHeader().service = ServiceType.ISBACK;
+				else if (pkt.getBody().length == 0)
 					return true;
 			}
 			break;

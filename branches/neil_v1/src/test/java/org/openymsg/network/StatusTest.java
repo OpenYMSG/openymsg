@@ -36,7 +36,7 @@ public abstract class StatusTest<T extends Roster<U>, U extends YahooUser> exten
 		}
 	}
 
-	// @Test
+//	@Test
 	public void testChangeStatus() throws IllegalArgumentException, IOException {
 		final T roster = sess1.getRoster();
 		final boolean existinList = roster.containsUser(TstSessions.OTHERUSR);

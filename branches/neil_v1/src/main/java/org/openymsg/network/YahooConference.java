@@ -26,14 +26,14 @@ import org.openymsg.network.YahooIdentity;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public interface YahooConference 
+public interface YahooConference<T extends YahooUser> 
 {
 
 	String getName();
 	
 	boolean isClosed();
 
-	Set<YahooUser> getMembers();
+	Set<T> getMembers();
 
 	YahooIdentity getIdentity();
 
@@ -45,6 +45,6 @@ public interface YahooConference
 	 * 
 	 * @return All users in this conference
 	 */
-	Set<YahooUser> getUsers();
+	Set<T> getUsers();
 
 }
