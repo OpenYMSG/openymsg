@@ -1,0 +1,85 @@
+<project name="OpenYMSG" default="all">
+	<description>OpenYMSG - Java YMSG Instant Messaging API</description>
+
+	<!-- API version -->
+	<property name="release" value="0.1"/>
+
+	<!-- Compile for 1.5 -->
+	<property name="j_target" value="1.5"/>
+
+	<!-- Root directory for the source code -->
+	<property name="src.base" location="${basedir}/src"/>
+	<property name="src.main" location="${src.base}/main"/>
+	<property name="src.test" location="${src.base}/test"/>
+	<property name="src" location="${src.main}/java"/>
+	<property name="resources" location="${src.main}/resources"/>
+	<property name="lib" location="${basedir}/lib"/>
+
+	<!-- Dump the Jars here -->
+	<property name="dist" location="${basedir}/dist"/>
+
+	<!-- Build directory -->
+	<property name="build" location="${basedir}/classes"/>
+
+	<!-- Generate the javadoc here -->
+	<property name="javadoc.location" location="${dist}/documentation/javadoc/"/>
+	
+	<path id="openymsg.classpath">
+		<pathelement path="${classpath}"/>
+		<fileset dir="${lib}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+	
+    <path id="test.classpath">
+		<pathelement location="${classpath}" />
+		<pathelement location="${build}" />
+		<fileset dir="${lib}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<!-- Standard 'all' and 'clean' targets -->
+	<target name="all" depends="jars, javadoc" description="Builds everything."/>
+	<target name="clean" description="Cleans previous build attempts">
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+	</target>
+
+	<!-- TARGET: Initialize -->
+	<target name="init" description="Pre-build initialization.">
+		<tstamp/>
+		<mkdir dir="${build}"/>
+		<mkdir dir="${build}/resources/"/>
+		<mkdir dir="${dist}"/>
+	</target>
+
+	<!-- TARGET: Compile code -->
+	<target name="compile" depends="init" description="Compiles the protocol API.">
+		<javac debug="${gen_db}" srcdir="${src}" destdir="${build}" source="${j_target}">
+			<classpath refid="openymsg.classpath"/>
+		</javac>
+		<copy file="${resources}/challenge.bin" todir="${build}/org/openymsg/network/"/>
+	</target>
+
+
+	<!-- TARGET: Compile test code -->
+	<target name="compile-tests" depends="compile" description="Compiles the test code.">
+		<javac debug="${gen_db}" srcdir="${src.test}/java" destdir="${build}" source="${j_target}">
+			<classpath refid="test.classpath"/>
+		</javac>
+	</target>
+
+	<!-- TARGET: Jars -->
+	<target name="jars" depends="compile-tests" description="Builds the Jar file.">
+		<jar destfile="${dist}/openymsg_${release}.jar" basedir="${build}" includes="org/openymsg/network/**,org/openymsg/support/**,resources/**"/>
+		<jar destfile="${dist}/openymsg_test_${release}.jar" basedir="${build}" includes="org/openymsg/test/**"/>
+	</target>
+
+	<!-- TARGET: Javadoc -->
+	<target name="javadoc" depends="init" description="Compiles the project javadoc.">
+		<javadoc destdir="${javadoc.location}" sourcepath="${src}" packagenames="org.openymsg.*" excludepackagenames="org.openymsg.test.*,org.jdom.*,org.junit.*" classpathref="openymsg.classpath" windowtitle="OpenYMSG Javadoc" failonerror="yes">
+		</javadoc>
+	</target>
+
+</project>
