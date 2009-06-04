@@ -24,8 +24,8 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.openymsg.network.event.SessionConferenceEvent;
+import org.openymsg.support.Logger;
 
 /**
  * Thread for handling network input, dispatching incoming packets to
@@ -39,7 +39,7 @@ public class InputThread extends Thread {
 
 	private final Session parentSession;
 
-	private static Logger log = Logger.getLogger(InputThread.class);
+    private static final Logger log = Logger.getLogger(InputThread.class);
 
 	/**
 	 * Constructs a new thread that starts processing immediately.
@@ -107,6 +107,8 @@ public class InputThread extends Thread {
 		// Process header
 		if (pkt.sessionId != 0) {
 			// Some chat packets send zero
+
+            log.trace("Received a packet - status: " + pkt.status + " service: " + pkt.service.getValue() + " packet:" + pkt);
 
 			// Update session id in outer class
 			parentSession.sessionId = pkt.sessionId;
@@ -199,6 +201,9 @@ public class InputThread extends Thread {
 		case LIST:
 			parentSession.receiveList(pkt);
 			break;
+        case LIST_15:
+            parentSession.receiveList15(pkt);
+            break;
 		case LOGOFF:
 			parentSession.receiveLogoff(pkt);
 			break;
@@ -220,6 +225,9 @@ public class InputThread extends Thread {
 		case Y6_STATUS_UPDATE:
 			parentSession.receiveStatusUpdate(pkt);
 			break;
+        case STATUS_15:
+            parentSession.receiveStatus15(pkt);
+            break;
 		case GROUPRENAME:
 			parentSession.receiveGroupRename(pkt);
 			break;
@@ -229,13 +237,16 @@ public class InputThread extends Thread {
 		case PICTURE:
 			parentSession.receivePicture(pkt);
 			break;
+        case Y7_AUTHORIZATION :
+            parentSession.receiveAuthorization(pkt);
+            break;
 		case PING:
 			// As we're sending pings back, it's probably safe to ignore the
 			// incoming pings from Yahoo.
 			log.info("Received PING (but ignoring it).");
 			break;
 		default:
-			log.warn("Don't know how to handle service type '" + pkt.service
+			log.warn("Don't know how to handle service type '" + pkt.service.getValue()
 					+ "'. The original packet was: " + pkt.toString());
 		}
 	}

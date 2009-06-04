@@ -18,7 +18,7 @@
  */
 package org.openymsg.network;
 
-import org.apache.log4j.Logger;
+import org.openymsg.support.Logger;
 
 /**
  * Enumeration of all ServiceType values, as found in the YMSG packets.
@@ -75,6 +75,7 @@ public enum ServiceType {
 	ISBACK(0x4),
 	KEEPALIVE(0x8a),
 	LIST(0x55),
+    LIST_15(0xf1),
 	LOGOFF(0x2),
 	LOGON(0x1),
 	MAILSTAT(0x9),
@@ -105,11 +106,13 @@ public enum ServiceType {
 	VOICECHAT(0x4a),
 	WEBCAM(0x50),
 	X_BUZZ(0xf03),
-	X_CHATUPDATE(0xf04),	
+	X_CHATUPDATE(0xf04),
+    X_CHATCAPTCHA(0xf05),
 	X_ERROR(0xf00),
 	X_EXCEPTION(0xf02),
 	X_OFFLINE(0xf01),
 	Y6_STATUS_UPDATE(0xc6),
+    STATUS_15(0xf0),
 	Y6_VISIBLE_TOGGLE(0xc5), 
 	Y7_AUTHORIZATION(0xd6),
 	Y7_CHANGE_GROUP(0xe7), 
@@ -142,7 +145,7 @@ public enum ServiceType {
 			}
 		}
 
-		Logger.getLogger(ServiceType.class).warn("No such ServiceType value '"
+        Logger.getLogger(ServiceType.class).warn("No such ServiceType value '"
 				+ value + "' (which is '" + Integer.toHexString(value)
 				+ "' in hex).");
 		return null;

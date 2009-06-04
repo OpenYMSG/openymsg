@@ -29,11 +29,14 @@ import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -41,13 +44,14 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
+import org.openymsg.network.challenge.ChallengeResponseV16;
 import org.openymsg.network.challenge.ChallengeResponseV10;
 import org.openymsg.network.challenge.ChallengeResponseV9;
 import org.openymsg.network.chatroom.ChatroomManager;
 import org.openymsg.network.chatroom.YahooChatLobby;
 import org.openymsg.network.chatroom.YahooChatUser;
+import org.openymsg.network.event.SessionAuthorizationEvent;
 import org.openymsg.network.event.SessionChatEvent;
 import org.openymsg.network.event.SessionConferenceEvent;
 import org.openymsg.network.event.SessionErrorEvent;
@@ -64,6 +68,7 @@ import org.openymsg.network.event.SessionNotifyEvent;
 import org.openymsg.network.event.SessionPictureEvent;
 import org.openymsg.network.event.SessionPictureHandler;
 import org.openymsg.roster.Roster;
+import org.openymsg.support.Logger;
 
 /**
  * Written by FISH, Feb 2003 , Copyright FISH 2003 - 2007
@@ -125,6 +130,8 @@ public class Session implements StatusConstants, FriendManager {
 
 	private YahooException loginException = null;
 
+    private boolean receivedListFired = false;
+
 	/** For split packets in multiple parts */
 	private YMSG9Packet cachePacket;
 
@@ -143,7 +150,7 @@ public class Session implements StatusConstants, FriendManager {
 
 	private SessionPictureHandler pictureHandler = null;
 
-	private static Logger log = Logger.getLogger(Session.class);
+    private static final Logger log = Logger.getLogger(Session.class);
 
 	/**
 	 * Creates a new Session based on a ConnectionHandler as configured in the
@@ -187,7 +194,7 @@ public class Session implements StatusConstants, FriendManager {
 			}
 		}
 
-		status = Status.AVAILABLE;
+		status = Status.WEBLOGIN;
 		sessionId = 0;
 		sessionStatus = SessionState.UNSTARTED;
 
@@ -765,6 +772,22 @@ public class Session implements StatusConstants, FriendManager {
 		transmitList();
 	}
 
+    public void rejectFriendAuthorization(SessionAuthorizationEvent ev,
+                                            String friend, String msg)
+        throws IllegalStateException, IOException
+    {
+            checkStatus();
+            transmitRejectBuddy(friend, ev.getTo(), msg);
+    }
+
+    public void acceptFriendAuthorization(SessionAuthorizationEvent ev, String friend)
+        throws IllegalStateException, IOException
+    {
+        checkStatus();
+        transmitAcceptBuddy(friend, ev.getTo());
+    }
+
+
 	/**
 	 * File transfer 'save as' saves to a particular directory and filename,
 	 * 'save to' uses the file's own name and saves it to a particular
@@ -1012,26 +1035,56 @@ public class Session implements StatusConstants, FriendManager {
 	 * also contains our initial status. plp - plain response (not MD5Crypt'd)
 	 * crp - crypted response (MD5Crypt'd)
 	 */
-	protected void transmitAuthResp(String plp, String crp) throws IOException {
-		if (sessionStatus != SessionState.CONNECTED) {
-			throw new IllegalStateException(
-					"Cannot transmit an AUTHRESP packet if you're not completely unconnected to the Yahoo Network. Current state: "
-							+ sessionStatus);
-		}
-		final PacketBodyBuffer body = new PacketBodyBuffer();
-		body.addElement("0", loginID.getId());
-		body.addElement("6", plp);
-		body.addElement("96", crp);
-		body.addElement("135", "6,0,0,1710"); // Needed for v12(?)
-		body.addElement("2", "1");
-		body.addElement("1", loginID.getId());
+    protected void transmitAuthResp(String plp, String crp, String base64) throws IOException {
+        if (sessionStatus != SessionState.CONNECTED) {
+            throw new IllegalStateException(
+                    "Cannot transmit an AUTHRESP packet if you're not completely unconnected to the Yahoo Network. Current state: "
+                        + sessionStatus);
+        }
+        if (base64 == null)
+        {
+            final PacketBodyBuffer body = new PacketBodyBuffer();
+            body.addElement("0", loginID.getId());
+            body.addElement("6", plp);
+            body.addElement("96", crp);
+            body.addElement("2" ,loginID.getId());
+            body.addElement("2", "1");
+            //body.addElement("135", "6,0,0,1710"); // Needed for v12(?)
+            body.addElement("244","2097087");           // Needed for v15(?)
+            body.addElement("148","180");               // Needed for v15(?)
+            body.addElement("135" ,NetworkConstants.CLIENT_VERSION);     // Needed for v15(?)
+            body.addElement("1", loginID.getId());
 
-		// add our picture checksum, if it's available
-		if (pictureHandler != null
-				&& pictureHandler.getPictureChecksum() != null) {
-			body.addElement("192", pictureHandler.getPictureChecksum());
-		}
-		sendPacket(body, ServiceType.AUTHRESP, status); // 0x54
+            // add our picture checksum, if it's available
+            if (pictureHandler != null
+                    && pictureHandler.getPictureChecksum() != null)
+            {
+                body.addElement("192", pictureHandler.getPictureChecksum());
+            }
+
+            sendPacket(body, ServiceType.AUTHRESP, status); // 0x54
+        }
+        else
+        {
+            PacketBodyBuffer body = new PacketBodyBuffer();
+            body.addElement("1", loginID.getId());
+            body.addElement("0", loginID.getId());
+            body.addElement("277", plp);// 277 Needed for v16(?)
+            body.addElement("278", crp);// 278 Needed for v16(?)
+            body.addElement("307", base64);// 307 Needed for v16(?)
+            body.addElement("244", NetworkConstants.CLIENT_VERSION_ID); // Needed for v15(?)
+            body.addElement("2", loginID.getId());
+            body.addElement("2", "1");
+            body.addElement("135", NetworkConstants.CLIENT_VERSION);    // Needed for v15(?)
+
+            if (pictureHandler != null &&
+                pictureHandler.getPictureChecksum() != null)
+            {
+                body.addElement("192", pictureHandler.getPictureChecksum());
+            }
+
+            sendPacket(body, ServiceType.AUTHRESP, status); // 0x54
+        }
 	}
 
 	/**
@@ -1311,6 +1364,30 @@ public class Session implements StatusConstants, FriendManager {
 		sendPacket(body, ServiceType.CONTACTREJECT); // 0x86
 	}
 
+    protected void transmitRejectBuddy(String friend,String yid,String msg)
+        throws IOException
+    {
+        PacketBodyBuffer body = new PacketBodyBuffer();
+        body.addElement("1" ,yid);
+        body.addElement("7" ,friend);
+        body.addElement("13", "2");// Reject Authorization
+
+        if(msg != null)
+            body.addElement("14", msg);
+
+        sendPacket(body,ServiceType.Y7_AUTHORIZATION);  // 0xd6
+    }
+
+    protected void transmitAcceptBuddy(String friend, String yid)
+        throws IOException
+    {
+            PacketBodyBuffer body = new PacketBodyBuffer();
+            body.addElement("1" ,yid);
+            body.addElement("5" ,friend);
+            body.addElement("13", "1");// Accept Authorization
+            sendPacket(body, ServiceType.Y7_AUTHORIZATION);   // 0xd6
+    }
+
 	/**
 	 * Transmit a FILETRANSFER packet, to send a binary file to a friend.
 	 */
@@ -1422,13 +1499,21 @@ public class Session implements StatusConstants, FriendManager {
 		// check if the current Session state allows us to send anything.
 		checkStatus();
 
-		final PacketBodyBuffer body = new PacketBodyBuffer();
-		body.addElement("1", primaryID.getId()); // ???: effective id?
-		body.addElement("7", userId);
-		body.addElement("65", groupId);
+        PacketBodyBuffer body = new PacketBodyBuffer();
+        body.addElement("14", "");
+        body.addElement("65", groupId);
+        body.addElement("97", "1");
+        body.addElement("1", primaryID.getId());    // ???: effective id?
+        body.addElement("302", "319");
+        body.addElement("300", "319");
+        body.addElement("7", userId);
+        body.addElement("334", "0");
+        body.addElement("301", "319");
+        body.addElement("303", "319");
+        body.addElement("241", "0");
 
-		sendPacket(body, ServiceType.FRIENDADD); // 0x83
-	}
+        sendPacket(body, ServiceType.FRIENDADD); // 0x83
+    }
 
 	/**
 	 * Transmit a FRIENDREMOVE packet. We should get a FRIENDREMOVE packet back
@@ -1730,38 +1815,215 @@ public class Session implements StatusConstants, FriendManager {
 	 * method dependent upon a switch in field '13'. If this field is absent or
 	 * 0, use v9, if 1 or 2, then use v10.
 	 */
-	protected void receiveAuth(YMSG9Packet pkt) // 0x57
-			throws IOException {
+    protected void receiveAuth(YMSG9Packet pkt) // 0x57
+        throws IOException, LoginRefusedException
+    {
 		if (sessionStatus != SessionState.CONNECTING) {
 			throw new IllegalStateException(
 					"Received a response to an AUTH packet, outside the normal"
 							+ " login flow. Current state: " + sessionStatus);
 		}
 		log.trace("Received AUTH from server. Going to parse challenge...");
-		// Value for key 13: '0'=v9, '1'=v10
-		final boolean isV9 = pkt.getValue("13") == null
-				|| pkt.getValue("13").equals("0");
-		final String[] s;
-		try {
-			if (isV9) {
-				log.trace("Parsing V9 challenge...");
-				s = ChallengeResponseV9.getStrings(loginID.getId(), password,
-						pkt.getValue("94"));
-			} else {
-				log.trace("Parsing V10 challenge...");
-				s = ChallengeResponseV10.getStrings(loginID.getId(), password,
-						pkt.getValue("94"));
-			}
+		// Value for key 13: '0'=v9, '1'=v10, '2'=v16
+        String v10 = pkt.getValue("13");
+        final String[] s;
+        String seed = pkt.getValue("94");
+        try
+        {
+            if (v10 != null && v10.equals("0"))
+            {
+                log.trace("Parsing V9 challenge...");
+                s = ChallengeResponseV9.getStrings(loginID.getId(), password,
+                pkt.getValue("94"));
+            }
+            else if (v10 != null && v10.equals("1"))
+            {
+                log.trace("Parsing V10 challenge...");
+                s = ChallengeResponseV10.getStrings(loginID.getId(), password,
+                pkt.getValue("94"));
+            }
+            else
+            {
+                s = yahooAuth16Stage1(seed);
+            }
 		} catch (NoSuchAlgorithmException e) {
 			throw new YMSG9BadFormatException("auth", pkt, e);
 		} catch (IOException e) {
 			throw new YMSG9BadFormatException("auth", pkt, e);
 		}
+        catch (LoginRefusedException e) {
+            throw e;
+        }
 		sessionStatus = SessionState.CONNECTED;
 		log.trace("Going to transmit Auth response, "
 				+ "containing the challenge...");
-		transmitAuthResp(s[0], s[1]);
-	}
+        if (s.length > 2)
+        {
+            transmitAuthResp(s[0], s[1], s[2]);
+        }
+        else
+        {
+            transmitAuthResp(s[0], s[1], null);
+        }
+    }
+
+    private String[] yahooAuth16Stage1(String seed)
+        throws LoginRefusedException, IOException, NoSuchAlgorithmException
+    {
+        String authLink =
+            "https://login.yahoo.com/config/pwtoken_get?src=ymsgr&ts=&login=" + loginID.getId() + "&passwd=" + password + "&chal=" + seed;
+
+        URL u = new URL(authLink);
+        URLConnection uc = u.openConnection();
+
+        if (uc instanceof HttpURLConnection) {
+            int responseCode = ((HttpURLConnection) uc).getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                InputStream in = uc.getInputStream();
+
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                int read = -1;
+                byte[] buff = new byte[256];
+                while ((read = in.read(buff)) != -1) {
+                    out.write(buff, 0, read);
+                }
+                in.close();
+
+                StringTokenizer toks = new StringTokenizer(out.toString(), "\r\n");
+                if (toks.countTokens() <= 0) {
+                    // errrorrrr
+                    throw new LoginRefusedException("Login Failed, wrong response in stage 1:" + ((HttpURLConnection) uc).getResponseMessage());
+                }
+
+                int responseNo = -1;
+                try {
+                    responseNo = Integer.valueOf(toks.nextToken());
+                }
+                catch (NumberFormatException e) {
+                    throw new LoginRefusedException("Login Failed, wrong response in stage 1:" + ((HttpURLConnection) uc).getResponseMessage());
+                }
+
+                if (responseNo != 0 || !toks.hasMoreTokens()) {
+                    switch (responseNo) {
+                        case 1235:
+                            throw new LoginRefusedException(
+                                "Login Failed, Invalid username", AuthenticationState.BADUSERNAME);
+                        case 1212:
+                            throw new LoginRefusedException(
+                                "Login Failed, Wrong password", AuthenticationState.BAD);
+                        case 1213:
+                            throw new LoginRefusedException(
+                                "Login locked: Too many failed login attempts", AuthenticationState.LOCKED);
+                        case 1236:
+                            throw new LoginRefusedException(
+                                "Login locked", AuthenticationState.LOCKED);
+                        case 100:
+                            throw new LoginRefusedException(
+                                "Username or password missing", AuthenticationState.BAD);
+                        default:
+                            throw new LoginRefusedException(
+                                "Login Failed, Unkown error", AuthenticationState.BAD);
+                    }
+                }
+
+                String ymsgr = toks.nextToken();
+
+                if (ymsgr.indexOf("ymsgr=") == -1 && toks.hasMoreTokens()) {
+                    ymsgr = toks.nextToken();
+                }
+
+                ymsgr = ymsgr.replaceAll("ymsgr=", "");
+
+                return yahooAuth16Stage2(ymsgr, seed);
+            }
+        }
+
+        throw new LoginRefusedException("Login Failed, unable to retrieve stage 1 url");
+    }
+
+    private String[] yahooAuth16Stage2(String token, String seed)
+        throws LoginRefusedException, IOException, NoSuchAlgorithmException
+    {
+        String loginLink =
+            "https://login.yahoo.com/config/pwtoken_login?src=ymsgr&ts=&token=" + token;
+
+        URL u = new URL(loginLink);
+        URLConnection uc = u.openConnection();
+
+        if (uc instanceof HttpURLConnection) {
+            int responseCode = ((HttpURLConnection) uc).getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                InputStream in = uc.getInputStream();
+
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                int read = -1;
+                byte[] buff = new byte[256];
+                while ((read = in.read(buff)) != -1) {
+                    out.write(buff, 0, read);
+                }
+
+                int responseNo = -1;
+                String crumb = null;
+                String cookieY = null;
+                String cookieT = null;
+
+                StringTokenizer toks = new StringTokenizer(out.toString(), "\r\n");
+                if (toks.countTokens() <= 0) {
+                    // errrorrrr
+                    throw new LoginRefusedException("Login Failed, wrong response in stage 2:" + ((HttpURLConnection) uc).getResponseMessage());
+                }
+
+                try {
+                    responseNo = Integer.valueOf(toks.nextToken());
+                }
+                catch (NumberFormatException e) {
+                    throw new LoginRefusedException("Login Failed, wrong response in stage 2:" + ((HttpURLConnection) uc).getResponseMessage());
+                }
+
+                if (responseNo != 0 || !toks.hasMoreTokens()) {
+                    throw new LoginRefusedException(
+                        "Login Failed, Unkown error", AuthenticationState.BAD);
+                }
+
+                while (toks.hasMoreTokens()) {
+                    String t = toks.nextToken();
+                    if (t.startsWith("crumb=")) {
+                        crumb = t.replaceAll("crumb=", "");
+                    }
+                    else if (t.startsWith("Y=")) {
+                        cookieY = t.replaceAll("Y=", "");
+                    }
+                    else if (t.startsWith("T=")) {
+                        cookieT = t.replaceAll("T=", "");
+                    }
+                }
+
+                if (crumb == null || cookieT == null || cookieY == null) {
+                    throw new LoginRefusedException(
+                        "Login Failed, Unkown error", AuthenticationState.BAD);
+                }
+
+//                Iterator<String> iter =
+//                    ((HttpURLConnection) uc).getHeaderFields().get("Set-Cookie").iterator();
+//                while (iter.hasNext())
+//                {
+//                    String string = iter.next();
+//                    System.out.println("\t" + string);
+//                }
+                this.cookieY = cookieY;
+                this.cookieT = cookieT;
+                return yahooAuth16Stage3(crumb + seed, cookieY, cookieT);
+            }
+        }
+
+        throw new LoginRefusedException("Login Failed, unable to retrieve stage 2 url");
+    }
+
+    private String[] yahooAuth16Stage3(String crypt, String cookieY, String cookieT)
+        throws NoSuchAlgorithmException
+    {
+        return ChallengeResponseV16.getStrings(cookieY, cookieT, crypt);
+    }
 
 	/**
 	 * Process an incoming AUTHRESP packet. If we get one of these it means the
@@ -1791,6 +2053,7 @@ public class Session implements StatusConstants, FriendManager {
 					break;
 
 				// Bad login (password?)
+                case BAD2:
 				case BAD:
 					loginException = new LoginRefusedException("User "
 							+ loginID + " refused login",
@@ -1807,6 +2070,14 @@ public class Session implements StatusConstants, FriendManager {
 					log.info("AUTHRESP says: authentication failed!",
 							loginException);
 					break;
+                //You have been logged out of the yahoo service, possibly due to a duplicate login.
+                case DUPLICATE_LOGIN:
+                    loginException = new LoginRefusedException("User "
+                            + loginID + " unknown",
+                            AuthenticationState.DUPLICATE_LOGIN);
+                    log.info("AUTHRESP says: authentication failed!",
+                            loginException);
+                    break;
 				}
 			}
 		} catch (IllegalArgumentException ex) {
@@ -1888,13 +2159,17 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming CHATJOIN packet. We get one of these: (a) as a way of
-	 * finishing the login handshaking process, containing room details (we
-	 * already know) and a list of current members. (b) when the login process
-	 * fails (room full?), containing only a 114 field (set to '-35'?) - see
-	 * error handling code elsewhere (c) as a stripped down version when a new
-	 * user enters the room (including ourselves!) (d) as a stripped down
-	 * version when an existing member updates their details. Sometimes a login
+	 * Process an incoming CHATJOIN packet. We get one of these:
+     * (a) as a way of finishing the login handshaking process, containing
+     * room details (we already know) and a list of current members.
+     * (b) when the login process fails (room full?), containing only a 114
+     *     field (set to '-35'?) - see error handling code elsewhere
+     * (c) as a stripped down version when a new user enters the room
+     *     (including ourselves!)
+     * (d) as a stripped down version when an existing member updates
+     *     their details.
+     * (e) when we need to deal with a chat captcha.
+     * Sometimes a login
 	 * packet is broken over several packets. The clue here appears to be that
 	 * the first (and subsequent?) packets have a status of 5, while the final
 	 * packet has a status of 1.
@@ -1924,6 +2199,22 @@ public class Session implements StatusConstants, FriendManager {
 			if (ycl == null)
 				throw new NoSuchChatroomException("Chatroom/lobby " + netname
 						+ " not found.");
+
+            // -----Process a captcha packet
+            if(pkt.exists("105"))
+            {
+                try
+                {
+                    String captchaMsg = pkt.getValue("105");
+                    String captchaURL = null;
+                    int idx = (captchaMsg!=null) ? captchaMsg.indexOf("http://captcha.") : -1;
+                    if(idx>=0)  captchaURL = captchaMsg.substring(idx);
+
+                    SessionChatEvent se = new SessionChatEvent(this,captchaMsg,captchaURL,ycl);
+                    eventDispatchQueue.append(se, ServiceType.X_CHATCAPTCHA);
+                    return;  // ...to finally block
+                }catch(Exception e) { throw new YMSG9BadFormatException("chat captcha",pkt,e); }
+            }
 
 			// Note: Yahoo sometimes lies about the '108' count of users!
 			// Reduce count until to see how many users there *actually* are!
@@ -2301,6 +2592,60 @@ public class Session implements StatusConstants, FriendManager {
 		}
 	}
 
+    protected void receiveAuthorization(YMSG9Packet pkt)		// 0xd6
+	{
+            try
+            {
+                if(pkt.length <= 0)
+                    return;
+
+                String who,
+                       msg,
+                       fname,
+                       lname,
+                       id;
+
+                 who = pkt.getValue("4");
+                 msg = pkt.getValue("14");
+                 fname = pkt.getValue("216");
+                 lname = pkt.getValue("254");
+                 id = pkt.getValue("5");
+
+                 int state = -1;
+                 String stateStr = pkt.getValue("13");
+                 if(stateStr != null)
+                 {
+                     try
+                     {
+                        state = Integer.parseInt(stateStr);
+                     }
+                     catch (NumberFormatException ex)
+                     {
+                         log.error("state not a number", ex);
+                     }
+                 }
+
+                 SessionAuthorizationEvent se = new SessionAuthorizationEvent
+                        (
+                            this,
+                            id,
+                            who,
+                            fname,
+                            lname,
+                            msg
+                        );
+                 /* 1 - Authorization Accepted
+                    2 - Authorization Denied
+                    3 - Authorization Request
+                  */
+                 se.setStatus(state);
+
+                 eventDispatchQueue.append(se, ServiceType.Y7_AUTHORIZATION);
+
+            }catch(Exception e)
+            { throw new YMSG9BadFormatException("contact request",pkt,e); }
+    }
+
 	/**
 	 * Process an incoming FILETRANSFER packet. This packet can be received
 	 * under two circumstances: after a successful FT upload, in which case it
@@ -2352,7 +2697,7 @@ public class Session implements StatusConstants, FriendManager {
 			final YahooUser user = new YahooUser(userId, groupName);
 
 			// Fire event : 7=friend, 66=status, 65=group name
-			final SessionFriendEvent se = new SessionFriendEvent(this, user);
+			final SessionFriendEvent se = new SessionFriendEvent(this, user, groupName);
 			eventDispatchQueue.append(se, ServiceType.FRIENDADD);
 		} catch (Exception e) {
 			throw new YMSG9BadFormatException("friend added", pkt, e);
@@ -2371,7 +2716,7 @@ public class Session implements StatusConstants, FriendManager {
 			// TODO: if this is a request to remove a user from one particular
 			// group, and that same user exists in another group, this might go
 			// terribly wrong...
-			// final String groupName = pkt.getValue("65");
+			final String groupName = pkt.getValue("65");
 
 			final YahooUser user = roster.getUser(userId);
 
@@ -2381,7 +2726,7 @@ public class Session implements StatusConstants, FriendManager {
 				return;
 			}
 			// Fire event : 7=friend, 66=status, 65=group name
-			SessionFriendEvent se = new SessionFriendEvent(this, user);
+			SessionFriendEvent se = new SessionFriendEvent(this, user, groupName);
 			eventDispatchQueue.append(se, ServiceType.FRIENDREMOVE);
 		} catch (Exception e) {
 			throw new YMSG9BadFormatException("friend removed", pkt, e);
@@ -2462,6 +2807,38 @@ public class Session implements StatusConstants, FriendManager {
 			updateFriendsStatus(pkt);
 		}
 	}
+
+    protected void receiveStatus15(YMSG9Packet pkt)
+    {
+        String v = pkt.getValue("1");
+        if (v != null)
+        {
+            sessionStatus = SessionState.LOGGED_ON;
+            {
+                // only one identity with v16 login ? I don't know where to get them
+                // after changing the auth mechanisum ?
+
+                identities.put(loginID.getId(), new YahooIdentity(loginID.getId()));
+                primaryID = loginID;
+
+                // -----Set the primary and login flags on the relevant YahooIdentity objects
+                primaryID.setPrimaryIdentity(true);
+                loginID.setPrimaryIdentity(true);
+            }
+            if (!receivedListFired) 
+            {
+                HashSet<YahooUser> us = new HashSet();
+                Iterator<YahooUser> usIter = getRoster().iterator();
+                while (usIter.hasNext())
+                {
+                    YahooUser yahooUser = usIter.next();
+                    us.add(yahooUser);
+                }
+                eventDispatchQueue.append(new SessionListEvent(this,
+                    ContactListType.Friends, us), ServiceType.LIST);
+            }
+        }
+    }
 
 	/**
 	 * Process and incoming LIST packet. We'll typically get one of these when
@@ -2648,6 +3025,93 @@ public class Session implements StatusConstants, FriendManager {
 		primaryID.setPrimaryIdentity(true);
 		loginID.setLoginIdentity(true);
 	}
+
+    protected void receiveList15(YMSG9Packet pkt)          // 0x55
+    {
+        String temp = null;
+//        int protocol = 0;
+        YahooGroup currentListGroup = null;
+        ArrayList<YahooGroup> receivedGroups = new ArrayList<YahooGroup>();
+
+        Set<YahooUser> usersOnFriendsList = new HashSet<YahooUser>();
+        Set<YahooUser> usersOnIgnoreList = new HashSet<YahooUser>();
+
+        Iterator<String[]> iter = pkt.entries().iterator();
+        while (iter.hasNext()) {
+            String[] s = iter.next();
+
+            int key = Integer.valueOf(s[0]);
+            String value = s[1];
+
+            switch (key) {
+                case 302:
+                    /* This is always 318 before a group, 319 before the first s/n in a group, 320 before any ignored s/n.
+                     * It is not sent for s/n's in a group after the first.
+                     * All ignored s/n's are listed last, so when we see a 320 we clear the group and begin marking the
+                     * s/n's as ignored.  It is always followed by an identical 300 key.
+                     */
+                    if (value != null && value.equals("320")) {
+                        currentListGroup = null;
+                    }
+                    break;
+                case 301:
+                    /* This is 319 before all s/n's in a group after the first. It is followed by an identical 300. */
+                    if (temp != null) {
+                        if (currentListGroup != null) {
+                            /* This buddy is in a group */
+                            YahooUser yu = new YahooUser(temp, currentListGroup.getName());
+                            usersOnFriendsList.add(yu);
+                            currentListGroup.addUser(yu);
+                        }
+                        else {
+                            /* This buddy is on the ignore list (and therefore in no group) */
+                            YahooUser yu = new YahooUser(temp);
+                            yu.setIgnored(true);
+                            usersOnIgnoreList.add(yu);
+                        }
+                        temp = null;
+                    }
+                    break;
+                case 300: /* This is 318 before a group, 319 before any s/n in a group, and 320 before any ignored s/n. */
+                    break;
+                case 65: /* This is the group */
+                    currentListGroup = new YahooGroup(value);
+                    receivedGroups.add(currentListGroup);
+                    break;
+                case 7: /* buddy's s/n */
+                    temp = value;
+                    break;
+                case 241: /* another protocol user */
+//                    protocol = Integer.valueOf(value);
+                    break;
+                case 59: /* somebody told cookies come here too, but im not sure */
+                    break;
+                case 317: /* Stealth Setting */
+//                    stealth = Integer.valueOf(value);
+                    break;
+            }
+        }
+
+        //groups = new YahooGroup[receivedGroups.size()];
+        //groups = (YahooGroup[]) receivedGroups.toArray(groups);
+
+        // -----If this was sent outside the login process is over, send an event
+//        if (loginOver) {
+            if(usersOnFriendsList.size() > 0)
+            {
+                receivedListFired = true;
+                eventDispatchQueue.append(new SessionListEvent(this,
+                    ContactListType.Friends, usersOnFriendsList),
+                    ServiceType.LIST);
+            }
+
+            if(usersOnIgnoreList.size() > 0)
+            {
+                eventDispatchQueue.append(new SessionListEvent(this,
+                    ContactListType.Ignored, usersOnIgnoreList),
+                    ServiceType.LIST);
+            }
+    }
 
 	/**
 	 * Process an incoming LOGOFF packet. If we get one of these it means Yahoo
