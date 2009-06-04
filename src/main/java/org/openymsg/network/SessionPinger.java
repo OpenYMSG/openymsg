@@ -20,8 +20,7 @@ package org.openymsg.network;
 
 import java.io.IOException;
 import java.util.TimerTask;
-
-import org.apache.log4j.Logger;
+import org.openymsg.support.Logger;
 
 /**
  * Runnable class that is responsible for sending keep-alive packets to the
@@ -31,7 +30,7 @@ import org.apache.log4j.Logger;
  */
 public class SessionPinger extends TimerTask {
 
-	private static final Logger log = Logger.getLogger(SessionPinger.class);
+    private static final Logger log = Logger.getLogger(SessionPinger.class);
 
 	/**
 	 * The session on which behalf the keep-alive packet should be sent.

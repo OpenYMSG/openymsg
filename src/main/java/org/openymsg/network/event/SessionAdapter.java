@@ -134,6 +134,15 @@ public class SessionAdapter implements SessionListener {
 		// override this function if you want to do something with it.
 	}
 
+    public void pictureReceived(SessionPictureEvent ev){}
+    public void authorizationReceived(SessionAuthorizationEvent ev){}
+
+    // A chat captcha has been requested.
+	//   captchMessage - full message from captcha
+	//   captchaURL - captcha URL
+	//   lobby - YahooChatLobby connecting to
+	public void chatCaptchaReceived(SessionChatEvent ev){}
+
 	/**
 	 * Dispatches an event immediately to all listeners, instead of queuing. it.
 	 * 
@@ -225,6 +234,15 @@ public class SessionAdapter implements SessionListener {
 			case LOGON:
 				logonReceived(ev);
 				break;
+            case X_CHATCAPTCHA:
+                chatCaptchaReceived((SessionChatEvent)ev);
+                break;
+            case PICTURE:
+                pictureReceived((SessionPictureEvent)ev);
+                break;
+            case Y7_AUTHORIZATION:
+                authorizationReceived((SessionAuthorizationEvent)ev);
+                break;
 			default:
 				throw new IllegalArgumentException(
 						"Don't know how to handle service type '"

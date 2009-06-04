@@ -43,6 +43,8 @@ public class SessionChatEvent extends SessionEvent {
 
 	protected boolean emote;
 
+    protected String captchaMsg,captchaURL;
+
 	/**
 	 * CONSTRUCTORS
 	 */
@@ -60,6 +62,14 @@ public class SessionChatEvent extends SessionEvent {
 		setChatUser(0, ycu);
 		this.message = message;
 		this.emote = (emote != null && emote.equals("2"));
+	}
+
+    // -----Captcha
+	public SessionChatEvent(Object o,String capM,String capU,YahooChatLobby ycl)
+	{
+        super(o);
+        captchaMsg=capM;  captchaURL=capU;
+        lobby=ycl;
 	}
 
 	public void setChatUser(int i, YahooChatUser ycu) {
@@ -90,6 +100,16 @@ public class SessionChatEvent extends SessionEvent {
 	public boolean isEmote() {
 		return emote;
 	}
+
+    public String getCaptchaMessage()
+    {
+        return captchaMsg;
+    }
+
+    public String getCaptchaURL()
+    {
+        return captchaURL;
+    }
 
 	@Override
 	public String toString() {

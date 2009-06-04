@@ -23,9 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-
+import org.openymsg.support.Logger;
 
 /**
  * A YMSG9 packet has a 20 byte fixed format header. The first four bytes are

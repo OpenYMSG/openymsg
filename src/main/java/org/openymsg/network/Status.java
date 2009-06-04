@@ -27,7 +27,7 @@ package org.openymsg.network;
 public enum Status {
 	ERROR(-1), AVAILABLE(0), BRB(1), BUSY(2), NOTATHOME(3), NOTATDESK(4), NOTINOFFICE(
 			5), ONPHONE(6), ONVACATION(7), OUTTOLUNCH(8), STEPPEDOUT(9), INVISIBLE(
-			12), CUSTOM(99), IDLE(999), OFFLINE(0x5a55aa56), TYPING(0x16);
+			12), CUSTOM(99), IDLE(999), OFFLINE(0x5a55aa56), WEBLOGIN(0x5a55aa55), TYPING(0x16);
 
 	// Unique long representation of this Status.
 	private long value;
