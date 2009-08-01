@@ -54,9 +54,18 @@ public class SessionAuthorizationEvent
 
         switch(s)
         {
-            case 1: authorizationAccepted = true;   /* Authorization Accepted */ break;
-            case 2: authorizationDenied = true;     /* Authorization Denied */ break;
-            default: authorizationRequest = true;   /* Authorization Request? */ break;
+            case 1:
+                /* Authorization Accepted */
+                authorizationAccepted = true;
+                break;
+            case 2:
+                /* Authorization Denied */
+                authorizationDenied = true;
+                break;
+            default:
+                /* Authorization Request? */
+                authorizationRequest = true;
+                break;
         }
         super.setStatus(s);
     }
