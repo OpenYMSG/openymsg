@@ -30,231 +30,236 @@ import org.openymsg.network.FireEvent;
  */
 @SuppressWarnings("unused")
 public class SessionAdapter implements SessionListener {
-	public void fileTransferReceived(SessionFileTransferEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void fileTransferReceived(SessionFileTransferEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void connectionClosed(SessionEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void connectionClosed(SessionEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void listReceived(SessionListEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void listReceived(SessionListEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void messageReceived(SessionEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void messageReceived(SessionEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void buzzReceived(SessionEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void buzzReceived(SessionEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void offlineMessageReceived(SessionEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void offlineMessageReceived(SessionEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void errorPacketReceived(SessionErrorEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void errorPacketReceived(SessionErrorEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void inputExceptionThrown(SessionExceptionEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void inputExceptionThrown(SessionExceptionEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void newMailReceived(SessionNewMailEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void newMailReceived(SessionNewMailEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void notifyReceived(SessionNotifyEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void notifyReceived(SessionNotifyEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void contactRequestReceived(SessionEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void contactRequestReceived(SessionEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void contactRejectionReceived(SessionFriendRejectedEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void contactRejectionReceived(SessionFriendRejectedEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void conferenceInviteReceived(SessionConferenceEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void conferenceInviteReceived(SessionConferenceEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void conferenceInviteDeclinedReceived(SessionConferenceEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void conferenceInviteDeclinedReceived(SessionConferenceEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void conferenceLogonReceived(SessionConferenceEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void conferenceLogonReceived(SessionConferenceEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void conferenceLogoffReceived(SessionConferenceEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void conferenceLogoffReceived(SessionConferenceEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void conferenceMessageReceived(SessionConferenceEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void conferenceMessageReceived(SessionConferenceEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void friendsUpdateReceived(SessionFriendEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void friendsUpdateReceived(SessionFriendEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void friendAddedReceived(SessionFriendEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void friendAddedReceived(SessionFriendEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void friendRemovedReceived(SessionFriendEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void friendRemovedReceived(SessionFriendEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void groupRenameReceived(SessionGroupEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void groupRenameReceived(SessionGroupEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void chatJoinReceived(SessionChatEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void chatJoinReceived(SessionChatEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void chatExitReceived(SessionChatEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void chatExitReceived(SessionChatEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void chatMessageReceived(SessionChatEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void chatMessageReceived(SessionChatEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void chatUserUpdateReceived(SessionChatEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void chatUserUpdateReceived(SessionChatEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-	public void chatConnectionClosed(SessionEvent event) {
-		// override this function if you want to do something with it.
-	}
+  public void chatConnectionClosed(SessionEvent event) {
+    // override this function if you want to do something with it.
+  }
 
-    public void pictureReceived(SessionPictureEvent ev){}
-    public void authorizationReceived(SessionAuthorizationEvent ev){}
+  public void pictureReceived(SessionPictureEvent ev) {
+    // override this function if you want to do something with it.
+  }
 
-    // A chat captcha has been requested.
-	//   captchMessage - full message from captcha
-	//   captchaURL - captcha URL
-	//   lobby - YahooChatLobby connecting to
-	public void chatCaptchaReceived(SessionChatEvent ev){}
+  public void authorizationReceived(SessionAuthorizationEvent ev) {
+    // override this function if you want to do something with it.
+  }
 
-	/**
-	 * Dispatches an event immediately to all listeners, instead of queuing. it.
-	 * 
-	 * @param event
-	 *            The event to be dispatched.
-	 */
-	public void dispatch(FireEvent event) {
-		final SessionEvent ev = event.getEvent();
+  // A chat captcha has been requested.
+  //   captchMessage - full message from captcha
+  //   captchaURL - captcha URL
+  //   lobby - YahooChatLobby connecting to
+  public void chatCaptchaReceived(SessionChatEvent ev){}
 
-			switch (event.getType()) {
-			case LOGOFF:
-				connectionClosed(ev);
-				break;
-			case Y6_STATUS_UPDATE:
-				friendsUpdateReceived((SessionFriendEvent) ev);
-				break;
-			case MESSAGE:
-				messageReceived(ev);
-				break;
-			case X_OFFLINE:
-				offlineMessageReceived(ev);
-				break;
-			case NEWMAIL:
-				newMailReceived((SessionNewMailEvent) ev);
-				break;
-			case CONTACTNEW:
-				contactRequestReceived(ev);
-				break;
-			case CONFDECLINE:
-				conferenceInviteDeclinedReceived((SessionConferenceEvent) ev);
-				break;
-			case CONFINVITE:
-				conferenceInviteReceived((SessionConferenceEvent) ev);
-				break;
-			case CONFLOGON:
-				conferenceLogonReceived((SessionConferenceEvent) ev);
-				break;
-			case CONFLOGOFF:
-				conferenceLogoffReceived((SessionConferenceEvent) ev);
-				break;
-			case CONFMSG:
-				conferenceMessageReceived((SessionConferenceEvent) ev);
-				break;
-			case FILETRANSFER:
-				fileTransferReceived((SessionFileTransferEvent) ev);
-				break;
-			case NOTIFY:
-				notifyReceived((SessionNotifyEvent) ev);
-				break;
-			case LIST:
-				listReceived((SessionListEvent) ev);
-				break;
-			case FRIENDADD:
-				friendAddedReceived((SessionFriendEvent) ev);
-				break;
-			case FRIENDREMOVE:
-				friendRemovedReceived((SessionFriendEvent) ev);
-				break;
-			case GOTGROUPRENAME:
-				groupRenameReceived((SessionGroupEvent) ev);
-				break;
-			case CONTACTREJECT:
-				contactRejectionReceived((SessionFriendRejectedEvent) ev);
-				break;
-			case CHATJOIN:
-				chatJoinReceived((SessionChatEvent) ev);
-				break;
-			case CHATEXIT:
-				chatExitReceived((SessionChatEvent) ev);
-				break;
-			case CHATDISCONNECT:
-				chatConnectionClosed(ev);
-				break;
-			case CHATMSG:
-				chatMessageReceived((SessionChatEvent) ev);
-				break;
-			case X_CHATUPDATE:
-				chatUserUpdateReceived((SessionChatEvent) ev);
-				break;
-			case X_ERROR:
-				errorPacketReceived((SessionErrorEvent) ev);
-				break;
-			case X_EXCEPTION:
-				inputExceptionThrown((SessionExceptionEvent) ev);
-				break;
-			case X_BUZZ:
-				buzzReceived(ev);
-				break;
-			case LOGON:
-				logonReceived(ev);
-				break;
-            case X_CHATCAPTCHA:
-                chatCaptchaReceived((SessionChatEvent)ev);
-                break;
-            case PICTURE:
-                pictureReceived((SessionPictureEvent)ev);
-                break;
-            case Y7_AUTHORIZATION:
-                authorizationReceived((SessionAuthorizationEvent)ev);
-                break;
-			default:
-				throw new IllegalArgumentException(
-						"Don't know how to handle service type '"
-								+ event.getType() + "'");
-			}
-	}
+  /**
+   * Dispatches an event immediately to all listeners, instead of queuing. it.
+   * 
+   * @param event
+   *            The event to be dispatched.
+   */
+  public void dispatch(FireEvent event) {
+    final SessionEvent ev = event.getEvent();
 
-	/**
-	 * @param ev
-	 */
-	private void logonReceived(SessionEvent ev) {
-		// TODO Auto-generated method stub
-		
-	}
+      switch (event.getType()) {
+      case LOGOFF:
+        connectionClosed(ev);
+        break;
+      case Y6_STATUS_UPDATE:
+        friendsUpdateReceived((SessionFriendEvent) ev);
+        break;
+      case MESSAGE:
+        messageReceived(ev);
+        break;
+      case X_OFFLINE:
+        offlineMessageReceived(ev);
+        break;
+      case NEWMAIL:
+        newMailReceived((SessionNewMailEvent) ev);
+        break;
+      case CONTACTNEW:
+        contactRequestReceived(ev);
+        break;
+      case CONFDECLINE:
+        conferenceInviteDeclinedReceived((SessionConferenceEvent) ev);
+        break;
+      case CONFINVITE:
+        conferenceInviteReceived((SessionConferenceEvent) ev);
+        break;
+      case CONFLOGON:
+        conferenceLogonReceived((SessionConferenceEvent) ev);
+        break;
+      case CONFLOGOFF:
+        conferenceLogoffReceived((SessionConferenceEvent) ev);
+        break;
+      case CONFMSG:
+        conferenceMessageReceived((SessionConferenceEvent) ev);
+        break;
+      case FILETRANSFER:
+        fileTransferReceived((SessionFileTransferEvent) ev);
+        break;
+      case NOTIFY:
+        notifyReceived((SessionNotifyEvent) ev);
+        break;
+      case LIST:
+        listReceived((SessionListEvent) ev);
+        break;
+      case FRIENDADD:
+        friendAddedReceived((SessionFriendEvent) ev);
+        break;
+      case FRIENDREMOVE:
+        friendRemovedReceived((SessionFriendEvent) ev);
+        break;
+      case GOTGROUPRENAME:
+        groupRenameReceived((SessionGroupEvent) ev);
+        break;
+      case CONTACTREJECT:
+        contactRejectionReceived((SessionFriendRejectedEvent) ev);
+        break;
+      case CHATJOIN:
+        chatJoinReceived((SessionChatEvent) ev);
+        break;
+      case CHATEXIT:
+        chatExitReceived((SessionChatEvent) ev);
+        break;
+      case CHATDISCONNECT:
+        chatConnectionClosed(ev);
+        break;
+      case CHATMSG:
+        chatMessageReceived((SessionChatEvent) ev);
+        break;
+      case X_CHATUPDATE:
+        chatUserUpdateReceived((SessionChatEvent) ev);
+        break;
+      case X_ERROR:
+        errorPacketReceived((SessionErrorEvent) ev);
+        break;
+      case X_EXCEPTION:
+        inputExceptionThrown((SessionExceptionEvent) ev);
+        break;
+      case X_BUZZ:
+        buzzReceived(ev);
+        break;
+      case LOGON:
+        logonReceived(ev);
+        break;
+      case X_CHATCAPTCHA:
+        chatCaptchaReceived((SessionChatEvent)ev);
+        break;
+      case PICTURE:
+        pictureReceived((SessionPictureEvent)ev);
+        break;
+      case Y7_AUTHORIZATION:
+        authorizationReceived((SessionAuthorizationEvent)ev);
+        break;
+      default:
+        throw new IllegalArgumentException(
+            "Don't know how to handle service type '"
+                + event.getType() + "'");
+      }
+  }
+
+  /**
+   * @param ev
+   */
+  private void logonReceived(SessionEvent ev) {
+    // TODO Auto-generated method stub
+    
+  }
 }
