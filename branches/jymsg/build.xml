@@ -1,0 +1,41 @@
+<project name="jYMSG" default="all" basedir="./">
+	<description>jYMSG - the Java YMSG Instant Messaging API</description>
+	
+	<property name="release" value="v0_63"/>		<!-- API version -->
+	<property name="j_target" value="1.5"/>			<!-- Compile for 1.5 -->
+	
+	<property name="src" location="./src"/>			<!-- Root directory for the source code -->
+	<property name="build" location="./classes"/>	<!-- Build directory -->
+	<property name="dist" location="./classes"/>	<!-- Dump the Jars here -->
+	
+	<!-- Standard 'all' and 'clean' targets -->
+	<target name="all" depends="jars" description="Builds everything"/>
+	<target name="clean" description="Cleans previous build attempts">
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+	</target>
+	
+	<!-- TARGET: Initialise -->
+	<target name="init" description="Pre-build initializations">
+		<tstamp/>
+		<mkdir dir="${build}"/>
+	</target>	
+	<!-- TARGET: Compile code -->
+	<target name="network" depends="init" description="Compiles the protocol API">
+		<javac
+			srcdir="${src}/ymsg"
+			destdir="${build}"
+			source="${j_target}" 
+			debug="false" />
+		<copy 
+			file="${src}/ymsg/network/challenge.bin"
+			todir="${build}/ymsg/network" />		
+	</target>
+	<!-- TARGET: Jar -->
+	<target name="jars" depends="network" description="Builds the Jar files">
+		<jar
+			destfile="${dist}/ymsg_network_${release}.jar"
+			basedir="${build}"
+			includes="ymsg/network/** ymsg/support/**" />
+	</target>	
+</project>
