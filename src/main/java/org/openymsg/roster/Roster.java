@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.openymsg.network.ContactListType;
 import org.openymsg.network.FireEvent;
 import org.openymsg.network.FriendManager;
@@ -17,7 +18,6 @@ import org.openymsg.network.event.SessionEvent;
 import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.network.event.SessionListEvent;
 import org.openymsg.network.event.SessionListener;
-import org.openymsg.support.Logger;
 
 /**
  * A Roster object is a representation of the contact list of a particular user.
@@ -36,7 +36,7 @@ import org.openymsg.support.Logger;
  */
 public class Roster implements Set<YahooUser>, SessionListener {
 
-    private static final Logger log = Logger.getLogger(Roster.class);
+	private final static Logger Log = Logger.getLogger(Roster.class);
 
 	/**
 	 * The collection of RosterListener instances that will be notified of new
@@ -91,7 +91,7 @@ public class Roster implements Set<YahooUser>, SessionListener {
 			listeners.add(listener);
 		}
 
-		log.debug("Added new RosterListener.");
+		Log.debug("Added new RosterListener.");
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class Roster implements Set<YahooUser>, SessionListener {
 			listeners.remove(listener);
 		}
 
-		log.debug("Removed RosterListener.");
+		Log.debug("Removed RosterListener.");
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class Roster implements Set<YahooUser>, SessionListener {
 			rosterListener.rosterChanged(event);
 		}
 
-		log.trace("Broadcasted RosterEvent to " + copies.length
+		Log.trace("Broadcasted RosterEvent to " + copies.length
 				+ " listeners: " + event);
 	}
 
@@ -166,7 +166,7 @@ public class Roster implements Set<YahooUser>, SessionListener {
 					"The user to be added must have a valid, non-empty String ID field set.");
 		}
 		
-		log.trace("Adding new user: " + user);
+		Log.trace("Adding new user: " + user);
 		
 		// TODO : input validation on userId/groupId?
 		
@@ -210,16 +210,16 @@ public class Roster implements Set<YahooUser>, SessionListener {
 					"The user to be added must have a valid, non-empty String ID field set.");
 		}
 
-		log.trace("Adding new user: " + user);
+		Log.trace("Adding new user: " + user);
 
 		synchronized (usersById) {
 			if (usersById.containsKey(id)) {
-				log.debug("Roster already contained this userId "
+				Log.debug("Roster already contained this userId "
 						+ "(backend storage will not be updated): " + id);
 				return false;
 			}
 			usersById.put(id, user);
-			log.trace("Added new user: " + user);
+			Log.trace("Added new user: " + user);
 		}
 
 		// notify listeners.
@@ -255,10 +255,10 @@ public class Roster implements Set<YahooUser>, SessionListener {
 		final YahooUser user = (YahooUser) userObject;
 		
 		if (!contains(user)) {
-			log.trace("Cannot remove a user, because it's not on this roster: " + user);
+			Log.trace("Cannot remove a user, because it's not on this roster: " + user);
 			return false;
 		}
-		log.trace("Removing a user: " + user);
+		Log.trace("Removing a user: " + user);
 		
 		for(final String groupId : user.getGroupIds()) {
 			try {
@@ -290,16 +290,16 @@ public class Roster implements Set<YahooUser>, SessionListener {
 					"Argument 'userId' cannot be null or an empty String.");
 		}
 
-		log.trace("Removing user by userId: " + userId);
+		Log.trace("Removing user by userId: " + userId);
 		final YahooUser user;
 		synchronized (usersById) {
 			if (!usersById.containsKey(userId)) {
-				log.debug("Roster does not contain this userId "
+				Log.debug("Roster does not contain this userId "
 						+ "(backend storage will not be updated): " + userId);
 				return false;
 			}
 			user = usersById.remove(userId);
-			log.trace("Removed user: " + user);
+			Log.trace("Removed user: " + user);
 		}
 
 		// notify listeners.
@@ -351,7 +351,7 @@ public class Roster implements Set<YahooUser>, SessionListener {
 			usersById.put(userId, user);
 		}
 
-		log.trace("Updated user identified by userId: " + userId);
+		Log.trace("Updated user identified by userId: " + userId);
 
 		// notify listeners.
 		broadcastEvent(new RosterEvent(this, user, RosterEventType.update));
@@ -568,10 +568,10 @@ public class Roster implements Set<YahooUser>, SessionListener {
 		if (sType == ServiceType.LIST) {
 			final SessionListEvent lEvent = (SessionListEvent) sEvent;
 			if (lEvent.getType() != ContactListType.Friends) {
-				log.trace("Ignoring non-Friends list");
+				Log.trace("Ignoring non-Friends list");
 				return;
 			}
-			log.trace("Session just received the inital user list. "
+			Log.trace("Session just received the inital user list. "
 					+ "Initializing this roster, as triggered by: " + event);
 			final Set<YahooUser> contacts = lEvent.getContacts();
 			for (final YahooUser contact : contacts) {
@@ -585,26 +585,26 @@ public class Roster implements Set<YahooUser>, SessionListener {
 
 		switch (event.getType()) {
 		case FRIENDADD:
-			log.trace("Adding user to roster, as triggered by "
+			Log.trace("Adding user to roster, as triggered by "
 					+ "SessionFriendEvent: " + event);
 			syncedAdd(user);
 			break;
 
 		case CONTACTREJECT:
 		case FRIENDREMOVE:
-			log.trace("Removing user from roster as triggered by "
+			Log.trace("Removing user from roster as triggered by "
 					+ "SessionFriendEvent: " + event);
 			syncedRemove(user.getId());
 			break;
 
 		case Y6_STATUS_UPDATE:
-			log.trace("Updating user on roster as triggered by "
+			Log.trace("Updating user on roster as triggered by "
 					+ "SessionFriendEvent: " + event);
 			syncedUpdate(user.getId(), user);
 			break;
 
 		default:
-			log.info("Ignoring SessionFriendEvent that came"
+			Log.info("Ignoring SessionFriendEvent that came"
 					+ " with an unsupported ServiceType: " + event.getType());
 			break;
 		}

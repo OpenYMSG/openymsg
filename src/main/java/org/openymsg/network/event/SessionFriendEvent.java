@@ -30,13 +30,6 @@ import org.openymsg.network.YahooUser;
  */
 public class SessionFriendEvent extends SessionEvent {
 	protected final YahooUser user;
-    private String groupName = null;
-
-    public SessionFriendEvent(Object source, YahooUser user, String groupName)
-    {
-        this(source, user);
-        this.groupName = groupName;
-    }
 
 	public SessionFriendEvent(Object source, YahooUser user) {
 		super(source);
@@ -64,12 +57,4 @@ public class SessionFriendEvent extends SessionEvent {
 		sb.append(user.getId());
 		return sb.toString();
 	}
-
-    /**
-     * @return the groupName
-     */
-    public String getGroupName()
-    {
-        return groupName;
-    }
 }

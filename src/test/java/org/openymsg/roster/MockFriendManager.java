@@ -2,8 +2,8 @@ package org.openymsg.roster;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.openymsg.network.FriendManager;
-import org.openymsg.support.Logger;
 
 /**
  * Mock (empty) implementation of the FriendManager interface. Useful for unit

@@ -19,7 +19,6 @@
 package org.openymsg.network;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -111,18 +110,6 @@ public class YMSG9Packet {
 		}
 		return null;
 	}
-
-    public Collection<String[]> entries()
-    {
-        ArrayList<String[]> result = new ArrayList<String[]>();
-
-        for (int i = 0; i < body.length; i+=2)
-        {
-            result.add(new String[]{body[i], body[i + 1]});
-        }
-
-        return result;
-    }
 
 	boolean exists(String k) {
 		return (getValue(k) != null);

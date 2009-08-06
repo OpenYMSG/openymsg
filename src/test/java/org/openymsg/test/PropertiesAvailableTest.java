@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.junit.Test;
 
 /**
@@ -47,7 +48,7 @@ public class PropertiesAvailableTest {
 
 			final Properties log4j = new Properties();
 			log4j.load(ip);
-//			PropertyConfigurator.configure(log4j);
+			PropertyConfigurator.configure(log4j);
 			is.close();
 			ip.close();
 		} catch (ClassNotFoundException e) {

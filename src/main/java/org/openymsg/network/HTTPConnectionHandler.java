@@ -27,7 +27,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Queue;
-import org.openymsg.support.Logger;
+
+import org.apache.log4j.Logger;
 
 /**
  * 
@@ -35,8 +36,7 @@ import org.openymsg.support.Logger;
  * @author S.E. Morris
  */
 public class HTTPConnectionHandler extends ConnectionHandler {
-	private static final Logger log
-        = Logger.getLogger(HTTPConnectionHandler.class);
+	private static final Logger log = Logger.getLogger(HTTPConnectionHandler.class);
 	private final static long IDLE_TIMEOUT = 30 * 1000;
 
 	private static final String HTTP_HEADER_POST = "POST http://"

@@ -26,9 +26,7 @@ package org.openymsg.network;
  */
 public enum AuthenticationState {
 	BAD(13), // Bad login?
-    BAD2(29), // Bad login?
 	LOCKED(14), // You've been naughty
-    DUPLICATE_LOGIN(99),
 	BADUSERNAME(3); // Account unknown?
 
 	private long value;
