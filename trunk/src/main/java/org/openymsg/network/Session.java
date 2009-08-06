@@ -1510,7 +1510,7 @@ public class Session implements StatusConstants, FriendManager {
     body.addElement("334", "0");
     body.addElement("301", "319");
     body.addElement("303", "319");
-    body.addElement("241", "0");
+    // body.addElement("241", "0");
 
     sendPacket(body, ServiceType.FRIENDADD); // 0x83
   }
@@ -2994,7 +2994,7 @@ public class Session implements StatusConstants, FriendManager {
   protected void receiveList15(YMSG9Packet pkt)      // 0x55
   {
     String username = null;
-//    int protocol = 0;
+    // int protocol = 0;
     YahooGroup currentListGroup = null;
     ArrayList<YahooGroup> receivedGroups = new ArrayList<YahooGroup>();
 
@@ -3047,20 +3047,16 @@ public class Session implements StatusConstants, FriendManager {
           username = value;
           break;
         case 241: /* another protocol user */
-//          protocol = Integer.valueOf(value);
+          // protocol = Integer.valueOf(value);
           break;
         case 59: /* somebody told cookies come here too, but im not sure */
           break;
         case 317: /* Stealth Setting */
-//          stealth = Integer.valueOf(value);
+          // stealth = Integer.valueOf(value);
           break;
       }
     }
 
-    //groups = new YahooGroup[receivedGroups.size()];
-    //groups = (YahooGroup[]) receivedGroups.toArray(groups);
-
-    // -----If this was sent outside the login process is over, send an event
     if(usersOnFriendsList.size() > 0)
     {
       receivedListFired = true;
@@ -3206,6 +3202,7 @@ public class Session implements StatusConstants, FriendManager {
         final String to = pkt.getValue("5");
         final String from = pkt.getValue("4");
         final String message = pkt.getValue("14");
+        final String id = pkt.getValue("429");
 
         final SessionEvent se = new SessionEvent(this, to, from,
             message);
@@ -3213,6 +3210,21 @@ public class Session implements StatusConstants, FriendManager {
           eventDispatchQueue.append(se, ServiceType.X_BUZZ);
         } else {
           eventDispatchQueue.append(se, ServiceType.MESSAGE);
+        }
+
+        if (id != null) {
+          /* Send acknowledgement.  If we don't do this then the official
+           * Yahoo Messenger client for Windows will send us the same
+           * message 7 seconds later as an offline message.  This is true
+           * for at least version 9.0.0.2162 on Windows XP. */
+          PacketBodyBuffer body = new PacketBodyBuffer();
+          body.addElement("1", loginID.getId());
+          body.addElement("5", from);
+          body.addElement("302", "430");
+          body.addElement("430", id);
+          body.addElement("303", "430");
+          body.addElement("450", "0");
+          sendPacket(body, ServiceType.MESSAGE_ACK, status);
         }
       }
     } catch (Exception e) {
@@ -3304,7 +3316,8 @@ public class Session implements StatusConstants, FriendManager {
    */
   protected void sendPacket(PacketBodyBuffer body, ServiceType service,
       Status status) throws IOException {
-    log.trace("Sending packet on/to the network. SessionId[" + sessionId
+    log.trace("Sending packet on/to the network. SessionId[0x"
+        + Long.toHexString(sessionId)
         + "] ServiceType[" + service + "] Status[" + status + "] Body["
         + body + "]");
     network.sendPacket(body, service, status.getValue(), sessionId);
