@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import org.openymsg.addressBook.YahooAddressBookEntry;
 import org.openymsg.network.ContactListType;
 import org.openymsg.network.FireEvent;
 import org.openymsg.network.FriendManager;
@@ -49,6 +50,12 @@ public class Roster implements Set<YahooUser>, SessionListener {
 	 * by the value returned by {@link YahooUser.getId()}
 	 */
 	private final Map<String, YahooUser> usersById = new Hashtable<String, YahooUser>();
+
+	/**
+	 * A collection of all YahooUsers from address book. The YahooUsers are mapped
+	 * by the value returned by {@link YahooUser.getId()}
+	 */
+	private final Map<String, YahooAddressBookEntry> addressBookUsersById = new Hashtable<String, YahooAddressBookEntry>();
 
 	/**
 	 * Interface used to relay changes to the roster to the Yahoo network.
@@ -199,7 +206,7 @@ public class Roster implements Set<YahooUser>, SessionListener {
 	 *             if some aspect of the specified user prevents it from being
 	 *             added to this set.
 	 */
-	private boolean syncedAdd(final YahooUser user) {
+	private boolean syncedAdd(YahooUser user) {
 		if (user == null) {
 			throw new NullPointerException();
 		}
@@ -211,12 +218,16 @@ public class Roster implements Set<YahooUser>, SessionListener {
 		}
 
 		log.trace("Adding new user: " + user);
+		YahooAddressBookEntry addressBookEntry = this.addressBookUsersById.get(id);
 
 		synchronized (usersById) {
 			if (usersById.containsKey(id)) {
 				log.debug("Roster already contained this userId "
 						+ "(backend storage will not be updated): " + id);
 				return false;
+			}
+			if (addressBookEntry != null) {
+				user = this.createMergedUser(addressBookEntry, id, user);
 			}
 			usersById.put(id, user);
 			log.trace("Added new user: " + user);
@@ -327,7 +338,7 @@ public class Roster implements Set<YahooUser>, SessionListener {
 	 *             roster.
 	 * 
 	 */
-	private void syncedUpdate(final String userId, final YahooUser user) {
+	private void syncedUpdate(final String userId, YahooUser user) {
 		if (userId == null || userId.length() == 0) {
 			throw new IllegalArgumentException(
 					"Argument 'userId' cannot be null or an empty String.");
@@ -342,12 +353,16 @@ public class Roster implements Set<YahooUser>, SessionListener {
 					"The user object that is updated must have the same userId as provided in the userId argument (updating a userID is illegal).");
 		}
 
+		YahooAddressBookEntry addressBookEntry = this.addressBookUsersById.get(userId);
+
 		synchronized (usersById) {
 			if (!usersById.containsKey(userId)) {
 				throw new IllegalStateException(
 						"No user on roster with this id: " + userId);
 			}
-
+			if (addressBookEntry != null) {
+				user = this.createMergedUser(addressBookEntry, userId, user);
+			}
 			usersById.put(userId, user);
 		}
 
@@ -608,5 +623,47 @@ public class Roster implements Set<YahooUser>, SessionListener {
 					+ " with an unsupported ServiceType: " + event.getType());
 			break;
 		}
+	}
+
+	public void addOrUpdateAddressBook(YahooAddressBookEntry addressBookEntry) {
+		String userId = addressBookEntry.getId();
+		log.trace("Adding to address book: " + addressBookEntry);
+		synchronized (this.addressBookUsersById) {
+			this.addressBookUsersById.put(userId, addressBookEntry);
+		}
+		
+		boolean isUpdate = false;
+		YahooUser newUser = null;
+		synchronized (usersById) {
+			YahooUser user = usersById.get(userId);
+			if (user != null) {
+				isUpdate = true;
+				newUser = createMergedUser(addressBookEntry, userId, user);
+				log.trace("updated user with addressBook: " + user);
+				usersById.put(userId, newUser);
+			}
+		}
+
+		RosterEventType rosterType;
+		// notify listeners.
+		if (isUpdate) {
+			rosterType = RosterEventType.update;
+			broadcastEvent(new RosterEvent(this, newUser, rosterType));
+		}
+		log.trace("Done Adding to address book: " + addressBookEntry);
+	
+	}
+
+	private YahooUser createMergedUser(YahooAddressBookEntry addressBookEntry,
+			String userId, YahooUser user) {
+		YahooUser newUser;
+		Set<String> groupIds = user.getGroupIds();
+		String groupId = null;
+		if (groupIds != null && groupIds.size() != 0) {
+			groupId = groupIds.iterator().next();
+		}
+		newUser = new YahooUser(userId, groupId, addressBookEntry);
+		newUser.update(user.getStatus(), user.isOnChat(), user.isOnPager());
+		return newUser;
 	}
 }

@@ -34,7 +34,7 @@ import java.io.UnsupportedEncodingException;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-class PacketBodyBuffer {
+public class PacketBodyBuffer {
 	protected ByteArrayOutputStream baos;
 
 	private final static int[] SEPARATOR = { 0xc0, 0x80 }; // Yahoo separator
@@ -43,7 +43,7 @@ class PacketBodyBuffer {
 
 	private String charEncoding; // Character encoding
 
-	PacketBodyBuffer() {
+	public PacketBodyBuffer() {
 		baos = new ByteArrayOutputStream(1024); // 1K initial size
 		charEncoding = System.getProperty("openymsg.network.charEncoding",
 				"UTF-8");
@@ -68,7 +68,7 @@ class PacketBodyBuffer {
 	 * @throws IOException
 	 * @throws UnsupportedEncodingException
 	 */
-	void addElement(String key, String value)
+	public void addElement(String key, String value)
 			throws UnsupportedEncodingException, IOException {
 		addString(key);
 		addString(value);

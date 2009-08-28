@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.openymsg.addressBook.YahooAddressBookEntry;
+
 /**
  * This class represents a single canonical representation of a user on Yahoo.
  * <p>
@@ -94,6 +96,11 @@ public class YahooUser {
 	private long idleTime = -1;
 
 	/**
+	 * Information from the address book.  first name, last name, nick name
+	 */
+	private YahooAddressBookEntry addressBookEntry = YahooAddressBookEntry.EMPTY;
+
+	/**
 	 * Creates a new user in one particular group. Note that the fact that the
 	 * user is in a group indicates that this user is on our roster.
 	 * 
@@ -110,6 +117,10 @@ public class YahooUser {
 			groupIds.add(groupId);
 		}
 	}
+	public YahooUser(final String userId, final String groupId, YahooAddressBookEntry addressBookEntry) {
+		this(userId, groupId);
+		this.addressBookEntry = addressBookEntry;
+	}
 
 	/**
 	 * Creates a new anonymous user. This user is said to be anonymous, because
@@ -121,7 +132,12 @@ public class YahooUser {
 	 *            The ID of the user.
 	 */
 	public YahooUser(final String userId) {
-		this(userId, null);
+		this(userId, (String)null);
+	}
+
+	public YahooUser(final String userId, YahooAddressBookEntry addressBookEntry) {
+		this(userId);
+		this.addressBookEntry = addressBookEntry;
 	}
 
 	/**
@@ -350,7 +366,8 @@ public class YahooUser {
 		return "YahooUser [ID=" + userId + ", status=" + status.name()
 				+ ", ignored=" + ignored + ", stealthBlock=" + stealthBlocked
 				+ ", customStatusMessage=" + customStatusMessage
-				+ ", isFriend=" + isFriend() + "]";
+				+ ", isFriend=" + isFriend() 
+				+ ", ab=" + addressBookEntry + "]";
 	}
 
 	/*
@@ -426,4 +443,21 @@ public class YahooUser {
 			customStatus = null;
 		}
 	}
+	
+	public String getFirstName() {
+		return this.addressBookEntry.getFirstName();
+	}
+
+	public String getLastName() {
+		return this.addressBookEntry.getLastName();
+	}
+	
+	public String getNickName() {
+		return this.addressBookEntry.getNickName();
+	}
+	
+	public YahooAddressBookEntry getAddressBookEntry() {
+		return addressBookEntry;
+	}
+
 }

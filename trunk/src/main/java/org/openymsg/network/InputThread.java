@@ -37,7 +37,7 @@ import org.openymsg.support.Logger;
 public class InputThread extends Thread {
     private volatile boolean quit = false; // Exit run in J2 compliant way
 
-    private final Session parentSession;
+    protected final Session parentSession;
 
   private static final Logger log = Logger.getLogger(InputThread.class);
 
@@ -120,7 +120,12 @@ public class InputThread extends Thread {
         log.trace("Incoming packet: " + pkt);
         
         // Process payload
-        switch (pkt.service) {
+        processPayload(pkt);
+    }
+
+	protected void processPayload(YMSG9Packet pkt) throws IOException,
+			LoginRefusedException {
+		switch (pkt.service) {
         case ADDIGNORE:
             parentSession.receiveAddIgnore(pkt);
             break;
