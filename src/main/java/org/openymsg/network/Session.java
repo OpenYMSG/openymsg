@@ -45,6 +45,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.jdom.JDOMException;
+import org.openymsg.addressBook.BuddyListImport;
 import org.openymsg.network.challenge.ChallengeResponseV16;
 import org.openymsg.network.challenge.ChallengeResponseV10;
 import org.openymsg.network.challenge.ChallengeResponseV9;
@@ -124,9 +125,9 @@ public class Session implements StatusConstants, FriendManager {
 
   private TimerTask pingerTask;
 
-  private InputThread ipThread;
+  protected InputThread ipThread;
 
-  private EventDispatcher eventDispatchQueue;
+  protected EventDispatcher eventDispatchQueue;
 
   private YahooException loginException = null;
 
@@ -149,6 +150,9 @@ public class Session implements StatusConstants, FriendManager {
   private Set<SessionListener> sessionListeners = new HashSet<SessionListener>();
 
   private SessionPictureHandler pictureHandler = null;
+
+  /** Message number to be included in sending a message */
+  private int messageNumber;
 
   private static final Logger log = Logger.getLogger(Session.class);
 
@@ -375,9 +379,9 @@ public class Session implements StatusConstants, FriendManager {
    * @throws IllegalStateException
    * @throws IOException
    */
-  public void sendMessage(String to, String message)
+  public String sendMessage(String to, String message)
       throws IllegalStateException, IOException {
-    sendMessage(to, message, loginID);
+    return sendMessage(to, message, loginID);
   }
 
   /**
@@ -393,7 +397,7 @@ public class Session implements StatusConstants, FriendManager {
    * @throws IOException
    * @throws IllegalIdentityException
    */
-  public void sendMessage(String to, String message, YahooIdentity yid)
+  public String sendMessage(String to, String message, YahooIdentity yid)
       throws IllegalStateException, IOException, IllegalIdentityException {
     checkStatus();
 
@@ -402,7 +406,7 @@ public class Session implements StatusConstants, FriendManager {
           + yid.getId()
           + "'is not a valid identity for this session.");
     }
-    transmitMessage(to, yid, message);
+    return transmitMessage(to, yid, message);
   }
 
   /**
@@ -1663,7 +1667,7 @@ public class Session implements StatusConstants, FriendManager {
    * @param msg
    *      the text of the message
    */
-  protected void transmitMessage(String to, YahooIdentity yid, String msg)
+  protected String transmitMessage(String to, YahooIdentity yid, String msg)
       throws IOException {
     if (to == null || to.length() == 0) {
       throw new IllegalArgumentException(
@@ -1674,9 +1678,11 @@ public class Session implements StatusConstants, FriendManager {
       throw new IllegalArgumentException("Argument 'yid' cannot be null.");
     }
 
+    String messageNumberString = buildMessageNumber();
     // Send packet
     PacketBodyBuffer body = new PacketBodyBuffer();
-    body.addElement("0", primaryID.getId()); // From (primary ID)
+    // don't need this in 16
+//    body.addElement("0", primaryID.getId()); // From (primary ID)
     body.addElement("1", yid.getId()); // From (effective ID)
     body.addElement("5", to); // To
     body.addElement("14", msg); // Message
@@ -1685,11 +1691,32 @@ public class Session implements StatusConstants, FriendManager {
       body.addElement("97", "1");
     body.addElement("63", ";" + imvironment); // Not supported here!
     body.addElement("64", "0");
+    body.addElement("206", "0");
+    body.addElement("429", messageNumberString);
+    body.addElement("450", "0");
     sendPacket(body, ServiceType.MESSAGE, Status.OFFLINE); // 0x06
+    return messageNumberString;
   }
+
+	private String buildMessageNumber() {
+		String blankMessageNumber = "0000000000000000";
+	    String messageNumber = "" + this.messageNumber++;
+	    messageNumber = blankMessageNumber.substring(0, blankMessageNumber.length() - messageNumber.length()) + messageNumber;
+		return messageNumber;
+	}
 
   /**
    * notify to friend the typing start or end action
+   * message parameters
+   * 	Version: 16
+   * 	Service: Notify (75)
+   * 	Status: Notify (22)
+   * 
+   * 	49: TYPING
+   * 	1: userId
+   * 	14: <empty>
+   * 	13: 1 or 0
+   * 	5: sendingToId
    * 
    * @param friend
    *      user whose sending message
@@ -1720,6 +1747,8 @@ public class Session implements StatusConstants, FriendManager {
   protected void transmitNotify(String friend, String yid, boolean on,
       String msg, String mode) throws IOException {
     final PacketBodyBuffer body = new PacketBodyBuffer();
+    //Added 1 for is typing, not sure we need the "4"
+    body.addElement("1", yid);
     body.addElement("4", yid);
     body.addElement("5", friend);
     body.addElement("14", msg);
@@ -1729,6 +1758,8 @@ public class Session implements StatusConstants, FriendManager {
       body.addElement("13", "0");
     }
     body.addElement("49", mode);
+    //added for is typing
+    body.addElement("241", "0");
     sendPacket(body, ServiceType.NOTIFY, Status.TYPING); // 0x4b
   }
 
@@ -1868,6 +1899,17 @@ public class Session implements StatusConstants, FriendManager {
     {
       transmitAuthResp(s[0], s[1], null);
     }
+    loadAddressBook(s);
+  }
+
+  private void loadAddressBook(String[] sessionCookies) {
+	  log.trace("loadAddressBook");
+	  BuddyListImport buddyListImport = new BuddyListImport(roster, sessionCookies);
+	  try {
+		buddyListImport.process(loginID.getId(), password);
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
   }
 
   private String[] yahooAuth16Stage1(String seed)
@@ -3342,13 +3384,17 @@ public class Session implements StatusConstants, FriendManager {
     // Open the socket, create input and output streams
     network.open();
     // Create a thread to handle input from network
-    ipThread = new InputThread(this);
-    ipThread.start();
+    initThread();
     // Add a TimerTask to periodically send ping packets for our connection
     pingerTask = new SessionPinger(this);
     SCHEDULED_PINGER_SERVICE.schedule(pingerTask,
         NetworkConstants.PING_TIMEOUT_IN_SECS * 1000,
         NetworkConstants.PING_TIMEOUT_IN_SECS * 1000);
+  }
+
+  protected void initThread() {
+	  ipThread = new InputThread(this);
+	  ipThread.start();
   }
 
   /**

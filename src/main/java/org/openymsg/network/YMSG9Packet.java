@@ -78,7 +78,7 @@ public class YMSG9Packet {
 	}
 
 	// Returns the first value of field of type k
-	String getValue(String k) {
+	public String getValue(String k) {
 		return getNthValue(k, 0);
 	}
 
