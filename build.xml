@@ -1,7 +1,7 @@
 <project name="jYMSG" default="all" basedir="./">
 	<description>jYMSG - the Java YMSG Instant Messaging API</description>
 	
-	<property name="release" value="v0_65"/>		<!-- API version -->
+	<property name="release" value="v0_66"/>		<!-- API version -->
 	<property name="j_target" value="1.5"/>			<!-- Compile for 1.5 -->
 	
 	<property name="src" location="./src"/>			<!-- Root directory for the source code -->
