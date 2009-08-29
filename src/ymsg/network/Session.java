@@ -349,6 +349,7 @@ public class Session implements StatusConstants, ServiceConstants, NetworkConsta
     public YahooGroup[] getGroups() { return (YahooGroup[])groups.clone(); }
     public Hashtable getUsers() { return (Hashtable)userStore.getUsers().clone(); }
     public YahooUser getUser(String id) { return userStore.get(id); }
+    public YahooUser addUserbyID(String id) { return userStore.getOrCreate(id); }
 
     // -----------------------------------------------------------------
     // General accessors
