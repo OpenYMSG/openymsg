@@ -2464,8 +2464,8 @@ public class Session implements StatusConstants, ServiceConstants, NetworkConsta
                     body.addElement("430", id);
                     body.addElement("303", "430");
                     body.addElement("450", "0");
-                    sendPacket(body, SERVICE_MESSAGE, status);
-                  }
+                    sendPacket(body, SERVICE_MESSAGE_ACK, status);
+                }
 
             }
         }catch(Exception e) { throw new YMSG9BadFormatException("message",false,e); }
