@@ -184,8 +184,8 @@ public class Roster implements Set<YahooUser>, SessionListener {
 				throw new RuntimeException("Unexpected exception.", ex);
 			}
 		}
-
-		return syncedAdd(user);
+		return true;
+//		return syncedAdd(user);  //add user when getting the ack
 	}
 
 	/**
@@ -278,7 +278,8 @@ public class Roster implements Set<YahooUser>, SessionListener {
 				throw new RuntimeException("Unexpected exception.", ex);
 			}
 		}
-		return syncedRemove(user.getId());
+		return true;
+//		return syncedRemove(user.getId()); // remover user when getting the ack
 	}
 
 	/**

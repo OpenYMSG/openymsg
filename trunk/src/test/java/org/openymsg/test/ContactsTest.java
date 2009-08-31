@@ -27,13 +27,13 @@ public class ContactsTest extends YahooTestAbstract {
 
 	@Test
 	public void testAddContact() throws Exception {
-		removeAllContacts(sess1);
-		removeAllContacts(sess2);
+		removeAllContacts(sess1, listener1);
 		
 		if (!sess1.getRoster().isEmpty()) {
 			throw new IllegalStateException("Test setup problem. Roster1 should have been emptied by now.");
 		}
 
+		removeAllContacts(sess2, listener2);
 		if (!sess2.getRoster().isEmpty()) {
 			throw new IllegalStateException("Test setup problem. Roster2 should have been emptied by now.");
 		}
@@ -66,9 +66,9 @@ public class ContactsTest extends YahooTestAbstract {
 		drain();
 
 		sess1.getRoster().add(new YahooUser(OTHERUSR, "group"));
-		FireEvent event = listener2.waitForEvent(5, ServiceType.CONTACTNEW);
+		FireEvent event = listener2.waitForEvent(5, ServiceType.Y7_AUTHORIZATION);
 		assertNotNull(event);
-		assertEquals(event.getType(), ServiceType.CONTACTNEW);
+		assertEquals(event.getType(), ServiceType.Y7_AUTHORIZATION);
 		assertEquals(event.getEvent().getFrom(), USERNAME);
 		event = listener1.waitForEvent(5, ServiceType.FRIENDADD);
 		assertEquals(event.getType(), ServiceType.FRIENDADD);
@@ -77,12 +77,12 @@ public class ContactsTest extends YahooTestAbstract {
 
 	@Test
 	public void testRejectContact() throws IOException, InterruptedException {
-		removeAllContacts(sess1);
+		removeAllContacts(sess1, listener1);
 		sess1.getRoster().add(new YahooUser(OTHERUSR, "group"));
 //		assertNotNull(listener1.waitForEvent(5, ServiceType.FRIENDADD));
 		Thread.sleep(500);
 		
-		final FireEvent event = listener2.waitForEvent(5, ServiceType.CONTACTNEW);
+		final FireEvent event = listener2.waitForEvent(5, ServiceType.Y7_AUTHORIZATION);
 		assertNotNull(event);
 		
 		sess2.rejectContact(event.getEvent(), "i don't want you");

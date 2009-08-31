@@ -4,9 +4,12 @@
 package org.openymsg.test;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.openymsg.network.FireEvent;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.Session;
 import org.openymsg.network.SessionState;
@@ -19,7 +22,6 @@ import org.openymsg.roster.Roster;
  * 
  */
 public class YahooTestAbstract {
-
 	protected static final String CHATMESSAGE = "CHATMESSAGE";
 
 	protected static final String USERNAME = PropertiesAvailableTest
@@ -55,8 +57,8 @@ public class YahooTestAbstract {
 			sess2.addSessionListener(listener2);
 			listener1.waitForEvent(2, ServiceType.LOGON);
 			listener2.waitForEvent(2, ServiceType.LOGON);
-			removeAllContacts(sess1);
-			removeAllContacts(sess2);
+			removeAllContacts(sess1, listener1);
+			removeAllContacts(sess2, listener2);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			throw e;
@@ -68,11 +70,13 @@ public class YahooTestAbstract {
 	 */
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		removeAllContacts(sess1);
+		
+		removeAllContacts(sess1, listener1);
 		if (sess1.getSessionStatus() == SessionState.LOGGED_ON) {
 			sess1.logout();
 		}
 
+		removeAllContacts(sess2, listener2);
 		if (sess2.getSessionStatus() == SessionState.LOGGED_ON) {
 			sess2.logout();
 		}
@@ -84,15 +88,23 @@ public class YahooTestAbstract {
 	 * 
 	 * @throws IOException
 	 */
-	protected static void removeAllContacts(Session sess) {
+	protected static void removeAllContacts(Session sess, WaitListener listener) {
 		drain();
+
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		final Roster roster = sess.getRoster();
 		
-		for (final YahooUser user : roster) {
-			// TODO: Set#remove() in a for-each loop? :S
+		List<YahooUser> oldRoster = new ArrayList<YahooUser>(roster);
+				
+		for (final YahooUser user : oldRoster) {
 			roster.remove(user);
-			listener1.waitForEvent(5, ServiceType.FRIENDREMOVE);
+			FireEvent event = listener.waitForEvent(5, ServiceType.FRIENDREMOVE);
 		}
 	}
 

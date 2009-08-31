@@ -59,7 +59,7 @@ public class SessionPinger extends TimerTask {
 		try {
 			session.transmitKeepAlive();
 		} catch (IOException ex) {
-			log.error("Could not send keep-alive!", ex);
+			log.error("Could not send keep-alive to: " + session.getSessionID(), ex);
 		}
 	}
 }
