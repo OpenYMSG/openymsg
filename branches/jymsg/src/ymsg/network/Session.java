@@ -2437,16 +2437,36 @@ public class Session implements StatusConstants, ServiceConstants, NetworkConsta
                 }
             }
             else                                // Sent while we are online
-            {   SessionEvent se = new SessionEvent
+            {   
+            	String from = pkt.getValue("4");
+            	SessionEvent se = new SessionEvent
                 (   this,
                     pkt.getValue("5"),                      // to
-                    pkt.getValue("4"),                      // from
+                    from,                                   // from
                     pkt.getValue("14")                      // message
                 );
                 if(se.getMessage().equalsIgnoreCase(BUZZ))
                     new FireEvent().fire(se,SERVICE_X_BUZZ);
                 else
                     new FireEvent().fire(se,SERVICE_MESSAGE);
+
+                String id = pkt.getValue("429");
+
+                if (id != null) {
+                    /* Send acknowledgement.  If we don't do this then the official
+                     * Yahoo Messenger client for Windows will send us the same
+                     * message 7 seconds later as an offline message.  This is true
+                     * for at least version 9.0.0.2162 on Windows XP. */
+                    PacketBodyBuffer body = new PacketBodyBuffer();
+                    body.addElement("1", loginID);
+                    body.addElement("5", from);
+                    body.addElement("302", "430");
+                    body.addElement("430", id);
+                    body.addElement("303", "430");
+                    body.addElement("450", "0");
+                    sendPacket(body, SERVICE_MESSAGE, status);
+                  }
+
             }
         }catch(Exception e) { throw new YMSG9BadFormatException("message",false,e); }
     }

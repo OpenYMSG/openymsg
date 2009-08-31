@@ -9,6 +9,8 @@ public interface ServiceConstants
     public final static int SERVICE_IDLE            = 0x05;
 
     public final static int SERVICE_MESSAGE         = 0x06;
+    public final static int SERVICE_MESSAGE_ACK     = 0xfb;
+
 
     public final static int SERVICE_IDACT           = 0x07;
     public final static int SERVICE_IDDEACT         = 0x08;
