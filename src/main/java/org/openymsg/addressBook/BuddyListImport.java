@@ -84,7 +84,7 @@ public class BuddyListImport {
 		
 							//get the employee element
 							Element el = (Element)nl.item(i);
-							log.trace("ct element: " + el);
+//							log.trace("ct element: " + el);
 							//get the Employee object
 							YahooAddressBookEntry user = getContact(el);
 							//add it to list
@@ -117,7 +117,7 @@ public class BuddyListImport {
 		String groupName = getTextValue(empEl, "li");
 		
 		YahooAddressBookEntry user = new YahooAddressBookEntry(id, firstName, lastName, nickName, groupName);
-		log.trace("firstname: " + firstName + ", lastname: " + lastName + ", nickname: " + nickName + ", groupName: " + groupName);
+//		log.trace("firstname: " + firstName + ", lastname: " + lastName + ", nickname: " + nickName + ", groupName: " + groupName);
 
 		return user;
 	}

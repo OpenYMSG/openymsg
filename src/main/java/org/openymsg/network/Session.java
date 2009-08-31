@@ -1379,7 +1379,7 @@ public class Session implements StatusConstants, FriendManager {
     if(msg != null)
       body.addElement("14", msg);
 
-    sendPacket(body,ServiceType.Y7_AUTHORIZATION);  // 0xd6
+    sendPacket(body,ServiceType.Y7_AUTHORIZATION, Status.AVAILABLE);  // 0xd6
   }
 
   protected void transmitAcceptBuddy(String friend, String yid)
@@ -1389,7 +1389,7 @@ public class Session implements StatusConstants, FriendManager {
       body.addElement("1" ,yid);
       body.addElement("5" ,friend);
       body.addElement("13", "1");// Accept Authorization
-      sendPacket(body, ServiceType.Y7_AUTHORIZATION);   // 0xd6
+      sendPacket(body, ServiceType.Y7_AUTHORIZATION, Status.AVAILABLE);   // 0xd6, 
   }
 
   /**
@@ -1504,17 +1504,19 @@ public class Session implements StatusConstants, FriendManager {
     checkStatus();
 
     PacketBodyBuffer body = new PacketBodyBuffer();
-    body.addElement("14", "");
-    body.addElement("65", groupId);
-    body.addElement("97", "1");
     body.addElement("1", primaryID.getId());  // ???: effective id?
     body.addElement("302", "319");
     body.addElement("300", "319");
     body.addElement("7", userId);
-    body.addElement("334", "0");
+    body.addElement("241", "0"); // for ack
     body.addElement("301", "319");
     body.addElement("303", "319");
-    // body.addElement("241", "0");
+    body.addElement("65", groupId);
+    body.addElement("14", "");
+    body.addElement("216", "");
+    body.addElement("254", "");
+    body.addElement("97", "1");
+//    body.addElement("334", "0"); not used in 16
 
     sendPacket(body, ServiceType.FRIENDADD); // 0x83
   }
@@ -1556,6 +1558,7 @@ public class Session implements StatusConstants, FriendManager {
     final PacketBodyBuffer body = new PacketBodyBuffer();
     body.addElement("1", primaryID.getId()); // ???: effective id?
     body.addElement("7", friendId);
+    body.addElement("241", "0"); // for ack
     body.addElement("65", groupId);
     sendPacket(body, ServiceType.FRIENDREMOVE); // 0x84
   }
@@ -2641,27 +2644,36 @@ public class Session implements StatusConstants, FriendManager {
   {
       try
       {
-          if(pkt.length <= 0)
-            return;
+          if(pkt.length <= 0) {
+              return;
+          }
+          
+    	  if (pkt.status == 1) { // it is an ack
+    		  log.trace("Received ack for Y7_AUTHORIZATION");
+    	  }
+    	  else {
+    		  if (pkt.status != 3) {
+    			  log.warn("Status should be 3 for authorization request");
+    		  }
+              String who, msg, fname, lname, id;
 
-          String who, msg, fname, lname, id;
+              who = pkt.getValue("4");
+              msg = pkt.getValue("14");
+              fname = pkt.getValue("216");
+              lname = pkt.getValue("254");
+              id = pkt.getValue("5");
 
-          who = pkt.getValue("4");
-          msg = pkt.getValue("14");
-          fname = pkt.getValue("216");
-          lname = pkt.getValue("254");
-          id = pkt.getValue("5");
-
-          SessionAuthorizationEvent se = new SessionAuthorizationEvent(this, id,
-              who, fname, lname, msg);
-          /**
-           pkt.status:
-             1 - Authorization Accepted
-             2 - Authorization Denied
-             3 - Authorization Request
-          */
-          se.setStatus(pkt.status);
-          eventDispatchQueue.append(se, ServiceType.Y7_AUTHORIZATION);
+              SessionAuthorizationEvent se = new SessionAuthorizationEvent(this, id,
+                  who, fname, lname, msg);
+              /**
+               pkt.status:
+                 1 - Authorization Accepted
+                 2 - Authorization Denied
+                 3 - Authorization Request
+              */
+              se.setStatus(pkt.status);
+              eventDispatchQueue.append(se, ServiceType.Y7_AUTHORIZATION);
+    	  }
 
       } catch(Exception e) {
           throw new YMSG9BadFormatException("contact request", pkt, e);
@@ -2710,14 +2722,25 @@ public class Session implements StatusConstants, FriendManager {
   protected void receiveFriendAdd(YMSG9Packet pkt) // 0x83
   {
     try {
-      // Sometimes, a status update arrives before the FRIENDADD
-      // confirmation. If that's the case, we'll already have this contact
-      // on our roster.
-      final String userId = pkt.getValue("7");
-      // String status = pkt.getValue("66"),
-      final String groupName = pkt.getValue("65");
-      final YahooUser user = new YahooUser(userId, groupName);
+      String userId = null;
+      String groupName = null;
+      YahooUser user = null;
+      if (pkt.status == 1) { //status 1 is an ack
+  	      userId = pkt.getValue("7");
+	      groupName = pkt.getValue("65");
+	      user = new YahooUser(userId, groupName);
+      }
+      else {
+    
+		  // Sometimes, a status update arrives before the FRIENDADD
+		  // confirmation. If that's the case, we'll already have this contact
+		  // on our roster.
+		  userId = pkt.getValue("7");
+		  // String status = pkt.getValue("66"),
+		  groupName = pkt.getValue("65");
+		  user = new YahooUser(userId, groupName);
 
+      }
       // Fire event : 7=friend, 66=status, 65=group name
       final SessionFriendEvent se = new SessionFriendEvent(this, user, groupName);
       eventDispatchQueue.append(se, ServiceType.FRIENDADD);
@@ -2733,20 +2756,31 @@ public class Session implements StatusConstants, FriendManager {
    */
   protected void receiveFriendRemove(YMSG9Packet pkt) // 0x84
   {
+    String userId = null;
+    String groupName = null;
+    YahooUser user = null;
     try {
-      final String userId = pkt.getValue("7");
-      // TODO: if this is a request to remove a user from one particular
-      // group, and that same user exists in another group, this might go
-      // terribly wrong...
-      final String groupName = pkt.getValue("65");
-
-      final YahooUser user = roster.getUser(userId);
-
-      if (user == null) {
-        log.info("Unable to remove a user that's not on the roster: "
-            + userId);
-        return;
-      }
+    	if (pkt.status == 1) { //status 1 is an ack
+  	      userId = pkt.getValue("7");
+	      groupName = pkt.getValue("65");
+	      user = roster.getUser(userId);
+	      user = new YahooUser(userId);
+    	}
+    	else {
+	      userId = pkt.getValue("7");
+	      // TODO: if this is a request to remove a user from one particular
+	      // group, and that same user exists in another group, this might go
+	      // terribly wrong...
+	      groupName = pkt.getValue("65");
+	
+	      user = roster.getUser(userId);
+	
+	      if (user == null) { 
+	        log.info("Unable to remove a user that's not on the roster: "
+	            + userId);
+	        return;
+	      }
+    	}
       // Fire event : 7=friend, 66=status, 65=group name
       SessionFriendEvent se = new SessionFriendEvent(this, user, groupName);
       eventDispatchQueue.append(se, ServiceType.FRIENDREMOVE);

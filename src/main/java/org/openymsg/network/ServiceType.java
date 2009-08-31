@@ -30,7 +30,7 @@ public enum ServiceType {
     /**
      * receive 'addFriend' command by an other user
      */
-    FRIENDADD(0x83),
+    FRIENDADD(0x83), //131 - Add Buddy
     ADDIDENT(0x10),
     ADDIGNORE(0x11),
     AUDIBLE(0xd0),
@@ -61,7 +61,7 @@ public enum ServiceType {
     CONTACTNEW(0xf),
     CONTACTREJECT(0x86),
     FILETRANSFER(0x46),
-    FRIENDREMOVE(0x84),
+    FRIENDREMOVE(0x84), //132
     GAME_INVITE(0xb7),
     GAMELOGOFF(0x29),
     GAMELOGON(0x28),
@@ -113,9 +113,9 @@ public enum ServiceType {
     X_EXCEPTION(0xf02),
     X_OFFLINE(0xf01),
     Y6_STATUS_UPDATE(0xc6),
-    STATUS_15(0xf0),
+    STATUS_15(0xf0), //240
     Y6_VISIBLE_TOGGLE(0xc5), 
-    Y7_AUTHORIZATION(0xd6),
+    Y7_AUTHORIZATION(0xd6), //214 - Y7 Buddy Authorization
     Y7_CHANGE_GROUP(0xe7), 
     Y7_CHAT_SESSION(0xd4),
     Y7_CONTACT_DETAILS(0xd3),
