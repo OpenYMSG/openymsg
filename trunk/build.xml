@@ -72,7 +72,7 @@
 
 	<!-- TARGET: Jars -->
 	<target name="jars" depends="compile-tests" description="Builds the Jar file.">
-		<jar destfile="${dist}/openymsg_${release}.jar" basedir="${build}" includes="org/openymsg/network/**,org/openymsg/roster/**,org/openymsg/support/**,*" excludes="support,resources"/>
+		<jar destfile="${dist}/openymsg_${release}.jar" basedir="${build}" includes="org/openymsg/addressBook/**,org/openymsg/network/**,org/openymsg/roster/**,org/openymsg/support/**,*" excludes="support,resources"/>
 		<jar destfile="${dist}/openymsg_test_${release}.jar" basedir="${build}" includes="org/openymsg/test/**"/>
 	</target>
 
