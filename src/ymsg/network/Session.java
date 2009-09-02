@@ -239,7 +239,9 @@ public class Session implements StatusConstants, ServiceConstants, NetworkConsta
 
     public synchronized void setStatus(long s)
     throws IllegalArgumentException,IOException
-    {   if(sessionStatus==UNSTARTED && !(s==STATUS_AVAILABLE || s==STATUS_INVISIBLE))
+    {   
+//    	System.out.println(this.loginID + "Status is: " + s);
+    	if(sessionStatus==UNSTARTED && !(s==STATUS_AVAILABLE || s==STATUS_INVISIBLE))
             throw new IllegalArgumentException("Unstarted sessions can be available or invisible only");
         if(s==STATUS_CUSTOM)
             throw new IllegalArgumentException("Cannot set custom state without message");
@@ -1016,18 +1018,23 @@ public class Session implements StatusConstants, ServiceConstants, NetworkConsta
     // group - Group to add it to
     // -----------------------------------------------------------------
     protected void transmitFriendAdd(String friend,String group) throws IOException
-    {   PacketBodyBuffer body = new PacketBodyBuffer();
-        body.addElement("14" ,"");
-        body.addElement("65",group);
-        body.addElement("97" ,"1");
+    {   
+    	if (friend.contains("id=")) {
+    		friend = friend.substring(3, friend.indexOf(" "));
+    	}
+    	PacketBodyBuffer body = new PacketBodyBuffer();
         body.addElement("1" ,primaryID);    // ???: effective id?
-        body.addElement("302" ,"319");
-        body.addElement("300" ,"319");
-        body.addElement("7" ,friend);
-//        body.addElement("334" ,"0");
-        body.addElement("301" ,"319");
-        body.addElement("303" ,"319");
-//        body.addElement("241" ,"0");
+        body.addElement("302", "319");
+        body.addElement("300", "319");
+        body.addElement("7", friend);
+        body.addElement("241", "0"); // for ack
+        body.addElement("301", "319");
+        body.addElement("303", "319");
+        body.addElement("65", group);
+        body.addElement("14", "");
+        body.addElement("216", "");
+        body.addElement("254", "");
+        body.addElement("97", "1");
 
         sendPacket(body,SERVICE_FRIENDADD);                 // 0x83
     }
@@ -1039,7 +1046,11 @@ public class Session implements StatusConstants, ServiceConstants, NetworkConsta
     // group - Group to remove it from
     // -----------------------------------------------------------------
     protected void transmitFriendRemove(String friend,String group) throws IOException
-    {   PacketBodyBuffer body = new PacketBodyBuffer();
+    {   
+    	if (friend.contains("id=")) {
+    		friend = friend.substring(3, friend.indexOf(" "));
+    	}
+    	PacketBodyBuffer body = new PacketBodyBuffer();
         body.addElement("1" ,primaryID);    // ???: effective id?
         body.addElement("7" ,friend);
         body.addElement("65",group);
@@ -1095,19 +1106,23 @@ public class Session implements StatusConstants, ServiceConstants, NetworkConsta
     // packet!  Comes in two flavours: custom message and regular
     // -----------------------------------------------------------------
     protected void transmitIsAway() throws IOException
-    {   PacketBodyBuffer body = new PacketBodyBuffer();
+    {   //System.out.println(this.loginID + "transmitIsAway");
+        PacketBodyBuffer body = new PacketBodyBuffer();
         body.addElement("10",status+"");
 //        sendPacket(body,SERVICE_ISAWAY,status);             // 0x03
+	    body.addElement("138", "");
         sendPacket(body,SERVICE_Y6_STATUS_UPDATE,status);
     }
 
     protected void transmitIsAway(String msg,boolean a) throws IOException
-    {   PacketBodyBuffer body = new PacketBodyBuffer();
+    {   //System.out.println(this.loginID + "transmitIsAway: " + msg + "/" + a);    
+        PacketBodyBuffer body = new PacketBodyBuffer();
         status=STATUS_CUSTOM;
         body.addElement("10",status+"");
         body.addElement("19",msg);
         if(a) body.addElement("47","1");  // 1=away
             else body.addElement("47","0");  // 0=back
+	    body.addElement("138", "");
 //        sendPacket(body,SERVICE_ISAWAY,status);             // 0x03
         sendPacket(body,SERVICE_Y6_STATUS_UPDATE,status);
     }
@@ -1120,9 +1135,11 @@ public class Session implements StatusConstants, ServiceConstants, NetworkConsta
     // AVAILABLE and INVISIBLE.
     // -----------------------------------------------------------------
     protected void transmitIsBack() throws IOException
-    {   PacketBodyBuffer body = new PacketBodyBuffer();
-        body.addElement("10",status+"");
-        sendPacket(body,SERVICE_ISBACK,status);             // 0x04
+    {       	System.out.println(this.loginID + "transmitIsBack");
+    		PacketBodyBuffer body = new PacketBodyBuffer();
+    	    body.addElement("10", status + "");
+    	    body.addElement("138", "");
+        sendPacket(body,SERVICE_Y6_STATUS_UPDATE,status);             // 0x04
     }
 
     // -----------------------------------------------------------------
