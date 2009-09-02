@@ -188,6 +188,7 @@ implements NetworkConstants
 			ops.write(b,0,b.length);
 			// -----Now send the buffer
 //            ops.flush();
+//			System.out.println("message: " + new String(b));
 //System.out.println("eeeeeeeeeeeee " + new String(b1.toByteArray()));
 //            this.ops.write(b1.toByteArray());
             ops.flush();
