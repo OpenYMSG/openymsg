@@ -1,24 +1,16 @@
 package org.openymsg.roster;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-
 import org.openymsg.addressBook.YahooAddressBookEntry;
-import org.openymsg.network.ContactListType;
-import org.openymsg.network.FireEvent;
-import org.openymsg.network.FriendManager;
-import org.openymsg.network.ServiceType;
-import org.openymsg.network.YahooUser;
+import org.openymsg.network.*;
 import org.openymsg.network.event.SessionEvent;
 import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.network.event.SessionListEvent;
 import org.openymsg.network.event.SessionListener;
 import org.openymsg.support.Logger;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A Roster object is a representation of the contact list of a particular user.
@@ -49,7 +41,7 @@ public class Roster implements Set<YahooUser>, SessionListener {
 	 * A collection of all YahooUsers on the roster. The YahooUsers are mapped
 	 * by the value returned by {@link YahooUser.getId()}
 	 */
-	private final Map<String, YahooUser> usersById = new Hashtable<String, YahooUser>();
+	private final Map<String, YahooUser> usersById = new ConcurrentHashMap<String, YahooUser>();
 
 	/**
 	 * A collection of all YahooUsers from address book. The YahooUsers are mapped
