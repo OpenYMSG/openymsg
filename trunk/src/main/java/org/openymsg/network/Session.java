@@ -784,11 +784,11 @@ public class Session implements StatusConstants, FriendManager {
       transmitRejectBuddy(friend, ev.getTo(), msg);
   }
 
-  public void acceptFriendAuthorization(SessionAuthorizationEvent ev, String friend)
+  public void acceptFriendAuthorization(String friend)
     throws IllegalStateException, IOException
   {
     checkStatus();
-    transmitAcceptBuddy(friend, ev.getTo());
+    transmitAcceptBuddy(friend);
   }
 
 
@@ -1382,11 +1382,11 @@ public class Session implements StatusConstants, FriendManager {
     sendPacket(body,ServiceType.Y7_AUTHORIZATION, Status.AVAILABLE);  // 0xd6
   }
 
-  protected void transmitAcceptBuddy(String friend, String yid)
+  protected void transmitAcceptBuddy(String friend)
     throws IOException
   {
       PacketBodyBuffer body = new PacketBodyBuffer();
-      body.addElement("1" ,yid);
+      body.addElement("1" ,primaryID.getId());
       body.addElement("5" ,friend);
       body.addElement("13", "1");// Accept Authorization
       sendPacket(body, ServiceType.Y7_AUTHORIZATION, Status.AVAILABLE);   // 0xd6, 
@@ -1751,17 +1751,17 @@ public class Session implements StatusConstants, FriendManager {
       String msg, String mode) throws IOException {
     final PacketBodyBuffer body = new PacketBodyBuffer();
     //Added 1 for is typing, not sure we need the "4"
+    body.addElement("49", mode);
     body.addElement("1", yid);
-    body.addElement("4", yid);
-    body.addElement("5", friend);
+//    body.addElement("4", yid);
     body.addElement("14", msg);
     if (on) {
       body.addElement("13", "1");
     } else {
       body.addElement("13", "0");
     }
-    body.addElement("49", mode);
-    //added for is typing
+    body.addElement("5", friend);
+      //added for is typing
     body.addElement("241", "0");
     sendPacket(body, ServiceType.NOTIFY, Status.TYPING); // 0x4b
   }
@@ -2725,12 +2725,18 @@ public class Session implements StatusConstants, FriendManager {
       String userId = null;
       String groupName = null;
       YahooUser user = null;
+      String friendAddStatus = pkt.getValue("66");
+      if (!"0".equals(friendAddStatus)) {
+    	  log.warn("Friend add status is not 0: " + friendAddStatus);
+      }
+    		  
       if (pkt.status == 1) { //status 1 is an ack
   	      userId = pkt.getValue("7");
 	      groupName = pkt.getValue("65");
 	      user = new YahooUser(userId, groupName);
       }
       else {
+    	  log.warn("Friend add is not an ack: " + pkt.status);
     
 		  // Sometimes, a status update arrives before the FRIENDADD
 		  // confirmation. If that's the case, we'll already have this contact
