@@ -214,7 +214,7 @@ public class YahooUser {
 	 * @param status
 	 *            A custom status.
 	 */
-	void setCustom(final String message, final String status) {
+	public void setCustom(final String message, final String status) {
 		customStatusMessage = message;
 		customStatus = status;
 	}
