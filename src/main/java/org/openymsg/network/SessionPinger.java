@@ -19,6 +19,7 @@
 package org.openymsg.network;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.TimerTask;
 import org.openymsg.support.Logger;
 
@@ -59,7 +60,14 @@ public class SessionPinger extends TimerTask {
 		try {
 			session.transmitKeepAlive();
 		} catch (IOException ex) {
-			log.error("Could not send keep-alive to: " + session.getSessionID(), ex);
+			log.error("Could not send keep-alive to: " + session.getSessionID() + "/" + session.getLoginID(), ex);
+			if (ex instanceof SocketException) {
+				log.error("Logging out due to socket exception: " + session.getSessionID() + "/" + session.getLoginID(), ex);
+				try {
+					this.session.logout();
+				} catch (Exception e) {
+				}
+			}
 		}
 	}
 }

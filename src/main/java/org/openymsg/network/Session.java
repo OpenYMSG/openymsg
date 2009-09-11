@@ -354,6 +354,17 @@ public class Session implements StatusConstants, FriendManager {
       closeSession();
     }
   }
+  
+  void forceCloseSession() throws IOException {
+    sessionStatus = SessionState.UNSTARTED;
+    cachePacket = null;
+    try {
+        network.close();
+    } catch (IOException e) {
+	} finally {
+        closeSession();
+    }
+  }
 
   /**
    * Reset a failed session, so the session object can be used again (for all
@@ -2651,31 +2662,32 @@ public class Session implements StatusConstants, FriendManager {
           }
           
     	  if (pkt.status == 1) { // it is an ack
-    		  log.trace("Received ack for Y7_AUTHORIZATION");
+    		  log.trace("Accepted authorization");
     	  }
-    	  else {
-    		  if (pkt.status != 3) {
-    			  log.warn("Status should be 3 for authorization request");
-    		  }
-              String who, msg, fname, lname, id;
-
-              who = pkt.getValue("4");
-              msg = pkt.getValue("14");
-              fname = pkt.getValue("216");
-              lname = pkt.getValue("254");
-              id = pkt.getValue("5");
-
-              SessionAuthorizationEvent se = new SessionAuthorizationEvent(this, id,
-                  who, fname, lname, msg);
-              /**
-               pkt.status:
-                 1 - Authorization Accepted
-                 2 - Authorization Denied
-                 3 - Authorization Request
-              */
-              se.setStatus(pkt.status);
-              eventDispatchQueue.append(se, ServiceType.Y7_AUTHORIZATION);
+    	  else if (pkt.status == 2) {
+    		  log.warn("Denied authorization request");
     	  }
+    	  else if (pkt.status == 3) {
+    		  log.warn("received authorization request");
+    	  }
+          String who, msg, fname, lname, id;
+
+          who = pkt.getValue("4");
+          msg = pkt.getValue("14");
+          fname = pkt.getValue("216");
+          lname = pkt.getValue("254");
+          id = pkt.getValue("5");
+
+          SessionAuthorizationEvent se = new SessionAuthorizationEvent(this, id,
+              who, fname, lname, msg);
+          /**
+           pkt.status:
+             1 - Authorization Accepted
+             2 - Authorization Denied
+             3 - Authorization Request
+          */
+          se.setStatus(pkt.status);
+          eventDispatchQueue.append(se, ServiceType.Y7_AUTHORIZATION);
 
       } catch(Exception e) {
           throw new YMSG9BadFormatException("contact request", pkt, e);
@@ -2731,27 +2743,29 @@ public class Session implements StatusConstants, FriendManager {
       if (!"0".equals(friendAddStatus)) {
     	  log.warn("Friend add status is not 0: " + friendAddStatus);
       }
-    		  
+
+	  userId = pkt.getValue("7");
+	  groupName = pkt.getValue("65");
+
       if (pkt.status == 1) { //status 1 is an ack
-  	      userId = pkt.getValue("7");
-	      groupName = pkt.getValue("65");
-	      user = new YahooUser(userId, groupName);
+    	  String something = pkt.getValue("223");
+    	  log.info("Friend add is an ack: " + pkt.status + "/"+ userId + "/"
+    			  + friendAddStatus + "/" + something);
+//  	      userId = pkt.getValue("7");
+//	      groupName = pkt.getValue("65");
+//	      user = new YahooUser(userId, groupName);
       }
       else {
-    	  log.warn("Friend add is not an ack: " + pkt.status);
+    	  log.info("Friend add accepted: " + pkt.status);
     
 		  // Sometimes, a status update arrives before the FRIENDADD
 		  // confirmation. If that's the case, we'll already have this contact
 		  // on our roster.
-		  userId = pkt.getValue("7");
-		  // String status = pkt.getValue("66"),
-		  groupName = pkt.getValue("65");
 		  user = new YahooUser(userId, groupName);
-
+	      // Fire event : 7=friend, 66=status, 65=group name
+	      final SessionFriendEvent se = new SessionFriendEvent(this, user, groupName);
+	      eventDispatchQueue.append(se, ServiceType.FRIENDADD);
       }
-      // Fire event : 7=friend, 66=status, 65=group name
-      final SessionFriendEvent se = new SessionFriendEvent(this, user, groupName);
-      eventDispatchQueue.append(se, ServiceType.FRIENDADD);
     } catch (Exception e) {
       throw new YMSG9BadFormatException("friend added", pkt, e);
     }
@@ -3457,12 +3471,15 @@ public class Session implements StatusConstants, FriendManager {
     }
 
     // If the network is open, close it
-    network.close();
+    try {
+		network.close();
+	} finally {
+	    if (eventDispatchQueue != null) {
+	        eventDispatchQueue.kill();
+	        eventDispatchQueue = null;
+	    }
+	}
 
-    if (eventDispatchQueue != null) {
-      eventDispatchQueue.kill();
-      eventDispatchQueue = null;
-    }
   }
 
   /**
@@ -3819,4 +3836,8 @@ public class Session implements StatusConstants, FriendManager {
   public Roster getRoster() {
     return roster;
   }
+
+	public YahooIdentity getLoginID() {
+		return loginID;
+	}
 }
