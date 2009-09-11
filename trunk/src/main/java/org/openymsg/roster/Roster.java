@@ -656,7 +656,14 @@ public class Roster implements Set<YahooUser>, SessionListener {
 			groupId = groupIds.iterator().next();
 		}
 		newUser = new YahooUser(userId, groupId, addressBookEntry);
-		newUser.update(user.getStatus(), user.isOnChat(), user.isOnPager());
+		Status status = user.getStatus();
+		String customMessage = user.getCustomStatusMessage();
+		String customStatus = user.getCustomStatus();
+		newUser.update(status, user.isOnChat(), user.isOnPager()); 
+		if (status.equals(Status.CUSTOM)) {
+			newUser.setCustom(customMessage, customStatus);
+		}
+        
 		return newUser;
 	}
 }

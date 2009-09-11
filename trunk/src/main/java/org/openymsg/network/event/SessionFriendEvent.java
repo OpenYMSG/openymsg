@@ -29,6 +29,7 @@ import org.openymsg.network.YahooUser;
  * @author S.E. Morris
  */
 public class SessionFriendEvent extends SessionEvent {
+	private static final long serialVersionUID = -3163616489244193645L;
 	protected final YahooUser user;
     private String groupName = null;
 

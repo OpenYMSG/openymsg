@@ -1388,7 +1388,9 @@ public class Session implements StatusConstants, FriendManager {
       PacketBodyBuffer body = new PacketBodyBuffer();
       body.addElement("1" ,primaryID.getId());
       body.addElement("5" ,friend);
+      body.addElement("241", "0");
       body.addElement("13", "1");// Accept Authorization
+      body.addElement("334", "");
       sendPacket(body, ServiceType.Y7_AUTHORIZATION, Status.AVAILABLE);   // 0xd6, 
   }
 
