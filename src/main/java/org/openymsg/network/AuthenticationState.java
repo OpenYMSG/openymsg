@@ -29,7 +29,8 @@ public enum AuthenticationState {
     BAD2(29), // Bad login?
 	LOCKED(14), // You've been naughty
     DUPLICATE_LOGIN(99),
-	BADUSERNAME(3); // Account unknown?
+	BADUSERNAME(3), // Account unknown?
+	UNKNOWN_52(52); // don't know
 
 	private long value;
 
