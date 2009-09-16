@@ -6,6 +6,7 @@
 
 	<!-- Compile for 1.5 -->
 	<property name="j_target" value="1.5"/>
+	<property name="gen_db" value="on"/>
 
 	<!-- Root directory for the source code -->
 	<property name="src.base" location="${basedir}/src"/>
