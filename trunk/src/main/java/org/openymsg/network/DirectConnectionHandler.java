@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 
+import org.openymsg.support.Logger;
+
 /**
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
@@ -41,6 +43,8 @@ public class DirectConnectionHandler extends ConnectionHandler {
 	private YMSG9InputStream ips; // For receiving messages
 
 	private DataOutputStream ops; // For sending messages
+
+	private static final Logger log = Logger.getLogger(DirectConnectionHandler.class);
 
 	public DirectConnectionHandler(String h, int p) {
 		host = h;
@@ -103,6 +107,9 @@ public class DirectConnectionHandler extends ConnectionHandler {
 			}
 		}
 
+		log.info("Source socket: " + socket.getLocalSocketAddress() + 
+				" yahoo socket: " + socket.getInetAddress() + 
+				":" + this.socket.getPort());
 		ips = new YMSG9InputStream(socket.getInputStream());
 		ops = new DataOutputStream(new BufferedOutputStream(socket
 				.getOutputStream()));

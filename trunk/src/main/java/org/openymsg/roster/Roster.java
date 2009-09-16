@@ -570,6 +570,7 @@ public class Roster implements Set<YahooUser>, SessionListener {
 		final ServiceType sType = event.getType();
 		if (!(sEvent instanceof SessionFriendEvent)
 				&& sType != ServiceType.LIST) {
+			log.trace("Ignoring non-list");
 			return;
 		}
 

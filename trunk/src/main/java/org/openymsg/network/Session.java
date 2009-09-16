@@ -344,12 +344,9 @@ public class Session implements StatusConstants, FriendManager {
    * @throws IOException
    */
   public synchronized void logout() throws IllegalStateException, IOException {
-    checkStatus();
-    sessionStatus = SessionState.UNSTARTED;
-    cachePacket = null;
     try {
+      checkStatus();
       transmitLogoff();
-      network.close();
     } finally {
       closeSession();
     }
@@ -2139,6 +2136,9 @@ public class Session implements StatusConstants, FriendManager {
           log.info("AUTHRESP says: authentication failed!",
               loginException);
           break;
+        case UNKNOWN_52:
+            log.info("AUTHRESP says: authentication failed with unknown: " + AuthenticationState.UNKNOWN_52,
+                    loginException);
         }
       }
     } catch (IllegalArgumentException ex) {
@@ -2740,8 +2740,9 @@ public class Session implements StatusConstants, FriendManager {
       String groupName = null;
       YahooUser user = null;
       String friendAddStatus = pkt.getValue("66");
+      String myName = pkt.getValue("1");
       if (!"0".equals(friendAddStatus)) {
-    	  log.warn("Friend add status is not 0: " + friendAddStatus);
+    	  log.warn("Me: " + myName + " Friend add status is not 0: " + friendAddStatus);
       }
 
 	  userId = pkt.getValue("7");
@@ -2749,14 +2750,34 @@ public class Session implements StatusConstants, FriendManager {
 
       if (pkt.status == 1) { //status 1 is an ack
     	  String something = pkt.getValue("223");
-    	  log.info("Friend add is an ack: " + pkt.status + "/"+ userId + "/"
-    			  + friendAddStatus + "/" + something);
+    	  String protocol = pkt.getValue("241");
+    	  log.trace("Me: " + myName + " Friend add is an ack: " + pkt.status + 
+    			  "/" + userId + ", error code: " + friendAddStatus + ", unknown: " 
+    			  + something + ", protocol: "+ protocol);
+    	  if (friendAddStatus.equals("0")) {
+    		  log.info("Me: " + myName + " friend added: " + userId + ", unknown: " 
+    				  + something + ", protocol: " + protocol);
+    	  }
+    	  else if (friendAddStatus.equals("2")) {
+    		  log.info("Me: " + myName + " friend already in list: " + userId 
+    				  + ", unknown: " + something + ", protocol: " + protocol);
+    	  }
+    	  else if (friendAddStatus.equals("3")) {
+    		  log.info("Me: " + myName + " friend does not exist in yahoo: " + userId 
+    				  + ", unknown: " + something + ", protocol: " + protocol);
+    	  }
+    	  else {
+    		  log.warn("Me: " + myName + " problem adding friend: " + userId 
+    				  + ", unknown: " + something + ", protocol: " + protocol 
+    				  + ", error code: " + friendAddStatus);
+    	  }
+
 //  	      userId = pkt.getValue("7");
 //	      groupName = pkt.getValue("65");
 //	      user = new YahooUser(userId, groupName);
       }
       else {
-    	  log.info("Friend add accepted: " + pkt.status);
+    	  log.info("Me: " + myName + " Friend add accepted: " + pkt.status);
     
 		  // Sometimes, a status update arrives before the FRIENDADD
 		  // confirmation. If that's the case, we'll already have this contact
@@ -3098,7 +3119,10 @@ public class Session implements StatusConstants, FriendManager {
 
     Set<YahooUser> usersOnFriendsList = new HashSet<YahooUser>();
     Set<YahooUser> usersOnIgnoreList = new HashSet<YahooUser>();
+    Set<YahooUser> usersOnPendingList = new HashSet<YahooUser>();
 
+    boolean isPending = false;
+    
     Iterator<String[]> iter = pkt.entries().iterator();
     while (iter.hasNext()) {
       String[] s = iter.next();
@@ -3120,20 +3144,28 @@ public class Session implements StatusConstants, FriendManager {
         case 301:
           /* This is 319 before all s/n's in a group after the first. It is followed by an identical 300. */
           if (username != null) {
+        	YahooUser yu = null;
             if (currentListGroup != null) {
               /* This buddy is in a group */
-              YahooUser yu = new YahooUser(username, currentListGroup.getName());
+              yu = new YahooUser(username, currentListGroup.getName());
               usersOnFriendsList.add(yu);
               currentListGroup.addUser(yu);
             }
             else {
               /* This buddy is on the ignore list (and therefore in no group) */
-              YahooUser yu = new YahooUser(username);
+              yu = new YahooUser(username);
               yu.setIgnored(true);
               usersOnIgnoreList.add(yu);
             }
+            if (isPending) {
+              usersOnPendingList.add(yu);
+            }
             username = null;
+            isPending = false;
           }
+          break;
+        case 223: /* Pending add user request */
+          isPending = true;
           break;
         case 300: /* This is 318 before a group, 319 before any s/n in a group, and 320 before any ignored s/n. */
           break;
@@ -3155,7 +3187,7 @@ public class Session implements StatusConstants, FriendManager {
       }
     }
 
-    if(usersOnFriendsList.size() > 0)
+    if(!usersOnFriendsList.isEmpty())
     {
       receivedListFired = true;
       eventDispatchQueue.append(new SessionListEvent(this,
@@ -3163,10 +3195,17 @@ public class Session implements StatusConstants, FriendManager {
         ServiceType.LIST);
     }
 
-    if(usersOnIgnoreList.size() > 0)
+    if(!usersOnIgnoreList.isEmpty())
     {
       eventDispatchQueue.append(new SessionListEvent(this,
         ContactListType.Ignored, usersOnIgnoreList),
+        ServiceType.LIST);
+    }
+
+    if(!usersOnPendingList.isEmpty())
+    {
+      eventDispatchQueue.append(new SessionListEvent(this,
+        ContactListType.Pending, usersOnPendingList),
         ServiceType.LIST);
     }
 
@@ -3202,6 +3241,7 @@ public class Session implements StatusConstants, FriendManager {
       // Is this packet about us, or one of our online friends?
       if (!pkt.exists("7")) // About us
       {
+      	log.info("Logging of because I received a logoff");
         // Note: when this method returns, the input thread loop
         // which called it exits.
         sessionStatus = SessionState.UNSTARTED;
@@ -3458,6 +3498,7 @@ public class Session implements StatusConstants, FriendManager {
    */
   private void closeSession() throws IOException {
     // Close the input thread (unless ipThread itself is calling us)
+    sessionStatus = SessionState.UNSTARTED;
     if (ipThread != null && Thread.currentThread() != ipThread) {
       ipThread.stopMe();
       ipThread.interrupt();

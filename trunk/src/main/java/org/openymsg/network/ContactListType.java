@@ -21,4 +21,9 @@ public enum ContactListType {
 	 * People that the user does not want to hear from.
 	 */
 	Ignored,
+
+	/**
+	 * People that the user had not accepted add request.
+	 */
+	Pending,
 }
