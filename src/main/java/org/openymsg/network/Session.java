@@ -64,6 +64,7 @@ import org.openymsg.network.event.SessionFriendRejectedEvent;
 import org.openymsg.network.event.SessionGroupEvent;
 import org.openymsg.network.event.SessionListEvent;
 import org.openymsg.network.event.SessionListener;
+import org.openymsg.network.event.SessionLogoutEvent;
 import org.openymsg.network.event.SessionNewMailEvent;
 import org.openymsg.network.event.SessionNotifyEvent;
 import org.openymsg.network.event.SessionPictureEvent;
@@ -2092,6 +2093,7 @@ public class Session implements StatusConstants, FriendManager {
   protected void receiveAuthResp(YMSG9Packet pkt) // 0x54
   {
     log.trace("Received AUTHRESP packet.");
+    SessionLogoutEvent sessionEvent = null;
     try {
       if (pkt.exists("66")) {
         final long l = Long.parseLong(pkt.getValue("66"));
@@ -2108,6 +2110,7 @@ public class Session implements StatusConstants, FriendManager {
               + loginID + " has been locked out", u);
           log.info("AUTHRESP says: authentication failed!",
               loginException);
+          sessionEvent = new SessionLogoutEvent(AuthenticationState.LOCKED);
           break;
 
         // Bad login (password?)
@@ -2118,6 +2121,7 @@ public class Session implements StatusConstants, FriendManager {
               AuthenticationState.BAD);
           log.info("AUTHRESP says: authentication failed!",
               loginException);
+          sessionEvent = new SessionLogoutEvent(AuthenticationState.BAD);
           break;
 
         // unknown account?
@@ -2127,6 +2131,7 @@ public class Session implements StatusConstants, FriendManager {
               AuthenticationState.BADUSERNAME);
           log.info("AUTHRESP says: authentication failed!",
               loginException);
+          sessionEvent = new SessionLogoutEvent(AuthenticationState.BADUSERNAME);
           break;
         //You have been logged out of the yahoo service, possibly due to a duplicate login.
         case DUPLICATE_LOGIN:
@@ -2135,10 +2140,15 @@ public class Session implements StatusConstants, FriendManager {
               AuthenticationState.DUPLICATE_LOGIN);
           log.info("AUTHRESP says: authentication failed!",
               loginException);
+          sessionEvent = new SessionLogoutEvent(AuthenticationState.DUPLICATE_LOGIN);
           break;
         case UNKNOWN_52:
             log.info("AUTHRESP says: authentication failed with unknown: " + AuthenticationState.UNKNOWN_52,
                     loginException);
+            loginException = new LoginRefusedException("User "
+                    + loginID + " was forced off",
+                    AuthenticationState.UNKNOWN_52);
+            sessionEvent = new SessionLogoutEvent(AuthenticationState.UNKNOWN_52);
         }
       }
     } catch (IllegalArgumentException ex) {
@@ -2150,7 +2160,7 @@ public class Session implements StatusConstants, FriendManager {
       ipThread.stopMe();
       // Notify login() calling thread of failure
       sessionStatus = SessionState.FAILED;
-            eventDispatchQueue.append(ServiceType.LOGOFF);
+      eventDispatchQueue.append(sessionEvent, ServiceType.LOGOFF);
     }
   }
 
