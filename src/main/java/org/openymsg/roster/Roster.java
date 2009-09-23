@@ -570,7 +570,7 @@ public class Roster implements Set<YahooUser>, SessionListener {
 		final ServiceType sType = event.getType();
 		if (!(sEvent instanceof SessionFriendEvent)
 				&& sType != ServiceType.LIST) {
-			log.trace("Ignoring non-list");
+			log.trace("Ignoring non-list: " + event);
 			return;
 		}
 
@@ -592,6 +592,9 @@ public class Roster implements Set<YahooUser>, SessionListener {
 		final SessionFriendEvent fEvent = (SessionFriendEvent) sEvent;
 		final YahooUser user = fEvent.getUser();
 
+		if (fEvent.isFailure()) {
+			return;
+		}
 		switch (event.getType()) {
 		case FRIENDADD:
 			log.trace("Adding user to roster, as triggered by "

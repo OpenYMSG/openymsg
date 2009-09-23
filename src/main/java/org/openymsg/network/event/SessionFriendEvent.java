@@ -73,4 +73,9 @@ public class SessionFriendEvent extends SessionEvent {
     {
         return groupName;
     }
+    
+    public boolean isFailure() 
+    {
+    	return false;
+    }
 }

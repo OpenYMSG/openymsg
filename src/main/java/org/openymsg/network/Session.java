@@ -60,6 +60,7 @@ import org.openymsg.network.event.SessionEvent;
 import org.openymsg.network.event.SessionExceptionEvent;
 import org.openymsg.network.event.SessionFileTransferEvent;
 import org.openymsg.network.event.SessionFriendEvent;
+import org.openymsg.network.event.SessionFriendFailureEvent;
 import org.openymsg.network.event.SessionFriendRejectedEvent;
 import org.openymsg.network.event.SessionGroupEvent;
 import org.openymsg.network.event.SessionListEvent;
@@ -1399,7 +1400,7 @@ public class Session implements StatusConstants, FriendManager {
       body.addElement("5" ,friend);
       body.addElement("241", "0");
       body.addElement("13", "1");// Accept Authorization
-      body.addElement("334", "");
+//      body.addElement("334", ""); not therein v16
       sendPacket(body, ServiceType.Y7_AUTHORIZATION, Status.AVAILABLE);   // 0xd6, 
   }
 
@@ -2781,6 +2782,15 @@ public class Session implements StatusConstants, FriendManager {
     				  + ", unknown: " + something + ", protocol: " + protocol 
     				  + ", error code: " + friendAddStatus);
     	  }
+    	  user = this.roster.getUser(userId);
+    	  if (user == null) {
+    		  user = new YahooUser(userId, groupName);
+    	  }
+    	  else if (!friendAddStatus.equals("2")){
+    		  log.warn("Adding friend failed and friend is in our roster: " + userId);
+    	  }
+	      final SessionFriendEvent se = new SessionFriendFailureEvent(this, user, groupName, friendAddStatus);
+	      eventDispatchQueue.append(se, ServiceType.FRIENDADD);
 
 //  	      userId = pkt.getValue("7");
 //	      groupName = pkt.getValue("65");
@@ -2792,7 +2802,10 @@ public class Session implements StatusConstants, FriendManager {
 		  // Sometimes, a status update arrives before the FRIENDADD
 		  // confirmation. If that's the case, we'll already have this contact
 		  // on our roster.
-		  user = new YahooUser(userId, groupName);
+    	  user = this.roster.getUser(userId);
+    	  if (user == null) {
+    		  user = new YahooUser(userId, groupName);
+    	  }
 	      // Fire event : 7=friend, 66=status, 65=group name
 	      final SessionFriendEvent se = new SessionFriendEvent(this, user, groupName);
 	      eventDispatchQueue.append(se, ServiceType.FRIENDADD);
