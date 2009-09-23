@@ -114,20 +114,27 @@ public class EventDispatcher extends Thread {
 
 			while (!queue.isEmpty()) {
 				final FireEvent event = queue.remove(0);
-				if (event == null) {
-					continue;
-				}
-
-				try {
-					for (final SessionListener l : session
-							.getSessionListeners()) {
-						l.dispatch(event);
-					}
-				} catch (RuntimeException ex) {
-					log.error("error during the dispatch of event: " + event,
-							ex);
-				}
+                runEventNOW(event);
 			}
 		}
 	}
+
+    /**
+     * Do not use this directly unless you need it out of sequence or to run w/o an event queue.
+     * @param event to run
+     */
+    public void runEventNOW(final FireEvent event) {
+        if (event == null) {
+            return;
+        }
+
+        try {
+            for (final SessionListener l : session
+                    .getSessionListeners()) {
+                l.dispatch(event);
+            }
+        } catch (RuntimeException ex) {
+            log.error("error during the dispatch of event: " + event, ex);
+        }
+    } // runEventNOW
 }
