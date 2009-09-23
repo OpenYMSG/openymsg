@@ -434,9 +434,23 @@ public class YahooUser {
 	 */
 	public void update(Status newStatus, boolean newOnChat, boolean newOnPager) {
 		// This is the old version, when 13=pager and 17=chat
-		this.status = newStatus;
+		update(newStatus);
+		
 		this.onChat = newOnChat;
 		this.onPager = newOnPager;
+	}
+	
+	/**
+	 * Updates the YahooUser with the new values.  This method should be
+	 * called in cases when no chat or pager information was provided 
+	 * (presumed that these values don't change in this case)
+	 * 
+	 * @param newStatus
+	 *            replacement for current Status value
+	 */
+	public void update(Status newStatus) {
+		// This is the old version, when 13=pager and 17=chat
+		this.status = newStatus;
 
 		if (this.status != Status.CUSTOM) {
 			customStatusMessage = null;

@@ -3679,8 +3679,8 @@ public class Session implements StatusConstants, FriendManager {
         user.update(newStatus, visibility);
       }
       else {
-        // No chat, nor pager information.
-        user.update(newStatus, false, false);
+        // No chat, nor pager information, so leave those values alone and just update status.
+        user.update(newStatus);
       }
 
       // Custom message?
