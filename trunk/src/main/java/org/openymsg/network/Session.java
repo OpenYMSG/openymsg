@@ -3527,6 +3527,7 @@ public class Session implements StatusConstants, FriendManager {
 	} finally {
 	    if (eventDispatchQueue != null) {
 	        eventDispatchQueue.kill();
+            eventDispatchQueue.runEventNOW(new FireEvent(null, ServiceType.LOGOFF));
 	        eventDispatchQueue = null;
 	    }
 	}

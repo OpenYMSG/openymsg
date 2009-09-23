@@ -61,10 +61,11 @@ public class SessionPinger extends TimerTask {
 			session.transmitKeepAlive();
 		} catch (IOException ex) {
 			if (ex instanceof SocketException) {
-				log.error("Logging out due to socket exception: " + session.getSessionID() + "/" + session.getLoginID());
+				log.info("Logging out due to socket exception: " + session.getSessionID() + "/" + session.getLoginID());
 				try {
 					this.session.forceCloseSession();
 				} catch (Exception e) {
+                    log.error("Failed to close session: " + session.getSessionID() + "/" + session.getLoginID(), e);
 				}
 			}
 			else 
