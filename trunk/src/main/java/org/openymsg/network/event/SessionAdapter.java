@@ -102,6 +102,10 @@ public class SessionAdapter implements SessionListener {
     // override this function if you want to do something with it.
   }
 
+  public void friendsUpdateFailureReceived(SessionFriendFailureEvent event) {
+	// override this function if you want to do something with it.
+  }
+
   public void friendAddedReceived(SessionFriendEvent event) {
     // override this function if you want to do something with it.
   }
@@ -201,7 +205,13 @@ public class SessionAdapter implements SessionListener {
         listReceived((SessionListEvent) ev);
         break;
       case FRIENDADD:
-        friendAddedReceived((SessionFriendEvent) ev);
+    	SessionFriendEvent friendAddEvent = (SessionFriendEvent) ev;  
+    	if (friendAddEvent.isFailure()) {
+            friendsUpdateFailureReceived((SessionFriendFailureEvent) ev);
+    	}
+    	else {
+    		friendAddedReceived((SessionFriendEvent) ev);
+    	}
         break;
       case FRIENDREMOVE:
         friendRemovedReceived((SessionFriendEvent) ev);

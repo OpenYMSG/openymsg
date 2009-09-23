@@ -19,8 +19,10 @@
 package org.openymsg.network;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.openymsg.network.event.SessionEvent;
 import org.openymsg.network.event.SessionListener;
@@ -129,10 +131,11 @@ public class EventDispatcher extends Thread {
         }
 
         try {
-            for (final SessionListener l : session
-                    .getSessionListeners()) {
-                l.dispatch(event);
-            }
+        	Set<SessionListener> externalSessionListeners = 
+        		new HashSet<SessionListener>(session.getSessionListeners());
+			for (final SessionListener l : externalSessionListeners) {
+				l.dispatch(event);
+			}
         } catch (RuntimeException ex) {
             log.error("error during the dispatch of event: " + event, ex);
         }

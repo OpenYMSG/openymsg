@@ -3,7 +3,7 @@
   <groupId>org.openymsg</groupId>
   <artifactId>openymsg</artifactId>
   <name>OpenYMSG library</name>
-  <version>1.0.0</version>
+  <version>0.3.0</version>
   <description>OpenYMSG is an Java library that implements the Yahoo Instant
 		Messenger protocol.</description>
   <issueManagement>
@@ -50,24 +50,9 @@
       <version>1.0</version>
     </dependency>
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.15</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>jms</artifactId>
-          <groupId>javax.jms</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>jmxtools</artifactId>
-          <groupId>com.sun.jdmk</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>jmxri</artifactId>
-          <groupId>com.sun.jmx</groupId>
-        </exclusion>
-      </exclusions>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

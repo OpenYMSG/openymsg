@@ -9,6 +9,7 @@ import org.openymsg.network.YahooUser;
  * @author Guus der Kinderen, guus@nimbuzz.com
  */
 public class SessionFriendRejectedEvent extends SessionFriendEvent {
+	private static final long serialVersionUID = 3415551157526861773L;
 
 	/**
 	 * Constructs new instance.
