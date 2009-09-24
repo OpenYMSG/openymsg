@@ -1799,20 +1799,16 @@ public class Session implements StatusConstants, FriendManager {
   /**
    * Transmit a PING packet always and a CHATPING packet, if the user is
    * logged into a lobby.
-   * 
-   * @deprecated It appears that the transmission of PING packets from the
-   *       client to the Yahoo network has been replaced by sending
-   *       KEEPALIVE packets.
-   * @see #transmitKeepAlive()       
+   * Needed every hour to keep from getting knocked off by LOGGOFF 52
    */
-  @Deprecated
   protected void transmitPings() throws IOException {
     PacketBodyBuffer body = new PacketBodyBuffer();
     sendPacket(body, ServiceType.PING); // 0x12
 
-    if (currentLobby != null) {
-      transmitChatPing();
-    }
+//  Not sure we need to chatPing
+//    if (currentLobby != null) {
+//      transmitChatPing();
+//    }
   }
 
   /**
@@ -2765,50 +2761,53 @@ public class Session implements StatusConstants, FriendManager {
     	  log.trace("Me: " + myName + " Friend add is an ack: " + pkt.status + 
     			  "/" + userId + ", error code: " + friendAddStatus + ", unknown: " 
     			  + something + ", protocol: "+ protocol);
-    	  if (friendAddStatus.equals("0")) {
+    	  if (friendAddStatus.equals("0")) { // successful add
     		  log.info("Me: " + myName + " friend added: " + userId + ", unknown: " 
     				  + something + ", protocol: " + protocol);
+    		  // Sometimes, a status update arrives before the FRIENDADD
+    		  // confirmation. If that's the case, we'll already have this contact
+    		  // on our roster.
+        	  user = this.roster.getUser(userId);
+        	  if (user == null) {
+        		  user = new YahooUser(userId, groupName);
+        	  }
+    	      // Fire event : 7=friend, 66=status, 65=group name
+    	      final SessionFriendEvent se = new SessionFriendEvent(this, user, groupName);
+    	      eventDispatchQueue.append(se, ServiceType.FRIENDADD);
     	  }
-    	  else if (friendAddStatus.equals("2")) {
-    		  log.info("Me: " + myName + " friend already in list: " + userId 
-    				  + ", unknown: " + something + ", protocol: " + protocol);
+    	  else
+    	  {
+    		  if (friendAddStatus.equals("2")) {
+	    		  log.info("Me: " + myName + " friend already in list: " + userId 
+	    				  + ", unknown: " + something + ", protocol: " + protocol);
+	    	  }
+	    	  else if (friendAddStatus.equals("3")) {
+	    		  log.info("Me: " + myName + " friend does not exist in yahoo: " + userId 
+	    				  + ", unknown: " + something + ", protocol: " + protocol);
+	    	  }
+	    	  else {
+	    		  log.warn("Me: " + myName + " problem adding friend: " + userId 
+	    				  + ", unknown: " + something + ", protocol: " + protocol 
+	    				  + ", error code: " + friendAddStatus);
+	    	  }
+	    	  user = this.roster.getUser(userId);
+	    	  if (user == null) {
+	    		  user = new YahooUser(userId, groupName);
+	    	  }
+	    	  else if (!friendAddStatus.equals("2")){
+	    		  log.warn("Adding friend failed and friend is in our roster: " + userId);
+	    	  }
+		      final SessionFriendEvent se = new SessionFriendFailureEvent(this, user, groupName, friendAddStatus);
+		      eventDispatchQueue.append(se, ServiceType.FRIENDADD);
     	  }
-    	  else if (friendAddStatus.equals("3")) {
-    		  log.info("Me: " + myName + " friend does not exist in yahoo: " + userId 
-    				  + ", unknown: " + something + ", protocol: " + protocol);
-    	  }
-    	  else {
-    		  log.warn("Me: " + myName + " problem adding friend: " + userId 
-    				  + ", unknown: " + something + ", protocol: " + protocol 
-    				  + ", error code: " + friendAddStatus);
-    	  }
-    	  user = this.roster.getUser(userId);
-    	  if (user == null) {
-    		  user = new YahooUser(userId, groupName);
-    	  }
-    	  else if (!friendAddStatus.equals("2")){
-    		  log.warn("Adding friend failed and friend is in our roster: " + userId);
-    	  }
-	      final SessionFriendEvent se = new SessionFriendFailureEvent(this, user, groupName, friendAddStatus);
-	      eventDispatchQueue.append(se, ServiceType.FRIENDADD);
 
 //  	      userId = pkt.getValue("7");
 //	      groupName = pkt.getValue("65");
 //	      user = new YahooUser(userId, groupName);
       }
       else {
-    	  log.info("Me: " + myName + " Friend add accepted: " + pkt.status);
+    	  log.warn("Me: " + myName + " Add buddy attempt: " + primaryID + ", " + userId + " problem: " + friendAddStatus + " not an ack: " + pkt.status);
     
-		  // Sometimes, a status update arrives before the FRIENDADD
-		  // confirmation. If that's the case, we'll already have this contact
-		  // on our roster.
-    	  user = this.roster.getUser(userId);
-    	  if (user == null) {
-    		  user = new YahooUser(userId, groupName);
-    	  }
-	      // Fire event : 7=friend, 66=status, 65=group name
-	      final SessionFriendEvent se = new SessionFriendEvent(this, user, groupName);
-	      eventDispatchQueue.append(se, ServiceType.FRIENDADD);
       }
     } catch (Exception e) {
       throw new YMSG9BadFormatException("friend added", pkt, e);
@@ -3507,8 +3506,8 @@ public class Session implements StatusConstants, FriendManager {
     // Add a TimerTask to periodically send ping packets for our connection
     pingerTask = new SessionPinger(this);
     SCHEDULED_PINGER_SERVICE.schedule(pingerTask,
-        NetworkConstants.PING_TIMEOUT_IN_SECS * 1000,
-        NetworkConstants.PING_TIMEOUT_IN_SECS * 1000);
+        NetworkConstants.KEEPALIVE_TIMEOUT_IN_SECS * 1000,
+        NetworkConstants.KEEPALIVE_TIMEOUT_IN_SECS * 1000);
   }
 
   protected void initThread() {
