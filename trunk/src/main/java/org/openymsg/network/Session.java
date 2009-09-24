@@ -3690,8 +3690,12 @@ public class Session implements StatusConstants, FriendManager {
         final String visibility = pkt.getNthValue("13", i);
         user.update(newStatus, visibility);
       }
+      else if (logoff) {
+        // logoff message doesn't have chat or pager info, but we reset those in this case.
+        user.update(newStatus, false, false);
+      }
       else {
-        // No chat, nor pager information, so leave those values alone and just update status.
+        // status update with no chat, nor pager information, so leave those values alone.
         user.update(newStatus);
       }
 
