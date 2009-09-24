@@ -919,6 +919,7 @@ public class Session implements StatusConstants, FriendManager {
           + "'is not a valid identity for this session.");
     }
 
+    // TODO synchronized blocks don't really work (java optimization problem). Need a separate synchronized method for this
     synchronized (this) {
       if (chatSessionStatus != SessionState.UNSTARTED
           && chatSessionStatus != SessionState.LOGGED_ON) {
@@ -1052,7 +1053,7 @@ public class Session implements StatusConstants, FriendManager {
   protected void transmitAuthResp(String plp, String crp, String base64) throws IOException {
     if (sessionStatus != SessionState.CONNECTED) {
       throw new IllegalStateException(
-          "Cannot transmit an AUTHRESP packet if you're not completely unconnected to the Yahoo Network. Current state: "
+          "Cannot transmit an AUTHRESP packet if you're not completely connected to the Yahoo Network. Current state: "
             + sessionStatus);
     }
     if (base64 == null)
