@@ -296,7 +296,7 @@ public class YahooUser {
 	 * @param groupId
 	 *            The ID of the group that this user is in.
 	 */
-	void addGroupId(final String groupId) {
+	public void addGroupId(final String groupId) {
 		groupIds.add(groupId);
 	}
 

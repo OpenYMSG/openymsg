@@ -199,7 +199,11 @@ public class SessionAdapter implements SessionListener {
         fileTransferReceived((SessionFileTransferEvent) ev);
         break;
       case NOTIFY:
-        notifyReceived((SessionNotifyEvent) ev);
+    	if (ev instanceof SessionNotifyEvent) {
+    		notifyReceived((SessionNotifyEvent) ev);
+    	} else {
+    		// probably a SessionPictureEvent, not handled
+    	}
         break;
       case LIST:
         listReceived((SessionListEvent) ev);
