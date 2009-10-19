@@ -165,6 +165,11 @@ public class Roster implements Set<YahooUser>, SessionListener {
 					"The user to be added must have a valid, non-empty String ID field set.");
 		}
 		
+		if (user.getGroupIds() == null || user.getGroupIds().isEmpty()) {
+			throw new IllegalArgumentException(
+					"The user to be added must have at least on groupId.");
+		}
+		
 		log.trace("Adding new user: " + user);
 		
 		// TODO : input validation on userId/groupId?
@@ -213,11 +218,11 @@ public class Roster implements Set<YahooUser>, SessionListener {
 		YahooAddressBookEntry addressBookEntry = this.addressBookUsersById.get(id);
 
 		synchronized (usersById) {
-			if (usersById.containsKey(id)) {
-				log.debug("Roster already contained this userId "
-						+ "(backend storage will not be updated): " + id);
-				return false;
-			}
+//			if (usersById.containsKey(id)) {
+//				log.debug("Roster already contained this userId "
+//						+ "(backend storage will not be updated): " + id);
+//				return false;
+//			}
 			if (addressBookEntry != null) {
 				user = this.createMergedUser(addressBookEntry, id, user);
 			}
@@ -352,6 +357,14 @@ public class Roster implements Set<YahooUser>, SessionListener {
 			if (!usersById.containsKey(userId)) {
 				throw new IllegalStateException(
 						"No user on roster with this id: " + userId);
+			}
+			if (user.getGroupIds().isEmpty())
+			{
+				// this is an early user warning
+				for (String groupId: usersById.get(userId).getGroupIds())
+				{
+					user.addGroupId(groupId);
+				}
 			}
 			if (addressBookEntry != null) {
 				user = this.createMergedUser(addressBookEntry, userId, user);

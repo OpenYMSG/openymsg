@@ -18,10 +18,7 @@
  */
 package org.openymsg.network;
 
-import java.io.IOException;
-import java.net.SocketException;
 import java.util.TimerTask;
-import org.openymsg.support.Logger;
 
 /**
  * Runnable class that is responsible for sending keep-alive packets to the
@@ -30,9 +27,6 @@ import org.openymsg.support.Logger;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
 public class SessionPinger extends TimerTask {
-
-    private static final Logger log = Logger.getLogger(SessionPinger.class);
-    int count = 0;
 
 	/**
 	 * The session on which behalf the keep-alive packet should be sent.
@@ -58,24 +52,6 @@ public class SessionPinger extends TimerTask {
 	 */
 	@Override
 	public void run() {
-		try {
-			session.transmitKeepAlive();
-			if (count++ % NetworkConstants.PING_TO_KEEPALIVE_RATIO == 0) {
-				session.transmitPings();
-			}
-		} catch (IOException ex) {
-			if (ex instanceof SocketException) {
-				log.info("Logging out due to socket exception: " + session.getSessionID() + "/" + session.getLoginID());
-				try {
-					this.session.forceCloseSession();
-				} catch (Exception e) {
-                    log.error("Failed to close session: " + session.getSessionID() + "/" + session.getLoginID(), e);
-				}
-			}
-			else 
-			{
-				log.error("Could not send keep-alive to: " + session.getSessionID() + "/" + session.getLoginID(), ex);
-			}
-		}
+		session.sendKeepAliveAndPing();
 	}
 }

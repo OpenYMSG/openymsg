@@ -111,15 +111,27 @@ public class BuddyListImport {
 
 	private YahooAddressBookEntry getContact(Element empEl) {
 		String id = getTextValue(empEl, "yi");
+		String lcsid = getTextValue(empEl, "lcsid");
 		String firstName = getTextValue(empEl, "fn");
 		String lastName = getTextValue(empEl, "ln");
 		String nickName = getTextValue(empEl, "nn");
 		String groupName = getTextValue(empEl, "li");
 		
+		if (isEmpty(id) && isEmpty(lcsid)) {
+			log.warn("Failed building user firstname: " + firstName + ", lastname: " + lastName + ", nickname: " + nickName + ", groupName: " + groupName);
+		}
+		if (isEmpty(id) && !isEmpty(lcsid)) {
+			id = lcsid;
+		}
 		YahooAddressBookEntry user = new YahooAddressBookEntry(id, firstName, lastName, nickName, groupName);
 //		log.trace("firstname: " + firstName + ", lastname: " + lastName + ", nickname: " + nickName + ", groupName: " + groupName);
+//		System.out.println("id: " + id + ", firstname: " + firstName + ", lastname: " + lastName + ", nickname: " + nickName + ", groupName: " + groupName);
 
 		return user;
+	}
+
+	private boolean isEmpty(String id) {
+		return id == null || id.length() == 0;
 	}
 
 	private String getTextValue(Element ele, String tagName) {

@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.NoSuchAlgorithmException;
@@ -101,7 +102,7 @@ public class Session implements StatusConstants, FriendManager {
   private String imvironment;
 
   /** Yahoo status (presence) */
-  private Status status;
+  protected Status status;
 
   /** Message for custom status. */
   private String customStatusMessage;
@@ -122,8 +123,7 @@ public class Session implements StatusConstants, FriendManager {
 
   public volatile ConnectionHandler network;
 
-  private final Timer SCHEDULED_PINGER_SERVICE = new Timer(
-      "OpenYMSG session ping timer", true);
+  private Timer scheduledPingerService;
 
   private TimerTask pingerTask;
 
@@ -133,7 +133,7 @@ public class Session implements StatusConstants, FriendManager {
 
   private YahooException loginException = null;
 
-  private boolean receivedListFired = false;
+//  private boolean receivedListFired = false;
 
   /** For split packets in multiple parts */
   private YMSG9Packet cachePacket;
@@ -155,6 +155,10 @@ public class Session implements StatusConstants, FriendManager {
 
   /** Message number to be included in sending a message */
   private int messageNumber;
+
+  private int keepAliveCount;
+
+  private ArrayList<YMSG9Packet> queueOfList15  = new ArrayList<YMSG9Packet>();
 
   private static final Logger log = Logger.getLogger(Session.class);
 
@@ -252,6 +256,7 @@ public class Session implements StatusConstants, FriendManager {
   /**
    * Call this to connect to the Yahoo server and do all the initial
    * handshaking and accepting of data
+   * Session will do it's own thread for pings and keepAlives
    * 
    * @param username
    *      Yahoo id
@@ -259,6 +264,24 @@ public class Session implements StatusConstants, FriendManager {
    *      password
    */
   public void login(String username, String password)
+      throws IllegalStateException, IOException, AccountLockedException,
+      LoginRefusedException {
+	  this.login(username, password, true);
+  }
+  
+  
+  /**
+   * Call this to connect to the Yahoo server and do all the initial
+   * handshaking and accepting of data
+   * 
+   * @param username
+   *      Yahoo id
+   * @param password
+   *      password
+   * @param createPingerTask
+   * 	Session will do it's own thread for pings and keepAlives
+   */
+  public void login(String username, String password, boolean createPingerTask)
       throws IllegalStateException, IOException, AccountLockedException,
       LoginRefusedException {
     identities = new HashMap<String, YahooIdentity>();
@@ -305,7 +328,7 @@ public class Session implements StatusConstants, FriendManager {
       // Create the socket and threads (ipThread, sessionPingRunnable and
       // maybe eventDispatchQueue)
       log.trace("Opening session...");
-      openSession();
+      openSession(createPingerTask);
 
       // Begin login process
       log.trace("Transmitting auth...");
@@ -379,6 +402,36 @@ public class Session implements StatusConstants, FriendManager {
     resetData(); // Just to be on the safe side
   }
 
+  /**
+   * Send keepAlive.  Should not call if the session is doing this itself.
+   * This allows calling clients to manage the threads.
+   * @return true if a ping was sent
+   */
+  public boolean sendKeepAliveAndPing() {
+		try {
+			this.transmitKeepAlive();
+			if (keepAliveCount++ % NetworkConstants.PING_TO_KEEPALIVE_RATIO == 0) {
+				this.transmitPings();
+				return true;
+			}
+		} catch (IOException ex) {
+			if (ex instanceof SocketException) {
+				log.info("Logging out due to socket exception: " + this.getSessionID() + "/" + this.getLoginID());
+				try {
+					this.forceCloseSession();
+				} catch (Exception e) {
+                    log.error("Failed to close session: " + this.getSessionID() + "/" + this.getLoginID(), e);
+				}
+			}
+			else 
+			{
+				log.error("Could not send keep-alive to: " + this.getSessionID() + "/" + this.getLoginID(), ex);
+			}
+		}
+		return false;
+
+
+  }
   /**
    * Send a chat message.
    * 
@@ -1632,9 +1685,9 @@ public class Session implements StatusConstants, FriendManager {
    */
   protected void transmitNewStatus() throws IOException {
     final PacketBodyBuffer body = new PacketBodyBuffer();
-    body.addElement("47", "1");
-    body.addElement("19", "");
     body.addElement("10", String.valueOf(status.getValue()));
+    body.addElement("19", "");
+    body.addElement("97", "1");
     sendPacket(body, ServiceType.Y6_STATUS_UPDATE);
   }
 
@@ -1645,11 +1698,13 @@ public class Session implements StatusConstants, FriendManager {
    */
   protected void transmitNewCustomStatus() throws IOException {
     final PacketBodyBuffer body = new PacketBodyBuffer();
-    body.addElement("19", customStatusMessage);
     body.addElement("10", "99");
+    body.addElement("19", customStatusMessage);
+    body.addElement("97", "1");
     if (customStatusBusy) {
-      body.addElement("47", "1");
+        body.addElement("47", "1");
     }
+    body.addElement("187", "0");
     sendPacket(body, ServiceType.Y6_STATUS_UPDATE, Status.AVAILABLE);
   }
 
@@ -1697,8 +1752,6 @@ public class Session implements StatusConstants, FriendManager {
     String messageNumberString = buildMessageNumber();
     // Send packet
     PacketBodyBuffer body = new PacketBodyBuffer();
-    // don't need this in 16
-//    body.addElement("0", primaryID.getId()); // From (primary ID)
     body.addElement("1", yid.getId()); // From (effective ID)
     body.addElement("5", to); // To
     body.addElement("14", msg); // Message
@@ -2106,7 +2159,7 @@ public class Session implements StatusConstants, FriendManager {
           }
           loginException = new AccountLockedException("User "
               + loginID + " has been locked out", u);
-          log.info("AUTHRESP says: authentication failed!",
+          log.info("AUTHRESP says: authentication failed!" + loginID,
               loginException);
           sessionEvent = new SessionLogoutEvent(AuthenticationState.LOCKED);
           break;
@@ -2115,7 +2168,7 @@ public class Session implements StatusConstants, FriendManager {
         case BAD2:
         case BAD:
           loginException = new LoginRefusedException("User "
-              + loginID + " refused login",
+              + loginID + " refused login" + loginID,
               AuthenticationState.BAD);
           log.info("AUTHRESP says: authentication failed!",
               loginException);
@@ -2125,7 +2178,7 @@ public class Session implements StatusConstants, FriendManager {
         // unknown account?
         case BADUSERNAME:
           loginException = new LoginRefusedException("User "
-              + loginID + " unknown",
+              + loginID + " unknown" + loginID,
               AuthenticationState.BADUSERNAME);
           log.info("AUTHRESP says: authentication failed!",
               loginException);
@@ -2134,7 +2187,7 @@ public class Session implements StatusConstants, FriendManager {
         //You have been logged out of the yahoo service, possibly due to a duplicate login.
         case DUPLICATE_LOGIN:
           loginException = new LoginRefusedException("User "
-              + loginID + " unknown",
+              + loginID + " unknown" + loginID,
               AuthenticationState.DUPLICATE_LOGIN);
           log.info("AUTHRESP says: authentication failed!",
               loginException);
@@ -2144,7 +2197,7 @@ public class Session implements StatusConstants, FriendManager {
             log.info("AUTHRESP says: authentication failed with unknown: " + AuthenticationState.UNKNOWN_52,
                     loginException);
             loginException = new LoginRefusedException("User "
-                    + loginID + " was forced off",
+                    + loginID + " was forced off" + loginID,
                     AuthenticationState.UNKNOWN_52);
             sessionEvent = new SessionLogoutEvent(AuthenticationState.UNKNOWN_52);
         }
@@ -2757,14 +2810,14 @@ public class Session implements StatusConstants, FriendManager {
 	  groupName = pkt.getValue("65");
 
       if (pkt.status == 1) { //status 1 is an ack
-    	  String something = pkt.getValue("223");
+    	  String pending = pkt.getValue("223");
     	  String protocol = pkt.getValue("241");
     	  log.trace("Me: " + myName + " Friend add is an ack: " + pkt.status + 
-    			  "/" + userId + ", error code: " + friendAddStatus + ", unknown: " 
-    			  + something + ", protocol: "+ protocol);
+    			  "/" + userId + ", error code: " + friendAddStatus + ", pending: " 
+    			  + pending + ", protocol: "+ protocol);
     	  if (friendAddStatus.equals("0")) { // successful add
-    		  log.info("Me: " + myName + " friend added: " + userId + ", unknown: " 
-    				  + something + ", protocol: " + protocol);
+    		  log.info("Me: " + myName + " friend added: " + userId + ", pending: " 
+    				  + pending + ", protocol: " + protocol);
     		  // Sometimes, a status update arrives before the FRIENDADD
     		  // confirmation. If that's the case, we'll already have this contact
     		  // on our roster.
@@ -2780,24 +2833,29 @@ public class Session implements StatusConstants, FriendManager {
     	  {
     		  if (friendAddStatus.equals("2")) {
 	    		  log.info("Me: " + myName + " friend already in list: " + userId 
-	    				  + ", unknown: " + something + ", protocol: " + protocol);
+	    				  + ", pending: " + pending + ", protocol: " + protocol);
 	    	  }
 	    	  else if (friendAddStatus.equals("3")) {
 	    		  log.info("Me: " + myName + " friend does not exist in yahoo: " + userId 
-	    				  + ", unknown: " + something + ", protocol: " + protocol);
+	    				  + ", pending: " + pending + ", protocol: " + protocol);
 	    	  }
 	    	  else {
 	    		  log.warn("Me: " + myName + " problem adding friend: " + userId 
-	    				  + ", unknown: " + something + ", protocol: " + protocol 
+	    				  + ", pending: " + pending + ", protocol: " + protocol 
 	    				  + ", error code: " + friendAddStatus);
 	    	  }
-	    	  user = this.roster.getUser(userId);
-	    	  if (user == null) {
-	    		  user = new YahooUser(userId, groupName);
-	    	  }
-	    	  else if (!friendAddStatus.equals("2")){
-	    		  log.warn("Adding friend failed and friend is in our roster: " + userId);
-	    	  }
+    		  if (userId != null) {
+		    	  user = this.roster.getUser(userId);
+		    	  if (user == null) {
+		    		  user = new YahooUser(userId, groupName);
+		    	  }
+		    	  else if (!friendAddStatus.equals("2")){
+		    		  log.warn("Adding friend failed and friend is in our roster: " + userId);
+		    	  }
+    		  }
+    		  else {
+    			  user = null;
+    		  }
 		      final SessionFriendEvent se = new SessionFriendFailureEvent(this, user, groupName, friendAddStatus);
 		      eventDispatchQueue.append(se, ServiceType.FRIENDADD);
     	  }
@@ -3135,6 +3193,10 @@ public class Session implements StatusConstants, FriendManager {
 
   protected void receiveList15(YMSG9Packet pkt)      // 0x55
   {
+	queueOfList15.add(pkt);
+	if(pkt.status != 0) {
+		return;
+	}
     String username = null;
     // int protocol = 0;
     YahooGroup currentListGroup = null;
@@ -3145,74 +3207,84 @@ public class Session implements StatusConstants, FriendManager {
     Set<YahooUser> usersOnPendingList = new HashSet<YahooUser>();
 
     boolean isPending = false;
-    
-    Iterator<String[]> iter = pkt.entries().iterator();
-    while (iter.hasNext()) {
-      String[] s = iter.next();
 
-      int key = Integer.valueOf(s[0]);
-      String value = s[1];
-
-      switch (key) {
-        case 302:
-          /* This is always 318 before a group, 319 before the first s/n in a group, 320 before any ignored s/n.
-           * It is not sent for s/n's in a group after the first.
-           * All ignored s/n's are listed last, so when we see a 320 we clear the group and begin marking the
-           * s/n's as ignored.  It is always followed by an identical 300 key.
-           */
-          if (value != null && value.equals("320")) {
-            currentListGroup = null;
-          }
-          break;
-        case 301:
-          /* This is 319 before all s/n's in a group after the first. It is followed by an identical 300. */
-          if (username != null) {
-        	YahooUser yu = null;
-            if (currentListGroup != null) {
-              /* This buddy is in a group */
-              yu = new YahooUser(username, currentListGroup.getName());
-              usersOnFriendsList.add(yu);
-              currentListGroup.addUser(yu);
-            }
-            else {
-              /* This buddy is on the ignore list (and therefore in no group) */
-              yu = new YahooUser(username);
-              yu.setIgnored(true);
-              usersOnIgnoreList.add(yu);
-            }
-            if (isPending) {
-              usersOnPendingList.add(yu);
-            }
-            username = null;
-            isPending = false;
-          }
-          break;
-        case 223: /* Pending add user request */
-          isPending = true;
-          break;
-        case 300: /* This is 318 before a group, 319 before any s/n in a group, and 320 before any ignored s/n. */
-          break;
-        case 65: /* This is the group */
-          currentListGroup = new YahooGroup(value);
-          receivedGroups.add(currentListGroup);
-          break;
-        case 7: /* buddy's s/n */
-          username = value;
-          break;
-        case 241: /* another protocol user */
-          // protocol = Integer.valueOf(value);
-          break;
-        case 59: /* somebody told cookies come here too, but im not sure */
-          break;
-        case 317: /* Stealth Setting */
-          // stealth = Integer.valueOf(value);
-          break;
-      }
+    for (YMSG9Packet qPkt: queueOfList15) {
+	    Iterator<String[]> iter = qPkt.entries().iterator();
+	    while (iter.hasNext()) {
+	      String[] s = iter.next();
+	
+	      int key = Integer.valueOf(s[0]);
+	      String value = s[1];
+	
+	      switch (key) {
+	        case 302:
+	          /* This is always 318 before a group, 319 before the first s/n in a group, 320 before any ignored s/n.
+	           * It is not sent for s/n's in a group after the first.
+	           * All ignored s/n's are listed last, so when we see a 320 we clear the group and begin marking the
+	           * s/n's as ignored.  It is always followed by an identical 300 key.
+	           */
+	          if (value != null && value.equals("320")) {
+	            currentListGroup = null;
+	          }
+	          break;
+	        case 301:
+	          /* This is 319 before all s/n's in a group after the first. It is followed by an identical 300. */
+	          if (username != null) {
+	        	YahooUser yu = null;
+	            if (currentListGroup != null) {
+	              for (YahooUser friend: usersOnFriendsList) {
+	            	  if (friend.getId().equals(username)) {
+	            		  yu = friend;
+	            		  yu.addGroupId(currentListGroup.getName());
+	            	  }
+	              }
+	              if (yu == null) {
+	              /* This buddy is in a group */
+	            	  yu = new YahooUser(username, currentListGroup.getName());
+		              usersOnFriendsList.add(yu);
+	              }
+	              currentListGroup.addUser(yu);
+	            }
+	            else {
+	              /* This buddy is on the ignore list (and therefore in no group) */
+	              yu = new YahooUser(username);
+	              yu.setIgnored(true);
+	              usersOnIgnoreList.add(yu);
+	            }
+	            if (isPending) {
+	              usersOnPendingList.add(yu);
+	            }
+	            username = null;
+	            isPending = false;
+	          }
+	          break;
+	        case 223: /* Pending add user request */
+	          isPending = true;
+	          break;
+	        case 300: /* This is 318 before a group, 319 before any s/n in a group, and 320 before any ignored s/n. */
+	          break;
+	        case 65: /* This is the group */
+	          currentListGroup = new YahooGroup(value);
+	          receivedGroups.add(currentListGroup);
+	          break;
+	        case 7: /* buddy's s/n */
+	          username = value;
+	          break;
+	        case 241: /* another protocol user */
+	          // protocol = Integer.valueOf(value);
+	          break;
+	        case 59: /* somebody told cookies come here too, but im not sure */
+	          break;
+	        case 317: /* Stealth Setting */
+	          // stealth = Integer.valueOf(value);
+	          break;
+	      }
+	    }
     }
-
+    
     if(!usersOnFriendsList.isEmpty())
     {
-      receivedListFired = true;
+//      receivedListFired = true;
       eventDispatchQueue.append(new SessionListEvent(this,
         ContactListType.Friends, usersOnFriendsList),
         ServiceType.LIST);
@@ -3264,7 +3336,7 @@ public class Session implements StatusConstants, FriendManager {
       // Is this packet about us, or one of our online friends?
       if (!pkt.exists("7")) // About us
       {
-      	log.info("Logging of because I received a logoff");
+      	log.info("Logging of because I received a logoff" + this.primaryID + "/" + pkt);
         // Note: when this method returns, the input thread loop
         // which called it exits.
         sessionStatus = SessionState.UNSTARTED;
@@ -3499,16 +3571,19 @@ public class Session implements StatusConstants, FriendManager {
   /**
    * Start threads
    */
-  private void openSession() throws IOException {
+  private void openSession(boolean createPingerTask) throws IOException {
     // Open the socket, create input and output streams
     network.open();
     // Create a thread to handle input from network
     initThread();
     // Add a TimerTask to periodically send ping packets for our connection
-    pingerTask = new SessionPinger(this);
-    SCHEDULED_PINGER_SERVICE.schedule(pingerTask,
-        NetworkConstants.KEEPALIVE_TIMEOUT_IN_SECS * 1000,
-        NetworkConstants.KEEPALIVE_TIMEOUT_IN_SECS * 1000);
+    if (createPingerTask) {
+	    pingerTask = new SessionPinger(this);
+	    scheduledPingerService = new Timer("OpenYMSG session ping timer", true);
+	    scheduledPingerService.schedule(pingerTask,
+	        NetworkConstants.KEEPALIVE_TIMEOUT_IN_SECS * 1000,
+	        NetworkConstants.KEEPALIVE_TIMEOUT_IN_SECS * 1000);
+    }
   }
 
   protected void initThread() {
@@ -3550,7 +3625,7 @@ public class Session implements StatusConstants, FriendManager {
   /**
    * Are we logged into Yahoo?
    */
-  private void checkStatus() throws IllegalStateException {
+  protected void checkStatus() throws IllegalStateException {
     if (sessionStatus != SessionState.LOGGED_ON) {
       throw new IllegalStateException("Not logged in");
     }
