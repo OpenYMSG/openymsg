@@ -102,8 +102,10 @@ public class YahooTestAbstract {
 		
 		List<YahooUser> oldRoster = new ArrayList<YahooUser>(roster);
 				
+//		System.err.print("Removing: ");
 		for (final YahooUser user : oldRoster) {
 			roster.remove(user);
+//			System.err.print(user.getId() + ",");
 			FireEvent event = listener.waitForEvent(5, ServiceType.FRIENDREMOVE);
 		}
 	}

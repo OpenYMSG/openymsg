@@ -25,7 +25,7 @@ package org.openymsg.network;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-interface PropertyConstants {
+public interface PropertyConstants {
 	/**
 	 * Names of properties
 	 */
