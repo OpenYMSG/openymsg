@@ -534,7 +534,7 @@ public class Session implements StatusConstants, FriendManager {
    */
   public synchronized void setStatus(Status status)
       throws IllegalArgumentException, IOException {
-
+	  log.debug("setting status: " + status);
     if (status == Status.CUSTOM) {
       throw new IllegalArgumentException(
           "Cannot set custom state without message");
@@ -1687,7 +1687,6 @@ public class Session implements StatusConstants, FriendManager {
     final PacketBodyBuffer body = new PacketBodyBuffer();
     body.addElement("10", String.valueOf(status.getValue()));
     body.addElement("19", "");
-    body.addElement("97", "1");
     sendPacket(body, ServiceType.Y6_STATUS_UPDATE);
   }
 
@@ -1701,10 +1700,10 @@ public class Session implements StatusConstants, FriendManager {
     body.addElement("10", "99");
     body.addElement("19", customStatusMessage);
     body.addElement("97", "1");
-    if (customStatusBusy) {
-        body.addElement("47", "1");
-    }
-    body.addElement("187", "0");
+//    if (customStatusBusy) { pigdin has 47 as some idle thing
+//        body.addElement("47", "1");
+//    }
+//    body.addElement("187", "0");
     sendPacket(body, ServiceType.Y6_STATUS_UPDATE, Status.AVAILABLE);
   }
 
@@ -1767,7 +1766,7 @@ public class Session implements StatusConstants, FriendManager {
     return messageNumberString;
   }
 
-	private String buildMessageNumber() {
+	protected String buildMessageNumber() {
 		String blankMessageNumber = "0000000000000000";
 	    String messageNumber = "" + this.messageNumber++;
 	    messageNumber = blankMessageNumber.substring(0, blankMessageNumber.length() - messageNumber.length()) + messageNumber;
@@ -2990,19 +2989,7 @@ public class Session implements StatusConstants, FriendManager {
 
   protected void receiveStatus15(YMSG9Packet pkt)
   {
-    Iterator<String[]> iter = pkt.entries().iterator();
-    while (iter.hasNext()) {
-      String[] s = iter.next();
-
-      int key = Integer.valueOf(s[0]);
-      String value = s[1];
-
-      switch (key) {
-        case 7: // New buddy coming online
-          updateFriendsStatus(pkt);
-          break;
-      }
-    }
+    updateFriendsStatus(pkt);
   }
 
   /**
@@ -3724,90 +3711,149 @@ public class Session implements StatusConstants, FriendManager {
     // Process online friends data
 
     // Process each friend
-    int i = -1;
-    while (pkt.getNthValue("7", ++i) != null) {
-      final String userId = pkt.getNthValue("7", i);
-      YahooUser user = roster.getUser(userId);
-      // When we add a friend, we get a status update before
-      // getting a confirmation FRIENDADD packet (crazy!)
-      if (user == null) {
-        log.debug("Presence of a new friend seems to have arrived "
-            + "before the details of the new friend. Adding "
-            + "them now: " + userId);
-        // TODO: clean up the threading mess that can be caused by this.
-        roster.dispatch(new FireEvent(new SessionFriendEvent(this,
-            new YahooUser(userId)), ServiceType.FRIENDADD));
-        user = roster.getUser(userId);
-      }
+    Iterator<String[]> iter = pkt.entries().iterator();
+    YahooUser user = null;
+    long longStatus = 0;
+    Status newStatus = Status.AVAILABLE;
+    Boolean onChat = null;
+    Boolean onPager = null;
+    String visibility = null;
+    String clearIdleTime = null;
+    String idleTime = null;
+	String customMessage = null;
+	String customStatus = null;
+    while (iter.hasNext()) {
+      String[] s = iter.next();
 
-      // 7=friend 10=status 17=chat 13=pager (old version)
-      // 7=friend 10=status 13=chat&pager (new version May 2005)
-      long longStatus = 0;
-      String customMsg = null;
-      try {
-        longStatus = Long.parseLong(pkt.getNthValue("10", i));
-      } catch (NumberFormatException e) {
-        customMsg = pkt.getNthValue("10", i);
-      }
+      int key = Integer.valueOf(s[0]);
+      String value = s[1];
+//      log.info("Key: " + key + ", value: " + value);
+      switch (key) {
+      	case 300:
+      		// initial row, most of the time
+      		break;
+      	case 7:
+      		//check and see if we have one
+      		if (user != null) {
+          		updateFriendStatus(logoff, user, newStatus, onChat, onPager,
+						visibility, clearIdleTime, idleTime, customMessage,
+						customStatus, longStatus);
+                  user = null;
+                  longStatus = 0;
+                  newStatus = Status.AVAILABLE;
+                  onChat = null;
+                  onPager = null;
+                  visibility = null;
+                  clearIdleTime = null;
+                  idleTime = null;
+      	          customMessage = null;
+      	      	  customStatus = null;
 
-      Status newStatus = Status.AVAILABLE;
-      try {
-        newStatus = logoff ? Status.OFFLINE : Status
-            .getStatus(longStatus);
-      } catch (IllegalArgumentException e) {
-        // unknown status
-      }
-      if (pkt.exists("17")) {
-        final boolean onChat = pkt.getNthValue("17", i).equals("1");
-        final boolean onPager = pkt.getNthValue("13", i).equals("1");
-        user.update(newStatus, onChat, onPager);
-      }
-      else if (pkt.exists("13")) {
-        final String visibility = pkt.getNthValue("13", i);
-        user.update(newStatus, visibility);
-      }
-      else if (logoff) {
-        // logoff message doesn't have chat or pager info, but we reset those in this case.
-        user.update(newStatus, false, false);
-      }
-      else {
-        // status update with no chat, nor pager information, so leave those values alone.
-        user.update(newStatus);
-      }
-
-      // Custom message?
-      // 19=Custom message 47=Custom message is busy
-      if (pkt.getNthValue("19", i) != null) {
-        if (pkt.getNthValue("47", i) != null) {
-          user.setCustom(pkt.getNthValue("19", i), pkt.getNthValue("47", i));
-        }
-      }
-
-      // 138=Clear idle time
-      final String clearIdleTime = pkt.getNthValue("138", i);
-      if (clearIdleTime != null) {
-        user.setIdleTime(-1);
-      }
-
-      // 137=Idle time (seconds)
-      final String idleTime = pkt.getNthValue("137", i);
-      if (idleTime != null) {
-        user.setIdleTime(Long.parseLong(idleTime));
-      }
-
-      // 60=SMS
-      // 197=Avatars
-      // 192=Friends icon (checksum)
-      // ...
-      // Add to event object
-
-      final SessionFriendEvent event = new SessionFriendEvent(this, user);
-      // Fire event
-      if (eventDispatchQueue != null) {
-        eventDispatchQueue.append(event, ServiceType.Y6_STATUS_UPDATE);
+                  user = null;
+	
+      		}
+            final String userId = value;
+            user = roster.getUser(userId);
+            // When we add a friend, we get a status update before
+            // getting a confirmation FRIENDADD packet (crazy!)
+            if (user == null) {
+              log.debug("Presence of a new friend seems to have arrived "
+                  + "before the details of the new friend. Adding "
+                  + "them now: " + userId);
+              // TODO: clean up the threading mess that can be caused by this.
+              roster.dispatch(new FireEvent(new SessionFriendEvent(this,
+                  new YahooUser(userId)), ServiceType.FRIENDADD));
+              user = roster.getUser(userId);
+            }
+            break;
+      	case 10:
+            try {
+                longStatus = Long.parseLong(value);
+              } catch (NumberFormatException e) {
+            	customMessage = value;
+              }
+              break;
+      	case 17:
+            onChat = value.equals("1");
+            break;
+      	case 13:  // one of these matters
+            onPager = value.equals("1");
+            visibility = value;
+     		break;
+      	case 19:
+      		customMessage = value;
+      		break;
+      	case 47:
+      		customStatus = value;
+      		break;
+      	case 138:
+      	    clearIdleTime = value;
+      	    break;
+      	case 137:
+            idleTime = value;
+            break;
+      	case 301:
+      		// ending row, most of the time
+            break;
       }
     }
+	if (user != null) {
+  		updateFriendStatus(logoff, user, newStatus, onChat, onPager,
+				visibility, clearIdleTime, idleTime, customMessage,
+				customStatus, longStatus);
+	}
+
   }
+
+private void updateFriendStatus(boolean logoff, YahooUser user,
+		Status newStatus, Boolean onChat, Boolean onPager, String visibility,
+		String clearIdleTime, String idleTime, String customMessage,
+		String customStatus, long longStatus) {
+	log.info("logoff: " + logoff + ", user: " + user + ", newStatus: " + newStatus
+			+ ", onChat: " + onChat + ", onPager: " + onPager + ", visibility: "
+			+visibility + ", clearIdleTime: " + clearIdleTime + ", idleTime: " +
+			idleTime + ", customMessage: " + customMessage + ", customStatus: " +
+			customStatus + ", longStatus: " + longStatus);
+	if (longStatus == -1 && (onPager == null || !onPager))
+	{
+		//Offline -- usually federated or msn live
+		logoff = true; 
+	}
+    try {
+        newStatus = logoff ? Status.OFFLINE : Status
+            .getStatus(longStatus);
+    } catch (IllegalArgumentException e) {
+        // unknown status
+    }
+
+	if (onChat != null) {
+		  user.update(newStatus, onChat, onPager);
+		} else if (onPager != null) {
+		  user.update(newStatus, visibility);
+		} else if (logoff) {
+	      // logoff message doesn't have chat or pager info, but we reset those in this case.
+	      user.update(newStatus, false, false);
+	  }
+	  else {
+	    // status update with no chat, nor pager information, so leave those values alone.
+	    user.update(newStatus);
+	  }
+		if (customMessage != null) {
+		  user.setCustom(customMessage, customStatus);
+		}
+		
+	    if (clearIdleTime != null) {
+	  user.setIdleTime(-1);
+	}
+	  if (idleTime != null) {
+	    user.setIdleTime(Long.parseLong(idleTime));
+	  }
+	  final SessionFriendEvent event = new SessionFriendEvent(this, user);
+	  // Fire event
+	  if (eventDispatchQueue != null) {
+	    eventDispatchQueue.append(event, ServiceType.Y6_STATUS_UPDATE);
+	  }
+}
 
   /**
    * Create chat user from a chat packet. Note: a YahooUser is created if

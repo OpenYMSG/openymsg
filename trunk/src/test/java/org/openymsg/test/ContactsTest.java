@@ -35,6 +35,11 @@ public class ContactsTest extends YahooTestAbstract {
 
 		removeAllContacts(sess2, listener2);
 		if (!sess2.getRoster().isEmpty()) {
+//			System.err.print("Roster still contains: ");
+//			for (YahooUser user : sess2.getRoster()) {
+//				System.err.print(user.getId() + ",");
+//			}
+//			System.err.println(".");
 			throw new IllegalStateException("Test setup problem. Roster2 should have been emptied by now.");
 		}
 		
