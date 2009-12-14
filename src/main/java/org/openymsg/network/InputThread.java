@@ -124,7 +124,7 @@ public class InputThread extends Thread {
     }
 
 	protected void processPayload(YMSG9Packet pkt) throws IOException,
-			LoginRefusedException {
+			YahooException {
 		log.trace("processPayload " + pkt.service + "/" + pkt.status);
 		switch (pkt.service) {
         case ADDIGNORE:

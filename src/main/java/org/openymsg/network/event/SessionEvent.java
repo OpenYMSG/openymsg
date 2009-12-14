@@ -31,6 +31,8 @@ import java.util.Date;
  * @author S.E. Morris
  */
 public class SessionEvent extends java.util.EventObject {
+	private static final long serialVersionUID = -128672051097761320L;
+
 	private final String to;
 
 	private final String from;

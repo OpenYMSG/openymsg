@@ -25,6 +25,7 @@ package org.openymsg.network;
  * @author S.E. Morris
  */
 public abstract class YahooException extends Exception {
+	private static final long serialVersionUID = 5508344016278756016L;
 
 	/**
 	 * Creates a new instance and adds a more detailed description to it.
