@@ -30,6 +30,7 @@ public enum AuthenticationState {
 	LOCKED(14), // You've been naughty
     DUPLICATE_LOGIN(99),
 	BADUSERNAME(3), // Account unknown?
+	YAHOO_LOGOFF(-100), // Yahoo has told us to log off
 	UNKNOWN_52(52); // don't know
 
 	private long value;

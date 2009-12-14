@@ -425,8 +425,16 @@ public class Roster implements Set<YahooUser>, SessionListener {
 			throw new IllegalArgumentException(
 					"Argument 'userId' cannot be an empty String.");
 		}
-
-		return usersById.containsKey(userId);
+		for (String idOfUser: this.usersById.keySet()) {
+			if (idOfUser.toLowerCase().equals(userId.toLowerCase())) {
+				if (!idOfUser.equals(userId)) {
+					log.debug("contains user with mixed case: " + idOfUser 
+							+ " looking for: " + userId);
+				}
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/*

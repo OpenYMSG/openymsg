@@ -45,7 +45,6 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.jdom.JDOMException;
 import org.openymsg.addressBook.BuddyListImport;
 import org.openymsg.network.challenge.ChallengeResponseV16;
 import org.openymsg.network.challenge.ChallengeResponseV10;
@@ -160,6 +159,9 @@ public class Session implements StatusConstants, FriendManager {
 
   private ArrayList<YMSG9Packet> queueOfList15  = new ArrayList<YMSG9Packet>();
 
+  // used to simulate failures
+//  static private int triesBeforeFailure = 0;
+
   private static final Logger log = Logger.getLogger(Session.class);
 
   /**
@@ -265,7 +267,7 @@ public class Session implements StatusConstants, FriendManager {
    */
   public void login(String username, String password)
       throws IllegalStateException, IOException, AccountLockedException,
-      LoginRefusedException {
+      LoginRefusedException, FailedLoginException {
 	  this.login(username, password, true);
   }
   
@@ -283,7 +285,7 @@ public class Session implements StatusConstants, FriendManager {
    */
   public void login(String username, String password, boolean createPingerTask)
       throws IllegalStateException, IOException, AccountLockedException,
-      LoginRefusedException {
+      LoginRefusedException, FailedLoginException {
     identities = new HashMap<String, YahooIdentity>();
     conferences = new Hashtable<String, YahooConference>();
     chatroomManager = new ChatroomManager(null, null);
@@ -338,13 +340,16 @@ public class Session implements StatusConstants, FriendManager {
       long timeout = System.currentTimeMillis()
           + Util.loginTimeout(NetworkConstants.LOGIN_TIMEOUT);
       while (sessionStatus != SessionState.LOGGED_ON
-          && sessionStatus != SessionState.FAILED && !past(timeout)) {
+          && sessionStatus != SessionState.FAILED && !past(timeout)
+          && loginException == null) {
         try {
           Thread.sleep(10);
         } catch (InterruptedException e) {
           // ignore
         }
       }
+      log.trace("finished waiting for connection: " + sessionStatus + "/" + past(timeout)
+    		  + "/" + loginException);
 
       if (past(timeout)) {
         sessionStatus = SessionState.FAILED;
@@ -352,13 +357,21 @@ public class Session implements StatusConstants, FriendManager {
       }
 
       if (sessionStatus == SessionState.FAILED) {
-        throw (LoginRefusedException) loginException;
+    	  if (loginException instanceof FailedLoginException)
+    	  {
+    		  throw (FailedLoginException)loginException;
+    	  }
+    	  throw (LoginRefusedException) loginException;
       }
+    } catch (Exception ex) {
+      log.error("Got Exception on Login: ", ex);
     } finally {
       // Logon failure? When network input finishes, all supporting
       // threads are stopped.
-      if (sessionStatus != SessionState.LOGGED_ON)
+      if (sessionStatus != SessionState.LOGGED_ON){
+    	log.error("Never logged in, sessionStatus is: " + sessionStatus);
         closeSession();
+      }
     }
   }
 
@@ -369,6 +382,7 @@ public class Session implements StatusConstants, FriendManager {
    * @throws IOException
    */
   public synchronized void logout() throws IllegalStateException, IOException {
+	log.trace("logout");
     try {
       checkStatus();
       transmitLogoff();
@@ -378,6 +392,7 @@ public class Session implements StatusConstants, FriendManager {
   }
   
   void forceCloseSession() throws IOException {
+	log.trace("force close session");
     sessionStatus = SessionState.UNSTARTED;
     cachePacket = null;
     try {
@@ -416,7 +431,7 @@ public class Session implements StatusConstants, FriendManager {
 			}
 		} catch (IOException ex) {
 			if (ex instanceof SocketException) {
-				log.info("Logging out due to socket exception: " + this.getSessionID() + "/" + this.getLoginID());
+				log.warn("Logging out due to socket exception: " + this.getSessionID() + "/" + this.getLoginID());
 				try {
 					this.forceCloseSession();
 				} catch (Exception e) {
@@ -1914,7 +1929,7 @@ public class Session implements StatusConstants, FriendManager {
    * 0, use v9, if 1 or 2, then use v10.
    */
   protected void receiveAuth(YMSG9Packet pkt) // 0x57
-    throws IOException, LoginRefusedException
+    throws IOException, YahooException
   {
     if (sessionStatus != SessionState.CONNECTING) {
       throw new IllegalStateException(
@@ -1950,7 +1965,13 @@ public class Session implements StatusConstants, FriendManager {
       throw new YMSG9BadFormatException("auth", pkt, e);
     }
     catch (LoginRefusedException e) {
+    	loginException = e;
       throw e;
+    }
+    catch (Exception e) {
+        loginException = new FailedLoginException("User " + loginID
+                + ": Login failed unexpectedly.", e);
+        throw loginException;
     }
     sessionStatus = SessionState.CONNECTED;
     log.trace("Going to transmit Auth response, "
@@ -1986,6 +2007,8 @@ public class Session implements StatusConstants, FriendManager {
     URLConnection uc = u.openConnection();
 
     if (uc instanceof HttpURLConnection) {
+    	//used to simulate failures
+//    if (uc instanceof HttpURLConnection && triesBeforeFailure++ % 3 != 0) {
       int responseCode = ((HttpURLConnection) uc).getResponseCode();
       if (responseCode == HttpURLConnection.HTTP_OK) {
         InputStream in = uc.getInputStream();
@@ -2158,7 +2181,7 @@ public class Session implements StatusConstants, FriendManager {
           }
           loginException = new AccountLockedException("User "
               + loginID + " has been locked out", u);
-          log.info("AUTHRESP says: authentication failed!" + loginID,
+          log.info("AUTHRESP says: authentication failed! " + loginID,
               loginException);
           sessionEvent = new SessionLogoutEvent(AuthenticationState.LOCKED);
           break;
@@ -2169,7 +2192,7 @@ public class Session implements StatusConstants, FriendManager {
           loginException = new LoginRefusedException("User "
               + loginID + " refused login" + loginID,
               AuthenticationState.BAD);
-          log.info("AUTHRESP says: authentication failed!",
+          log.info("AUTHRESP says: authentication failed! "  + loginID,
               loginException);
           sessionEvent = new SessionLogoutEvent(AuthenticationState.BAD);
           break;
@@ -2179,7 +2202,7 @@ public class Session implements StatusConstants, FriendManager {
           loginException = new LoginRefusedException("User "
               + loginID + " unknown" + loginID,
               AuthenticationState.BADUSERNAME);
-          log.info("AUTHRESP says: authentication failed!",
+          log.info("AUTHRESP says: authentication failed! " + loginID,
               loginException);
           sessionEvent = new SessionLogoutEvent(AuthenticationState.BADUSERNAME);
           break;
@@ -2188,12 +2211,13 @@ public class Session implements StatusConstants, FriendManager {
           loginException = new LoginRefusedException("User "
               + loginID + " unknown" + loginID,
               AuthenticationState.DUPLICATE_LOGIN);
-          log.info("AUTHRESP says: authentication failed!",
+          log.info("AUTHRESP says: authentication failed! " + loginID,
               loginException);
           sessionEvent = new SessionLogoutEvent(AuthenticationState.DUPLICATE_LOGIN);
           break;
         case UNKNOWN_52:
-            log.info("AUTHRESP says: authentication failed with unknown: " + AuthenticationState.UNKNOWN_52,
+            log.info("AUTHRESP says: authentication failed with unknown: " + AuthenticationState.UNKNOWN_52 
+            		+ " "  + loginID,
                     loginException);
             loginException = new LoginRefusedException("User "
                     + loginID + " was forced off" + loginID,
@@ -3323,12 +3347,17 @@ public class Session implements StatusConstants, FriendManager {
       // Is this packet about us, or one of our online friends?
       if (!pkt.exists("7")) // About us
       {
-      	log.info("Logging of because I received a logoff" + this.primaryID + "/" + pkt);
+      	log.info("Logging out because I received a logoff" + this.primaryID + "/" + pkt);
         // Note: when this method returns, the input thread loop
         // which called it exits.
         sessionStatus = SessionState.UNSTARTED;
         ipThread.stopMe();
-        eventDispatchQueue.append(ServiceType.LOGOFF);
+        SessionLogoutEvent logoutEvent = new SessionLogoutEvent(AuthenticationState.YAHOO_LOGOFF);
+        if (pkt.status == -1)
+        {
+        	logoutEvent = new SessionLogoutEvent(AuthenticationState.DUPLICATE_LOGIN);
+        }
+		eventDispatchQueue.append(logoutEvent, ServiceType.LOGOFF);
         closeSession();
       } else
       // About friends
@@ -3582,6 +3611,7 @@ public class Session implements StatusConstants, FriendManager {
    * If the network isn't closed already, close it.
    */
   private void closeSession() throws IOException {
+	log.trace("close session");
     // Close the input thread (unless ipThread itself is calling us)
     sessionStatus = SessionState.UNSTARTED;
     if (ipThread != null && Thread.currentThread() != ipThread) {
