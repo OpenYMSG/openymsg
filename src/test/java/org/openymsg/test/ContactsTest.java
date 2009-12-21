@@ -48,8 +48,7 @@ public class ContactsTest extends YahooTestAbstract {
 
 	@Test
 	public void testReLoginFriendAndChangeStatusBuddy()
-			throws IllegalStateException, IOException, AccountLockedException,
-			LoginRefusedException, InterruptedException {
+			throws Exception {
 		sess2.logout();
 		Thread.sleep(500);
 		YahooUser buddy = sess1.getRoster().getUser(OTHERUSR);

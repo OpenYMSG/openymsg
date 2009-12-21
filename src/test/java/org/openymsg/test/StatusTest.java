@@ -63,8 +63,7 @@ public class StatusTest extends YahooTestAbstract {
 	// @Test
 	// TODO: this test fails because the two user are not subscribed to each
 	// other.
-	public void testReceiveLogoutStatus() throws IllegalStateException,
-			IOException, AccountLockedException, LoginRefusedException {
+	public void testReceiveLogoutStatus() throws Exception {
 		sess2.logout();
 		FireEvent event = listener1.waitForEvent(5,
 				ServiceType.Y6_STATUS_UPDATE);
@@ -90,8 +89,7 @@ public class StatusTest extends YahooTestAbstract {
 
 	@Test
 	public void testServerBanYouout4AnotherLoginWithSameUser()
-			throws AccountLockedException, IllegalStateException,
-			LoginRefusedException, IOException, InterruptedException {
+			throws Exception {
 		Session sessKiller = new Session();
 		listener2.clearEvents();
 		Thread.sleep(500);
