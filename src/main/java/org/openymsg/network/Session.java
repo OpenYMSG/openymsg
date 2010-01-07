@@ -3757,7 +3757,7 @@ public class Session implements StatusConstants, FriendManager {
     String clearIdleTime = null;
     String idleTime = null;
 	String customMessage = null;
-	long customStatus = 0;
+	String customStatus = null;
     while (iter.hasNext()) {
       String[] s = iter.next();
 
@@ -3783,7 +3783,7 @@ public class Session implements StatusConstants, FriendManager {
                   clearIdleTime = null;
                   idleTime = null;
       	          customMessage = null;
-      	      	  customStatus = 0;
+      	      	  customStatus = null;
 
                   user = null;
 	
@@ -3820,13 +3820,7 @@ public class Session implements StatusConstants, FriendManager {
       		customMessage = value;
       		break;
       	case 47:
-                try {
-                    customStatus = Long.parseLong(value);
-                }
-                catch (NumberFormatException e) {
-                    log.info("Unable to parse customStatus to a long value: "
-                            + value);
-                }
+            customStatus = value;
       		break;
       	case 138:
       	    clearIdleTime = value;
@@ -3850,7 +3844,7 @@ public class Session implements StatusConstants, FriendManager {
     private void updateFriendStatus(boolean logoff, YahooUser user,
             Status newStatus, Boolean onChat, Boolean onPager,
             String visibility, String clearIdleTime, String idleTime,
-            String customMessage, long customStatus, long longStatus) {
+            String customMessage, String customStatus, long longStatus) {
         log.info("UpdateFriendStatus arguments: logoff: " + logoff + ", user: " + user + ", newStatus: "
                 + newStatus + ", onChat: " + onChat + ", onPager: " + onPager
                 + ", visibility: " + visibility + ", clearIdleTime: "
