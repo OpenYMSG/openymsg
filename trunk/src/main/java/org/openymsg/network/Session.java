@@ -1467,7 +1467,7 @@ public class Session implements StatusConstants, FriendManager {
       PacketBodyBuffer body = new PacketBodyBuffer();
       body.addElement("1" ,primaryID.getId());
       body.addElement("5" ,friend);
-      body.addElement("241", "0");
+//      body.addElement("241", "0"); // not in v17
       body.addElement("13", "1");// Accept Authorization
 //      body.addElement("334", ""); not therein v16
       sendPacket(body, ServiceType.Y7_AUTHORIZATION, Status.AVAILABLE);   // 0xd6, 
@@ -2737,45 +2737,51 @@ public class Session implements StatusConstants, FriendManager {
     }
   }
 
-  protected void receiveAuthorization(YMSG9Packet pkt)    // 0xd6
-  {
-      try
-      {
-          if(pkt.length <= 0) {
-              return;
-          }
-          
-    	  if (pkt.status == 1) { // it is an ack
-    		  log.trace("Accepted authorization");
-    	  }
-    	  else if (pkt.status == 2) {
-    		  log.warn("Denied authorization request");
-    	  }
-    	  else if (pkt.status == 3) {
-    		  log.warn("received authorization request");
-    	  }
-          String who, msg, fname, lname, id;
-
-          who = pkt.getValue("4");
-          msg = pkt.getValue("14");
-          fname = pkt.getValue("216");
-          lname = pkt.getValue("254");
-          id = pkt.getValue("5");
-
-          SessionAuthorizationEvent se = new SessionAuthorizationEvent(this, id,
-              who, fname, lname, msg);
-          /**
-           pkt.status:
-             1 - Authorization Accepted
-             2 - Authorization Denied
-             3 - Authorization Request
-          */
-          se.setStatus(pkt.status);
-          eventDispatchQueue.append(se, ServiceType.Y7_AUTHORIZATION);
-
-      } catch(Exception e) {
-          throw new YMSG9BadFormatException("contact request", pkt, e);
+  // TODO sending two events is a bit iffy. See if we can improve on this.
+  protected void receiveAuthorization(YMSG9Packet pkt) { // 0xd6
+    try {
+      if(pkt.length <= 0) {
+        return;
       }
+      
+      String who, msg, fname, lname, id;
+      who = pkt.getValue("4");
+      msg = pkt.getValue("14");
+      fname = pkt.getValue("216");
+      lname = pkt.getValue("254");
+      id = pkt.getValue("5");
+    
+      SessionAuthorizationEvent se = new SessionAuthorizationEvent(this, id,
+        who, fname, lname, msg);
+          
+      /**
+       pkt.status:
+       1 - Authorization Accepted
+       2 - Authorization Denied
+       3 - Authorization Request
+      */
+      se.setStatus(pkt.status);
+      eventDispatchQueue.append(se, ServiceType.Y7_AUTHORIZATION);
+
+      if (pkt.status == 1) { // it is an ack
+          log.trace("Accepted authorization");
+      }
+      else if (pkt.status == 2) {
+        log.trace("A friend refused our subscription request: " + who);
+        final YahooUser user = roster.getUser(who);
+        final SessionFriendRejectedEvent ser = new SessionFriendRejectedEvent(
+                this, user, msg);
+        eventDispatchQueue.append(ser, ServiceType.CONTACTREJECT);
+      }
+      else if (pkt.status == 3) {
+        // Someone is sending us a subscription request.
+        log.trace("Someone is sending us a subscription request: "
+                  + who);
+        eventDispatchQueue.append(se, ServiceType.CONTACTNEW);
+      }
+    } catch(Exception e) {
+      throw new YMSG9BadFormatException("contact request", pkt, e);
+    }
   }
 
   /**
@@ -3751,7 +3757,7 @@ public class Session implements StatusConstants, FriendManager {
     String clearIdleTime = null;
     String idleTime = null;
 	String customMessage = null;
-	String customStatus = null;
+	long customStatus = 0;
     while (iter.hasNext()) {
       String[] s = iter.next();
 
@@ -3777,7 +3783,7 @@ public class Session implements StatusConstants, FriendManager {
                   clearIdleTime = null;
                   idleTime = null;
       	          customMessage = null;
-      	      	  customStatus = null;
+      	      	  customStatus = 0;
 
                   user = null;
 	
@@ -3814,7 +3820,13 @@ public class Session implements StatusConstants, FriendManager {
       		customMessage = value;
       		break;
       	case 47:
-      		customStatus = value;
+                try {
+                    customStatus = Long.parseLong(value);
+                }
+                catch (NumberFormatException e) {
+                    log.info("Unable to parse customStatus to a long value: "
+                            + value);
+                }
       		break;
       	case 138:
       	    clearIdleTime = value;
@@ -3835,55 +3847,60 @@ public class Session implements StatusConstants, FriendManager {
 
   }
 
-private void updateFriendStatus(boolean logoff, YahooUser user,
-		Status newStatus, Boolean onChat, Boolean onPager, String visibility,
-		String clearIdleTime, String idleTime, String customMessage,
-		String customStatus, long longStatus) {
-	log.info("logoff: " + logoff + ", user: " + user + ", newStatus: " + newStatus
-			+ ", onChat: " + onChat + ", onPager: " + onPager + ", visibility: "
-			+visibility + ", clearIdleTime: " + clearIdleTime + ", idleTime: " +
-			idleTime + ", customMessage: " + customMessage + ", customStatus: " +
-			customStatus + ", longStatus: " + longStatus);
-	if (longStatus == -1 && (onPager == null || !onPager))
-	{
-		//Offline -- usually federated or msn live
-		logoff = true; 
-	}
-    try {
-        newStatus = logoff ? Status.OFFLINE : Status
-            .getStatus(longStatus);
-    } catch (IllegalArgumentException e) {
-        // unknown status
-    }
+    private void updateFriendStatus(boolean logoff, YahooUser user,
+            Status newStatus, Boolean onChat, Boolean onPager,
+            String visibility, String clearIdleTime, String idleTime,
+            String customMessage, long customStatus, long longStatus) {
+        log.info("UpdateFriendStatus arguments: logoff: " + logoff + ", user: " + user + ", newStatus: "
+                + newStatus + ", onChat: " + onChat + ", onPager: " + onPager
+                + ", visibility: " + visibility + ", clearIdleTime: "
+                + clearIdleTime + ", idleTime: " + idleTime
+                + ", customMessage: " + customMessage + ", customStatus: "
+                + customStatus + ", longStatus: " + longStatus);
+        if (longStatus == -1 && (onPager == null || !onPager)) {
+            // Offline -- usually federated or msn live
+            logoff = true;
+        }
+        try {
+            newStatus = logoff ? Status.OFFLINE : Status.getStatus(longStatus);
+        }
+        catch (IllegalArgumentException e) {
+            log.info("UpdateFriendStatus: disregarding an unknown longStatus: " + longStatus);
+        }
 
-	if (onChat != null) {
-		  user.update(newStatus, onChat, onPager);
-		} else if (onPager != null) {
-		  user.update(newStatus, visibility);
-		} else if (logoff) {
-	      // logoff message doesn't have chat or pager info, but we reset those in this case.
-	      user.update(newStatus, false, false);
-	  }
-	  else {
-	    // status update with no chat, nor pager information, so leave those values alone.
-	    user.update(newStatus);
-	  }
-		if (customMessage != null) {
-		  user.setCustom(customMessage, customStatus);
-		}
-		
-	    if (clearIdleTime != null) {
-	  user.setIdleTime(-1);
-	}
-	  if (idleTime != null) {
-	    user.setIdleTime(Long.parseLong(idleTime));
-	  }
-	  final SessionFriendEvent event = new SessionFriendEvent(this, user);
-	  // Fire event
-	  if (eventDispatchQueue != null) {
-	    eventDispatchQueue.append(event, ServiceType.Y6_STATUS_UPDATE);
-	  }
-}
+        if (onChat != null) {
+            user.update(newStatus, onChat, onPager);
+        }
+        else if (onPager != null) {
+            user.update(newStatus, visibility);
+        }
+        else if (logoff) {
+            // logoff message doesn't have chat or pager info, but we reset
+            // those in this case.
+            user.update(newStatus, false, false);
+        }
+        else {
+            // status update with no chat, nor pager information, so leave those
+            // values alone.
+            user.update(newStatus);
+        }
+        
+        if (customMessage != null) {
+            user.setCustom(customMessage, customStatus);
+        }
+
+        if (clearIdleTime != null) {
+            user.setIdleTime(-1);
+        }
+        if (idleTime != null) {
+            user.setIdleTime(Long.parseLong(idleTime));
+        }
+        final SessionFriendEvent event = new SessionFriendEvent(this, user);
+        // Fire event
+        if (eventDispatchQueue != null) {
+            eventDispatchQueue.append(event, ServiceType.Y6_STATUS_UPDATE);
+        }
+    }
 
   /**
    * Create chat user from a chat packet. Note: a YahooUser is created if
