@@ -2737,7 +2737,6 @@ public class Session implements StatusConstants, FriendManager {
     }
   }
 
-  // TODO sending two events is a bit iffy. See if we can improve on this.
   protected void receiveAuthorization(YMSG9Packet pkt) { // 0xd6
     try {
       if(pkt.length <= 0) {
@@ -2761,23 +2760,27 @@ public class Session implements StatusConstants, FriendManager {
        3 - Authorization Request
       */
       se.setStatus(pkt.status);
-      eventDispatchQueue.append(se, ServiceType.Y7_AUTHORIZATION);
-
-      if (pkt.status == 1) { // it is an ack
-          log.trace("Accepted authorization");
+      
+      if (pkt.status == 1) { 
+          log.trace("A friend accepted our authorization request: " + who);
+          final YahooUser user = roster.getUser(who);
+          final SessionFriendRejectedEvent ser = new SessionFriendRejectedEvent(
+                  this, user, msg);
+          eventDispatchQueue.append(ser, ServiceType.Y7_AUTHORIZATION);
       }
       else if (pkt.status == 2) {
         log.trace("A friend refused our subscription request: " + who);
         final YahooUser user = roster.getUser(who);
         final SessionFriendRejectedEvent ser = new SessionFriendRejectedEvent(
                 this, user, msg);
-        eventDispatchQueue.append(ser, ServiceType.CONTACTREJECT);
+        eventDispatchQueue.append(ser, ServiceType.Y7_AUTHORIZATION);
       }
       else if (pkt.status == 3) {
-        // Someone is sending us a subscription request.
-        log.trace("Someone is sending us a subscription request: "
-                  + who);
-        eventDispatchQueue.append(se, ServiceType.CONTACTNEW);
+        log.trace("Someone is sending us a subscription request: " + who);
+        eventDispatchQueue.append(se, ServiceType.Y7_AUTHORIZATION);
+      }
+      else {
+        log.info("Unexpected authorization packet. Do not know how to handle: " + pkt);
       }
     } catch(Exception e) {
       throw new YMSG9BadFormatException("contact request", pkt, e);

@@ -3,7 +3,9 @@ package org.openymsg.roster;
 import org.openymsg.addressBook.YahooAddressBookEntry;
 import org.openymsg.network.*;
 import org.openymsg.network.event.SessionEvent;
+import org.openymsg.network.event.SessionFriendAcceptedEvent;
 import org.openymsg.network.event.SessionFriendEvent;
+import org.openymsg.network.event.SessionFriendRejectedEvent;
 import org.openymsg.network.event.SessionListEvent;
 import org.openymsg.network.event.SessionListener;
 import org.openymsg.support.Logger;
@@ -636,6 +638,21 @@ public class Roster implements Set<YahooUser>, SessionListener {
 			syncedUpdate(user.getId(), user);
 			break;
 
+		case Y7_AUTHORIZATION:
+		    if (fEvent instanceof SessionFriendAcceptedEvent) {
+	            log.trace("Adding user to roster, as triggered by "
+	                    + "SessionFriendAcceptedEvent: " + event);
+	            syncedAdd(user);
+		    } else if (fEvent instanceof SessionFriendRejectedEvent) {
+	            log.trace("Removing user from roster as triggered by "
+	                    + "SessionFriendRejectedEvent: " + event);
+	            syncedRemove(user.getId());
+            } else {
+                log.info("Ignoring SessionFriendEvent of type "
+                        + event.getType() + " that contains an event that we"
+                        + " do not know how to process: " + fEvent);
+            }
+		    break;
 		default:
 			log.info("Ignoring SessionFriendEvent that came"
 					+ " with an unsupported ServiceType: " + event.getType());
