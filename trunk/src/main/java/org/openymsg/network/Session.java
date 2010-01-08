@@ -2982,18 +2982,66 @@ public class Session implements StatusConstants, FriendManager {
     // Fix: do something here!
   }
 
-  /**
-   * Process an incoming V6_STATUS_UPDATE packet. This most likely replaces
-   * {@link #receiveIsAway(YMSG9Packet)} and
-   * {@link #receiveIsBack(YMSG9Packet)}.
-   * 
-   * @param pkt
-   *      The V6_STATUS_UPDATE packet.
-   */
-  protected void receiveStatusUpdate(YMSG9Packet pkt) // 0xC6
-  {
-    updateFriendsStatus(pkt);
-  }
+    /**
+     * Process an incoming Y6_STATUS_UPDATE packet. This packet most likely
+     * replaces {@link #receiveIsAway(YMSG9Packet)} and
+     * {@link #receiveIsBack(YMSG9Packet)}.
+     * 
+     * An example of a packet that is received, is this:
+     * 
+     * <pre>
+     * Version: 16
+     * Packet Length: 177
+     * Service: Y6 Status Update (198)
+     * Status: Server Ack (1)
+     * Session ID: 0x125f5e00
+     * Content
+     *   7:workingonthefix2
+     *   10:99
+     *   19:test
+     *   47:1
+     *   97:1
+     *   187:0
+     *   302:316
+     *   300:316
+     *   135:0.38.0
+     *   258:16762d37-0eb1-40d0-5863-5fa5ade02675
+     *   310:en-us
+     *   301:316
+     *   303:316
+     *   317:1
+     * </pre>
+     * 
+     * The values in the content map are to be interpreted as follows:
+     * 
+     * <table><tr><th>key (decimal)</th><th>example value</th><th>key description</th><th>interpretation</th></tr>
+     * <tr><td>7</td><td>workingonthefix2</td><td>userID</td><td>the conteact that changed status</td></tr>
+     * <tr><td>10</td><td>99</td><td>status code</td><td>This is expected to be '99' (CUSTOM) for all packets. It appears that in previous incarnations of the Yahoo protocol, this code was used to indicate a variety of status modes, including ERROR(-1), AVAILABLE(0), BRB(1), BUSY(2), NOTATHOME(3), NOTATDESK(4), NOTINOFFICE(5), ONPHONE(6), ONVACATION(7), OUTTOLUNCH(8), STEPPEDOUT(9), INVISIBLE(12), CUSTOM(99), IDLE(999), OFFLINE(0x5a55aa56), WEBLOGIN(0x5a55aa55) and TYPING(0x16)</td></tr><tr><td>19</td><td></td><td></td></tr>
+     * <tr><td>19</td><td>test</td><td>custom status message</td><td>A custom status message that was entered by the user. This is a free-form text field.</td><td></td></tr>
+     * <tr><td>47</td><td>1</td><td>custom status code</td><td>This is expected to be either '0' or '1'. If a custom status message is set, this key indicates how the availability of the user that set this status must be interpreted. If the status is '0', than the user is 'available'. If the status is '1', then the user is 'busy.'</td></tr>
+     * <tr><td>97</td><td>1</td><td></td><td></td></tr>
+     * <tr><td>187</td><td>0</td><td></td><td></td></tr>
+     * <tr><td>302</td><td>316</td><td></td><td></td></tr>
+     * <tr><td>300</td><td>316</td><td></td><td></td></tr>
+     * <tr><td>135</td><td>0.38.0</td><td></td><td></td></tr>
+     * <tr><td>258</td><td>16762d37-0eb1-40d0-5863-5fa5ade02675</td><td></td><td></td></tr>
+     * <tr><td>310</td><td>en-us</td><td></td><td>(this looks like a locale)</td></tr>
+     * <tr><td>301</td><td>316</td><td></td><td></td></tr>
+     * <tr><td>303</td><td>316</td><td></td><td></td></tr>
+     * <tr><td>317</td><td>1</td><td></td><td>(possibly: idle time)</td></tr>
+     * </table>
+     * 
+     * @param pkt The V6_STATUS_UPDATE packet.
+     */
+    protected void receiveStatusUpdate(YMSG9Packet pkt) // 0xC6
+    {
+        final String userID = pkt.getValue("7");
+        final String statusMessage = pkt.getValue("19");
+        final boolean isBusy = Boolean.parseBoolean(pkt.getValue("47"));
+        
+        // TODO Don't use updateFriendStatus, but create a new routine that isn't bogged down by old stuff.
+        updateFriendsStatus(pkt);
+    }
 
   /**
    * Process an incoming ISAWAY packet. See ISBACK below.
