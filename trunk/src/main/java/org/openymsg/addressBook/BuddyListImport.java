@@ -94,7 +94,7 @@ public class BuddyListImport {
 					}
 					else 
 					{
-						log.warn("No node list found for ct");
+						log.info("No node list found for ct. AddressBook empty?");
 					}
 				}catch(Exception pce) {
 					log.error("Failed reading xml addressbook", pce);
