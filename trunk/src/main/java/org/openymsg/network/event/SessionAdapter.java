@@ -78,6 +78,10 @@ public class SessionAdapter implements SessionListener {
     // override this function if you want to do something with it.
   }
 
+  public void contactAcceptedReceived(SessionFriendAcceptedEvent event) {
+    // override this function if you want to do something with it.
+  }
+  
   public void conferenceInviteReceived(SessionConferenceEvent event) {
     // override this function if you want to do something with it.
   }
@@ -139,10 +143,6 @@ public class SessionAdapter implements SessionListener {
   }
 
   public void pictureReceived(SessionPictureEvent ev) {
-    // override this function if you want to do something with it.
-  }
-
-  public void authorizationReceived(SessionAuthorizationEvent ev) {
     // override this function if you want to do something with it.
   }
 
@@ -260,7 +260,17 @@ public class SessionAdapter implements SessionListener {
         pictureReceived((SessionPictureEvent)ev);
         break;
       case Y7_AUTHORIZATION:
-        authorizationReceived((SessionAuthorizationEvent)ev);
+          if (ev instanceof SessionAuthorizationEvent) {
+              contactRequestReceived((SessionAuthorizationEvent) ev);
+          } else if (ev instanceof SessionFriendRejectedEvent) {
+              contactRejectionReceived((SessionFriendRejectedEvent) ev);
+          } else if (ev instanceof SessionFriendAcceptedEvent) {
+              contactAcceptedReceived((SessionFriendAcceptedEvent) ev);
+            }
+            else {
+                throw new IllegalArgumentException("Don't know how to handle '"
+                        + event.getType() + "' event: " + event);
+            }
         break;
       default:
         throw new IllegalArgumentException(
