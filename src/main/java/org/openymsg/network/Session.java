@@ -3896,7 +3896,7 @@ public class Session implements StatusConstants, FriendManager {
             Status newStatus, Boolean onChat, Boolean onPager,
             String visibility, String clearIdleTime, String idleTime,
             String customMessage, String customStatus, long longStatus) {
-        log.info("UpdateFriendStatus arguments: logoff: " + logoff + ", user: " + user + ", newStatus: "
+        log.trace("UpdateFriendStatus arguments: logoff: " + logoff + ", user: " + user + ", newStatus: "
                 + newStatus + ", onChat: " + onChat + ", onPager: " + onPager
                 + ", visibility: " + visibility + ", clearIdleTime: "
                 + clearIdleTime + ", idleTime: " + idleTime
