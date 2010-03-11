@@ -357,14 +357,13 @@ public class Session implements StatusConstants, FriendManager {
       }
 
       if (sessionStatus == SessionState.FAILED) {
+          log.error("Got Exception on Login: ", loginException);
     	  if (loginException instanceof FailedLoginException)
     	  {
     		  throw (FailedLoginException)loginException;
     	  }
     	  throw (LoginRefusedException) loginException;
       }
-    } catch (Exception ex) {
-      log.error("Got Exception on Login: ", ex);
     } finally {
       // Logon failure? When network input finishes, all supporting
       // threads are stopped.
