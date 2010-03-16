@@ -45,6 +45,7 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.jdom.JDOMException;
 import org.openymsg.addressBook.BuddyListImport;
 import org.openymsg.network.challenge.ChallengeResponseV16;
 import org.openymsg.network.challenge.ChallengeResponseV10;
@@ -357,7 +358,6 @@ public class Session implements StatusConstants, FriendManager {
       }
 
       if (sessionStatus == SessionState.FAILED) {
-          log.error("Got Exception on Login: ", loginException);
     	  if (loginException instanceof FailedLoginException)
     	  {
     		  throw (FailedLoginException)loginException;
@@ -861,11 +861,11 @@ public class Session implements StatusConstants, FriendManager {
       transmitRejectBuddy(friend, ev.getTo(), msg);
   }
 
-  public void acceptFriendAuthorization(String friend)
+  public void acceptFriendAuthorization(String friend, YahooProtocol procotol)
     throws IllegalStateException, IOException
   {
     checkStatus();
-    transmitAcceptBuddy(friend);
+    transmitAcceptBuddy(friend, procotol.getStringValue());
   }
 
 
@@ -1460,13 +1460,13 @@ public class Session implements StatusConstants, FriendManager {
     sendPacket(body,ServiceType.Y7_AUTHORIZATION, Status.AVAILABLE);  // 0xd6
   }
 
-  protected void transmitAcceptBuddy(String friend)
+  protected void transmitAcceptBuddy(String friend, String type)
     throws IOException
   {
       PacketBodyBuffer body = new PacketBodyBuffer();
       body.addElement("1" ,primaryID.getId());
       body.addElement("5" ,friend);
-//      body.addElement("241", "0"); // not in v17
+      body.addElement("241", type);
       body.addElement("13", "1");// Accept Authorization
 //      body.addElement("334", ""); not therein v16
       sendPacket(body, ServiceType.Y7_AUTHORIZATION, Status.AVAILABLE);   // 0xd6, 
@@ -1761,12 +1761,15 @@ public class Session implements StatusConstants, FriendManager {
     if (yid == null) {
       throw new IllegalArgumentException("Argument 'yid' cannot be null.");
     }
+    
+    String type = this.getType(to);
 
     String messageNumberString = buildMessageNumber();
     // Send packet
     PacketBodyBuffer body = new PacketBodyBuffer();
     body.addElement("1", yid.getId()); // From (effective ID)
     body.addElement("5", to); // To
+	body.addElement("241", type);
     body.addElement("14", msg); // Message
     // Extension for YMSG9
     if (Util.isUtf8(msg))
@@ -1779,6 +1782,14 @@ public class Session implements StatusConstants, FriendManager {
     sendPacket(body, ServiceType.MESSAGE, Status.OFFLINE); // 0x06
     return messageNumberString;
   }
+
+	protected String getType(String to) {
+		YahooUser user = this.roster.getUser(to);
+		if (user == null || user.getProtocol() == null) {
+			return YahooProtocol.YAHOO.getStringValue();
+		}
+		return user.getProtocol().getStringValue();
+	}
 
 	protected String buildMessageNumber() {
 		String blankMessageNumber = "0000000000000000";
@@ -1808,7 +1819,8 @@ public class Session implements StatusConstants, FriendManager {
    */
   public void sendTypingNotification(String friend, boolean isTyping)
       throws IOException {
-    transmitNotify(friend, primaryID.getId(), isTyping, " ", NOTIFY_TYPING);
+	String type = this.getType(friend);
+    transmitNotify(friend, primaryID.getId(), isTyping, " ", NOTIFY_TYPING, type);
   }
 
   /**
@@ -1827,7 +1839,7 @@ public class Session implements StatusConstants, FriendManager {
    * @throws IOException
    */
   protected void transmitNotify(String friend, String yid, boolean on,
-      String msg, String mode) throws IOException {
+      String msg, String mode, String type) throws IOException {
     final PacketBodyBuffer body = new PacketBodyBuffer();
     //Added 1 for is typing, not sure we need the "4"
     body.addElement("49", mode);
@@ -1841,7 +1853,7 @@ public class Session implements StatusConstants, FriendManager {
     }
     body.addElement("5", friend);
       //added for is typing
-    body.addElement("241", "0");
+    body.addElement("241", type);
     sendPacket(body, ServiceType.NOTIFY, Status.TYPING); // 0x4b
   }
 
@@ -2736,55 +2748,57 @@ public class Session implements StatusConstants, FriendManager {
     }
   }
 
-  protected void receiveAuthorization(YMSG9Packet pkt) { // 0xd6
-    try {
-      if(pkt.length <= 0) {
-        return;
-      }
-      
-      String who, msg, fname, lname, id;
-      who = pkt.getValue("4");
-      msg = pkt.getValue("14");
-      fname = pkt.getValue("216");
-      lname = pkt.getValue("254");
-      id = pkt.getValue("5");
-    
-      SessionAuthorizationEvent se = new SessionAuthorizationEvent(this, id,
-        who, fname, lname, msg);
+  protected void receiveAuthorization(YMSG9Packet pkt)    // 0xd6
+  {
+      try
+      {
+          if(pkt.length <= 0) {
+              return;
+          }
           
-      /**
-       pkt.status:
-       1 - Authorization Accepted
-       2 - Authorization Denied
-       3 - Authorization Request
-      */
-      se.setStatus(pkt.status);
-      
-      if (pkt.status == 1) { 
-          log.trace("A friend accepted our authorization request: " + who);
-          final YahooUser user = roster.getUser(who);
-          final SessionFriendRejectedEvent ser = new SessionFriendRejectedEvent(
-                  this, user, msg);
-          eventDispatchQueue.append(ser, ServiceType.Y7_AUTHORIZATION);
+    	  if (pkt.status == 1) { // it is an ack
+    		  log.trace("Accepted authorization");
+    	  }
+    	  else if (pkt.status == 2) {
+    		  log.warn("Denied authorization request");
+    	  }
+    	  else if (pkt.status == 3) {
+    		  log.warn("received authorization request");
+    	  }
+          String who, msg, fname, lname, id, protocolString;
+          YahooProtocol protocol;
+          who = pkt.getValue("4");
+          msg = pkt.getValue("14");
+          fname = pkt.getValue("216");
+          lname = pkt.getValue("254");
+          id = pkt.getValue("5");
+          protocolString = pkt.getValue("241");
+          protocol = getUserProtocol(protocolString, who);
+          
+          SessionAuthorizationEvent se = new SessionAuthorizationEvent(this, id,
+              who, fname, lname, msg, protocol);
+          /**
+           pkt.status:
+             1 - Authorization Accepted
+             2 - Authorization Denied
+             3 - Authorization Request
+          */
+          se.setStatus(pkt.status);
+          eventDispatchQueue.append(se, ServiceType.Y7_AUTHORIZATION);
+
+      } catch(Exception e) {
+          throw new YMSG9BadFormatException("contact request", pkt, e);
       }
-      else if (pkt.status == 2) {
-        log.trace("A friend refused our subscription request: " + who);
-        final YahooUser user = roster.getUser(who);
-        final SessionFriendRejectedEvent ser = new SessionFriendRejectedEvent(
-                this, user, msg);
-        eventDispatchQueue.append(ser, ServiceType.Y7_AUTHORIZATION);
-      }
-      else if (pkt.status == 3) {
-        log.trace("Someone is sending us a subscription request: " + who);
-        eventDispatchQueue.append(se, ServiceType.Y7_AUTHORIZATION);
-      }
-      else {
-        log.info("Unexpected authorization packet. Do not know how to handle: " + pkt);
-      }
-    } catch(Exception e) {
-      throw new YMSG9BadFormatException("contact request", pkt, e);
-    }
   }
+
+	private YahooProtocol getUserProtocol(String protocolString, String who) {
+		try {
+			return YahooProtocol.getProtocol(protocolString);
+		} catch (IllegalArgumentException e) {
+			log.error("Failed finding protocol: " + protocolString + " for user: " + who);
+			return YahooProtocol.YAHOO;
+		}
+	}
 
   /**
    * Process an incoming FILETRANSFER packet. This packet can be received
@@ -2854,7 +2868,8 @@ public class Session implements StatusConstants, FriendManager {
     		  // on our roster.
         	  user = this.roster.getUser(userId);
         	  if (user == null) {
-        		  user = new YahooUser(userId, groupName);
+        		  YahooProtocol yahooProtocol = getUserProtocol(protocol, userId);
+        		  user = new YahooUser(userId, groupName, yahooProtocol);
         	  }
     	      // Fire event : 7=friend, 66=status, 65=group name
     	      final SessionFriendEvent se = new SessionFriendEvent(this, user, groupName);
@@ -2878,7 +2893,8 @@ public class Session implements StatusConstants, FriendManager {
     		  if (userId != null) {
 		    	  user = this.roster.getUser(userId);
 		    	  if (user == null) {
-		    		  user = new YahooUser(userId, groupName);
+	        		  YahooProtocol yahooProtocol = getUserProtocol(protocol, userId);
+		    		  user = new YahooUser(userId, groupName, yahooProtocol);
 		    	  }
 		    	  else if (!friendAddStatus.equals("2")){
 		    		  log.warn("Adding friend failed and friend is in our roster: " + userId);
@@ -2984,66 +3000,18 @@ public class Session implements StatusConstants, FriendManager {
     // Fix: do something here!
   }
 
-    /**
-     * Process an incoming Y6_STATUS_UPDATE packet. This packet most likely
-     * replaces {@link #receiveIsAway(YMSG9Packet)} and
-     * {@link #receiveIsBack(YMSG9Packet)}.
-     * 
-     * An example of a packet that is received, is this:
-     * 
-     * <pre>
-     * Version: 16
-     * Packet Length: 177
-     * Service: Y6 Status Update (198)
-     * Status: Server Ack (1)
-     * Session ID: 0x125f5e00
-     * Content
-     *   7:workingonthefix2
-     *   10:99
-     *   19:test
-     *   47:1
-     *   97:1
-     *   187:0
-     *   302:316
-     *   300:316
-     *   135:0.38.0
-     *   258:16762d37-0eb1-40d0-5863-5fa5ade02675
-     *   310:en-us
-     *   301:316
-     *   303:316
-     *   317:1
-     * </pre>
-     * 
-     * The values in the content map are to be interpreted as follows:
-     * 
-     * <table><tr><th>key (decimal)</th><th>example value</th><th>key description</th><th>interpretation</th></tr>
-     * <tr><td>7</td><td>workingonthefix2</td><td>userID</td><td>the conteact that changed status</td></tr>
-     * <tr><td>10</td><td>99</td><td>status code</td><td>This is expected to be '99' (CUSTOM) for all packets. It appears that in previous incarnations of the Yahoo protocol, this code was used to indicate a variety of status modes, including ERROR(-1), AVAILABLE(0), BRB(1), BUSY(2), NOTATHOME(3), NOTATDESK(4), NOTINOFFICE(5), ONPHONE(6), ONVACATION(7), OUTTOLUNCH(8), STEPPEDOUT(9), INVISIBLE(12), CUSTOM(99), IDLE(999), OFFLINE(0x5a55aa56), WEBLOGIN(0x5a55aa55) and TYPING(0x16)</td></tr><tr><td>19</td><td></td><td></td></tr>
-     * <tr><td>19</td><td>test</td><td>custom status message</td><td>A custom status message that was entered by the user. This is a free-form text field.</td><td></td></tr>
-     * <tr><td>47</td><td>1</td><td>custom status code</td><td>This is expected to be either '0' or '1'. If a custom status message is set, this key indicates how the availability of the user that set this status must be interpreted. If the status is '0', than the user is 'available'. If the status is '1', then the user is 'busy.'</td></tr>
-     * <tr><td>97</td><td>1</td><td></td><td></td></tr>
-     * <tr><td>187</td><td>0</td><td></td><td></td></tr>
-     * <tr><td>302</td><td>316</td><td></td><td></td></tr>
-     * <tr><td>300</td><td>316</td><td></td><td></td></tr>
-     * <tr><td>135</td><td>0.38.0</td><td></td><td></td></tr>
-     * <tr><td>258</td><td>16762d37-0eb1-40d0-5863-5fa5ade02675</td><td></td><td></td></tr>
-     * <tr><td>310</td><td>en-us</td><td></td><td>(this looks like a locale)</td></tr>
-     * <tr><td>301</td><td>316</td><td></td><td></td></tr>
-     * <tr><td>303</td><td>316</td><td></td><td></td></tr>
-     * <tr><td>317</td><td>1</td><td></td><td>(possibly: idle time)</td></tr>
-     * </table>
-     * 
-     * @param pkt The V6_STATUS_UPDATE packet.
-     */
-    protected void receiveStatusUpdate(YMSG9Packet pkt) // 0xC6
-    {
-        final String userID = pkt.getValue("7");
-        final String statusMessage = pkt.getValue("19");
-        final boolean isBusy = Boolean.parseBoolean(pkt.getValue("47"));
-        
-        // TODO Don't use updateFriendStatus, but create a new routine that isn't bogged down by old stuff.
-        updateFriendsStatus(pkt);
-    }
+  /**
+   * Process an incoming V6_STATUS_UPDATE packet. This most likely replaces
+   * {@link #receiveIsAway(YMSG9Packet)} and
+   * {@link #receiveIsBack(YMSG9Packet)}.
+   * 
+   * @param pkt
+   *      The V6_STATUS_UPDATE packet.
+   */
+  protected void receiveStatusUpdate(YMSG9Packet pkt) // 0xC6
+  {
+    updateFriendsStatus(pkt);
+  }
 
   /**
    * Process an incoming ISAWAY packet. See ISBACK below.
@@ -3265,7 +3233,7 @@ public class Session implements StatusConstants, FriendManager {
 		return;
 	}
     String username = null;
-    // int protocol = 0;
+    YahooProtocol protocol =  YahooProtocol.YAHOO;
     YahooGroup currentListGroup = null;
     ArrayList<YahooGroup> receivedGroups = new ArrayList<YahooGroup>();
 
@@ -3303,18 +3271,23 @@ public class Session implements StatusConstants, FriendManager {
 	            	  if (friend.getId().equals(username)) {
 	            		  yu = friend;
 	            		  yu.addGroupId(currentListGroup.getName());
+	            		  if (!yu.getProtocol().equals(protocol) && yu.getProtocol().equals(YahooProtocol.YAHOO)) {
+	            				log.debug("Switching protocols because user is in list more that once: " + yu.getId() 
+	            						+ " from: " + yu.getProtocol() +" to: " + protocol);
+	            				yu.update(protocol);
+	            		  }
 	            	  }
 	              }
 	              if (yu == null) {
 	              /* This buddy is in a group */
-	            	  yu = new YahooUser(username, currentListGroup.getName());
+	            	  yu = new YahooUser(username, currentListGroup.getName(), protocol);
 		              usersOnFriendsList.add(yu);
 	              }
 	              currentListGroup.addUser(yu);
 	            }
 	            else {
 	              /* This buddy is on the ignore list (and therefore in no group) */
-	              yu = new YahooUser(username);
+	              yu = new YahooUser(username, null, protocol);
 	              yu.setIgnored(true);
 	              usersOnIgnoreList.add(yu);
 	            }
@@ -3323,6 +3296,7 @@ public class Session implements StatusConstants, FriendManager {
 	            }
 	            username = null;
 	            isPending = false;
+	            protocol = YahooProtocol.YAHOO;
 	          }
 	          break;
 	        case 223: /* Pending add user request */
@@ -3338,7 +3312,7 @@ public class Session implements StatusConstants, FriendManager {
 	          username = value;
 	          break;
 	        case 241: /* another protocol user */
-	          // protocol = Integer.valueOf(value);
+	          protocol = getUserProtocol(value, username);
 	          break;
 	        case 59: /* somebody told cookies come here too, but im not sure */
 	          break;
@@ -3347,6 +3321,36 @@ public class Session implements StatusConstants, FriendManager {
 	          break;
 	      }
 	    }
+        if (username != null) {
+        	YahooUser yu = null;
+            if (currentListGroup != null) {
+              for (YahooUser friend: usersOnFriendsList) {
+            	  if (friend.getId().equals(username)) {
+            		  yu = friend;
+            		  yu.addGroupId(currentListGroup.getName());
+            	  }
+              }
+              if (yu == null) {
+              /* This buddy is in a group */
+            	  yu = new YahooUser(username, currentListGroup.getName(), protocol);
+	              usersOnFriendsList.add(yu);
+              }
+              currentListGroup.addUser(yu);
+            }
+            else {
+              /* This buddy is on the ignore list (and therefore in no group) */
+              yu = new YahooUser(username, null, protocol);
+              yu.setIgnored(true);
+              usersOnIgnoreList.add(yu);
+            }
+            if (isPending) {
+              usersOnPendingList.add(yu);
+            }
+            username = null;
+            isPending = false;
+            protocol = YahooProtocol.YAHOO;
+          }
+
     }
     
     if(!usersOnFriendsList.isEmpty())
@@ -3748,7 +3752,7 @@ public class Session implements StatusConstants, FriendManager {
       sessionStatus = SessionState.FAILED;
       SessionExceptionEvent se = new SessionExceptionEvent(Session.this, msg,
         e);
-    eventDispatchQueue.append(se, ServiceType.X_EXCEPTION);
+      eventDispatchQueue.append(se, ServiceType.X_EXCEPTION);
   }
 
   /**
@@ -3808,6 +3812,8 @@ public class Session implements StatusConstants, FriendManager {
     String idleTime = null;
 	String customMessage = null;
 	String customStatus = null;
+	YahooProtocol protocol = YahooProtocol.YAHOO;
+    String userId = null;
     while (iter.hasNext()) {
       String[] s = iter.next();
 
@@ -3820,10 +3826,10 @@ public class Session implements StatusConstants, FriendManager {
       		break;
       	case 7:
       		//check and see if we have one
-      		if (user != null) {
-          		updateFriendStatus(logoff, user, newStatus, onChat, onPager,
+      		if (userId != null) {
+          		updateFriendStatus(logoff, userId, newStatus, onChat, onPager,
 						visibility, clearIdleTime, idleTime, customMessage,
-						customStatus, longStatus);
+						customStatus, longStatus, protocol);
                   user = null;
                   longStatus = 0;
                   newStatus = Status.AVAILABLE;
@@ -3834,23 +3840,12 @@ public class Session implements StatusConstants, FriendManager {
                   idleTime = null;
       	          customMessage = null;
       	      	  customStatus = null;
-
+      	      	  userId = null;
                   user = null;
+                  protocol = YahooProtocol.YAHOO;
 	
       		}
-            final String userId = value;
-            user = roster.getUser(userId);
-            // When we add a friend, we get a status update before
-            // getting a confirmation FRIENDADD packet (crazy!)
-            if (user == null) {
-              log.debug("Presence of a new friend seems to have arrived "
-                  + "before the details of the new friend. Adding "
-                  + "them now: " + userId);
-              // TODO: clean up the threading mess that can be caused by this.
-              roster.dispatch(new FireEvent(new SessionFriendEvent(this,
-                  new YahooUser(userId)), ServiceType.FRIENDADD));
-              user = roster.getUser(userId);
-            }
+            userId = value;
             break;
       	case 10:
             try {
@@ -3870,10 +3865,13 @@ public class Session implements StatusConstants, FriendManager {
       		customMessage = value;
       		break;
       	case 47:
-            customStatus = value;
+      		customStatus = value;
       		break;
       	case 138:
       	    clearIdleTime = value;
+      	    break;
+      	case 241:
+      	    protocol = getUserProtocol(value, userId);
       	    break;
       	case 137:
             idleTime = value;
@@ -3883,68 +3881,80 @@ public class Session implements StatusConstants, FriendManager {
             break;
       }
     }
-	if (user != null) {
-  		updateFriendStatus(logoff, user, newStatus, onChat, onPager,
+	if (userId != null) {
+  		updateFriendStatus(logoff, userId, newStatus, onChat, onPager,
 				visibility, clearIdleTime, idleTime, customMessage,
-				customStatus, longStatus);
+				customStatus, longStatus, protocol);
 	}
 
   }
 
-    private void updateFriendStatus(boolean logoff, YahooUser user,
-            Status newStatus, Boolean onChat, Boolean onPager,
-            String visibility, String clearIdleTime, String idleTime,
-            String customMessage, String customStatus, long longStatus) {
-        log.trace("UpdateFriendStatus arguments: logoff: " + logoff + ", user: " + user + ", newStatus: "
-                + newStatus + ", onChat: " + onChat + ", onPager: " + onPager
-                + ", visibility: " + visibility + ", clearIdleTime: "
-                + clearIdleTime + ", idleTime: " + idleTime
-                + ", customMessage: " + customMessage + ", customStatus: "
-                + customStatus + ", longStatus: " + longStatus);
-        if (longStatus == -1 && (onPager == null || !onPager)) {
-            // Offline -- usually federated or msn live
-            logoff = true;
-        }
-        try {
-            newStatus = logoff ? Status.OFFLINE : Status.getStatus(longStatus);
-        }
-        catch (IllegalArgumentException e) {
-            log.info("UpdateFriendStatus: disregarding an unknown longStatus: " + longStatus);
-        }
-
-        if (onChat != null) {
-            user.update(newStatus, onChat, onPager);
-        }
-        else if (onPager != null) {
-            user.update(newStatus, visibility);
-        }
-        else if (logoff) {
-            // logoff message doesn't have chat or pager info, but we reset
-            // those in this case.
-            user.update(newStatus, false, false);
-        }
-        else {
-            // status update with no chat, nor pager information, so leave those
-            // values alone.
-            user.update(newStatus);
-        }
-        
-        if (customMessage != null) {
-            user.setCustom(customMessage, customStatus);
-        }
-
-        if (clearIdleTime != null) {
-            user.setIdleTime(-1);
-        }
-        if (idleTime != null) {
-            user.setIdleTime(Long.parseLong(idleTime));
-        }
-        final SessionFriendEvent event = new SessionFriendEvent(this, user);
-        // Fire event
-        if (eventDispatchQueue != null) {
-            eventDispatchQueue.append(event, ServiceType.Y6_STATUS_UPDATE);
-        }
+private void updateFriendStatus(boolean logoff,  String userId,
+		Status newStatus, Boolean onChat, Boolean onPager, String visibility,
+		String clearIdleTime, String idleTime, String customMessage,
+		String customStatus, long longStatus, YahooProtocol protocol) {
+	log.trace("logoff: " + logoff + ", user: " + userId + ", newStatus: " + newStatus
+			+ ", onChat: " + onChat + ", onPager: " + onPager + ", visibility: "
+			+visibility + ", clearIdleTime: " + clearIdleTime + ", idleTime: " +
+			idleTime + ", customMessage: " + customMessage + ", customStatus: " +
+			customStatus + ", longStatus: " + longStatus + ", protocol: " + protocol);
+	YahooUser user = roster.getUser(userId);
+    // When we add a friend, we get a status update before
+    // getting a confirmation FRIENDADD packet (crazy!)
+    if (user == null) {
+      log.debug("Presence of a new friend seems to have arrived "
+          + "before the details of the new friend. Adding "
+          + "them now: " + userId + "/" + protocol);
+      // TODO: clean up the threading mess that can be caused by this.
+      roster.dispatch(new FireEvent(new SessionFriendEvent(this,
+          new YahooUser(userId, null, protocol)), ServiceType.FRIENDADD));
+      user = roster.getUser(userId);
     }
+
+	if (user.getProtocol() == null || !user.getProtocol().equals(protocol)) {
+		log.warn("In updateFriendStatus, Protocols do not match for user: " + user.getId() + " " + user.getProtocol() +"/" + protocol);
+	}
+		
+	if (longStatus == -1 && (onPager == null || !onPager))
+	{
+		//Offline -- usually federated or msn live
+		logoff = true; 
+	}
+    try {
+        newStatus = logoff ? Status.OFFLINE : Status
+            .getStatus(longStatus);
+    } catch (IllegalArgumentException e) {
+        // unknown status
+    }
+
+	if (onChat != null) {
+		  user.update(newStatus, onChat, onPager);
+		} else if (onPager != null) {
+		  user.update(newStatus, visibility);
+		} else if (logoff) {
+	      // logoff message doesn't have chat or pager info, but we reset those in this case.
+	      user.update(newStatus, false, false);
+	  }
+	  else {
+	    // status update with no chat, nor pager information, so leave those values alone.
+	    user.update(newStatus);
+	  }
+		if (customMessage != null) {
+		  user.setCustom(customMessage, customStatus);
+		}
+		
+	    if (clearIdleTime != null) {
+	  user.setIdleTime(-1);
+	}
+	  if (idleTime != null) {
+	    user.setIdleTime(Long.parseLong(idleTime));
+	  }
+	  final SessionFriendEvent event = new SessionFriendEvent(this, user);
+	  // Fire event
+	  if (eventDispatchQueue != null) {
+	    eventDispatchQueue.append(event, ServiceType.Y6_STATUS_UPDATE);
+	  }
+}
 
   /**
    * Create chat user from a chat packet. Note: a YahooUser is created if

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.openymsg.network.YahooProtocol;
 import org.openymsg.network.YahooUser;
 
 /**
@@ -26,7 +27,7 @@ public class RosterAdd {
 		// setup
 		final MockFriendManager manager = new MockFriendManager();
 		final Roster roster = new Roster(manager);
-		final YahooUser user = new YahooUser("user", "group");
+		final YahooUser user = new YahooUser("user", "group", YahooProtocol.YAHOO);
 
 		// execution
 		final boolean result = roster.add(user);
@@ -47,7 +48,7 @@ public class RosterAdd {
 		// setup
 		final MockFriendManager manager = new MockFriendManager();
 		final Roster roster = new Roster(manager);
-		final YahooUser user = new YahooUser("user", "group");
+		final YahooUser user = new YahooUser("user", "group", YahooProtocol.YAHOO);
 		roster.add(user); // first time
 		manager.reset();
 

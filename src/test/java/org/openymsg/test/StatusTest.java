@@ -9,12 +9,11 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.junit.Test;
-import org.openymsg.network.AccountLockedException;
 import org.openymsg.network.FireEvent;
-import org.openymsg.network.LoginRefusedException;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.Session;
 import org.openymsg.network.Status;
+import org.openymsg.network.YahooProtocol;
 import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.network.event.WaitListener;
@@ -42,7 +41,7 @@ public class StatusTest extends YahooTestAbstract {
 		final Roster roster = sess1.getRoster();
 		final boolean existinList = roster.containsUser(OTHERUSR);
 		if (!existinList) {
-			roster.add(new YahooUser(OTHERUSR, "group"));
+			roster.add(new YahooUser(OTHERUSR, "group", YahooProtocol.YAHOO));
 			listener1.waitForEvent(5, ServiceType.FRIENDADD);
 		}
 
