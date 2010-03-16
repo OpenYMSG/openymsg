@@ -18,6 +18,8 @@
  */
 package org.openymsg.network.event;
 
+import org.openymsg.network.YahooProtocol;
+
 
 /**
  * @author Damian Minkov
@@ -25,22 +27,32 @@ package org.openymsg.network.event;
 public class SessionAuthorizationEvent
     extends SessionEvent
 {
-    protected String fName = null, lName = null;
-    protected boolean authorizationAccepted = false;
+	private static final long serialVersionUID = -4434174537165587365L;
+	protected String fName = null;
+	protected String lName = null;
+	private YahooProtocol protocol = null;
+    public YahooProtocol getProtocol() {
+		return protocol;
+	}
+
+	protected boolean authorizationAccepted = false;
     protected boolean authorizationDenied = false;
     protected boolean authorizationRequest = false;
 
-    public SessionAuthorizationEvent(Object o, String who, String msg)
+    public SessionAuthorizationEvent(Object o, String who, String msg, YahooProtocol protocol)
     {
         super(o, null, who, msg);
+        this.protocol = protocol;
     }
 
     public SessionAuthorizationEvent(Object o,
-            String id, String who, String fname, String lname, String msg)
+            String id, String who, String fname, String lname, String msg,
+            YahooProtocol protocol)
     {
         super(o, id, who, msg);
         this.fName = fname;
         this.lName = lname;
+        this.protocol = protocol;
     }
 
 

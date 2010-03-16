@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.Session;
 import org.openymsg.network.Status;
+import org.openymsg.network.YahooProtocol;
 import org.openymsg.network.YahooUser;
 import org.openymsg.network.event.SessionAdapter;
 import org.openymsg.network.event.SessionFriendEvent;
@@ -210,7 +211,7 @@ public class PresenceTest {
 			final Roster roster = receiver.getRoster();
 			final boolean exists = roster.containsUser(RECEIVER);
 			if (!exists) {
-				roster.add(new YahooUser(USERNAME, "Friends"));
+				roster.add(new YahooUser(USERNAME, "Friends", YahooProtocol.YAHOO));
 				wl.waitForEvent(4, ServiceType.FRIENDADD);
 			}
 

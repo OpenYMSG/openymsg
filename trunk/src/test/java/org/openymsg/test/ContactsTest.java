@@ -12,11 +12,10 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 
 import org.junit.Test;
-import org.openymsg.network.AccountLockedException;
 import org.openymsg.network.FireEvent;
-import org.openymsg.network.LoginRefusedException;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.Status;
+import org.openymsg.network.YahooProtocol;
 import org.openymsg.network.YahooUser;
 
 /**
@@ -69,7 +68,7 @@ public class ContactsTest extends YahooTestAbstract {
 
 		drain();
 
-		sess1.getRoster().add(new YahooUser(OTHERUSR, "group"));
+		sess1.getRoster().add(new YahooUser(OTHERUSR, "group", YahooProtocol.YAHOO));
 		FireEvent event = listener2.waitForEvent(5, ServiceType.Y7_AUTHORIZATION);
 		assertNotNull(event);
 		assertEquals(event.getType(), ServiceType.Y7_AUTHORIZATION);
@@ -82,7 +81,7 @@ public class ContactsTest extends YahooTestAbstract {
 	@Test
 	public void testRejectContact() throws IOException, InterruptedException {
 		removeAllContacts(sess1, listener1);
-		sess1.getRoster().add(new YahooUser(OTHERUSR, "group"));
+		sess1.getRoster().add(new YahooUser(OTHERUSR, "group", YahooProtocol.YAHOO));
 //		assertNotNull(listener1.waitForEvent(5, ServiceType.FRIENDADD));
 		Thread.sleep(500);
 		
@@ -97,7 +96,7 @@ public class ContactsTest extends YahooTestAbstract {
 
 	@Test
 	public void testRemoveUnknowContact() {
-		sess1.getRoster().remove(new YahooUser("ewrgergerg", CHATMESSAGE));
+		sess1.getRoster().remove(new YahooUser("ewrgergerg", CHATMESSAGE, YahooProtocol.YAHOO));
 		FireEvent event = listener1.waitForEvent(5);
 		assertNull(event);
 	}

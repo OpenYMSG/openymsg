@@ -99,7 +99,15 @@ public class YahooUser {
 	 * Information from the address book.  first name, last name, nick name
 	 */
 	private YahooAddressBookEntry addressBookEntry = YahooAddressBookEntry.EMPTY;
+	
+	/**
+	 * Protocol of the user.  Yahoo, Federated, OCS, msn.live, etc
+	 */
+	private YahooProtocol protocol;
 
+	public YahooProtocol getProtocol() {
+		return protocol;
+	}
 	/**
 	 * Creates a new user in one particular group. Note that the fact that the
 	 * user is in a group indicates that this user is on our roster.
@@ -109,16 +117,18 @@ public class YahooUser {
 	 * @param groupId
 	 *            The ID of the group in which this user has been put.
 	 */
-	public YahooUser(final String userId, final String groupId) {
+	public YahooUser(final String userId, final String groupId, final YahooProtocol protocol) {
 		this.userId = userId.toLowerCase();
 		groupIds = new HashSet<String>();
 
 		if (groupId != null && groupId.length() != 0) {
 			groupIds.add(groupId);
 		}
+		
+		this.protocol = protocol;
 	}
-	public YahooUser(final String userId, final String groupId, YahooAddressBookEntry addressBookEntry) {
-		this(userId, groupId);
+	public YahooUser(final String userId, final String groupId, YahooProtocol protocol, YahooAddressBookEntry addressBookEntry) {
+		this(userId, groupId, protocol);
 		this.addressBookEntry = addressBookEntry;
 	}
 
@@ -132,7 +142,7 @@ public class YahooUser {
 	 *            The ID of the user.
 	 */
 	public YahooUser(final String userId) {
-		this(userId, (String)null);
+		this(userId, (String)null, YahooProtocol.YAHOO);
 	}
 
 	public YahooUser(final String userId, YahooAddressBookEntry addressBookEntry) {
@@ -367,6 +377,7 @@ public class YahooUser {
 				+ ", ignored=" + ignored + ", stealthBlock=" + stealthBlocked
 				+ ", customStatusMessage=" + customStatusMessage
 				+ ", isFriend=" + isFriend() 
+				+ ", protocol=" + protocol
 				+ ", ab=" + addressBookEntry + "]";
 	}
 
@@ -472,6 +483,9 @@ public class YahooUser {
 	
 	public YahooAddressBookEntry getAddressBookEntry() {
 		return addressBookEntry;
+	}
+	public void update(YahooProtocol protocol) {
+		this.protocol = protocol;
 	}
 
 }
