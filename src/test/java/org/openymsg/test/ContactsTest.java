@@ -48,9 +48,11 @@ public class ContactsTest extends YahooTestAbstract {
 	@Test
 	public void testReLoginFriendAndChangeStatusBuddy()
 			throws Exception {
+        YahooUser buddy = sess1.getRoster().getUser(OTHERUSR);
+        assertNotNull(buddy);
+        assertEquals(Status.AVAILABLE, buddy.getStatus());
 		sess2.logout();
 		Thread.sleep(500);
-		YahooUser buddy = sess1.getRoster().getUser(OTHERUSR);
 		assertNotNull(buddy);
 
 		assertEquals(Status.OFFLINE, buddy.getStatus());
@@ -81,6 +83,7 @@ public class ContactsTest extends YahooTestAbstract {
 	@Test
 	public void testRejectContact() throws IOException, InterruptedException {
 		removeAllContacts(sess1, listener1);
+        assertFalse(sess1.getRoster().containsUser(OTHERUSR));
 		sess1.getRoster().add(new YahooUser(OTHERUSR, "group", YahooProtocol.YAHOO));
 //		assertNotNull(listener1.waitForEvent(5, ServiceType.FRIENDADD));
 		Thread.sleep(500);

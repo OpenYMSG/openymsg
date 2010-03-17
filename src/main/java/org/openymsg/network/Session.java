@@ -2748,44 +2748,54 @@ public class Session implements StatusConstants, FriendManager {
     }
   }
 
-  protected void receiveAuthorization(YMSG9Packet pkt)    // 0xd6
-  {
-      try
-      {
-          if(pkt.length <= 0) {
-              return;
-          }
+      /**
+       pkt.status:
+       1 - Authorization Accepted
+       2 - Authorization Denied
+       3 - Authorization Request
+      */
+  protected void receiveAuthorization(YMSG9Packet pkt) { // 0xd6
+    try {
+      if(pkt.length <= 0) {
+        return;
+      }
           
-    	  if (pkt.status == 1) { // it is an ack
-    		  log.trace("Accepted authorization");
-    	  }
-    	  else if (pkt.status == 2) {
-    		  log.warn("Denied authorization request");
-    	  }
-    	  else if (pkt.status == 3) {
-    		  log.warn("received authorization request");
-    	  }
-          String who, msg, fname, lname, id, protocolString;
-          YahooProtocol protocol;
-          who = pkt.getValue("4");
-          msg = pkt.getValue("14");
-          fname = pkt.getValue("216");
-          lname = pkt.getValue("254");
-          id = pkt.getValue("5");
-          protocolString = pkt.getValue("241");
-          protocol = getUserProtocol(protocolString, who);
+      String who, msg, fname, lname, id, protocolString;
+      YahooProtocol protocol;
+      who = pkt.getValue("4");
+      msg = pkt.getValue("14");
+      fname = pkt.getValue("216");
+      lname = pkt.getValue("254");
+      id = pkt.getValue("5");
+      protocolString = pkt.getValue("241");
+      protocol = getUserProtocol(protocolString, who);
           
-          SessionAuthorizationEvent se = new SessionAuthorizationEvent(this, id,
-              who, fname, lname, msg, protocol);
-          /**
-           pkt.status:
-             1 - Authorization Accepted
-             2 - Authorization Denied
-             3 - Authorization Request
-          */
-          se.setStatus(pkt.status);
-          eventDispatchQueue.append(se, ServiceType.Y7_AUTHORIZATION);
-
+      if (pkt.status == 1) { 
+          log.trace("A friend accepted our authorization request: " + who);
+          final YahooUser user = roster.getUser(who);
+          final SessionFriendRejectedEvent ser = new SessionFriendRejectedEvent(
+                  this, user, msg);
+          eventDispatchQueue.append(ser, ServiceType.Y7_AUTHORIZATION);
+      }
+      else if (pkt.status == 2) {
+        log.trace("A friend refused our subscription request: " + who);
+        final YahooUser user = roster.getUser(who);
+        final SessionFriendRejectedEvent ser = new SessionFriendRejectedEvent(
+                this, user, msg);
+        eventDispatchQueue.append(ser, ServiceType.Y7_AUTHORIZATION);
+      }
+      else if (pkt.status == 3) {
+       SessionAuthorizationEvent se = new SessionAuthorizationEvent(this, id,
+        who, fname, lname, msg, protocol);
+       se.setStatus(pkt.status);
+        
+        log.trace("Someone is sending us a subscription request: " + who);
+        eventDispatchQueue.append(se, ServiceType.Y7_AUTHORIZATION);
+      }
+      else {
+        log.info("Unexpected authorization packet. Do not know how to handle: " + pkt);
+      }
+          
       } catch(Exception e) {
           throw new YMSG9BadFormatException("contact request", pkt, e);
       }
@@ -3893,7 +3903,7 @@ private void updateFriendStatus(boolean logoff,  String userId,
 		Status newStatus, Boolean onChat, Boolean onPager, String visibility,
 		String clearIdleTime, String idleTime, String customMessage,
 		String customStatus, long longStatus, YahooProtocol protocol) {
-	log.trace("logoff: " + logoff + ", user: " + userId + ", newStatus: " + newStatus
+	log.trace("UpdateFriendStatus arguments: logoff: " + logoff + ", user: " + userId + ", newStatus: " + newStatus
 			+ ", onChat: " + onChat + ", onPager: " + onPager + ", visibility: "
 			+visibility + ", clearIdleTime: " + clearIdleTime + ", idleTime: " +
 			idleTime + ", customMessage: " + customMessage + ", customStatus: " +
