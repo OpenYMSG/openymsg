@@ -1,5 +1,6 @@
 package org.openymsg.network.event;
 
+import org.openymsg.network.YahooProtocol;
 import org.openymsg.network.YahooUser;
 
 /**
@@ -11,7 +12,7 @@ import org.openymsg.network.YahooUser;
 public class SessionFriendAcceptedEvent extends SessionFriendEvent {
 
     private static final long serialVersionUID = 8585143061164760956L;
-
+    private YahooProtocol protocol;
     /**
      * Constructs new instance.
      * 
@@ -23,8 +24,13 @@ public class SessionFriendAcceptedEvent extends SessionFriendEvent {
      *            An optional message, describing the event.s
      */
     public SessionFriendAcceptedEvent(Object source, YahooUser user,
-            String message) {
+            String message, YahooProtocol protocol) {
         super(source, user);
         this.message = message;
+        this.protocol = protocol;
+    }
+
+    public YahooProtocol getProtocol() {
+        return protocol;
     }
 }

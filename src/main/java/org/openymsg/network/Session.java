@@ -60,6 +60,7 @@ import org.openymsg.network.event.SessionErrorEvent;
 import org.openymsg.network.event.SessionEvent;
 import org.openymsg.network.event.SessionExceptionEvent;
 import org.openymsg.network.event.SessionFileTransferEvent;
+import org.openymsg.network.event.SessionFriendAcceptedEvent;
 import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.network.event.SessionFriendFailureEvent;
 import org.openymsg.network.event.SessionFriendRejectedEvent;
@@ -383,10 +384,14 @@ public class Session implements StatusConstants, FriendManager {
   public synchronized void logout() throws IllegalStateException, IOException {
 	log.trace("logout");
     try {
-      checkStatus();
-      transmitLogoff();
+        if (sessionStatus == SessionState.CONNECTING || 
+                sessionStatus == SessionState.CONNECTED)
+        {
+            throw new IllegalStateException("Not logged in or connecting");
+        }
+        transmitLogoff();
     } finally {
-      closeSession();
+        closeSession();
     }
   }
   
@@ -2773,8 +2778,8 @@ public class Session implements StatusConstants, FriendManager {
       if (pkt.status == 1) { 
           log.trace("A friend accepted our authorization request: " + who);
           final YahooUser user = roster.getUser(who);
-          final SessionFriendRejectedEvent ser = new SessionFriendRejectedEvent(
-                  this, user, msg);
+          final SessionFriendAcceptedEvent ser = new SessionFriendAcceptedEvent(
+                  this, user, msg, protocol);
           eventDispatchQueue.append(ser, ServiceType.Y7_AUTHORIZATION);
       }
       else if (pkt.status == 2) {
