@@ -3817,9 +3817,7 @@ public class Session implements StatusConstants, FriendManager {
 
     // Process each friend
     Iterator<String[]> iter = pkt.entries().iterator();
-    YahooUser user = null;
     long longStatus = 0;
-    Status newStatus = Status.AVAILABLE;
     Boolean onChat = null;
     Boolean onPager = null;
     String visibility = null;
@@ -3842,12 +3840,10 @@ public class Session implements StatusConstants, FriendManager {
       	case 7:
       		//check and see if we have one
       		if (userId != null) {
-          		updateFriendStatus(logoff, userId, newStatus, onChat, onPager,
+          		updateFriendStatus(logoff, userId, onChat, onPager,
 						visibility, clearIdleTime, idleTime, customMessage,
 						customStatus, longStatus, protocol);
-                  user = null;
                   longStatus = 0;
-                  newStatus = Status.AVAILABLE;
                   onChat = null;
                   onPager = null;
                   visibility = null;
@@ -3856,7 +3852,6 @@ public class Session implements StatusConstants, FriendManager {
       	          customMessage = null;
       	      	  customStatus = null;
       	      	  userId = null;
-                  user = null;
                   protocol = YahooProtocol.YAHOO;
 	
       		}
@@ -3897,22 +3892,23 @@ public class Session implements StatusConstants, FriendManager {
       }
     }
 	if (userId != null) {
-  		updateFriendStatus(logoff, userId, newStatus, onChat, onPager,
+  		updateFriendStatus(logoff, userId, onChat, onPager,
 				visibility, clearIdleTime, idleTime, customMessage,
 				customStatus, longStatus, protocol);
 	}
 
   }
 
-private void updateFriendStatus(boolean logoff,  String userId,
-		Status newStatus, Boolean onChat, Boolean onPager, String visibility,
+  private void updateFriendStatus(boolean logoff,  String userId,
+		Boolean onChat, Boolean onPager, String visibility,
 		String clearIdleTime, String idleTime, String customMessage,
 		String customStatus, long longStatus, YahooProtocol protocol) {
-	log.trace("UpdateFriendStatus arguments: logoff: " + logoff + ", user: " + userId + ", newStatus: " + newStatus
+	log.trace("UpdateFriendStatus arguments: logoff: " + logoff + ", user: " + userId 
 			+ ", onChat: " + onChat + ", onPager: " + onPager + ", visibility: "
 			+visibility + ", clearIdleTime: " + clearIdleTime + ", idleTime: " +
 			idleTime + ", customMessage: " + customMessage + ", customStatus: " +
 			customStatus + ", longStatus: " + longStatus + ", protocol: " + protocol);
+	Status newStatus = Status.AVAILABLE;
 	YahooUser user = roster.getUser(userId);
     // When we add a friend, we get a status update before
     // getting a confirmation FRIENDADD packet (crazy!)
