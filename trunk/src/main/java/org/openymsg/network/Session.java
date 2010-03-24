@@ -31,6 +31,7 @@ import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -2017,7 +2018,8 @@ public class Session implements StatusConstants, FriendManager {
     throws LoginRefusedException, IOException, NoSuchAlgorithmException
   {
     String authLink =
-      "https://login.yahoo.com/config/pwtoken_get?src=ymsgr&ts=&login=" + loginID.getId() + "&passwd=" + password + "&chal=" + seed;
+        "https://login.yahoo.com/config/pwtoken_get?src=ymsgr&ts=&login=" 
+                + loginID.getId() + "&passwd=" + URLEncoder.encode(password, "UTF-8") + "&chal=" + seed;
 
     URL u = new URL(authLink);
     URLConnection uc = u.openConnection();
