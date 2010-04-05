@@ -118,7 +118,8 @@ public class BuddyListImport {
 		String groupName = getTextValue(empEl, "li");
 		
 		if (isEmpty(id) && isEmpty(lcsid)) {
-			log.warn("Failed building user firstname: " + firstName + ", lastname: " + lastName + ", nickname: " + nickName + ", groupName: " + groupName);
+			log.warn("Failed building user firstname: " + firstName + ", lastname: " + lastName 
+			        + ", nickname: " + nickName + ", groupName: " + groupName + ", element: " + empEl);
 		}
 		if (isEmpty(id) && !isEmpty(lcsid)) {
 			id = lcsid;

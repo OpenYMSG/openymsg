@@ -801,11 +801,13 @@ public class Session implements StatusConstants, FriendManager {
    *       if any problem occured related to creating or sending the
    *       request to the Yahoo network.
    */
-  public void sendNewFriendRequest(final String userId, final String groupId)
+  public void sendNewFriendRequest(final String userId, final String groupId,
+          YahooProtocol yahooProtocol)
       throws IOException {
+		log.trace("Adding new user: " + userId + ", group: " + groupId + ", protocol: " + yahooProtocol);
     // TODO: perhaps we should check the roster to make sure that this
     // friend does not already exist.
-    transmitFriendAdd(userId, groupId);
+    transmitFriendAdd(userId, groupId, yahooProtocol);
   }
 
   /**
@@ -1574,7 +1576,8 @@ public class Session implements StatusConstants, FriendManager {
    * @throws IOException
    *       on any problem while trying to create or send the packet.
    */
-  protected void transmitFriendAdd(final String userId, final String groupId)
+  protected void transmitFriendAdd(final String userId, final String groupId, 
+          YahooProtocol yahooProtocol)
       throws IOException {
     if (userId == null || userId.length() == 0) {
       throw new IllegalArgumentException(
@@ -1594,7 +1597,7 @@ public class Session implements StatusConstants, FriendManager {
     body.addElement("302", "319");
     body.addElement("300", "319");
     body.addElement("7", userId);
-    body.addElement("241", "0"); // for ack
+	body.addElement("241", "" + yahooProtocol.getValue()); // type
     body.addElement("301", "319");
     body.addElement("303", "319");
     body.addElement("65", groupId);
@@ -2734,20 +2737,20 @@ public class Session implements StatusConstants, FriendManager {
       }
 
       // Someone is sending us a subscription request.
-      log
-          .trace("Someone is sending us a subscription request: "
-              + userId);
+      log.trace("Someone is sending us a subscription request: " + userId);
       final String to = pkt.getValue("1");
-      final String timestamp = pkt.getValue("15");
-
+//      final String timestamp = pkt.getValue("15");
+      String protocolString = pkt.getValue("241"); // not there, it is yahoo
+      YahooProtocol protocol = YahooProtocol.getProtocol(protocolString);
+      
       final SessionEvent se;
-      if (timestamp == null || timestamp.length() == 0) {
-        se = new SessionEvent(this, to, userId, message);
-      } else {
-        final long timestampInMillis = 1000 * Long.parseLong(timestamp);
-        se = new SessionEvent(this, to, userId, message,
-            timestampInMillis);
-      }
+//      if (timestamp == null || timestamp.length() == 0) {
+      se = new SessionAuthorizationEvent(this, to, message, protocol);
+//      } else {
+//        final long timestampInMillis = 1000 * Long.parseLong(timestamp);
+//        se = new SessionEvent(this, to, userId, message,
+//            timestampInMillis);
+//      }
       se.setStatus(pkt.status); // status!=0 means offline message
       eventDispatchQueue.append(se, ServiceType.CONTACTNEW);
     } catch (RuntimeException e) {
@@ -2767,30 +2770,44 @@ public class Session implements StatusConstants, FriendManager {
         return;
       }
           
-      String who, msg, fname, lname, id, protocolString;
       YahooProtocol protocol;
-      who = pkt.getValue("4");
-      msg = pkt.getValue("14");
-      fname = pkt.getValue("216");
-      lname = pkt.getValue("254");
-      id = pkt.getValue("5");
-      protocolString = pkt.getValue("241");
+      String who = pkt.getValue("4");
+      String msg = pkt.getValue("14");
+      String fname = pkt.getValue("216");
+      String lname = pkt.getValue("254");
+      String id = pkt.getValue("5");
+      String authStatus = pkt.getValue("13");
+      String protocolString = pkt.getValue("241");
       protocol = getUserProtocol(protocolString, who);
           
-      if (pkt.status == 1) { 
-          log.trace("A friend accepted our authorization request: " + who);
-          final YahooUser user = roster.getUser(who);
-          final SessionFriendAcceptedEvent ser = new SessionFriendAcceptedEvent(
-                  this, user, msg, protocol);
-          eventDispatchQueue.append(ser, ServiceType.Y7_AUTHORIZATION);
-      }
-      else if (pkt.status == 2) {
-        log.trace("A friend refused our subscription request: " + who);
-        final YahooUser user = roster.getUser(who);
-        final SessionFriendRejectedEvent ser = new SessionFriendRejectedEvent(
-                this, user, msg);
-        eventDispatchQueue.append(ser, ServiceType.Y7_AUTHORIZATION);
-      }
+      if (pkt.status == 1) {
+          if (authStatus.equals("1")) { 
+              log.trace("A friend accepted our authorization request: " + who);
+              YahooUser user = roster.getUser(who);
+              SessionFriendAcceptedEvent ser = new SessionFriendAcceptedEvent(
+                      this, user, msg, protocol);
+              int eventStatus = 1;
+              ser.setStatus(eventStatus);
+              eventDispatchQueue.append(ser, ServiceType.Y7_AUTHORIZATION);
+          }
+          else if (authStatus.equals("2")) {
+            log.trace("A friend refused our subscription request: " + who);
+            log.debug("roster: " + roster);
+            log.debug("who: " + who);
+            YahooUser user = roster.getUser(who);
+            log.debug("user: " + user);
+            SessionFriendRejectedEvent ser = new SessionFriendRejectedEvent(
+                    this, user, msg);
+            log.debug("ser: " + ser);
+            int eventStatus = 2;
+            log.debug("eventStatus: " + eventStatus);
+            ser.setStatus(eventStatus);
+            eventDispatchQueue.append(ser, ServiceType.Y7_AUTHORIZATION);
+          }
+          else {
+              log.info("Unexpected authorization packet. Do not know how to handle: " + pkt);
+          }
+      } 
       else if (pkt.status == 3) {
        SessionAuthorizationEvent se = new SessionAuthorizationEvent(this, id,
         who, fname, lname, msg, protocol);

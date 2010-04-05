@@ -70,7 +70,7 @@ public class SessionAdapter implements SessionListener {
     // override this function if you want to do something with it.
   }
 
-  public void contactRequestReceived(SessionEvent event) {
+  public void contactRequestReceived(SessionAuthorizationEvent event) {
     // override this function if you want to do something with it.
   }
 
@@ -178,7 +178,7 @@ public class SessionAdapter implements SessionListener {
         newMailReceived((SessionNewMailEvent) ev);
         break;
       case CONTACTNEW:
-        contactRequestReceived(ev);
+        contactRequestReceived((SessionAuthorizationEvent)ev);
         break;
       case CONFDECLINE:
         conferenceInviteDeclinedReceived((SessionConferenceEvent) ev);
