@@ -3,6 +3,7 @@ package org.openymsg.roster;
 import java.io.IOException;
 
 import org.openymsg.network.FriendManager;
+import org.openymsg.network.YahooProtocol;
 import org.openymsg.support.Logger;
 
 /**
@@ -40,7 +41,8 @@ public class MockFriendManager implements FriendManager {
 	 * @see org.openymsg.network.FriendManager#sendNewFriendRequest(java.lang.String,
 	 *      java.lang.String)
 	 */
-	public void sendNewFriendRequest(String userId, String groupId)
+	public void sendNewFriendRequest(String userId, String groupId,
+	        YahooProtocol yahooProtocol)
 			throws IOException {
 		log.info("Mock sendNewFriendRequest triggered with friendId ["+userId+"] and groupId ["+groupId+"]");
 		this.friendId = userId;

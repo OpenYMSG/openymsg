@@ -93,7 +93,7 @@ public class SessionEvent extends java.util.EventObject {
 	public String toString() {
 		StringBuffer sb = new StringBuffer(getClass().getCanonicalName()).append(" to:").append(to).append(" from:")
 				.append(from).append(" message:").append(message).append(
-						" timestamp:").append(timestamp);
+						" timestamp:").append(timestamp).append(" status:").append(status);
 		return sb.toString();
 	}
 }

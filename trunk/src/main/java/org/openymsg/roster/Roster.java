@@ -174,12 +174,21 @@ public class Roster implements Set<YahooUser>, SessionListener {
 		
 		log.trace("Adding new user: " + user);
 		
+		YahooProtocol yahooProtocol = YahooProtocol.YAHOO;
+		if (user.getProtocol() == null) {
+		    log.debug("default protocol used for: " + id);
+		} else {
+		    yahooProtocol = user.getProtocol();
+		}
+		
 		// TODO : input validation on userId/groupId?
 		
 		for(final String groupId : user.getGroupIds()) {
 			try {
-				friendManager.sendNewFriendRequest(user.getId(), groupId);
+				log.trace("Adding new user: " + user + ", group: " + groupId);
+				friendManager.sendNewFriendRequest(user.getId(), groupId, yahooProtocol);
 			} catch (IOException ex) {
+				log.error("Failed adding user: " + user, ex);
 				throw new RuntimeException("Unexpected exception.", ex);
 			}
 		}

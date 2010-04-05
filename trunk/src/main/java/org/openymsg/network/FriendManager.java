@@ -34,7 +34,8 @@ public interface FriendManager {
 	 *             if any problem occured related to creating or sending the
 	 *             request to the Yahoo network.
 	 */
-	public void sendNewFriendRequest(final String userId, final String groupId)
+	public void sendNewFriendRequest(final String userId, final String groupId,
+	        YahooProtocol yahooProtocol)
 			throws IOException;
 
 	/**
