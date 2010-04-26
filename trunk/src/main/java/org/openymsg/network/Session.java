@@ -3321,7 +3321,7 @@ public class Session implements StatusConstants, FriendManager {
 	            }
 	            else {
 	              /* This buddy is on the ignore list (and therefore in no group) */
-	              yu = new YahooUser(username, null, protocol);
+	              yu = new YahooUser(username, new HashSet<String>(), protocol);
 	              yu.setIgnored(true);
 	              usersOnIgnoreList.add(yu);
 	            }
@@ -3373,7 +3373,7 @@ public class Session implements StatusConstants, FriendManager {
             }
             else {
               /* This buddy is on the ignore list (and therefore in no group) */
-              yu = new YahooUser(username, null, protocol);
+              yu = new YahooUser(username, new HashSet<String>(), protocol);
               yu.setIgnored(true);
               usersOnIgnoreList.add(yu);
             }
@@ -3937,7 +3937,7 @@ public class Session implements StatusConstants, FriendManager {
           + "them now: " + userId + "/" + protocol);
       // TODO: clean up the threading mess that can be caused by this.
       roster.dispatch(new FireEvent(new SessionFriendEvent(this,
-          new YahooUser(userId, null, protocol)), ServiceType.FRIENDADD));
+          new YahooUser(userId, new HashSet<String>(), protocol)), ServiceType.FRIENDADD));
       user = roster.getUser(userId);
     }
 

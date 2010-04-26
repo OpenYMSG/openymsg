@@ -132,6 +132,17 @@ public class YahooUser {
 		this.addressBookEntry = addressBookEntry;
 	}
 
+	public YahooUser(final String userId, Set<String> groupIds, final YahooProtocol protocol) {
+		this.userId = userId.toLowerCase();
+		this.groupIds = groupIds;
+		
+		this.protocol = protocol;
+	}
+	public YahooUser(final String userId, final Set<String> groupIds, YahooProtocol protocol, YahooAddressBookEntry addressBookEntry) {
+		this(userId, groupIds, protocol);
+		this.addressBookEntry = addressBookEntry;
+	}
+
 	/**
 	 * Creates a new anonymous user. This user is said to be anonymous, because
 	 * it is not on our roster. Note that users that are on our roster MUST be
