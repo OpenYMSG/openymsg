@@ -649,11 +649,11 @@ public class Roster implements Set<YahooUser>, SessionListener {
 
 		case Y7_AUTHORIZATION:
 		    if (fEvent instanceof SessionFriendAcceptedEvent) {
-	            log.trace("Adding user to roster, as triggered by "
+	            log.debug("Adding user to roster, as triggered by "
 	                    + "SessionFriendAcceptedEvent: " + event);
 	            syncedAdd(user);
 		    } else if (fEvent instanceof SessionFriendRejectedEvent) {
-	            log.trace("Removing user from roster as triggered by "
+	            log.debug("Removing user from roster as triggered by "
 	                    + "SessionFriendRejectedEvent: " + event);
 	            syncedRemove(user.getId());
             } else {
@@ -702,12 +702,8 @@ public class Roster implements Set<YahooUser>, SessionListener {
 			String userId, YahooUser user) {
 		YahooUser newUser;
 		Set<String> groupIds = user.getGroupIds();
-		String groupId = null;
-		if (groupIds != null && groupIds.size() != 0) {
-			groupId = groupIds.iterator().next();
-		}
 		YahooProtocol protocol = user.getProtocol();
-		newUser = new YahooUser(userId, groupId, protocol, addressBookEntry);
+		newUser = new YahooUser(userId, groupIds, protocol, addressBookEntry);
 		Status status = user.getStatus();
 		String customMessage = user.getCustomStatusMessage();
 		String customStatus = user.getCustomStatus();
