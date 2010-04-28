@@ -2088,10 +2088,20 @@ public class Session implements StatusConstants, FriendManager {
         ymsgr = ymsgr.replaceAll("ymsgr=", "");
 
         return yahooAuth16Stage2(ymsgr, seed);
+      } else {
+      	log.error("Failed opening login url: " + authLink + " return code: " + responseCode);
+        throw new LoginRefusedException("Login Failed, Login url: " + authLink + " return code: " + responseCode);
       }
+    } else {
+    	Class<? extends URLConnection> ucType = null;
+    	if (uc != null) {
+    		ucType = uc.getClass();
+    	}
+    	log.error("Failed opening login url: " + authLink + " returns: " + ucType);
+        throw new LoginRefusedException("Login Failed, Unable to submit login url");
     }
 
-    throw new LoginRefusedException("Login Failed, unable to retrieve stage 1 url");
+//    throw new LoginRefusedException("Login Failed, unable to retrieve stage 1 url");
   }
 
   private String[] yahooAuth16Stage2(String token, String seed)
@@ -2227,6 +2237,14 @@ public class Session implements StatusConstants, FriendManager {
               loginException);
           sessionEvent = new SessionLogoutEvent(AuthenticationState.BADUSERNAME);
           break;
+        case INVALID_CREDENTIALS:
+            loginException = new LoginRefusedException("User "
+                + loginID + " invalid Credentials" + loginID,
+                AuthenticationState.BADUSERNAME);
+            log.info("AUTHRESP says: authentication failed! " + loginID,
+                loginException);
+            sessionEvent = new SessionLogoutEvent(AuthenticationState.INVALID_CREDENTIALS);
+            break;
         //You have been logged out of the yahoo service, possibly due to a duplicate login.
         case DUPLICATE_LOGIN:
           loginException = new LoginRefusedException("User "
