@@ -32,134 +32,128 @@ import org.openymsg.network.event.SessionEvent;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
 public class MessageTest {
-	private static String USERNAME = PropertiesAvailableTest
-			.getUsername("messagetestuser1");
+    private static String USERNAME = PropertiesAvailableTest.getUsername("messagetestuser1");
 
-	private static String RECIPIENT = PropertiesAvailableTest
-			.getUsername("messagetestuser2");
+    private static String RECIPIENT = PropertiesAvailableTest.getUsername("messagetestuser2");
 
-	private static String PASSWORD = PropertiesAvailableTest
-			.getPassword(USERNAME);
+    private static String PASSWORD = PropertiesAvailableTest.getPassword(USERNAME);
 
-	private static String RECPWD = PropertiesAvailableTest
-			.getPassword(RECIPIENT);
+    private static String RECPWD = PropertiesAvailableTest.getPassword(RECIPIENT);
 
-	@Test(expected = IllegalStateException.class)
-	public void testSendMessageBeforeLoggingIn() throws Exception {
-		final Session session = new Session();
-		session.sendMessage(RECIPIENT, "test message");
-	}
+    @Test(expected = IllegalStateException.class)
+    public void testSendMessageBeforeLoggingIn() throws Exception {
+        final Session session = new Session();
+        session.sendMessage(RECIPIENT, "test message");
+    }
 
-	@Test
-	public void testSendMessage() throws Exception {
-		final Session sender = new Session();
-		final Session receiver = new Session();
-		try {
-			final ReceiveMessageAdaptor listener = new ReceiveMessageAdaptor();
+    @Test
+    public void testSendMessage() throws Exception {
+        final Session sender = new Session();
+        final Session receiver = new Session();
+        try {
+            final ReceiveMessageAdaptor listener = new ReceiveMessageAdaptor();
 
-			sender.login(USERNAME, PASSWORD);
-			receiver.login(RECIPIENT, RECPWD);
-			Thread.sleep(1000); // wait for any offline messages to disappear.
-			
-			if (!receiver.getRoster().containsUser(USERNAME)) {
-				throw new IllegalStateException("For this test to work, both users must be friends.");
-			}
-			receiver.addSessionListener(listener);
+            sender.login(USERNAME, PASSWORD);
+            receiver.login(RECIPIENT, RECPWD);
+            Thread.sleep(1000); // wait for any offline messages to disappear.
 
-			String message = "test message";
-			sender.sendMessage(RECIPIENT, message);
-			SessionEvent event = listener.waitForNextEvent(10000);
-			assertNotNull(event);
-			assertEquals(USERNAME, event.getFrom());
-			assertEquals(message, event.getMessage());
+            if (!receiver.getRoster().containsUser(USERNAME)) {
+                throw new IllegalStateException("For this test to work, both users must be friends.");
+            }
+            receiver.addSessionListener(listener);
 
-			message = "ç ë and Japanese chars: \u65e5\u672c\u8a9e\u6587\u5b57\u5217";
-			sender.sendMessage(RECIPIENT, message);
-			event = listener.waitForNextEvent(10000);
-			assertNotNull(event);
-			assertEquals(USERNAME, event.getFrom());
-			assertEquals(message, event.getMessage());
+            String message = "test message";
+            sender.sendMessage(RECIPIENT, message);
+            SessionEvent event = listener.waitForNextEvent(10000);
+            assertNotNull(event);
+            assertEquals(USERNAME, event.getFrom());
+            assertEquals(message, event.getMessage());
 
-			// TODO: this actually fails, but as GAIM has the exact same
-			// failure, I deem it acceptable for now. :)
-			// message = "<html><body><p>This should be
-			// escaped.</p></body></html>";
-			// sender.sendMessage(RECIPIENT, message);
-			// event = listener.waitForNextEvent(10000);
-			// assertNotNull(event);
-			// assertEquals(USERNAME, event.getFrom());
-			// assertEquals(message, event.getMessage());
+            message = "ç ë and Japanese chars: \u65e5\u672c\u8a9e\u6587\u5b57\u5217";
+            sender.sendMessage(RECIPIENT, message);
+            event = listener.waitForNextEvent(10000);
+            assertNotNull(event);
+            assertEquals(USERNAME, event.getFrom());
+            assertEquals(message, event.getMessage());
 
-		} finally {
-			sender.logout();
-			receiver.logout();
-		}
-	}
+            // TODO: this actually fails, but as GAIM has the exact same
+            // failure, I deem it acceptable for now. :)
+            // message = "<html><body><p>This should be
+            // escaped.</p></body></html>";
+            // sender.sendMessage(RECIPIENT, message);
+            // event = listener.waitForNextEvent(10000);
+            // assertNotNull(event);
+            // assertEquals(USERNAME, event.getFrom());
+            // assertEquals(message, event.getMessage());
 
-	/**
-	 * Utility class that lets you wait for a particular event.
-	 * 
-	 * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
-	 * 
-	 */
-	private static class ReceiveMessageAdaptor extends SessionAdapter {
-		/**
-		 * The queued event.
-		 */
-		private SessionEvent sessionEvent = null;
+        }
+        finally {
+            sender.logout();
+            receiver.logout();
+        }
+    }
 
-		public ReceiveMessageAdaptor() {
-			// doesn't do much, but prevens synthetic accessor warnings.
-		}
+    /**
+     * Utility class that lets you wait for a particular event.
+     * 
+     * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
+     * 
+     */
+    private static class ReceiveMessageAdaptor extends SessionAdapter {
+        /**
+         * The queued event.
+         */
+        private SessionEvent sessionEvent = null;
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.openymsg.network.event.SessionAdapter#messageReceived(org.openymsg.network.event.SessionEvent)
-		 */
-		@Override
-		public void messageReceived(SessionEvent event) {
-			this.sessionEvent = event;
-		}
+        public ReceiveMessageAdaptor() {
+            // doesn't do much, but prevens synthetic accessor warnings.
+        }
 
-		/**
-		 * Waits for a particular amount of time for the next event to arrive,
-		 * and then returns that event. If within the timeout no event has been
-		 * received, this method returns null.
-		 * 
-		 * @param timeout_in_millis
-		 *            The time (in milliseconds) to wait for the next event.
-		 * @return 'null' or the first event that arrived within the timeout
-		 *         value.
-		 */
-		public SessionEvent waitForNextEvent(long timeout_in_millis) {
-			if (timeout_in_millis < 0) {
-				throw new IllegalArgumentException(
-						"Cannot use negative timeout values.");
-			}
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.openymsg.network.event.SessionAdapter#messageReceived(org.openymsg.network.event.SessionEvent)
+         */
+        @Override
+        public void messageReceived(SessionEvent event) {
+            this.sessionEvent = event;
+        }
 
-			if (sessionEvent != null) {
-				throw new IllegalStateException(
-						"There's already an event queued, before this method was called.");
-			}
+        /**
+         * Waits for a particular amount of time for the next event to arrive, and then returns that event. If within
+         * the timeout no event has been received, this method returns null.
+         * 
+         * @param timeout_in_millis
+         *            The time (in milliseconds) to wait for the next event.
+         * @return 'null' or the first event that arrived within the timeout value.
+         */
+        public SessionEvent waitForNextEvent(long timeout_in_millis) {
+            if (timeout_in_millis < 0) {
+                throw new IllegalArgumentException("Cannot use negative timeout values.");
+            }
 
-			final long STEP_IN_MILLIS = 100;
-			SessionEvent result = null;
-			for (int i = 0; i < timeout_in_millis; i += STEP_IN_MILLIS) {
-				if (sessionEvent != null) {
-					result = sessionEvent;
-					break;
-				}
+            if (sessionEvent != null) {
+                throw new IllegalStateException("There's already an event queued, before this method was called.");
+            }
 
-				try {
-					Thread.sleep(STEP_IN_MILLIS);
-				} catch (InterruptedException e) {
-					// ignore
-				}
-			}
+            final long STEP_IN_MILLIS = 100;
+            SessionEvent result = null;
+            for (int i = 0; i < timeout_in_millis; i += STEP_IN_MILLIS) {
+                if (sessionEvent != null) {
+                    result = sessionEvent;
+                    break;
+                }
 
-			sessionEvent = null;
-			return result;
-		}
-	}
+                try {
+                    Thread.sleep(STEP_IN_MILLIS);
+                }
+                catch (InterruptedException e) {
+                    // ignore
+                }
+            }
+
+            sessionEvent = null;
+            return result;
+        }
+    }
 }

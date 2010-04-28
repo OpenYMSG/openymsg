@@ -33,192 +33,187 @@ import org.openymsg.network.event.WaitListener;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
 public class LoginTest {
-	private static String USERNAME = PropertiesAvailableTest
-			.getUsername("logintestuser1");
+    private static String USERNAME = PropertiesAvailableTest.getUsername("logintestuser1");
 
-	private static String PASSWORD = PropertiesAvailableTest
-			.getPassword(USERNAME);
+    private static String PASSWORD = PropertiesAvailableTest.getPassword(USERNAME);
 
-	private static String OTHERUSR = PropertiesAvailableTest
-			.getUsername("logintestuser2");
+    private static String OTHERUSR = PropertiesAvailableTest.getUsername("logintestuser2");
 
-	private static String OTHERPWD = PropertiesAvailableTest
-			.getPassword(OTHERUSR);
+    private static String OTHERPWD = PropertiesAvailableTest.getPassword(OTHERUSR);
 
-	@Test
-	public void testFalseLogin() throws Exception {
-		Session session = new Session();
-		assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
-		try {
-			session.login("sdfds", null);
-			Assert
-					.fail("An IllegalArgumentException should have been thrown after the #login() call.");
-		} catch (IllegalArgumentException e) {
-			// should happen.
-		}
-		assertEquals(SessionState.FAILED, session.getSessionStatus());
+    @Test
+    public void testFalseLogin() throws Exception {
+        Session session = new Session();
+        assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
+        try {
+            session.login("sdfds", null);
+            Assert.fail("An IllegalArgumentException should have been thrown after the #login() call.");
+        }
+        catch (IllegalArgumentException e) {
+            // should happen.
+        }
+        assertEquals(SessionState.FAILED, session.getSessionStatus());
 
-		session = new Session();
-		assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
+        session = new Session();
+        assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
 
-		try {
-			session.login(null, "sdfds");
-			Assert
-					.fail("An IllegalArgumentException should have been thrown after the #login() call.");
-		} catch (IllegalArgumentException e) {
-			// should happen.
-		}
+        try {
+            session.login(null, "sdfds");
+            Assert.fail("An IllegalArgumentException should have been thrown after the #login() call.");
+        }
+        catch (IllegalArgumentException e) {
+            // should happen.
+        }
 
-		session = new Session();
-		try {
-			session.login("sdfsda", "");
-			Assert
-					.fail("An IllegalArgumentException should have been thrown after the #login() call.");
-		} catch (IllegalArgumentException e) {
-			// should happen.
-		}
+        session = new Session();
+        try {
+            session.login("sdfsda", "");
+            Assert.fail("An IllegalArgumentException should have been thrown after the #login() call.");
+        }
+        catch (IllegalArgumentException e) {
+            // should happen.
+        }
 
-		session = new Session();
-		try {
-			session.login("", "sdfds");
-			Assert
-					.fail("An IllegalArgumentException should have been thrown after the #login() call.");
-		} catch (IllegalArgumentException e) {
-			// should happen.
-		}
-		assertEquals(SessionState.FAILED, session.getSessionStatus());
+        session = new Session();
+        try {
+            session.login("", "sdfds");
+            Assert.fail("An IllegalArgumentException should have been thrown after the #login() call.");
+        }
+        catch (IllegalArgumentException e) {
+            // should happen.
+        }
+        assertEquals(SessionState.FAILED, session.getSessionStatus());
 
-	}
+    }
 
-	@Test
-	public void testLogin() throws Exception {
-		final Session session = new Session();
-		assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
-		try {
-			session.login(USERNAME, PASSWORD);
-		} catch (YahooException ex) {
-			ex.printStackTrace();
-			Assert.fail("This should not have thrown an exception, but did: "
-					+ ex.getMessage());
-		}
-		assertEquals(SessionState.LOGGED_ON, session.getSessionStatus());
-		session.logout();
-	}
+    @Test
+    public void testLogin() throws Exception {
+        final Session session = new Session();
+        assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
+        try {
+            session.login(USERNAME, PASSWORD);
+        }
+        catch (YahooException ex) {
+            ex.printStackTrace();
+            Assert.fail("This should not have thrown an exception, but did: " + ex.getMessage());
+        }
+        assertEquals(SessionState.LOGGED_ON, session.getSessionStatus());
+        session.logout();
+    }
 
-	// @Test // according to Jive, this should be possible, but it isn't?
-	public void testLoginWithUsernameAsEmail() throws Exception {
-		final Session session = new Session();
-		try {
-			session.login(USERNAME + "@yahoo.com", PASSWORD);
-		} catch (Exception e) {
-			// Should NOT happen!
-			e.printStackTrace();
-			Assert
-					.fail("An unexpected exception was caught: "
-							+ e.getMessage());
-		}
-		assertEquals(SessionState.LOGGED_ON, session.getSessionStatus());
-		session.logout();
-	}
+    // @Test // according to Jive, this should be possible, but it isn't?
+    public void testLoginWithUsernameAsEmail() throws Exception {
+        final Session session = new Session();
+        try {
+            session.login(USERNAME + "@yahoo.com", PASSWORD);
+        }
+        catch (Exception e) {
+            // Should NOT happen!
+            e.printStackTrace();
+            Assert.fail("An unexpected exception was caught: " + e.getMessage());
+        }
+        assertEquals(SessionState.LOGGED_ON, session.getSessionStatus());
+        session.logout();
+    }
 
-	@Test
-	public void testLoginIncorrectPassword() throws Exception {
-		final Session session = new Session();
-		try {
-			session.login(USERNAME, "incorrect!");
-			session.logout();
-			Assert
-					.fail("A LoginRefusedException should have been thrown after the #login() call.");
-		} catch (LoginRefusedException e) {
-			// should happen.
-			assertEquals(SessionState.FAILED, session.getSessionStatus());
-		}
-	}
+    @Test
+    public void testLoginIncorrectPassword() throws Exception {
+        final Session session = new Session();
+        try {
+            session.login(USERNAME, "incorrect!");
+            session.logout();
+            Assert.fail("A LoginRefusedException should have been thrown after the #login() call.");
+        }
+        catch (LoginRefusedException e) {
+            // should happen.
+            assertEquals(SessionState.FAILED, session.getSessionStatus());
+        }
+    }
 
-	@Test
-	public void testDuplicateLogin() throws Exception {
-		// first session should login ok, the second session shouldn't.
-		final Session sessionOne = new Session();
-		final Session sessionTwo = new Session();
-		sessionOne.login(USERNAME, PASSWORD);
+    @Test
+    public void testDuplicateLogin() throws Exception {
+        // first session should login ok, the second session shouldn't.
+        final Session sessionOne = new Session();
+        final Session sessionTwo = new Session();
+        sessionOne.login(USERNAME, PASSWORD);
 
-		sessionTwo.login(USERNAME, PASSWORD);
-		sessionTwo.logout();
-		try {
-			sessionOne.logout();
-			Assert
-					.fail("An IllegalStateException should have been thrown by now.");
-		} catch (IllegalStateException e) {
-			// should happen
-		}
-		assertEquals(SessionState.UNSTARTED, sessionOne.getSessionStatus());
-		assertEquals(SessionState.UNSTARTED, sessionTwo.getSessionStatus());
+        sessionTwo.login(USERNAME, PASSWORD);
+        sessionTwo.logout();
+        try {
+            sessionOne.logout();
+            Assert.fail("An IllegalStateException should have been thrown by now.");
+        }
+        catch (IllegalStateException e) {
+            // should happen
+        }
+        assertEquals(SessionState.UNSTARTED, sessionOne.getSessionStatus());
+        assertEquals(SessionState.UNSTARTED, sessionTwo.getSessionStatus());
 
-	}
+    }
 
-	@Test
-	public void testLoginTwiceOnSameSession() throws Exception {
-		final Session session = new Session();
-		session.login(USERNAME, PASSWORD);
-		try {
-			session.login(USERNAME, PASSWORD);
-			Assert
-					.fail("An IllegalStateException should have been thrown by now.");
-		} catch (IllegalStateException e) {
-			// should happen
-		} finally {
-			session.logout();
-		}
-	}
+    @Test
+    public void testLoginTwiceOnSameSession() throws Exception {
+        final Session session = new Session();
+        session.login(USERNAME, PASSWORD);
+        try {
+            session.login(USERNAME, PASSWORD);
+            Assert.fail("An IllegalStateException should have been thrown by now.");
+        }
+        catch (IllegalStateException e) {
+            // should happen
+        }
+        finally {
+            session.logout();
+        }
+    }
 
-	@Test
-	public void testLoginLogoutAndLoginAgain() throws Exception {
-		// using two session objects
-		final Session sessionOne = new Session();
-		sessionOne.login(USERNAME, PASSWORD);
-		assertEquals(SessionState.LOGGED_ON, sessionOne.getSessionStatus());
-		sessionOne.logout();
-		assertEquals(SessionState.UNSTARTED, sessionOne.getSessionStatus());
+    @Test
+    public void testLoginLogoutAndLoginAgain() throws Exception {
+        // using two session objects
+        final Session sessionOne = new Session();
+        sessionOne.login(USERNAME, PASSWORD);
+        assertEquals(SessionState.LOGGED_ON, sessionOne.getSessionStatus());
+        sessionOne.logout();
+        assertEquals(SessionState.UNSTARTED, sessionOne.getSessionStatus());
 
-		final Session sessionTwo = new Session();
-		sessionTwo.login(USERNAME, PASSWORD);
-		assertEquals(SessionState.LOGGED_ON, sessionTwo.getSessionStatus());
-		sessionTwo.logout();
-		assertEquals(SessionState.UNSTARTED, sessionTwo.getSessionStatus());
-	}
+        final Session sessionTwo = new Session();
+        sessionTwo.login(USERNAME, PASSWORD);
+        assertEquals(SessionState.LOGGED_ON, sessionTwo.getSessionStatus());
+        sessionTwo.logout();
+        assertEquals(SessionState.UNSTARTED, sessionTwo.getSessionStatus());
+    }
 
-	@Test
-	public void testLoginLogoutAndLoginAgainUsingTheSameSessionObject()
-			throws Exception {
-		final Session session = new Session();
-		WaitListener wl = new WaitListener(session);
-		assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
-		session.login(USERNAME, PASSWORD);
-		wl.waitForEvent(5, ServiceType.LOGON);
-		assertEquals(SessionState.LOGGED_ON, session.getSessionStatus());
-		session.logout();
-		Thread.sleep(500);
-		assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
-		session.login(USERNAME, PASSWORD);
-		wl.waitForEvent(5, ServiceType.LOGON);
-		assertEquals(SessionState.LOGGED_ON, session.getSessionStatus());
-		session.logout();
-		assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
-	}
+    @Test
+    public void testLoginLogoutAndLoginAgainUsingTheSameSessionObject() throws Exception {
+        final Session session = new Session();
+        WaitListener wl = new WaitListener(session);
+        assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
+        session.login(USERNAME, PASSWORD);
+        wl.waitForEvent(5, ServiceType.LOGON);
+        assertEquals(SessionState.LOGGED_ON, session.getSessionStatus());
+        session.logout();
+        Thread.sleep(500);
+        assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
+        session.login(USERNAME, PASSWORD);
+        wl.waitForEvent(5, ServiceType.LOGON);
+        assertEquals(SessionState.LOGGED_ON, session.getSessionStatus());
+        session.logout();
+        assertEquals(SessionState.UNSTARTED, session.getSessionStatus());
+    }
 
-	@Test
-	public void testDuplicateLogins() throws Exception {
-		final Session sessionOne = new Session();
-		final Session sessionTwo = new Session();
-		assertEquals(SessionState.UNSTARTED, sessionOne.getSessionStatus());
-		assertEquals(SessionState.UNSTARTED, sessionTwo.getSessionStatus());
-		sessionOne.login(USERNAME, PASSWORD);
-		sessionTwo.login(OTHERUSR, OTHERPWD);
-		assertEquals(SessionState.LOGGED_ON, sessionOne.getSessionStatus());
-		assertEquals(SessionState.LOGGED_ON, sessionTwo.getSessionStatus());
-		sessionOne.logout();
-		sessionTwo.logout();
-		assertEquals(SessionState.UNSTARTED, sessionOne.getSessionStatus());
-		assertEquals(SessionState.UNSTARTED, sessionTwo.getSessionStatus());
-	}
+    @Test
+    public void testDuplicateLogins() throws Exception {
+        final Session sessionOne = new Session();
+        final Session sessionTwo = new Session();
+        assertEquals(SessionState.UNSTARTED, sessionOne.getSessionStatus());
+        assertEquals(SessionState.UNSTARTED, sessionTwo.getSessionStatus());
+        sessionOne.login(USERNAME, PASSWORD);
+        sessionTwo.login(OTHERUSR, OTHERPWD);
+        assertEquals(SessionState.LOGGED_ON, sessionOne.getSessionStatus());
+        assertEquals(SessionState.LOGGED_ON, sessionTwo.getSessionStatus());
+        sessionOne.logout();
+        sessionTwo.logout();
+        assertEquals(SessionState.UNSTARTED, sessionOne.getSessionStatus());
+        assertEquals(SessionState.UNSTARTED, sessionTwo.getSessionStatus());
+    }
 }

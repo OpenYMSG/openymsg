@@ -25,16 +25,15 @@ package org.openymsg.network;
  */
 public class NoSuchConferenceException extends RuntimeException {
 
-	private static final long serialVersionUID = -2038864806660541191L;
+    private static final long serialVersionUID = -2038864806660541191L;
 
-	/**
-	 * Creates a new instance of the exception, containing a more detailled
-	 * description.
-	 * 
-	 * @param message
-	 *            Description of the exception.
-	 */
-	public NoSuchConferenceException(String message) {
-		super(message);
-	}
+    /**
+     * Creates a new instance of the exception, containing a more detailled description.
+     * 
+     * @param message
+     *            Description of the exception.
+     */
+    public NoSuchConferenceException(String message) {
+        super(message);
+    }
 }

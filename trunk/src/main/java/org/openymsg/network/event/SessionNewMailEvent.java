@@ -25,45 +25,44 @@ package org.openymsg.network.event;
  * @author S.E. Morris
  */
 public class SessionNewMailEvent extends SessionEvent {
-	protected int mail;
+    protected int mail;
 
-	protected String subject, address;
+    protected String subject, address;
 
-	// CONSTRUCTORS
-	public SessionNewMailEvent(Object o, String ml) {
-		super(o);
-		mail = Integer.parseInt(ml);
-	}
+    // CONSTRUCTORS
+    public SessionNewMailEvent(Object o, String ml) {
+        super(o);
+        mail = Integer.parseInt(ml);
+    }
 
-	public SessionNewMailEvent(Object o, String fr, String em, String sb) {
-		super(o, null, fr, null);
-		mail = 0;
-		address = em;
-		subject = sb;
-	}
+    public SessionNewMailEvent(Object o, String fr, String em, String sb) {
+        super(o, null, fr, null);
+        mail = 0;
+        address = em;
+        subject = sb;
+    }
 
-	// Accessors
-	public int getMailCount() {
-		return mail;
-	}
+    // Accessors
+    public int getMailCount() {
+        return mail;
+    }
 
-	public String getSubject() {
-		return subject;
-	}
+    public String getSubject() {
+        return subject;
+    }
 
-	public String getEmailAddress() {
-		return address;
-	}
+    public String getEmailAddress() {
+        return address;
+    }
 
-	public boolean isWholeMail() {
-		return (mail == 0);
-	}
+    public boolean isWholeMail() {
+        return (mail == 0);
+    }
 
-	@Override
-	public String toString() {
-		StringBuffer sb = new StringBuffer(super.toString()).append(" mail:")
-				.append(mail).append(" addr:").append(address).append(
-						" subject:").append(subject);
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer(super.toString()).append(" mail:").append(mail).append(" addr:").append(
+                address).append(" subject:").append(subject);
+        return sb.toString();
+    }
 }

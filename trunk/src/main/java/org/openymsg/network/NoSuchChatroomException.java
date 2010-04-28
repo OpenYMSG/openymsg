@@ -24,16 +24,15 @@ package org.openymsg.network;
  * @author S.E. Morris
  */
 public class NoSuchChatroomException extends RuntimeException {
-	private static final long serialVersionUID = -304001727931672151L;
+    private static final long serialVersionUID = -304001727931672151L;
 
-	/**
-	 * Creates a new instance of the exception, containing a more detailled
-	 * description.
-	 * 
-	 * @param message
-	 *            Description of the exception.
-	 */
-	public NoSuchChatroomException(String message) {
-		super(message);
-	}
+    /**
+     * Creates a new instance of the exception, containing a more detailled description.
+     * 
+     * @param message
+     *            Description of the exception.
+     */
+    public NoSuchChatroomException(String message) {
+        super(message);
+    }
 }

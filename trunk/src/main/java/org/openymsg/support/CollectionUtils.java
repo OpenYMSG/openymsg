@@ -29,41 +29,37 @@ import java.util.Set;
  */
 public class CollectionUtils {
 
-	/**
-	 * Removes the value from the set of values mapped by key. If this value was
-	 * the last value in the set of values mapped by key, the complete
-	 * key/values entry is removed.
-	 * 
-	 * @param key
-	 *            The key for which to remove a value.
-	 * @param value
-	 *            The value for which to remove the key.
-	 * @param map
-	 *            The object that maps the key to a set of values, on which the
-	 *            operation should occur.
-	 */
-	public static <K, V> void deleteAndRemove(final K key, final V value,
-			final Map<K, Set<V>> map) {
-		if (key == null) {
-			throw new IllegalArgumentException("Argument 'key' cannot be null.");
-		}
-		if (value == null) {
-			throw new IllegalArgumentException(
-					"Argument 'value' cannot be null.");
-		}
-		if (map == null) {
-			throw new IllegalArgumentException("Argument 'map' cannot be null.");
-		}
+    /**
+     * Removes the value from the set of values mapped by key. If this value was the last value in the set of values
+     * mapped by key, the complete key/values entry is removed.
+     * 
+     * @param key
+     *            The key for which to remove a value.
+     * @param value
+     *            The value for which to remove the key.
+     * @param map
+     *            The object that maps the key to a set of values, on which the operation should occur.
+     */
+    public static <K, V> void deleteAndRemove(final K key, final V value, final Map<K, Set<V>> map) {
+        if (key == null) {
+            throw new IllegalArgumentException("Argument 'key' cannot be null.");
+        }
+        if (value == null) {
+            throw new IllegalArgumentException("Argument 'value' cannot be null.");
+        }
+        if (map == null) {
+            throw new IllegalArgumentException("Argument 'map' cannot be null.");
+        }
 
-		if (map.isEmpty() || !map.containsKey(key)) {
-			return;
-		}
+        if (map.isEmpty() || !map.containsKey(key)) {
+            return;
+        }
 
-		final Set<V> values = map.get(key);
-		values.remove(value);
+        final Set<V> values = map.get(key);
+        values.remove(value);
 
-		if (values.isEmpty()) {
-			map.remove(key);
-		}
-	}
+        if (values.isEmpty()) {
+            map.remove(key);
+        }
+    }
 }

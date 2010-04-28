@@ -23,78 +23,72 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 /**
- * This handy class hides most of the pain of building the Yahoo message body.
- * Each body consists of key/value pairs (or sometimes just keys) with each
- * field separated by the sequence 0xc080
+ * This handy class hides most of the pain of building the Yahoo message body. Each body consists of key/value pairs (or
+ * sometimes just keys) with each field separated by the sequence 0xc080
  * 
- * Note: this class is NOT thread safe (although, to be honest, building a
- * single message body from more than one independent thread is surely asking
- * for trouble?!??)
+ * Note: this class is NOT thread safe (although, to be honest, building a single message body from more than one
+ * independent thread is surely asking for trouble?!??)
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
 public class PacketBodyBuffer {
-	protected ByteArrayOutputStream baos;
+    protected ByteArrayOutputStream baos;
 
-	private final static int[] SEPARATOR = { 0xc0, 0x80 }; // Yahoo separator
-	private final static String SEPARATOR_STRING = new String(new byte[] {
-			(byte) 0xc0, (byte) 0x80 });
+    private final static int[] SEPARATOR = { 0xc0, 0x80 }; // Yahoo separator
+    private final static String SEPARATOR_STRING = new String(new byte[] { (byte) 0xc0, (byte) 0x80 });
 
-	private String charEncoding; // Character encoding
+    private String charEncoding; // Character encoding
 
-	public PacketBodyBuffer() {
-		baos = new ByteArrayOutputStream(1024); // 1K initial size
-		charEncoding = System.getProperty("openymsg.network.charEncoding",
-				"UTF-8");
-	}
+    public PacketBodyBuffer() {
+        baos = new ByteArrayOutputStream(1024); // 1K initial size
+        charEncoding = System.getProperty("openymsg.network.charEncoding", "UTF-8");
+    }
 
-	/**
-	 * Add a string to the buffer, and terminate with separator. Note: this
-	 * method is NOT thread safe.
-	 * 
-	 * @throws IOException
-	 * @throws UnsupportedEncodingException
-	 */
-	void addString(String s) throws UnsupportedEncodingException, IOException {
-		baos.write(s.getBytes(charEncoding));
-		baos.write(SEPARATOR[0]);
-		baos.write(SEPARATOR[1]);
-	}
+    /**
+     * Add a string to the buffer, and terminate with separator. Note: this method is NOT thread safe.
+     * 
+     * @throws IOException
+     * @throws UnsupportedEncodingException
+     */
+    void addString(String s) throws UnsupportedEncodingException, IOException {
+        baos.write(s.getBytes(charEncoding));
+        baos.write(SEPARATOR[0]);
+        baos.write(SEPARATOR[1]);
+    }
 
-	/**
-	 * Add key/value pair to buffer. Note: this method is NOT thread safe.
-	 * 
-	 * @throws IOException
-	 * @throws UnsupportedEncodingException
-	 */
-	public void addElement(String key, String value)
-			throws UnsupportedEncodingException, IOException {
-		addString(key);
-		addString(value);
-	}
+    /**
+     * Add key/value pair to buffer. Note: this method is NOT thread safe.
+     * 
+     * @throws IOException
+     * @throws UnsupportedEncodingException
+     */
+    public void addElement(String key, String value) throws UnsupportedEncodingException, IOException {
+        addString(key);
+        addString(value);
+    }
 
-	/**
-	 * Return buffer as byte array. Note: this method is NOT thread safe.
-	 */
-	synchronized byte[] getBuffer() {
-		return baos.toByteArray();
-	}
+    /**
+     * Return buffer as byte array. Note: this method is NOT thread safe.
+     */
+    synchronized byte[] getBuffer() {
+        return baos.toByteArray();
+    }
 
-	/**
-	 * Reset (clear) buffer
-	 */
-	void reset() {
-		baos.reset();
-	}
+    /**
+     * Reset (clear) buffer
+     */
+    void reset() {
+        baos.reset();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return new String(baos.toByteArray()).replace(SEPARATOR_STRING, " ");
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return new String(baos.toByteArray()).replace(SEPARATOR_STRING, " ");
+    }
 }

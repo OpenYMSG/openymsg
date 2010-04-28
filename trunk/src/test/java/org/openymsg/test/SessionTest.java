@@ -31,30 +31,30 @@ import org.openymsg.network.Session;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
 public class SessionTest {
-	@Test
-	public void testSession() throws Exception {
-		new Session();
-	}
+    @Test
+    public void testSession() throws Exception {
+        new Session();
+    }
 
-	@Test
-	public void testConcurrentSessions() throws Exception {
-		Set<Session> sessions = new HashSet<Session>();
-		final int max = 10;
-		for (int i = 0; i < max; i++) {
-			sessions.add(new Session());
-		}
+    @Test
+    public void testConcurrentSessions() throws Exception {
+        Set<Session> sessions = new HashSet<Session>();
+        final int max = 10;
+        for (int i = 0; i < max; i++) {
+            sessions.add(new Session());
+        }
 
-		assertEquals(max, sessions.size());
+        assertEquals(max, sessions.size());
 
-		Iterator<Session> it = sessions.iterator();
-		int i = 0;
-		while (it.hasNext()) {
-			i++;
-			it.next();
-			it.remove();
-		}
+        Iterator<Session> it = sessions.iterator();
+        int i = 0;
+        while (it.hasNext()) {
+            i++;
+            it.next();
+            it.remove();
+        }
 
-		assertEquals(max, i);
-		assertEquals(0, sessions.size());
-	}
+        assertEquals(max, i);
+        assertEquals(0, sessions.size());
+    }
 }

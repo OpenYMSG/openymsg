@@ -24,39 +24,39 @@ package org.openymsg.network;
  * @author S.E. Morris
  */
 public interface StatusConstants {
-	public static final String STATUS_AVAILABLE_STR = "Available";
+    public static final String STATUS_AVAILABLE_STR = "Available";
 
-	public static final String STATUS_BRB_STR = "Be right back";
+    public static final String STATUS_BRB_STR = "Be right back";
 
-	public static final String STATUS_BUSY_STR = "Busy";
+    public static final String STATUS_BUSY_STR = "Busy";
 
-	public static final String STATUS_NOTATHOME_STR = "Not at home";
+    public static final String STATUS_NOTATHOME_STR = "Not at home";
 
-	public static final String STATUS_NOTATDESK_STR = "Not at desk";
+    public static final String STATUS_NOTATDESK_STR = "Not at desk";
 
-	public static final String STATUS_NOTINOFFICE_STR = "Not in office";
+    public static final String STATUS_NOTINOFFICE_STR = "Not in office";
 
-	public static final String STATUS_ONPHONE_STR = "On the phone";
+    public static final String STATUS_ONPHONE_STR = "On the phone";
 
-	public static final String STATUS_ONVACATION_STR = "On vacation";
+    public static final String STATUS_ONVACATION_STR = "On vacation";
 
-	public static final String STATUS_OUTTOLUNCH_STR = "Out to lunch";
+    public static final String STATUS_OUTTOLUNCH_STR = "Out to lunch";
 
-	public static final String STATUS_STEPPEDOUT_STR = "Stepped out";
+    public static final String STATUS_STEPPEDOUT_STR = "Stepped out";
 
-	public static final String STATUS_INVISIBLE_STR = "Invisible";
+    public static final String STATUS_INVISIBLE_STR = "Invisible";
 
-	public static final String STATUS_CUSTOM_STR = "<custom>";
+    public static final String STATUS_CUSTOM_STR = "<custom>";
 
-	public static final String STATUS_IDLE_STR = "Zzz";
+    public static final String STATUS_IDLE_STR = "Zzz";
 
-	public static final int STEALTH_DEFAULT = 0;
+    public static final int STEALTH_DEFAULT = 0;
 
-	public static final int STEALTH_ONLINE = 1;
+    public static final int STEALTH_ONLINE = 1;
 
-	public static final int STEALTH_OFFLINE = 2;
+    public static final int STEALTH_OFFLINE = 2;
 
-	public static final String NOTIFY_TYPING = "TYPING";
+    public static final String NOTIFY_TYPING = "TYPING";
 
-	public static final String NOTIFY_GAME = "GAME";
+    public static final String NOTIFY_GAME = "GAME";
 }

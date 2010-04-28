@@ -22,101 +22,94 @@ import org.openymsg.network.chatroom.YahooChatLobby;
 import org.openymsg.network.chatroom.YahooChatUser;
 
 /**
- * Note: this class is designed to hold more than one chat user. However in real
- * life Yahoo never actually seems to send details of more than one user in a
- * single packet (except the for initial packet containing the list of users in
- * the room when you first join - but this event isn't used for that) ...
- * However, the packet does contain a user count. So to play it safe this class
- * uses an array.
+ * Note: this class is designed to hold more than one chat user. However in real life Yahoo never actually seems to send
+ * details of more than one user in a single packet (except the for initial packet containing the list of users in the
+ * room when you first join - but this event isn't used for that) ... However, the packet does contain a user count. So
+ * to play it safe this class uses an array.
  * 
- * From ChatUser ChatUsers Lobby Message Emote chatJoinReceived y y y y n n
- * chatDisconnectReceived y y y y n n chatMessageReceived y y y y y y
- * chatConnectionBroken n n n n n n
+ * From ChatUser ChatUsers Lobby Message Emote chatJoinReceived y y y y n n chatDisconnectReceived y y y y n n
+ * chatMessageReceived y y y y y y chatConnectionBroken n n n n n n
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
 public class SessionChatEvent extends SessionEvent {
-	protected YahooChatUser[] users;
+    protected YahooChatUser[] users;
 
-	protected YahooChatLobby lobby;
+    protected YahooChatLobby lobby;
 
-	protected boolean emote;
+    protected boolean emote;
 
-    protected String captchaMsg,captchaURL;
+    protected String captchaMsg, captchaURL;
 
-	/**
-	 * CONSTRUCTORS
-	 */
-	// Chat user joined/left
-	public SessionChatEvent(Object source, int size, YahooChatLobby ycl) {
-		super(source);
-		users = new YahooChatUser[size];
-		lobby = ycl;
-	}
+    /**
+     * CONSTRUCTORS
+     */
+    // Chat user joined/left
+    public SessionChatEvent(Object source, int size, YahooChatLobby ycl) {
+        super(source);
+        users = new YahooChatUser[size];
+        lobby = ycl;
+    }
 
-	// Message received
-	public SessionChatEvent(Object source, YahooChatUser ycu, String message,
-			String emote, YahooChatLobby ycl) {
-		this(source, 1, ycl);
-		setChatUser(0, ycu);
-		this.message = message;
-		this.emote = (emote != null && emote.equals("2"));
-	}
+    // Message received
+    public SessionChatEvent(Object source, YahooChatUser ycu, String message, String emote, YahooChatLobby ycl) {
+        this(source, 1, ycl);
+        setChatUser(0, ycu);
+        this.message = message;
+        this.emote = (emote != null && emote.equals("2"));
+    }
 
     // -----Captcha
-	public SessionChatEvent(Object o,String capM,String capU,YahooChatLobby ycl)
-	{
+    public SessionChatEvent(Object o, String capM, String capU, YahooChatLobby ycl) {
         super(o);
-        captchaMsg=capM;  captchaURL=capU;
-        lobby=ycl;
-	}
+        captchaMsg = capM;
+        captchaURL = capU;
+        lobby = ycl;
+    }
 
-	public void setChatUser(int i, YahooChatUser ycu) {
-		users[i] = ycu;
-	}
+    public void setChatUser(int i, YahooChatUser ycu) {
+        users[i] = ycu;
+    }
 
-	/**
-	 * Accessors
-	 */
-	// User joined room
-	public YahooChatUser getChatUser() {
-		return users[0];
-	}
+    /**
+     * Accessors
+     */
+    // User joined room
+    public YahooChatUser getChatUser() {
+        return users[0];
+    }
 
-	public YahooChatUser[] getChatUsers() {
-		return users;
-	}
+    public YahooChatUser[] getChatUsers() {
+        return users;
+    }
 
-	public YahooChatLobby getLobby() {
-		return lobby;
-	}
+    public YahooChatLobby getLobby() {
+        return lobby;
+    }
 
-	@Override
-	public String getFrom() {
-		return users[0].getId();
-	}
+    @Override
+    public String getFrom() {
+        return users[0].getId();
+    }
 
-	public boolean isEmote() {
-		return emote;
-	}
+    public boolean isEmote() {
+        return emote;
+    }
 
-    public String getCaptchaMessage()
-    {
+    public String getCaptchaMessage() {
         return captchaMsg;
     }
 
-    public String getCaptchaURL()
-    {
+    public String getCaptchaURL() {
         return captchaURL;
     }
 
-	@Override
-	public String toString() {
-		StringBuffer sb = new StringBuffer(super.toString());
-		sb.append(" size:").append(users.length).append(" chatuser:").append(
-				users[0].getId()).append(" lobby:").append(
-				lobby.getNetworkName());
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer(super.toString());
+        sb.append(" size:").append(users.length).append(" chatuser:").append(users[0].getId()).append(" lobby:")
+                .append(lobby.getNetworkName());
+        return sb.toString();
+    }
 }

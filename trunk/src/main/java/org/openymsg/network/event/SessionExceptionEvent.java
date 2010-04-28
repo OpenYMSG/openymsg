@@ -19,8 +19,7 @@
 package org.openymsg.network.event;
 
 /**
- * This class is used to pass exceptions from the input thread to the main
- * application.
+ * This class is used to pass exceptions from the input thread to the main application.
  * 
  * Message Exception inputExceptionThrown y y
  * 
@@ -28,26 +27,26 @@ package org.openymsg.network.event;
  * @author S.E. Morris
  */
 public class SessionExceptionEvent extends SessionEvent {
-	private static final long serialVersionUID = -5999099588327589758L;
-	protected Exception exception;
+    private static final long serialVersionUID = -5999099588327589758L;
+    protected Exception exception;
 
-	/**
-	 * CONSTRUCTORS
-	 */
-	public SessionExceptionEvent(Object o, String m, Exception e) {
-		super(o);
-		message = m;
-		exception = e;
-	}
+    /**
+     * CONSTRUCTORS
+     */
+    public SessionExceptionEvent(Object o, String m, Exception e) {
+        super(o);
+        message = m;
+        exception = e;
+    }
 
-	public Exception getException() {
-		return exception;
-	}
+    public Exception getException() {
+        return exception;
+    }
 
-	@Override
-	public String toString() {
-		StringBuffer sb = new StringBuffer("Exception: message=\"").append(
-				message).append("\" type=").append(exception.toString());
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer("Exception: message=\"").append(message).append("\" type=").append(
+                exception.toString());
+        return sb.toString();
+    }
 }

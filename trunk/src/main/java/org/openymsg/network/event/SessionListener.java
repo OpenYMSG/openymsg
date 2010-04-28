@@ -27,5 +27,5 @@ import org.openymsg.network.FireEvent;
  * @author S.E. Morris
  */
 public interface SessionListener {
-	public void dispatch(FireEvent event);
+    public void dispatch(FireEvent event);
 }

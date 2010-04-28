@@ -29,17 +29,17 @@ import org.openymsg.network.YahooGroup;
  */
 public class YahooGroupTest extends EqualsHashCodeTestCase {
 
-	public YahooGroupTest() {
-		super(YahooGroupTest.class.getName());
-	}
+    public YahooGroupTest() {
+        super(YahooGroupTest.class.getName());
+    }
 
-	@Override
-	protected Object createInstance() throws Exception {
-		return new YahooGroup("same");
-	}
+    @Override
+    protected Object createInstance() throws Exception {
+        return new YahooGroup("same");
+    }
 
-	@Override
-	protected Object createNotEqualInstance() throws Exception {
-		return new YahooGroup("different");
-	}
+    @Override
+    protected Object createNotEqualInstance() throws Exception {
+        return new YahooGroup("different");
+    }
 }

@@ -30,100 +30,97 @@ import org.openymsg.network.event.SessionEvent;
 import org.openymsg.network.event.SessionListener;
 
 /**
- * Dispatcher for events that are fired. Events that get fired are broadcasted
- * to all listeners that are registered to the instance of this object.
+ * Dispatcher for events that are fired. Events that get fired are broadcasted to all listeners that are registered to
+ * the instance of this object.
  * 
- * The process of dispatching events is threaded so the network code which
- * instigates these events can return to listening for input, and not get tied
- * up in each listener's event handler.
+ * The process of dispatching events is threaded so the network code which instigates these events can return to
+ * listening for input, and not get tied up in each listener's event handler.
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
 public class EventDispatcher extends Thread {
-	private volatile boolean quitFlag = false;
+    private volatile boolean quitFlag = false;
 
-	private static final Log log = LogFactory.getLog(EventDispatcher.class);
+    private static final Log log = LogFactory.getLog(EventDispatcher.class);
 
-	// queue of events that are going to be fired.
-	private final List<FireEvent> queue = Collections
-			.synchronizedList(new LinkedList<FireEvent>());
+    // queue of events that are going to be fired.
+    private final List<FireEvent> queue = Collections.synchronizedList(new LinkedList<FireEvent>());
 
-	private final Session session;
+    private final Session session;
 
-	public EventDispatcher(final Session session) {
-		super("jYMSG Event Dispatcher thread");
-		this.session = session;
-	}
+    public EventDispatcher(final Session session) {
+        super("jYMSG Event Dispatcher thread");
+        this.session = session;
+    }
 
-	/**
-	 * Gracefully stops this thread after sending out all currently queued
-	 * events. No new events can be queued after calling this method.
-	 */
-	public void kill() {
-		quitFlag = true;
-		interrupt();
-	}
+    /**
+     * Gracefully stops this thread after sending out all currently queued events. No new events can be queued after
+     * calling this method.
+     */
+    public void kill() {
+        quitFlag = true;
+        interrupt();
+    }
 
-	/**
-	 * Add an event to the dispatch queue. This causes the event to be
-	 * dispatched to all registered listeners.
-	 * 
-	 * @param type
-	 *            The service typ of the event that's being dispatched.
-	 */
-	public void append(final ServiceType type) {
-		append(null, type);
-	}
+    /**
+     * Add an event to the dispatch queue. This causes the event to be dispatched to all registered listeners.
+     * 
+     * @param type
+     *            The service typ of the event that's being dispatched.
+     */
+    public void append(final ServiceType type) {
+        append(null, type);
+    }
 
-	/**
-	 * Add an event to the dispatch queue. This causes the event to be
-	 * dispatched to all registered listeners.
-	 * 
-	 * @param event
-	 *            The sessionEvent that needs to be dispatched.
-	 * @param type
-	 *            The service typ of the event that's being dispatched.
-	 */
-	public void append(final SessionEvent event, final ServiceType type) {
-		if (type == null) {
-			throw new IllegalArgumentException(
-					"Argument 'type' cannot be null.");
-		}
+    /**
+     * Add an event to the dispatch queue. This causes the event to be dispatched to all registered listeners.
+     * 
+     * @param event
+     *            The sessionEvent that needs to be dispatched.
+     * @param type
+     *            The service typ of the event that's being dispatched.
+     */
+    public void append(final SessionEvent event, final ServiceType type) {
+        if (type == null) {
+            throw new IllegalArgumentException("Argument 'type' cannot be null.");
+        }
 
-		if (quitFlag) {
-			throw new IllegalStateException(
-					"No new events can be queued, because the dispatcher is being closed.");
-		}
+        if (quitFlag) {
+            throw new IllegalStateException("No new events can be queued, because the dispatcher is being closed.");
+        }
 
-		queue.add(new FireEvent(event, type));
-	}
+        queue.add(new FireEvent(event, type));
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Thread#run()
-	 */
-	@Override
-	public void run() {
-		while (!quitFlag) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Thread#run()
+     */
+    @Override
+    public void run() {
+        while (!quitFlag) {
 
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				// ignore.
-			}
+            try {
+                Thread.sleep(50);
+            }
+            catch (InterruptedException e) {
+                // ignore.
+            }
 
-			while (!queue.isEmpty()) {
-				final FireEvent event = queue.remove(0);
+            while (!queue.isEmpty()) {
+                final FireEvent event = queue.remove(0);
                 runEventNOW(event);
-			}
-		}
-	}
+            }
+        }
+    }
 
     /**
      * Do not use this directly unless you need it out of sequence or to run w/o an event queue.
-     * @param event to run
+     * 
+     * @param event
+     *            to run
      */
     public void runEventNOW(final FireEvent event) {
         if (event == null) {
@@ -131,12 +128,12 @@ public class EventDispatcher extends Thread {
         }
 
         try {
-        	Set<SessionListener> externalSessionListeners = 
-        		new HashSet<SessionListener>(session.getSessionListeners());
-			for (final SessionListener l : externalSessionListeners) {
-				l.dispatch(event);
-			}
-        } catch (RuntimeException ex) {
+            Set<SessionListener> externalSessionListeners = new HashSet<SessionListener>(session.getSessionListeners());
+            for (final SessionListener l : externalSessionListeners) {
+                l.dispatch(event);
+            }
+        }
+        catch (RuntimeException ex) {
             log.error("error during the dispatch of event: " + event, ex);
         }
     } // runEventNOW

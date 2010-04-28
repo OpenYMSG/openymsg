@@ -26,15 +26,15 @@ import org.openymsg.network.event.SessionAdapter;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
 public class EventListenerTest {
-	@Test
-	public void testAddEventListenerBeforeLoggingIn() throws Exception {
-		final Session session = new Session();
-		session.addSessionListener(new SessionAdapter());
-	}
+    @Test
+    public void testAddEventListenerBeforeLoggingIn() throws Exception {
+        final Session session = new Session();
+        session.addSessionListener(new SessionAdapter());
+    }
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testAddNull() throws Exception {
-		final Session session = new Session();
-		session.addSessionListener(null);
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddNull() throws Exception {
+        final Session session = new Session();
+        session.addSessionListener(null);
+    }
 }

@@ -32,65 +32,63 @@ import org.junit.Test;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
 public class PropertiesAvailableTest {
-	private static final Properties props = new Properties();
+    private static final Properties props = new Properties();
 
-	static {
-		final Class<?> me;
-		final InputStream is;
-		final InputStream ip;
-		try {
-			me = Class.forName("org.openymsg.test.PropertiesAvailableTest");
-			is = me
-					.getResourceAsStream("/yahooAuthenticationForJUnitTests.properties");
-			ip = me.getResourceAsStream("/log4j.properties");
-			props.load(is);
+    static {
+        final Class<?> me;
+        final InputStream is;
+        final InputStream ip;
+        try {
+            me = Class.forName("org.openymsg.test.PropertiesAvailableTest");
+            is = me.getResourceAsStream("/yahooAuthenticationForJUnitTests.properties");
+            ip = me.getResourceAsStream("/log4j.properties");
+            props.load(is);
 
-			final Properties log4j = new Properties();
-			log4j.load(ip);
-//			PropertyConfigurator.configure(log4j);
-			is.close();
-			ip.close();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+            final Properties log4j = new Properties();
+            log4j.load(ip);
+            // PropertyConfigurator.configure(log4j);
+            is.close();
+            ip.close();
+        }
+        catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	@Test
-	public void testGetTestUser() throws Exception {
-		InputStream is = getClass().getResourceAsStream(
-				"/yahooAuthenticationForJUnitTests.properties");
-		props.load(is);
-		final String[] user = getAccount("testuser");
-		assertNotNull(user);
-		assertEquals("DummyYahooUsername", user[0]);
-		assertEquals("YahooPassword", user[1]);
-	}
+    @Test
+    public void testGetTestUser() throws Exception {
+        InputStream is = getClass().getResourceAsStream("/yahooAuthenticationForJUnitTests.properties");
+        props.load(is);
+        final String[] user = getAccount("testuser");
+        assertNotNull(user);
+        assertEquals("DummyYahooUsername", user[0]);
+        assertEquals("YahooPassword", user[1]);
+    }
 
-	public static String getUsername(String accountname) {
-		final String value = props.getProperty(accountname);
-		assertNotNull(
-				"The property 'testuser' should be set in the resource file, but isn't.",
-				value);
-		return value;
-	}
+    public static String getUsername(String accountname) {
+        final String value = props.getProperty(accountname);
+        assertNotNull("The property 'testuser' should be set in the resource file, but isn't.", value);
+        return value;
+    }
 
-	public static String getPassword(String username) {
-		assertNotNull(username);
-		final String value = props.getProperty(username);
-		assertNotNull(
-				"There's no property that specifies the password for this username set in the resource file.",
-				value);
-		return value;
-	}
+    public static String getPassword(String username) {
+        assertNotNull(username);
+        final String value = props.getProperty(username);
+        assertNotNull("There's no property that specifies the password for this username set in the resource file.",
+                value);
+        return value;
+    }
 
-	public static String[] getAccount(String accountName) {
-		final String username = getUsername(accountName);
-		final String password = getPassword(username);
+    public static String[] getAccount(String accountName) {
+        final String username = getUsername(accountName);
+        final String password = getPassword(username);
 
-		return new String[] { username, password };
-	}
+        return new String[] { username, password };
+    }
 }

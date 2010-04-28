@@ -27,36 +27,35 @@ import org.openymsg.network.ServiceType;
  * @author S.E. Morris
  */
 public class SessionErrorEvent extends SessionEvent {
-	protected int code = -1;
+    protected int code = -1;
 
-	protected ServiceType service;
+    protected ServiceType service;
 
-	/**
-	 * CONSTRUCTORS
-	 */
-	public SessionErrorEvent(Object o, String m, ServiceType sv) {
-		super(o);
-		message = m;
-		service = sv;
-	}
+    /**
+     * CONSTRUCTORS
+     */
+    public SessionErrorEvent(Object o, String m, ServiceType sv) {
+        super(o);
+        message = m;
+        service = sv;
+    }
 
-	public void setCode(int c) {
-		code = c;
-	}
+    public void setCode(int c) {
+        code = c;
+    }
 
-	public ServiceType getService() {
-		return service;
-	}
+    public ServiceType getService() {
+        return service;
+    }
 
-	public int getCode() {
-		return code;
-	}
+    public int getCode() {
+        return code;
+    }
 
-	@Override
-	public String toString() {
-		StringBuffer sb = new StringBuffer("Error: message=\"").append(message)
-				.append("\" service=0x").append(
-						Integer.toHexString(service.getValue()));
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer("Error: message=\"").append(message).append("\" service=0x").append(
+                Integer.toHexString(service.getValue()));
+        return sb.toString();
+    }
 }
