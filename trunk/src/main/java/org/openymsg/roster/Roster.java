@@ -1,5 +1,7 @@
 package org.openymsg.roster;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openymsg.addressBook.YahooAddressBookEntry;
 import org.openymsg.network.*;
 import org.openymsg.network.event.SessionEvent;
@@ -8,7 +10,6 @@ import org.openymsg.network.event.SessionFriendEvent;
 import org.openymsg.network.event.SessionFriendRejectedEvent;
 import org.openymsg.network.event.SessionListEvent;
 import org.openymsg.network.event.SessionListener;
-import org.openymsg.support.Logger;
 
 import java.io.IOException;
 import java.util.*;
@@ -31,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Roster implements Set<YahooUser>, SessionListener {
 
-    private static final Logger log = Logger.getLogger(Roster.class);
+    private static final Log log = LogFactory.getLog(Roster.class);
 
 	/**
 	 * The collection of RosterListener instances that will be notified of new

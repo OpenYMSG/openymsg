@@ -46,6 +46,8 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jdom.JDOMException;
 import org.openymsg.addressBook.BuddyListImport;
 import org.openymsg.network.challenge.ChallengeResponseV16;
@@ -74,7 +76,6 @@ import org.openymsg.network.event.SessionNotifyEvent;
 import org.openymsg.network.event.SessionPictureEvent;
 import org.openymsg.network.event.SessionPictureHandler;
 import org.openymsg.roster.Roster;
-import org.openymsg.support.Logger;
 
 /**
  * Written by FISH, Feb 2003 , Copyright FISH 2003 - 2007
@@ -165,7 +166,7 @@ public class Session implements StatusConstants, FriendManager {
   // used to simulate failures
 //  static private int triesBeforeFailure = 0;
 
-  private static final Logger log = Logger.getLogger(Session.class);
+  private static final Log log = LogFactory.getLog(Session.class);
 
   /**
    * Creates a new Session based on a ConnectionHandler as configured in the

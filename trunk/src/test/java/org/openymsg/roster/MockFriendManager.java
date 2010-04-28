@@ -2,9 +2,10 @@ package org.openymsg.roster;
 
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.FriendManager;
 import org.openymsg.network.YahooProtocol;
-import org.openymsg.support.Logger;
 
 /**
  * Mock (empty) implementation of the FriendManager interface. Useful for unit
@@ -14,7 +15,7 @@ import org.openymsg.support.Logger;
  */
 public class MockFriendManager implements FriendManager {
 
-	private static final Logger log = Logger.getLogger(MockFriendManager.class);
+	private static final Log log = LogFactory.getLog(MockFriendManager.class);
 	
 	private String friendId = null;
 	private String groupId = null;

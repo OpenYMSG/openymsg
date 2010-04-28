@@ -7,10 +7,11 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.FireEvent;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.Session;
-import org.openymsg.support.Logger;
 
 /**
  * @author Giancarlo Frison - Nimbuzz B.V. <giancarlo@nimbuzz.com>
@@ -19,8 +20,7 @@ import org.openymsg.support.Logger;
 public class WaitListener implements SessionListener {
 
 	BlockingQueue<FireEvent> events = new ArrayBlockingQueue<FireEvent>(50);
-    private static final Logger log
-        = Logger.getLogger(WaitListener.class);
+    private static final Log log = LogFactory.getLog(WaitListener.class);
 	private Session session;
 
 	public WaitListener(Session session) {
