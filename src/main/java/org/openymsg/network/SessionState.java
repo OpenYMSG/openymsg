@@ -25,9 +25,9 @@ package org.openymsg.network;
  * @author S.E. Morris
  */
 public enum SessionState {
-	UNSTARTED, // Not logged in
-	CONNECTING, // Started to logon
-	CONNECTED, // Step one of logon successfully completed
-	LOGGED_ON, // Step two of logon successfully completed
-	FAILED; // Dead by Error
+    UNSTARTED, // Not logged in
+    CONNECTING, // Started to logon
+    CONNECTED, // Step one of logon successfully completed
+    LOGGED_ON, // Step two of logon successfully completed
+    FAILED; // Dead by Error
 }

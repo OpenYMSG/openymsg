@@ -29,8 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.event.SessionConferenceEvent;
 
 /**
- * Thread for handling network input, dispatching incoming packets to
- * appropriate methods based upon service id.
+ * Thread for handling network input, dispatching incoming packets to appropriate methods based upon service id.
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
@@ -40,7 +39,7 @@ public class InputThread extends Thread {
 
     protected final Session parentSession;
 
-  private static final Log log = LogFactory.getLog(InputThread.class);
+    private static final Log log = LogFactory.getLog(InputThread.class);
 
     /**
      * Constructs a new thread that starts processing immediately.
@@ -61,17 +60,19 @@ public class InputThread extends Thread {
     }
 
     /**
-     * Accept packets and send them for processing. Dies when (a) a LOGOFF
-     * packet sets quit, or (b) a null packet is sent to process().
+     * Accept packets and send them for processing. Dies when (a) a LOGOFF packet sets quit, or (b) a null packet is
+     * sent to process().
      */
     @Override
     public void run() {
         while (!quit) {
             try {
                 process(parentSession.network.receivePacket());
-            } catch (UnknowServiceException e) {
+            }
+            catch (UnknowServiceException e) {
                 log.warn("unknow packet: " + e.getPacket().toString());
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 // ignore SocketExceptions if we're closing the thread.
                 if (quit && e instanceof SocketException) {
                     return;
@@ -80,7 +81,8 @@ public class InputThread extends Thread {
                 log.error("error on process packet", e);
                 try {
                     parentSession.sendExceptionEvent(e, "Source: InputThread");
-                } catch (Exception e2) {
+                }
+                catch (Exception e2) {
                     log.error("error on sendException to the session", e2);
                 }
 
@@ -108,7 +110,8 @@ public class InputThread extends Thread {
         // Process header
         if (pkt.sessionId != 0) {
             // Some chat packets send zero
-            // log.trace("Received a packet - status: " + pkt.status + " service: " + pkt.service.getValue() + " packet:" + pkt);
+            // log.trace("Received a packet - status: " + pkt.status + " service: " + pkt.service.getValue() +
+            // " packet:" + pkt);
             // Update session id in outer class
             parentSession.sessionId = pkt.sessionId;
         }
@@ -119,15 +122,14 @@ public class InputThread extends Thread {
         }
 
         log.trace("Incoming packet: " + pkt);
-        
+
         // Process payload
         processPayload(pkt);
     }
 
-	protected void processPayload(YMSG9Packet pkt) throws IOException,
-			YahooException {
-		log.trace("processPayload " + pkt.service + "/" + pkt.status);
-		switch (pkt.service) {
+    protected void processPayload(YMSG9Packet pkt) throws IOException, YahooException {
+        log.trace("processPayload " + pkt.service + "/" + pkt.status);
+        switch (pkt.service) {
         case ADDIGNORE:
             parentSession.receiveAddIgnore(pkt);
             break;
@@ -257,8 +259,8 @@ public class InputThread extends Thread {
     }
 
     /**
-     * Called when status == -1. Returns true if no further processing is
-     * required (process() returns) otherwise false (process() continues).
+     * Called when status == -1. Returns true if no further processing is required (process() returns) otherwise false
+     * (process() continues).
      * 
      * @param pkt
      * @return
@@ -283,10 +285,9 @@ public class InputThread extends Thread {
     }
 
     /**
-     * Process an incoming CONFINVITE packet. We get one of these when we are
-     * being invited to join someone else's existing conference. To all intent
-     * and purpose this (I assume) is the same as a regular invite packet,
-     * except it is only delivered to one source, not everyone on the list (?)
+     * Process an incoming CONFINVITE packet. We get one of these when we are being invited to join someone else's
+     * existing conference. To all intent and purpose this (I assume) is the same as a regular invite packet, except it
+     * is only delivered to one source, not everyone on the list (?)
      * 
      * @param pkt
      */
@@ -296,9 +297,8 @@ public class InputThread extends Thread {
     }
 
     /**
-     * Process an incoming CONFINVITE packet. We get one of these when we are
-     * being invited to join someone else's conference. Note: it is possible for
-     * conference packets (ie: logon) can arrive before the invite. These are
+     * Process an incoming CONFINVITE packet. We get one of these when we are being invited to join someone else's
+     * conference. Note: it is possible for conference packets (ie: logon) can arrive before the invite. These are
      * buffered until the invite is received.
      * 
      * @param pkt
@@ -318,13 +318,11 @@ public class InputThread extends Thread {
             }
 
             // Create event
-            final SessionConferenceEvent se = new SessionConferenceEvent(this,
-                    pkt.getValue("1"), // to (effective id)
+            final SessionConferenceEvent se = new SessionConferenceEvent(this, pkt.getValue("1"), // to (effective id)
                     pkt.getValue("50"), // from
                     pkt.getValue("58"), // message (topic)
                     yc, // room
-                    conferenceUsers.toArray(new YahooUser[conferenceUsers
-                            .size()]) // users
+                    conferenceUsers.toArray(new YahooUser[conferenceUsers.size()]) // users
             // array
             );
             // Add the users
@@ -340,7 +338,8 @@ public class InputThread extends Thread {
                     process(packet);
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new YMSG9BadFormatException("conference invite", pkt, e);
         }
     }

@@ -21,61 +21,56 @@ package org.openymsg.network.event;
 import org.openymsg.network.YahooUser;
 
 /**
- * Represents an event triggered by a change in the presence or roster change of
- * a session. This Event typically gets thrown after a friend has been added,
- * removed or updated.
+ * Represents an event triggered by a change in the presence or roster change of a session. This Event typically gets
+ * thrown after a friend has been added, removed or updated.
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
 public class SessionFriendEvent extends SessionEvent {
-	private static final long serialVersionUID = -3163616489244193645L;
-	protected final YahooUser user;
+    private static final long serialVersionUID = -3163616489244193645L;
+    protected final YahooUser user;
     private String groupName = null;
 
-    public SessionFriendEvent(Object source, YahooUser user, String groupName)
-    {
+    public SessionFriendEvent(Object source, YahooUser user, String groupName) {
         this(source, user);
         this.groupName = groupName;
     }
 
-	public SessionFriendEvent(Object source, YahooUser user) {
-		super(source);
+    public SessionFriendEvent(Object source, YahooUser user) {
+        super(source);
 
-		if (user == null) {
-			throw new IllegalArgumentException(
-					"Argument 'user' cannot be null.");
-		}
-		this.user = user;
-	}
+        if (user == null) {
+            throw new IllegalArgumentException("Argument 'user' cannot be null.");
+        }
+        this.user = user;
+    }
 
-	public YahooUser getUser() {
-		return user;
-	}
+    public YahooUser getUser() {
+        return user;
+    }
 
-	@Override
-	public String getFrom() {
-		return user.getId();
-	}
+    @Override
+    public String getFrom() {
+        return user.getId();
+    }
 
-	@Override
-	public String toString() {
-		final StringBuffer sb = new StringBuffer(super.toString());
-		sb.append(" friend:");
-		sb.append(user.getId());
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer(super.toString());
+        sb.append(" friend:");
+        sb.append(user.getId());
+        return sb.toString();
+    }
 
     /**
      * @return the groupName
      */
-    public String getGroupName()
-    {
+    public String getGroupName() {
         return groupName;
     }
-    
-    public boolean isFailure() 
-    {
-    	return false;
+
+    public boolean isFailure() {
+        return false;
     }
 }

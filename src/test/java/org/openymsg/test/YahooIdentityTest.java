@@ -29,17 +29,17 @@ import org.openymsg.network.YahooIdentity;
  */
 public class YahooIdentityTest extends EqualsHashCodeTestCase {
 
-	public YahooIdentityTest() {
-		super(YahooIdentityTest.class.getName());
-	}
+    public YahooIdentityTest() {
+        super(YahooIdentityTest.class.getName());
+    }
 
-	@Override
-	protected Object createInstance() throws Exception {
-		return new YahooIdentity("same");
-	}
+    @Override
+    protected Object createInstance() throws Exception {
+        return new YahooIdentity("same");
+    }
 
-	@Override
-	protected Object createNotEqualInstance() throws Exception {
-		return new YahooIdentity("different");
-	}
+    @Override
+    protected Object createNotEqualInstance() throws Exception {
+        return new YahooIdentity("different");
+    }
 }

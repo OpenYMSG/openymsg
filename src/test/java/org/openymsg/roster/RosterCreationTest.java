@@ -9,21 +9,20 @@ import org.junit.Test;
  */
 public class RosterCreationTest {
 
-	/**
-	 * A default way of using the constructor should not cause any problems.
-	 */
-	@Test
-	public void testRosterConstructor() {
-		new Roster(new MockFriendManager());
-	}
+    /**
+     * A default way of using the constructor should not cause any problems.
+     */
+    @Test
+    public void testRosterConstructor() {
+        new Roster(new MockFriendManager());
+    }
 
-	/**
-	 * Passing 'null' as a FriendManager is invalid, and should cause an
-	 * exception.
-	 */
-	@Test(expected = IllegalArgumentException.class)
-	public void testRosterConstructorWithNullFriendManager() {
-		new Roster(null);
-	}
+    /**
+     * Passing 'null' as a FriendManager is invalid, and should cause an exception.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testRosterConstructorWithNullFriendManager() {
+        new Roster(null);
+    }
 
 }

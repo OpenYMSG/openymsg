@@ -23,15 +23,12 @@ import java.security.*;
 /**
  * @author Damian Minkov
  */
-public class ChallengeResponseV16 extends ChallengeResponseUtility
-{
+public class ChallengeResponseV16 extends ChallengeResponseUtility {
     // -----------------------------------------------------------------
     // Given a username, password and challenge string, this code returns
     // the two valid response strings needed to login to Yahoo
     // -----------------------------------------------------------------
-    public static String[] getStrings(String cookieY, String cookieT, String challenge)
-        throws NoSuchAlgorithmException
-    {
+    public static String[] getStrings(String cookieY, String cookieT, String challenge) throws NoSuchAlgorithmException {
         String[] s = new String[3];
         s[0] = cookieY;
         s[1] = cookieT;

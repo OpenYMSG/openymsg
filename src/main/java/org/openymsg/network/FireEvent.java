@@ -21,8 +21,7 @@ package org.openymsg.network;
 import org.openymsg.network.event.SessionEvent;
 
 /**
- * Wrapper for combining a SessionEvent with a type. This makes the event
- * dispatchable to eventlisteners.
+ * Wrapper for combining a SessionEvent with a type. This makes the event dispatchable to eventlisteners.
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
@@ -30,41 +29,41 @@ import org.openymsg.network.event.SessionEvent;
 // TODO: see if this class can be removed by adding 'type' as a member of
 // SessionEvent
 public class FireEvent {
-	private volatile ServiceType type;
+    private volatile ServiceType type;
 
-	private volatile SessionEvent event;
+    private volatile SessionEvent event;
 
-	public FireEvent(SessionEvent event, ServiceType type) {
-		this.event = event;
-		this.type = type;
-	}
+    public FireEvent(SessionEvent event, ServiceType type) {
+        this.event = event;
+        this.type = type;
+    }
 
-	/**
-	 * @return the event
-	 */
-	public SessionEvent getEvent() {
-		return event;
-	}
+    /**
+     * @return the event
+     */
+    public SessionEvent getEvent() {
+        return event;
+    }
 
-	/**
-	 * @return the type
-	 */
-	public ServiceType getType() {
-		return type;
-	}
+    /**
+     * @return the type
+     */
+    public ServiceType getType() {
+        return type;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		final StringBuilder sb = new StringBuilder("FireEvent [");
-		sb.append(event);
-		sb.append(' ');
-		sb.append(type);
-		sb.append("]");
-		return sb.toString();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("FireEvent [");
+        sb.append(event);
+        sb.append(' ');
+        sb.append(type);
+        sb.append("]");
+        return sb.toString();
+    }
 }

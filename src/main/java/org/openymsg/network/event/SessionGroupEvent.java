@@ -25,34 +25,33 @@ package org.openymsg.network.event;
  * @author S.E. Morris
  */
 public class SessionGroupEvent extends SessionEvent {
-	protected String oldName, newName;
+    protected String oldName, newName;
 
-	/**
-	 * CONSTRUCTORS
-	 */
-	public SessionGroupEvent(Object o, String on, String nn) // Group rename
-	{
-		super(o);
-		oldName = on;
-		newName = nn;
-	}
+    /**
+     * CONSTRUCTORS
+     */
+    public SessionGroupEvent(Object o, String on, String nn) // Group rename
+    {
+        super(o);
+        oldName = on;
+        newName = nn;
+    }
 
-	/**
-	 * Accessors
-	 */
-	public String getOldName() {
-		return oldName;
-	}
+    /**
+     * Accessors
+     */
+    public String getOldName() {
+        return oldName;
+    }
 
-	public String getNewName() {
-		return newName;
-	}
+    public String getNewName() {
+        return newName;
+    }
 
-	@Override
-	public String toString() {
-		StringBuffer sb = new StringBuffer(super.toString());
-		sb.append(" oldname:").append(oldName).append(" newname:").append(
-				newName);
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer(super.toString());
+        sb.append(" oldname:").append(oldName).append(" newname:").append(newName);
+        return sb.toString();
+    }
 }

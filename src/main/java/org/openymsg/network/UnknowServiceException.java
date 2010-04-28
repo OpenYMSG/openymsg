@@ -8,22 +8,22 @@ package org.openymsg.network;
  * 
  */
 public class UnknowServiceException extends RuntimeException {
-	
-	/**
+
+    /**
 	 * 
 	 */
-	private static final long	serialVersionUID	= -606709859886555442L;
-	private YMSG9Packet	packet;
-	
-	/**
-	 * @param p
-	 */
-	public UnknowServiceException(YMSG9Packet p) {
-		super();
-		packet = p;
-	}
+    private static final long serialVersionUID = -606709859886555442L;
+    private YMSG9Packet packet;
 
-	public YMSG9Packet getPacket() {
-		return packet;
-	}
+    /**
+     * @param p
+     */
+    public UnknowServiceException(YMSG9Packet p) {
+        super();
+        packet = p;
+    }
+
+    public YMSG9Packet getPacket() {
+        return packet;
+    }
 }

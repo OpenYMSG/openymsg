@@ -35,79 +35,74 @@ import org.openymsg.network.chatroom.YahooChatRoom;
  */
 public class ChatroomManagerTest {
     private static final Log log = LogFactory.getLog(ChatroomManagerTest.class);
-	
-	@Test
-	public void testDefaultChatroomManager() throws Exception {
-		new ChatroomManager(null, null);
-	}
 
-	@Test(expected = IllegalStateException.class)
-	public void testDefaultChatroomManagerIsUnloaded() {
-		final ChatroomManager manager = new ChatroomManager(null, null);
-		manager.getLobby("should not be loaded and throw exception.");
-	}
+    @Test
+    public void testDefaultChatroomManager() throws Exception {
+        new ChatroomManager(null, null);
+    }
 
-	@Test
-	public void testLoadCategories() throws Exception {
-		final Date start = new Date();
-		final ChatroomManager manager = new ChatroomManager(null, null);
-		final YahooChatCategory root = manager.loadCategories();
-		log.info("Loading categories in "
-				+ (new Date().getTime() - start.getTime()) + " milliseconds.");
-		testCategory(root);
-		// prettyPrint(root);
-	}
+    @Test(expected = IllegalStateException.class)
+    public void testDefaultChatroomManagerIsUnloaded() {
+        final ChatroomManager manager = new ChatroomManager(null, null);
+        manager.getLobby("should not be loaded and throw exception.");
+    }
 
-	private void testCategory(YahooChatCategory category) {
-		assertNotNull(category);
-		assertNotNull(category.getId());
-		assertNotNull(category.getName());
-		assertNotNull(category.getPrivateRooms());
-		assertNotNull(category.getPublicRooms());
-		assertNotNull(category.getSubcategories());
+    @Test
+    public void testLoadCategories() throws Exception {
+        final Date start = new Date();
+        final ChatroomManager manager = new ChatroomManager(null, null);
+        final YahooChatCategory root = manager.loadCategories();
+        log.info("Loading categories in " + (new Date().getTime() - start.getTime()) + " milliseconds.");
+        testCategory(root);
+        // prettyPrint(root);
+    }
 
-		for (YahooChatCategory cat : category.getSubcategories()) {
-			testCategory(cat);
-		}
-	}
+    private void testCategory(YahooChatCategory category) {
+        assertNotNull(category);
+        assertNotNull(category.getId());
+        assertNotNull(category.getName());
+        assertNotNull(category.getPrivateRooms());
+        assertNotNull(category.getPublicRooms());
+        assertNotNull(category.getSubcategories());
 
-	@SuppressWarnings("unused")
-	private void prettyPrint(YahooChatCategory category) throws Exception {
-		log.info(" ");
-		log.info(category.toString());
-		category.loadRooms();
-		for (YahooChatCategory subCategory : category.getSubcategories()) {
-			prettyPrint(subCategory);
-		}
+        for (YahooChatCategory cat : category.getSubcategories()) {
+            testCategory(cat);
+        }
+    }
 
-		if (category.getPrivateRooms().size() > 0) {
-			log.info("Private rooms:");
-			for (YahooChatRoom room : category.getPrivateRooms()) {
-				if (room.lobbyCount() > 0) {
-					log.info(" " + room.toString());
-					for (YahooChatLobby lobby : room.getLobbies()) {
-						log.info("   " + lobby.getNetworkName()
-								+ " users: " + lobby.getReportedUsers()
-								+ " voices: " + lobby.getReportedVoices()
-								+ " webcams: " + lobby.getReportedWebcams());
-					}
-				}
-			}
-		}
+    @SuppressWarnings("unused")
+    private void prettyPrint(YahooChatCategory category) throws Exception {
+        log.info(" ");
+        log.info(category.toString());
+        category.loadRooms();
+        for (YahooChatCategory subCategory : category.getSubcategories()) {
+            prettyPrint(subCategory);
+        }
 
-		if (category.getPublicRooms().size() > 0) {
-			log.info("Public rooms:");
-			for (YahooChatRoom room : category.getPublicRooms()) {
-				if (room.lobbyCount() > 0) {
-					log.info(" " + room.toString());
-					for (YahooChatLobby lobby : room.getLobbies()) {
-						log.info("   " + lobby.getNetworkName()
-								+ " users: " + lobby.getReportedUsers()
-								+ " voices: " + lobby.getReportedVoices()
-								+ " webcams: " + lobby.getReportedWebcams());
-					}
-				}
-			}
-		}
-	}
+        if (category.getPrivateRooms().size() > 0) {
+            log.info("Private rooms:");
+            for (YahooChatRoom room : category.getPrivateRooms()) {
+                if (room.lobbyCount() > 0) {
+                    log.info(" " + room.toString());
+                    for (YahooChatLobby lobby : room.getLobbies()) {
+                        log.info("   " + lobby.getNetworkName() + " users: " + lobby.getReportedUsers() + " voices: "
+                                + lobby.getReportedVoices() + " webcams: " + lobby.getReportedWebcams());
+                    }
+                }
+            }
+        }
+
+        if (category.getPublicRooms().size() > 0) {
+            log.info("Public rooms:");
+            for (YahooChatRoom room : category.getPublicRooms()) {
+                if (room.lobbyCount() > 0) {
+                    log.info(" " + room.toString());
+                    for (YahooChatLobby lobby : room.getLobbies()) {
+                        log.info("   " + lobby.getNetworkName() + " users: " + lobby.getReportedUsers() + " voices: "
+                                + lobby.getReportedVoices() + " webcams: " + lobby.getReportedWebcams());
+                    }
+                }
+            }
+        }
+    }
 }

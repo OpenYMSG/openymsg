@@ -21,38 +21,36 @@ package org.openymsg.network;
 import java.net.URL;
 
 /**
- * Represents a LoginRefused exception, caused by a locked account on the Yahoo
- * network.
+ * Represents a LoginRefused exception, caused by a locked account on the Yahoo network.
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
 public class AccountLockedException extends LoginRefusedException {
-	private static final long serialVersionUID = -7278019920906316416L;
+    private static final long serialVersionUID = -7278019920906316416L;
 
-	private URL location;
+    private URL location;
 
-	/**
-	 * Creates a new instance of the Exception, indicating that the account that
-	 * was used to login to the Yahoo network is Locked by Yahoo administrators.
-	 * 
-	 * @param message
-	 *            Description of this exception.
-	 * @param url
-	 *            URL of a webpage where more information can be found.
-	 */
-	public AccountLockedException(String message, URL url) {
-		super(message, AuthenticationState.LOCKED);
-		location = url;
-	}
+    /**
+     * Creates a new instance of the Exception, indicating that the account that was used to login to the Yahoo network
+     * is Locked by Yahoo administrators.
+     * 
+     * @param message
+     *            Description of this exception.
+     * @param url
+     *            URL of a webpage where more information can be found.
+     */
+    public AccountLockedException(String message, URL url) {
+        super(message, AuthenticationState.LOCKED);
+        location = url;
+    }
 
-	/**
-	 * Returns the URL that is included in the Exception. It should give you
-	 * further information.
-	 * 
-	 * @return The URL of a website.
-	 */
-	public URL getWebPage() {
-		return location;
-	}
+    /**
+     * Returns the URL that is included in the Exception. It should give you further information.
+     * 
+     * @return The URL of a website.
+     */
+    public URL getWebPage() {
+        return location;
+    }
 }

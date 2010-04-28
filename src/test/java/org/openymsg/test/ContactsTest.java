@@ -24,83 +24,82 @@ import org.openymsg.network.YahooUser;
  */
 public class ContactsTest extends YahooTestAbstract {
 
-	@Test
-	public void testAddContact() throws Exception {
-		removeAllContacts(sess1, listener1);
-		
-		if (!sess1.getRoster().isEmpty()) {
-			throw new IllegalStateException("Test setup problem. Roster1 should have been emptied by now.");
-		}
+    @Test
+    public void testAddContact() throws Exception {
+        removeAllContacts(sess1, listener1);
 
-		removeAllContacts(sess2, listener2);
-		if (!sess2.getRoster().isEmpty()) {
-//			System.err.print("Roster still contains: ");
-//			for (YahooUser user : sess2.getRoster()) {
-//				System.err.print(user.getId() + ",");
-//			}
-//			System.err.println(".");
-			throw new IllegalStateException("Test setup problem. Roster2 should have been emptied by now.");
-		}
-		
-		addfriend();
-	}
+        if (!sess1.getRoster().isEmpty()) {
+            throw new IllegalStateException("Test setup problem. Roster1 should have been emptied by now.");
+        }
 
-	@Test
-	public void testReLoginFriendAndChangeStatusBuddy()
-			throws Exception {
+        removeAllContacts(sess2, listener2);
+        if (!sess2.getRoster().isEmpty()) {
+            // System.err.print("Roster still contains: ");
+            // for (YahooUser user : sess2.getRoster()) {
+            // System.err.print(user.getId() + ",");
+            // }
+            // System.err.println(".");
+            throw new IllegalStateException("Test setup problem. Roster2 should have been emptied by now.");
+        }
+
+        addfriend();
+    }
+
+    @Test
+    public void testReLoginFriendAndChangeStatusBuddy() throws Exception {
         YahooUser buddy = sess1.getRoster().getUser(OTHERUSR);
         assertNotNull(buddy);
         assertEquals(Status.AVAILABLE, buddy.getStatus());
-		sess2.logout();
-		Thread.sleep(500);
-		assertNotNull(buddy);
+        sess2.logout();
+        Thread.sleep(500);
+        assertNotNull(buddy);
 
-		assertEquals(Status.OFFLINE, buddy.getStatus());
-		sess2.login(OTHERUSR, OTHERPWD);
-		Thread.sleep(500);
-		buddy = sess1.getRoster().getUser(OTHERUSR);
-		assertNotNull(buddy);
-		assertEquals(Status.AVAILABLE, buddy.getStatus());
-	}
+        assertEquals(Status.OFFLINE, buddy.getStatus());
+        sess2.login(OTHERUSR, OTHERPWD);
+        Thread.sleep(500);
+        buddy = sess1.getRoster().getUser(OTHERUSR);
+        assertNotNull(buddy);
+        assertEquals(Status.AVAILABLE, buddy.getStatus());
+    }
 
-	/**
-	 * @throws IOException
-	 */
-	private void addfriend() {
+    /**
+     * @throws IOException
+     */
+    private void addfriend() {
 
-		drain();
+        drain();
 
-		sess1.getRoster().add(new YahooUser(OTHERUSR, "group", YahooProtocol.YAHOO));
-		FireEvent event = listener2.waitForEvent(5, ServiceType.Y7_AUTHORIZATION);
-		assertNotNull(event);
-		assertEquals(event.getType(), ServiceType.Y7_AUTHORIZATION);
-		assertEquals(event.getEvent().getFrom(), USERNAME);
-		event = listener1.waitForEvent(5, ServiceType.FRIENDADD);
-		assertEquals(event.getType(), ServiceType.FRIENDADD);
-		assertTrue(sess1.getRoster().containsUser(OTHERUSR));
-	}
+        sess1.getRoster().add(new YahooUser(OTHERUSR, "group", YahooProtocol.YAHOO));
+        FireEvent event = listener2.waitForEvent(5, ServiceType.Y7_AUTHORIZATION);
+        assertNotNull(event);
+        assertEquals(event.getType(), ServiceType.Y7_AUTHORIZATION);
+        assertEquals(event.getEvent().getFrom(), USERNAME);
+        event = listener1.waitForEvent(5, ServiceType.FRIENDADD);
+        assertEquals(event.getType(), ServiceType.FRIENDADD);
+        assertTrue(sess1.getRoster().containsUser(OTHERUSR));
+    }
 
-	@Test
-	public void testRejectContact() throws IOException, InterruptedException {
-		removeAllContacts(sess1, listener1);
+    @Test
+    public void testRejectContact() throws IOException, InterruptedException {
+        removeAllContacts(sess1, listener1);
         assertFalse(sess1.getRoster().containsUser(OTHERUSR));
-		sess1.getRoster().add(new YahooUser(OTHERUSR, "group", YahooProtocol.YAHOO));
-//		assertNotNull(listener1.waitForEvent(5, ServiceType.FRIENDADD));
-		Thread.sleep(500);
-		
-		final FireEvent event = listener2.waitForEvent(5, ServiceType.Y7_AUTHORIZATION);
-		assertNotNull(event);
-		
-		sess2.rejectContact(event.getEvent(), "i don't want you");
-		assertNotNull(listener1.waitForEvent(5, ServiceType.CONTACTREJECT));
+        sess1.getRoster().add(new YahooUser(OTHERUSR, "group", YahooProtocol.YAHOO));
+        // assertNotNull(listener1.waitForEvent(5, ServiceType.FRIENDADD));
+        Thread.sleep(500);
 
-		assertFalse(sess1.getRoster().containsUser(OTHERUSR));
-	}
+        final FireEvent event = listener2.waitForEvent(5, ServiceType.Y7_AUTHORIZATION);
+        assertNotNull(event);
 
-	@Test
-	public void testRemoveUnknowContact() {
-		sess1.getRoster().remove(new YahooUser("ewrgergerg", CHATMESSAGE, YahooProtocol.YAHOO));
-		FireEvent event = listener1.waitForEvent(5);
-		assertNull(event);
-	}
+        sess2.rejectContact(event.getEvent(), "i don't want you");
+        assertNotNull(listener1.waitForEvent(5, ServiceType.CONTACTREJECT));
+
+        assertFalse(sess1.getRoster().containsUser(OTHERUSR));
+    }
+
+    @Test
+    public void testRemoveUnknowContact() {
+        sess1.getRoster().remove(new YahooUser("ewrgergerg", CHATMESSAGE, YahooProtocol.YAHOO));
+        FireEvent event = listener1.waitForEvent(5);
+        assertNull(event);
+    }
 }

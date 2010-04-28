@@ -20,85 +20,73 @@ package org.openymsg.network.event;
 
 import org.openymsg.network.YahooProtocol;
 
-
 /**
  * @author Damian Minkov
  */
-public class SessionAuthorizationEvent
-    extends SessionEvent
-{
-	private static final long serialVersionUID = -4434174537165587365L;
-	protected String fName = null;
-	protected String lName = null;
-	private YahooProtocol protocol = null;
-    public YahooProtocol getProtocol() {
-		return protocol;
-	}
+public class SessionAuthorizationEvent extends SessionEvent {
+    private static final long serialVersionUID = -4434174537165587365L;
+    protected String fName = null;
+    protected String lName = null;
+    private YahooProtocol protocol = null;
 
-	protected boolean authorizationAccepted = false;
+    public YahooProtocol getProtocol() {
+        return protocol;
+    }
+
+    protected boolean authorizationAccepted = false;
     protected boolean authorizationDenied = false;
     protected boolean authorizationRequest = false;
 
-    public SessionAuthorizationEvent(Object o, String who, String msg, YahooProtocol protocol)
-    {
+    public SessionAuthorizationEvent(Object o, String who, String msg, YahooProtocol protocol) {
         super(o, null, who, msg);
         this.protocol = protocol;
     }
 
-    public SessionAuthorizationEvent(Object o,
-            String id, String who, String fname, String lname, String msg,
-            YahooProtocol protocol)
-    {
+    public SessionAuthorizationEvent(Object o, String id, String who, String fname, String lname, String msg,
+            YahooProtocol protocol) {
         super(o, id, who, msg);
         this.fName = fname;
         this.lName = lname;
         this.protocol = protocol;
     }
 
-
     // -----------------------------------------------------------------
     // Accessors
     // -----------------------------------------------------------------
 
-    public void setStatus(int s)
-    {
+    public void setStatus(int s) {
         super.setStatus(s);
 
-        switch(s)
-        {
-            case 1:
-                /* Authorization Accepted */
-                authorizationAccepted = true;
-                break;
-            case 2:
-                /* Authorization Denied */
-                authorizationDenied = true;
-                break;
-            default:
-                /* Authorization Request? */
-                authorizationRequest = true;
-                break;
+        switch (s) {
+        case 1:
+            /* Authorization Accepted */
+            authorizationAccepted = true;
+            break;
+        case 2:
+            /* Authorization Denied */
+            authorizationDenied = true;
+            break;
+        default:
+            /* Authorization Request? */
+            authorizationRequest = true;
+            break;
         }
         super.setStatus(s);
     }
 
-    public boolean isAuthorizationAccepted()
-    {
+    public boolean isAuthorizationAccepted() {
         return authorizationAccepted;
     }
 
-    public boolean isAuthorizationDenied()
-    {
+    public boolean isAuthorizationDenied() {
         return authorizationDenied;
     }
 
-    public boolean isAuthorizationRequest()
-    {
+    public boolean isAuthorizationRequest() {
         return authorizationRequest;
     }
 
-    public String toString()
-    {
-        return "to:"+getTo()+" from:"+getFrom()+" message:"+message;
+    public String toString() {
+        return "to:" + getTo() + " from:" + getFrom() + " message:" + message;
     }
 }

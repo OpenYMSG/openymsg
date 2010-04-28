@@ -25,16 +25,15 @@ package org.openymsg.network;
  * @author S.E. Morris
  */
 public class FileTransferFailedException extends RuntimeException {
-	private static final long serialVersionUID = -7839412560727319060L;
+    private static final long serialVersionUID = -7839412560727319060L;
 
-	/**
-	 * Creates a new instance, containing a detailled description of the
-	 * exception.
-	 * 
-	 * @param message
-	 *            A detailled description of the exception.
-	 */
-	public FileTransferFailedException(String message) {
-		super(message);
-	}
+    /**
+     * Creates a new instance, containing a detailled description of the exception.
+     * 
+     * @param message
+     *            A detailled description of the exception.
+     */
+    public FileTransferFailedException(String message) {
+        super(message);
+    }
 }

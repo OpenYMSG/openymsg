@@ -23,77 +23,75 @@ import java.util.Date;
 /**
  * This class is the parent of all event classes in this package.
  * 
- * To From Message Timestamp contactRejectionReceived y y y n
- * contactRequestReceived y y y y messageReceived y y y n buzzReceived y y y n
- * offlineMessageReceived y y y y listReceived n n n n logoffReceived n n n n
+ * To From Message Timestamp contactRejectionReceived y y y n contactRequestReceived y y y y messageReceived y y y n
+ * buzzReceived y y y n offlineMessageReceived y y y y listReceived n n n n logoffReceived n n n n
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
 public class SessionEvent extends java.util.EventObject {
-	private static final long serialVersionUID = -128672051097761320L;
+    private static final long serialVersionUID = -128672051097761320L;
 
-	private final String to;
+    private final String to;
 
-	private final String from;
+    private final String from;
 
-	protected String message;
+    protected String message;
 
-	private final long timestamp;
+    private final long timestamp;
 
-	private long status = 0;
+    private long status = 0;
 
-	public SessionEvent(Object source) {
-		this(source, null, null, null, 0);
-	}
+    public SessionEvent(Object source) {
+        this(source, null, null, null, 0);
+    }
 
-	// Online message
-	public SessionEvent(Object source, String to, String from, String message) {
-		this(source, to, from, message, 0);
-	}
+    // Online message
+    public SessionEvent(Object source, String to, String from, String message) {
+        this(source, to, from, message, 0);
+    }
 
-	// Offline message
-	public SessionEvent(Object source, String to, String from, String message,
-			long timestampInMillis) {
-		super(source);
-		this.to = to;
-		this.from = from;
-		this.message = message;
-		this.timestamp = timestampInMillis;
-	}
+    // Offline message
+    public SessionEvent(Object source, String to, String from, String message, long timestampInMillis) {
+        super(source);
+        this.to = to;
+        this.from = from;
+        this.message = message;
+        this.timestamp = timestampInMillis;
+    }
 
-	/**
-	 * Accessors
-	 */
-	public String getTo() {
-		return to;
-	}
+    /**
+     * Accessors
+     */
+    public String getTo() {
+        return to;
+    }
 
-	public String getFrom() {
-		return from;
-	}
+    public String getFrom() {
+        return from;
+    }
 
-	public String getMessage() {
-		return message;
-	}
+    public String getMessage() {
+        return message;
+    }
 
-	public Date getTimestamp() {
-		return new Date(timestamp);
-	}
+    public Date getTimestamp() {
+        return new Date(timestamp);
+    }
 
-	public long getStatus() {
-		return status;
-	}
+    public long getStatus() {
+        return status;
+    }
 
-	public void setStatus(long s) {
-		status = s;
-	}
+    public void setStatus(long s) {
+        status = s;
+    }
 
-	@Override
-	public String toString() {
-		StringBuffer sb = new StringBuffer(getClass().getCanonicalName()).append(" to:").append(to).append(" from:")
-				.append(from).append(" message:").append(message).append(
-						" timestamp:").append(timestamp).append(" status:").append(status);
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer(getClass().getCanonicalName()).append(" to:").append(to).append(" from:")
+                .append(from).append(" message:").append(message).append(" timestamp:").append(timestamp).append(
+                        " status:").append(status);
+        return sb.toString();
+    }
 }

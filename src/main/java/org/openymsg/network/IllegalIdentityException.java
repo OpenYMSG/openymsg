@@ -19,23 +19,21 @@
 package org.openymsg.network;
 
 /**
- * Represents errors thrown in situations where an Yahoo identity is used that's
- * not valid in that particular context.
+ * Represents errors thrown in situations where an Yahoo identity is used that's not valid in that particular context.
  * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
 public class IllegalIdentityException extends RuntimeException {
-	private static final long serialVersionUID = 7869852919855818638L;
+    private static final long serialVersionUID = 7869852919855818638L;
 
-	/**
-	 * Creates a new instance of the exception, containing a more detailled
-	 * description.
-	 * 
-	 * @param message
-	 *            Description of the exception.
-	 */
-	public IllegalIdentityException(String message) {
-		super(message);
-	}
+    /**
+     * Creates a new instance of the exception, containing a more detailled description.
+     * 
+     * @param message
+     *            Description of the exception.
+     */
+    public IllegalIdentityException(String message) {
+        super(message);
+    }
 }
