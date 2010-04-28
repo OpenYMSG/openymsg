@@ -24,7 +24,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 
-import org.openymsg.support.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * 
@@ -44,7 +45,7 @@ public class DirectConnectionHandler extends ConnectionHandler {
 
 	private DataOutputStream ops; // For sending messages
 
-	private static final Logger log = Logger.getLogger(DirectConnectionHandler.class);
+	private static final Log log = LogFactory.getLog(DirectConnectionHandler.class);
 
 	public DirectConnectionHandler(String h, int p) {
 		host = h;

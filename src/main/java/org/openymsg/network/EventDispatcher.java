@@ -24,9 +24,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.event.SessionEvent;
 import org.openymsg.network.event.SessionListener;
-import org.openymsg.support.Logger;
 
 /**
  * Dispatcher for events that are fired. Events that get fired are broadcasted
@@ -42,8 +43,7 @@ import org.openymsg.support.Logger;
 public class EventDispatcher extends Thread {
 	private volatile boolean quitFlag = false;
 
-	private static final Logger log
-        = Logger.getLogger(EventDispatcher.class);
+	private static final Log log = LogFactory.getLog(EventDispatcher.class);
 
 	// queue of events that are going to be fired.
 	private final List<FireEvent> queue = Collections

@@ -18,7 +18,8 @@
  */
 package org.openymsg.network;
 
-import org.openymsg.support.Logger;
+import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Enumeration of all ServiceType values, as found in the YMSG packets.
@@ -146,7 +147,7 @@ public enum ServiceType {
             }
         }
 
-        Logger.getLogger(ServiceType.class).warn("No such ServiceType value '"
+        LogFactory.getLog(ServiceType.class).warn("No such ServiceType value '"
                 + value + "' (which is '" + Integer.toHexString(value)
                 + "' in hex).");
         return null;

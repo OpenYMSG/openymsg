@@ -11,16 +11,17 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.Util;
 import org.openymsg.roster.Roster;
-import org.openymsg.support.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class BuddyListImport {
-	private static final Logger log = Logger.getLogger(BuddyListImport.class);
+	private static final Log log = LogFactory.getLog(BuddyListImport.class);
 	private Roster roster;
 	private String cookieLine;
 

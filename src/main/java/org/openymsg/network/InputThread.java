@@ -24,8 +24,9 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.event.SessionConferenceEvent;
-import org.openymsg.support.Logger;
 
 /**
  * Thread for handling network input, dispatching incoming packets to
@@ -39,7 +40,7 @@ public class InputThread extends Thread {
 
     protected final Session parentSession;
 
-  private static final Logger log = Logger.getLogger(InputThread.class);
+  private static final Log log = LogFactory.getLog(InputThread.class);
 
     /**
      * Constructs a new thread that starts processing immediately.

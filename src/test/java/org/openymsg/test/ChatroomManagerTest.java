@@ -22,18 +22,19 @@ import static junit.framework.Assert.assertNotNull;
 
 import java.util.Date;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.openymsg.network.chatroom.ChatroomManager;
 import org.openymsg.network.chatroom.YahooChatCategory;
 import org.openymsg.network.chatroom.YahooChatLobby;
 import org.openymsg.network.chatroom.YahooChatRoom;
-import org.openymsg.support.Logger;
 
 /**
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  */
 public class ChatroomManagerTest {
-    private static final Logger log = Logger.getLogger(ChatroomManagerTest.class);
+    private static final Log log = LogFactory.getLog(ChatroomManagerTest.class);
 	
 	@Test
 	public void testDefaultChatroomManager() throws Exception {
