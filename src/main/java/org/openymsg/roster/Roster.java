@@ -652,7 +652,7 @@ public class Roster implements Set<YahooUser>, SessionListener {
 
     private YahooUser createMergedUser(YahooAddressBookEntry addressBookEntry, String userId, YahooUser user) {
         YahooUser newUser;
-        Set<String> groupIds = user.getGroupIds();
+        Set<String> groupIds = new HashSet<String>(user.getGroupIds()); // returns an unmodifiable set
         YahooProtocol protocol = user.getProtocol();
         newUser = new YahooUser(userId, groupIds, protocol, addressBookEntry);
         Status status = user.getStatus();
