@@ -293,6 +293,10 @@ public class InputThread extends Thread {
      */
     private void receiveConfAddInvite(YMSG9Packet pkt) // 0x01c
     {
+        final YahooConference yc = parentSession.getOrCreateConference(pkt);
+        if (yc.isClosed()) {
+            yc.reopenConference();
+        }
         receiveConfInvite(pkt);
     }
 

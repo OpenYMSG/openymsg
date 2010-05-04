@@ -77,15 +77,19 @@ public class YahooConference // Cannot be serialised
 
     /**
      * The closed flag is set when this conference is exited. All further packets from this conference should be
-     * ignored.
+     * ignored. Until reinvited
      */
     void closeConference() {
         closed = true;
     }
 
     /**
-     * Public accessors
+     * Reinvited to the conference
      */
+    void reopenConference() {
+        closed = false;
+    }
+
     public String getName() {
         return room;
     }

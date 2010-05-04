@@ -34,6 +34,8 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -715,15 +717,15 @@ public class Session implements StatusConstants, FriendManager {
         transmitConfDecline(room.getName(), room.getIdentity().getId(), msg);
     }
 
-    public void extendConference(YahooConference room, YahooIdentity user, String msg) throws IllegalStateException,
+    public void extendConference(YahooConference room, String username, String msg) throws IllegalStateException,
             IOException, NoSuchConferenceException, IllegalIdentityException {
         checkStatus();
 
-        final String id = user.getId();
+        final String id = username;
         if (primaryID.getId().equals(id) || loginID.getId().equals(id) || identities.containsKey(id)) {
             throw new IllegalIdentityException(id + " is an identity of this session and cannot be used here");
         }
-        transmitConfAddInvite(user, room.getName(), room.getIdentity().getId(), msg);
+        transmitConfAddInvite(username, room.getName(), room.getIdentity().getId(), msg);
     }
 
     public void sendConferenceMessage(YahooConference room, String msg) throws IllegalStateException, IOException,
@@ -1207,14 +1209,14 @@ public class Session implements StatusConstants, FriendManager {
     /**
      * Transmit an CONFADDINVITE packet. We send one of these when we wish to invite more users to our conference.
      */
-    protected void transmitConfAddInvite(YahooIdentity user, String room, String yid, String msg) throws IOException,
+    protected void transmitConfAddInvite(String username, String room, String yid, String msg) throws IOException,
             NoSuchConferenceException {
         // Check this conference actually exists (throws exception if not)
         getConference(room);
         // Send new invite packet to Yahoo
         PacketBodyBuffer body = new PacketBodyBuffer();
         body.addElement("1", yid);
-        body.addElement("51", user.getId());
+        body.addElement("51", username);
         body.addElement("57", room);
 
         final Set<YahooUser> users = getConference(room).getUsers();
@@ -1259,11 +1261,11 @@ public class Session implements StatusConstants, FriendManager {
         // Send request to Yahoo
         PacketBodyBuffer body = new PacketBodyBuffer();
         body.addElement("1", yid);
-        body.addElement("50", primaryID.getId());
+        body.addElement("57", room);
         for (int i = 0; i < users.length; i++)
             body.addElement("52", users[i]);
-        body.addElement("57", room);
         body.addElement("58", msg);
+        body.addElement("97", "1"); 
         body.addElement("13", "0"); // FIX: what's this for?
         sendPacket(body, ServiceType.CONFINVITE); // 0x18
     }
@@ -1863,7 +1865,7 @@ public class Session implements StatusConstants, FriendManager {
 
     private String[] yahooAuth16Stage1(String seed) throws LoginRefusedException, IOException, NoSuchAlgorithmException {
         String authLink = "https://login.yahoo.com/config/pwtoken_get?src=ymsgr&ts=&login=" + loginID.getId()
-                + "&passwd=" + URLEncoder.encode(password, "UTF-8") + "&chal=" + seed;
+                + "&passwd=" + URLEncoder.encode(password, "UTF-8") + "&chal=" + URLEncoder.encode(seed, "UTF-8");
 
         URL u = new URL(authLink);
         URLConnection uc = u.openConnection();
@@ -3804,9 +3806,11 @@ public class Session implements StatusConstants, FriendManager {
         return yid + "-" + conferenceCount++;
     }
 
-    private YahooConference getConference(String room) throws NoSuchConferenceException {
+    public YahooConference getConference(String room) throws NoSuchConferenceException {
         YahooConference yc = conferences.get(room);
-        if (yc == null) throw new NoSuchConferenceException("Conference " + room + " not found.");
+        if (yc == null) {
+            throw new NoSuchConferenceException("Conference " + room + " not found.");
+        }
         return yc;
     }
 
@@ -3940,5 +3944,9 @@ public class Session implements StatusConstants, FriendManager {
 
     public YahooIdentity getLoginID() {
         return loginID;
+    }
+
+    public Collection<YahooConference> getConferences() {
+        return Collections.unmodifiableCollection(conferences.values()) ;
     }
 }
