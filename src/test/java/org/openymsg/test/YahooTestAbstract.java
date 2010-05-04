@@ -32,10 +32,10 @@ public class YahooTestAbstract {
 
     protected static final String OTHERPWD = PropertiesAvailableTest.getPassword(OTHERUSR);
 
-    static Session sess1;
-    static Session sess2;
-    static WaitListener listener1;
-    static WaitListener listener2;
+    protected static Session sess1;
+    protected static Session sess2;
+    protected static WaitListener listener1;
+    protected static WaitListener listener2;
 
     /**
      * @throws Throwable

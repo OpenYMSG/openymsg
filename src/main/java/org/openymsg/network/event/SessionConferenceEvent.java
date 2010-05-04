@@ -29,6 +29,8 @@ import org.openymsg.network.YahooUser;
  * @author S.E. Morris
  */
 public class SessionConferenceEvent extends SessionEvent {
+    private static final long serialVersionUID = 6550109967442109240L;
+
     private YahooConference room;
 
     private YahooUser[] users;
