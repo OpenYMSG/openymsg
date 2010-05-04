@@ -5,7 +5,9 @@ public enum YahooProtocol {
      * Different Yahoo messaging protocols
      */
     YAHOO(0), // really nothing
-    LCS(1), MSN(2), LOTUS(9);
+    LCS(1),
+    MSN(2),
+    LOTUS(9);
 
     // Unique long representation of this Status.
     private int value;
