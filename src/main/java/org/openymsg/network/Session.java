@@ -3459,7 +3459,7 @@ public class Session implements StatusConstants, FriendManager {
      * Note: it is assumed that the ConnectionHandler has been open()'d
      */
     protected void sendPacket(PacketBodyBuffer body, ServiceType service, Status status) throws IOException {
-        log.trace("Sending packet on/to the network. SessionId[0x" + Long.toHexString(sessionId) + "] ServiceType["
+        log.debug("Sending packet on/to the network. SessionId[0x" + Long.toHexString(sessionId) + "] ServiceType["
                 + service + "] Status[" + status + "] Body[" + body + "]");
         network.sendPacket(body, service, status.getValue(), sessionId);
     }
