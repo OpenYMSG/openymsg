@@ -47,6 +47,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -115,9 +116,6 @@ public class Session implements StatusConstants, FriendManager {
     private boolean customStatusBusy;
 
     private Roster roster = new Roster(this);
-
-    /** Creating conference room names. */
-    private int conferenceCount;
 
     /** Status of session (see StatusConstants) */
     private volatile SessionState sessionStatus;
@@ -698,21 +696,19 @@ public class Session implements StatusConstants, FriendManager {
             }
         }
 
-        String r = getConferenceName(yid.getId());
-        transmitConfInvite(users, yid.getId(), r, msg);
-        return getConference(r);
+        String conferenceName = getConferenceName(yid.getId());
+        transmitConfInvite(users, yid.getId(), conferenceName, msg);
+        return getConference(conferenceName);
     }
 
-    public void acceptConferenceInvite(SessionConferenceEvent ev) throws IllegalStateException, IOException,
+    public void acceptConferenceInvite(YahooConference room) throws IllegalStateException, IOException,
             NoSuchConferenceException {
-        YahooConference room = ev.getRoom();
         checkStatus();
         transmitConfLogon(room.getName(), room.getIdentity().getId());
     }
 
-    public void declineConferenceInvite(SessionConferenceEvent ev, String msg) throws IllegalStateException,
+    public void declineConferenceInvite(YahooConference room, String msg) throws IllegalStateException,
             IOException, NoSuchConferenceException {
-        YahooConference room = ev.getRoom();
         checkStatus();
         transmitConfDecline(room.getName(), room.getIdentity().getId(), msg);
     }
@@ -1257,13 +1253,14 @@ public class Session implements StatusConstants, FriendManager {
      */
     protected void transmitConfInvite(String[] users, String yid, String room, String msg) throws IOException {
         // Create a new conference object
-        conferences.put(room, new YahooConference(identities.get(yid.toLowerCase()), room, this, false));
+        conferences.put(room, new YahooConference(identities.get(yid.toLowerCase()), room, msg, this, false));
         // Send request to Yahoo
         PacketBodyBuffer body = new PacketBodyBuffer();
         body.addElement("1", yid);
         body.addElement("57", room);
-        for (int i = 0; i < users.length; i++)
+        for (int i = 0; i < users.length; i++) {
             body.addElement("52", users[i]);
+        }
         body.addElement("58", msg);
         body.addElement("97", "1"); 
         body.addElement("13", "0"); // FIX: what's this for?
@@ -1831,7 +1828,8 @@ public class Session implements StatusConstants, FriendManager {
             throw new YMSG9BadFormatException("auth", pkt, e);
         }
         catch (IOException e) {
-            throw new YMSG9BadFormatException("auth", pkt, e);
+            loginException = new FailedLoginException("User " + loginID + ": Login failed unexpectedly.", e);
+            throw loginException;
         }
         catch (LoginRefusedException e) {
             loginException = e;
@@ -3803,7 +3801,9 @@ public class Session implements StatusConstants, FriendManager {
      * Create a unique conference name
      */
     private String getConferenceName(String yid) {
-        return yid + "-" + conferenceCount++;
+        String uuid = UUID.randomUUID().toString();
+        String conferencePart = uuid.substring(0, 12) + "--";
+        return yid + "-" + conferencePart;
     }
 
     public YahooConference getConference(String room) throws NoSuchConferenceException {
@@ -3816,10 +3816,11 @@ public class Session implements StatusConstants, FriendManager {
 
     YahooConference getOrCreateConference(YMSG9Packet pkt) {
         String room = pkt.getValue("57");
+        String message = pkt.getValue("58");
         YahooIdentity yid = identities.get(pkt.getValue("1").toLowerCase());
         YahooConference yc = conferences.get(room);
         if (yc == null) {
-            yc = new YahooConference(yid, room, this);
+            yc = new YahooConference(yid, room, message, this);
             conferences.put(room, yc);
         }
         return yc;

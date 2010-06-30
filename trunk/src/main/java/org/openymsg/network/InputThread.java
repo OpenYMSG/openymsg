@@ -253,7 +253,7 @@ public class InputThread extends Thread {
             log.info("Received PING (but ignoring it).");
             break;
         default:
-            log.warn("Don't know how to handle service type '" + pkt.service.getValue()
+            log.info("Don't know how to handle service type '" + pkt.service.getValue()
                     + "'. The original packet was: " + pkt.toString());
         }
     }

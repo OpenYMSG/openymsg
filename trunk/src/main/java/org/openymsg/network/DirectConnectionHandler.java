@@ -21,6 +21,7 @@ package org.openymsg.network;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -107,7 +108,6 @@ public class DirectConnectionHandler extends ConnectionHandler {
                 }
             }
         }
-
         log.info("Source socket: " + socket.getLocalSocketAddress() + " yahoo socket: " + socket.getInetAddress() + ":"
                 + this.socket.getPort());
         ips = new YMSG9InputStream(socket.getInputStream());
@@ -118,6 +118,8 @@ public class DirectConnectionHandler extends ConnectionHandler {
     void close() throws IOException {
         if (socket != null) socket.close();
         socket = null;
+        ips = null;
+        ops = null;
     }
 
     /**
@@ -166,5 +168,18 @@ public class DirectConnectionHandler extends ConnectionHandler {
     public String toString() {
         StringBuffer sb = new StringBuffer("Direct connection: ").append(host).append(":").append(port);
         return sb.toString();
+    }
+
+    /**
+     * Allow changing the host to open a new connection
+     * @return ip address
+     */
+    public void setHost(String host) {
+        this.host = host;
+        try {
+            close();
+        } catch (Exception ex) {
+            // silently fail;
+        }
     }
 }

@@ -46,6 +46,8 @@ public class YahooConference // Cannot be serialised
 
     protected String room; // Room name
 
+    protected String message; // message
+
     private boolean closed; // Conference has been exited?
 
     private Queue<YMSG9Packet> packetBuffer; // Buffer packets before invite
@@ -59,11 +61,12 @@ public class YahooConference // Cannot be serialised
      * invited to someone else's conference. When *we* create a conference, there is no need to buffer packets prior to
      * an invite.
      */
-    YahooConference(YahooIdentity yid, String r, Session ss, boolean b) {
+    YahooConference(YahooIdentity yid, String room, String message, Session ss, boolean b) {
         identity = yid;
         users = new HashSet<YahooUser>();
         parent = ss;
-        room = r;
+        this.room = room;
+        this.message = message;
         closed = false;
         if (b)
             packetBuffer = new LinkedList<YMSG9Packet>();
@@ -71,8 +74,8 @@ public class YahooConference // Cannot be serialised
             packetBuffer = null;
     }
 
-    YahooConference(YahooIdentity yid, String r, Session ss) {
-        this(yid, r, ss, true);
+    YahooConference(YahooIdentity yid, String room, String message, Session ss) {
+        this(yid, room, message, ss, true);
     }
 
     /**
@@ -204,5 +207,9 @@ public class YahooConference // Cannot be serialised
             }
         }
         return false;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

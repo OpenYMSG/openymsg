@@ -85,7 +85,7 @@ public class ConferenceTest extends YahooTestAbstract {
             public void conferenceInviteReceived(SessionConferenceEvent event) {
                 System.out.println ("conferenceInviteReceived: " + event);
                 try {
-                    sess2.acceptConferenceInvite(event);
+                    sess2.acceptConferenceInvite(event.getRoom());
                 }
                 catch (IllegalStateException e) {
                     // TODO Auto-generated catch block
