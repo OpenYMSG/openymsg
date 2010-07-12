@@ -21,7 +21,6 @@ package org.openymsg.network;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -108,7 +107,7 @@ public class DirectConnectionHandler extends ConnectionHandler {
                 }
             }
         }
-        log.info("Source socket: " + socket.getLocalSocketAddress() + " yahoo socket: " + socket.getInetAddress() + ":"
+        log.debug("Source socket: " + socket.getLocalSocketAddress() + " yahoo socket: " + socket.getInetAddress() + ":"
                 + this.socket.getPort());
         ips = new YMSG9InputStream(socket.getInputStream());
         ops = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));

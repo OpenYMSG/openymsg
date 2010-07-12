@@ -61,7 +61,10 @@ import org.openymsg.network.chatroom.YahooChatLobby;
 import org.openymsg.network.chatroom.YahooChatUser;
 import org.openymsg.network.event.SessionAuthorizationEvent;
 import org.openymsg.network.event.SessionChatEvent;
-import org.openymsg.network.event.SessionConferenceEvent;
+import org.openymsg.network.event.SessionConferenceDeclineInviteEvent;
+import org.openymsg.network.event.SessionConferenceLogoffEvent;
+import org.openymsg.network.event.SessionConferenceLogonEvent;
+import org.openymsg.network.event.SessionConferenceMessageEvent;
 import org.openymsg.network.event.SessionErrorEvent;
 import org.openymsg.network.event.SessionEvent;
 import org.openymsg.network.event.SessionExceptionEvent;
@@ -2345,13 +2348,12 @@ public class Session implements StatusConstants, FriendManager {
     {
         try {
             YahooConference yc = getOrCreateConference(pkt);
+            String to = pkt.getValue("1");
+            String from = pkt.getValue("54");
+            String message = pkt.getValue("14");
             // Create event
-            SessionConferenceEvent se = new SessionConferenceEvent(this, pkt.getValue("1"), // to (effective id)
-                    pkt.getValue("54"), // from
-                    pkt.getValue("14"), // message (topic)
-                    yc, // room
-                    null // users array
-            );
+            SessionConferenceDeclineInviteEvent se = 
+                new SessionConferenceDeclineInviteEvent(this, to, from, message, yc);
             // Remove the user
             yc.removeUser(se.getFrom());
             // Fire invite event
@@ -2371,6 +2373,8 @@ public class Session implements StatusConstants, FriendManager {
     {
         // If we have not received an invite yet, buffer packets
         YahooConference yc = getOrCreateConference(pkt);
+        String to = pkt.getValue("1");
+        String from = pkt.getValue("56");
         synchronized (yc) {
             if (!yc.isInvited()) {
                 yc.addPacket(pkt);
@@ -2379,11 +2383,7 @@ public class Session implements StatusConstants, FriendManager {
         }
         // Otherwise, handle the packet
         try {
-            SessionConferenceEvent se = new SessionConferenceEvent(this, pkt.getValue("1"), // to (effective id)
-                    pkt.getValue("56"), // from
-                    null, // message
-                    yc // room
-            );
+            SessionConferenceLogoffEvent se = new SessionConferenceLogoffEvent(this, to, from, yc);
             // Remove the user
             yc.removeUser(se.getFrom());
             // Fire invite event
@@ -2404,6 +2404,8 @@ public class Session implements StatusConstants, FriendManager {
     {
         // If we have not received an invite yet, buffer packets
         YahooConference yc = getOrCreateConference(pkt);
+        String to = pkt.getValue("1");
+        String from = pkt.getValue("53");
         synchronized (yc) {
             if (!yc.isInvited()) {
                 yc.addPacket(pkt);
@@ -2412,11 +2414,7 @@ public class Session implements StatusConstants, FriendManager {
         }
         // Otherwise, handle the packet
         try {
-            SessionConferenceEvent se = new SessionConferenceEvent(this, pkt.getValue("1"), // to (effective id)
-                    pkt.getValue("53"), // from (accepting user)
-                    null, // message
-                    yc // room
-            );
+            SessionConferenceLogonEvent se = new SessionConferenceLogonEvent(this, to, from, yc);
             // Add user (probably already on list, but just to be sure!)
             yc.addUser(se.getFrom());
             // Fire event
@@ -2435,6 +2433,9 @@ public class Session implements StatusConstants, FriendManager {
     {
         // If we have not received an invite yet, buffer packets
         YahooConference yc = getOrCreateConference(pkt);
+        // there is from to
+        String from = pkt.getValue("1");
+        String message = pkt.getValue("14");
         synchronized (yc) {
             if (!yc.isInvited()) {
                 yc.addPacket(pkt);
@@ -2443,11 +2444,8 @@ public class Session implements StatusConstants, FriendManager {
         }
         // Otherwise, handle the packet
         try {
-            SessionConferenceEvent se = new SessionConferenceEvent(this, pkt.getValue("1"), // to (effective id)
-                    pkt.getValue("3"), // from
-                    pkt.getValue("14"), // message
-                    yc // room
-            );
+            SessionConferenceMessageEvent se = new SessionConferenceMessageEvent(this, null,
+                    from, message, yc);
             // Fire event
             if (!yc.isClosed()) eventDispatchQueue.append(se, ServiceType.CONFMSG);
         }
@@ -2717,11 +2715,11 @@ public class Session implements StatusConstants, FriendManager {
                 }
                 else {
                     if (friendAddStatus.equals("2")) {
-                        log.info("Me: " + myName + " friend already in list: " + userId + ", pending: " + pending
+                        log.warn("Me: " + myName + " friend already in list: " + userId + ", pending: " + pending
                                 + ", protocol: " + protocol);
                     }
                     else if (friendAddStatus.equals("3")) {
-                        log.info("Me: " + myName + " friend does not exist in yahoo: " + userId + ", pending: "
+                        log.warn("Me: " + myName + " friend does not exist in yahoo: " + userId + ", pending: "
                                 + pending + ", protocol: " + protocol);
                     }
                     else {
