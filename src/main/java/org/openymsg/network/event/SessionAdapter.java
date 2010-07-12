@@ -80,23 +80,23 @@ public class SessionAdapter implements SessionListener {
         // override this function if you want to do something with it.
     }
 
-    public void conferenceInviteReceived(SessionConferenceEvent event) {
+    public void conferenceInviteReceived(SessionConferenceInviteEvent event) {
         // override this function if you want to do something with it.
     }
 
-    public void conferenceInviteDeclinedReceived(SessionConferenceEvent event) {
+    public void conferenceInviteDeclinedReceived(SessionConferenceDeclineInviteEvent event) {
         // override this function if you want to do something with it.
     }
 
-    public void conferenceLogonReceived(SessionConferenceEvent event) {
+    public void conferenceLogonReceived(SessionConferenceLogonEvent event) {
         // override this function if you want to do something with it.
     }
 
-    public void conferenceLogoffReceived(SessionConferenceEvent event) {
+    public void conferenceLogoffReceived(SessionConferenceLogoffEvent event) {
         // override this function if you want to do something with it.
     }
 
-    public void conferenceMessageReceived(SessionConferenceEvent event) {
+    public void conferenceMessageReceived(SessionConferenceMessageEvent event) {
         // override this function if you want to do something with it.
     }
 
@@ -180,19 +180,19 @@ public class SessionAdapter implements SessionListener {
             contactRequestReceived((SessionAuthorizationEvent) ev);
             break;
         case CONFDECLINE:
-            conferenceInviteDeclinedReceived((SessionConferenceEvent) ev);
+            conferenceInviteDeclinedReceived((SessionConferenceDeclineInviteEvent) ev);
             break;
         case CONFINVITE:
-            conferenceInviteReceived((SessionConferenceEvent) ev);
+            conferenceInviteReceived((SessionConferenceInviteEvent) ev);
             break;
         case CONFLOGON:
-            conferenceLogonReceived((SessionConferenceEvent) ev);
+            conferenceLogonReceived((SessionConferenceLogonEvent) ev);
             break;
         case CONFLOGOFF:
-            conferenceLogoffReceived((SessionConferenceEvent) ev);
+            conferenceLogoffReceived((SessionConferenceLogoffEvent) ev);
             break;
         case CONFMSG:
-            conferenceMessageReceived((SessionConferenceEvent) ev);
+            conferenceMessageReceived((SessionConferenceMessageEvent) ev);
             break;
         case FILETRANSFER:
             fileTransferReceived((SessionFileTransferEvent) ev);

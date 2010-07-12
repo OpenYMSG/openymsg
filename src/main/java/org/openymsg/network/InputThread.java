@@ -20,13 +20,14 @@ package org.openymsg.network;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.network.event.SessionConferenceEvent;
+import org.openymsg.network.event.SessionConferenceInviteEvent;
 
 /**
  * Thread for handling network input, dispatching incoming packets to appropriate methods based upon service id.
@@ -250,7 +251,12 @@ public class InputThread extends Thread {
         case PING:
             // As we're sending pings back, it's probably safe to ignore the
             // incoming pings from Yahoo.
-            log.info("Received PING (but ignoring it).");
+            log.debug("Received PING (but ignoring it).");
+            break;
+        case UNKNOWN002:
+            // As we're sending pings back, it's probably safe to ignore the
+            // incoming pings from Yahoo.
+            log.debug("Received 239 (but ignoring it).");
             break;
         default:
             log.info("Don't know how to handle service type '" + pkt.service.getValue()
@@ -311,27 +317,23 @@ public class InputThread extends Thread {
     {
         try {
             final YahooConference yc = parentSession.getOrCreateConference(pkt);
-            final String[] users = pkt.getValues("52");
-            final Set<YahooUser> conferenceUsers = new HashSet<YahooUser>();
-            for (final String userId : users) {
-                YahooUser user = parentSession.getRoster().getUser(userId);
-                if (user == null) {
-                    user = new YahooUser(userId);
-                }
-                conferenceUsers.add(user);
-            }
-
+            final String[] invitedUserIds = pkt.getValues("52");
+            final String[] currentUserIds = pkt.getValues("53");
+            String otherInvitedUserIdsCommaSeparated = pkt.getValue("51");
+            String to = pkt.getValue("1");
+            String from = pkt.getValue("50");
+            Set<YahooUser> invitedUsers = getUsers(invitedUserIds);
+            Set<YahooUser> currentUsers = getUsers(currentUserIds);
+            Set<YahooUser> otherInvitedUsers = getUsers(otherInvitedUserIdsCommaSeparated);
+            invitedUsers.addAll(otherInvitedUsers);
+            
             // Create event
-            final SessionConferenceEvent se = new SessionConferenceEvent(this, pkt.getValue("1"), // to (effective id)
-                    pkt.getValue("50"), // from
-                    pkt.getValue("58"), // message (topic)
-                    yc, // room
-                    conferenceUsers.toArray(new YahooUser[conferenceUsers.size()]) // users
-            // array
-            );
+            SessionConferenceInviteEvent se = new SessionConferenceInviteEvent(this, to,
+                    from, yc, invitedUsers, currentUsers);
             // Add the users
-            yc.addUsers(users);
-            yc.addUser(se.getFrom());
+            yc.addUsers(invitedUserIds);
+            yc.addUsers(currentUserIds);
+            yc.addUser(from);
             // Fire invite event
             if (!yc.isClosed()) // Should never be closed for invite!
                 parentSession.fire(se, ServiceType.CONFINVITE);
@@ -346,5 +348,26 @@ public class InputThread extends Thread {
         catch (Exception e) {
             throw new YMSG9BadFormatException("conference invite", pkt, e);
         }
+    }
+
+    private Set<YahooUser> getUsers(String otherInvitedUserIdsCommaSeparated) {
+        if (otherInvitedUserIdsCommaSeparated == null 
+                || otherInvitedUserIdsCommaSeparated.isEmpty()) {
+            return Collections.emptySet();
+        }
+        String[] ids = otherInvitedUserIdsCommaSeparated.split(",");
+        return getUsers(ids);
+    }
+
+    private Set<YahooUser> getUsers(final String[] users) {
+        final Set<YahooUser> conferenceUsers = new HashSet<YahooUser>();
+        for (final String userId : users) {
+            YahooUser user = parentSession.getRoster().getUser(userId);
+            if (user == null) {
+                user = new YahooUser(userId);
+            }
+            conferenceUsers.add(user);
+        }
+        return conferenceUsers;
     }
 }

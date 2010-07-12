@@ -2,14 +2,16 @@ package org.openymsg.conference;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 import org.openymsg.network.IllegalIdentityException;
 import org.openymsg.network.NoSuchConferenceException;
 import org.openymsg.network.YahooConference;
 import org.openymsg.network.event.SessionAdapter;
-import org.openymsg.network.event.SessionConferenceEvent;
+import org.openymsg.network.event.SessionConferenceDeclineInviteEvent;
+import org.openymsg.network.event.SessionConferenceInviteEvent;
+import org.openymsg.network.event.SessionConferenceLogoffEvent;
+import org.openymsg.network.event.SessionConferenceLogonEvent;
+import org.openymsg.network.event.SessionConferenceMessageEvent;
 import org.openymsg.network.event.SessionListener;
 import org.openymsg.test.YahooTestAbstract;
 
@@ -47,27 +49,27 @@ public class ConferenceTest extends YahooTestAbstract {
         return new SessionAdapter() {
 
             @Override
-            public void conferenceInviteDeclinedReceived(SessionConferenceEvent event) {
+            public void conferenceInviteDeclinedReceived(SessionConferenceDeclineInviteEvent event) {
                 System.out.println ("conferenceInviteDeclinedReceived: " + event);
             }
 
             @Override
-            public void conferenceInviteReceived(SessionConferenceEvent event) {
+            public void conferenceInviteReceived(SessionConferenceInviteEvent event) {
                 System.out.println ("conferenceInviteReceived: " + event);
             }
 
             @Override
-            public void conferenceLogoffReceived(SessionConferenceEvent event) {
+            public void conferenceLogoffReceived(SessionConferenceLogoffEvent event) {
                 System.out.println ("conferenceLogoffReceived: " + event);
             }
 
             @Override
-            public void conferenceLogonReceived(SessionConferenceEvent event) {
+            public void conferenceLogonReceived(SessionConferenceLogonEvent event) {
                 System.out.println ("conferenceLogonReceived: " + event);
             }
 
             @Override
-            public void conferenceMessageReceived(SessionConferenceEvent event) {
+            public void conferenceMessageReceived(SessionConferenceMessageEvent event) {
                 System.out.println ("conferenceMessageReceived: " + event);
             }
             
@@ -77,12 +79,12 @@ public class ConferenceTest extends YahooTestAbstract {
         return new SessionAdapter() {
 
             @Override
-            public void conferenceInviteDeclinedReceived(SessionConferenceEvent event) {
+            public void conferenceInviteDeclinedReceived(SessionConferenceDeclineInviteEvent event) {
                 System.out.println ("conferenceInviteDeclinedReceived: " + event);
             }
 
             @Override
-            public void conferenceInviteReceived(SessionConferenceEvent event) {
+            public void conferenceInviteReceived(SessionConferenceInviteEvent event) {
                 System.out.println ("conferenceInviteReceived: " + event);
                 try {
                     sess2.acceptConferenceInvite(event.getRoom());
@@ -102,17 +104,17 @@ public class ConferenceTest extends YahooTestAbstract {
             }
 
             @Override
-            public void conferenceLogoffReceived(SessionConferenceEvent event) {
+            public void conferenceLogoffReceived(SessionConferenceLogoffEvent event) {
                 System.out.println ("conferenceLogoffReceived: " + event);
             }
 
             @Override
-            public void conferenceLogonReceived(SessionConferenceEvent event) {
+            public void conferenceLogonReceived(SessionConferenceLogonEvent event) {
                 System.out.println ("conferenceLogonReceived: " + event);
             }
 
             @Override
-            public void conferenceMessageReceived(SessionConferenceEvent event) {
+            public void conferenceMessageReceived(SessionConferenceMessageEvent event) {
                 System.out.println ("conferenceMessageReceived: " + event);
             }
             
