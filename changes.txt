@@ -1,3 +1,11 @@
+Changes from 0.5.1 to 0.5.2
+Fixes for Conference Room
+	Adding additional people to conference room was failing
+Lowered logging level in buddy import
+
+Public API Changes
+	none
+
 Changes from 0.5.0 to 0.5.1
 Fixes for Conference Room
 	Conference room contains the message which is normally the name of the conference room

@@ -49,8 +49,8 @@ public class EventDispatcher extends Thread {
 
     private final Session session;
 
-    public EventDispatcher(final Session session) {
-        super("jYMSG Event Dispatcher thread");
+    public EventDispatcher(String username, final Session session) {
+        super("jYMSG Event: " + username);
         this.session = session;
     }
 
