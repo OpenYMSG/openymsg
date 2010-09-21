@@ -166,7 +166,7 @@ public class Session implements StatusConstants, FriendManager {
     private ArrayList<YMSG9Packet> queueOfList15 = new ArrayList<YMSG9Packet>();
 
     // used to simulate failures
-    // static private int triesBeforeFailure = 0;
+//     static private int triesBeforeFailure = 0;
 
     private static final Log log = LogFactory.getLog(Session.class);
 
@@ -245,7 +245,9 @@ public class Session implements StatusConstants, FriendManager {
         if (sessionListener == null) {
             throw new IllegalArgumentException("Argument 'sessionListener' cannot be null.");
         }
-        sessionListeners.remove(sessionListener);
+        if (!sessionListeners.remove(sessionListener)) {
+            log.warn("SessionListener not found to be removed");
+        }
     }
 
     /**
@@ -285,7 +287,7 @@ public class Session implements StatusConstants, FriendManager {
         conferences = new Hashtable<String, YahooConference>();
         chatroomManager = new ChatroomManager(null, null);
         if (eventDispatchQueue == null) {
-            eventDispatchQueue = new EventDispatcher(this);
+            eventDispatchQueue = new EventDispatcher(username, this);
             eventDispatchQueue.start();
         }
         if (username == null || username.length() == 0) {
@@ -1220,7 +1222,6 @@ public class Session implements StatusConstants, FriendManager {
 
         final Set<YahooUser> users = getConference(room).getUsers();
         for (YahooUser u : users) {
-            body.addElement("52", u.getId());
             body.addElement("53", u.getId());
         }
 
@@ -1266,7 +1267,7 @@ public class Session implements StatusConstants, FriendManager {
         }
         body.addElement("58", msg);
         body.addElement("97", "1"); 
-        body.addElement("13", "0"); // FIX: what's this for?
+        body.addElement("13", "0"); // 0 for not voice.  voice is 256
         sendPacket(body, ServiceType.CONFINVITE); // 0x18
     }
 
@@ -1855,7 +1856,7 @@ public class Session implements StatusConstants, FriendManager {
 
     private void loadAddressBook(String[] sessionCookies) {
         log.trace("loadAddressBook");
-        BuddyListImport buddyListImport = new BuddyListImport(roster, sessionCookies);
+        BuddyListImport buddyListImport = new BuddyListImport(this.loginID.getId(), roster, sessionCookies);
         try {
             buddyListImport.process(loginID.getId(), password);
         }
@@ -1873,7 +1874,9 @@ public class Session implements StatusConstants, FriendManager {
 
         if (uc instanceof HttpURLConnection) {
             // used to simulate failures
-            // if (uc instanceof HttpURLConnection && triesBeforeFailure++ % 3 != 0) {
+//             if  (triesBeforeFailure++ % 3 == 0) {
+//                 throw new SocketException("Test failure");
+//             }
             int responseCode = ((HttpURLConnection) uc).getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 InputStream in = uc.getInputStream();
@@ -2086,12 +2089,18 @@ public class Session implements StatusConstants, FriendManager {
                     sessionEvent = new SessionLogoutEvent(AuthenticationState.DUPLICATE_LOGIN);
                     break;
                 case UNKNOWN_52:
-                    log.info("AUTHRESP says: authentication failed with unknown: " + AuthenticationState.UNKNOWN_52
-                            + " " + loginID, loginException);
                     loginException = new LoginRefusedException("User " + loginID + " was forced off" + loginID,
                             AuthenticationState.UNKNOWN_52);
+                    log.info("AUTHRESP says: authentication failed with unknown: " + AuthenticationState.UNKNOWN_52
+                            + " " + loginID, loginException);
                     sessionEvent = new SessionLogoutEvent(AuthenticationState.UNKNOWN_52);
                 }
+            } else {
+                loginException = new LoginRefusedException("User " + loginID + " was forced off" + loginID,
+                        AuthenticationState.NO_REASON);
+                log.info("AUTHRESP says: authentication failed without a reason"
+                        + " " + loginID, loginException);
+                sessionEvent = new SessionLogoutEvent(AuthenticationState.NO_REASON);
             }
         }
         catch (IllegalArgumentException ex) {
@@ -2433,8 +2442,8 @@ public class Session implements StatusConstants, FriendManager {
     {
         // If we have not received an invite yet, buffer packets
         YahooConference yc = getOrCreateConference(pkt);
-        // there is from to
-        String from = pkt.getValue("1");
+        String to = pkt.getValue("1");
+        String from = pkt.getValue("3");
         String message = pkt.getValue("14");
         synchronized (yc) {
             if (!yc.isInvited()) {
@@ -2444,7 +2453,7 @@ public class Session implements StatusConstants, FriendManager {
         }
         // Otherwise, handle the packet
         try {
-            SessionConferenceMessageEvent se = new SessionConferenceMessageEvent(this, null,
+            SessionConferenceMessageEvent se = new SessionConferenceMessageEvent(this, to,
                     from, message, yc);
             // Fire event
             if (!yc.isClosed()) eventDispatchQueue.append(se, ServiceType.CONFMSG);

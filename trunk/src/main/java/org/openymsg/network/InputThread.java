@@ -49,7 +49,7 @@ public class InputThread extends Thread {
      *            the parent session of this thread.
      */
     public InputThread(Session parentSession) {
-        super("jYMSG Network Input thread");
+        super("jYMSG Input " + parentSession.getLoginID().getId());
         this.parentSession = parentSession;
     }
 
@@ -76,6 +76,7 @@ public class InputThread extends Thread {
             catch (Exception e) {
                 // ignore SocketExceptions if we're closing the thread.
                 if (quit && e instanceof SocketException) {
+                    log.debug("logging out so don't handle exception", e);
                     return;
                 }
 
@@ -316,9 +317,14 @@ public class InputThread extends Thread {
     private void receiveConfInvite(YMSG9Packet pkt) // 0x18
     {
         try {
-            final YahooConference yc = parentSession.getOrCreateConference(pkt);
             final String[] invitedUserIds = pkt.getValues("52");
             final String[] currentUserIds = pkt.getValues("53");
+            if (invitedUserIds.length == 0 && currentUserIds.length == 0)
+            {
+                log.debug("Correctly not handling empty invite: " + pkt);
+                return;
+            }
+            final YahooConference yc = parentSession.getOrCreateConference(pkt);
             String otherInvitedUserIdsCommaSeparated = pkt.getValue("51");
             String to = pkt.getValue("1");
             String from = pkt.getValue("50");
@@ -352,7 +358,7 @@ public class InputThread extends Thread {
 
     private Set<YahooUser> getUsers(String otherInvitedUserIdsCommaSeparated) {
         if (otherInvitedUserIdsCommaSeparated == null 
-                || otherInvitedUserIdsCommaSeparated.isEmpty()) {
+                || otherInvitedUserIdsCommaSeparated.length() == 0) {
             return Collections.emptySet();
         }
         String[] ids = otherInvitedUserIdsCommaSeparated.split(",");

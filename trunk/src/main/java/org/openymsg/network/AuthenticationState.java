@@ -25,6 +25,7 @@ package org.openymsg.network;
  * @author S.E. Morris
  */
 public enum AuthenticationState {
+    NO_REASON(-1), // don't know, this is when no reason is sent
     BAD(13), // Bad login?
     BAD2(29), // Bad login?
     LOCKED(14), // You've been naughty

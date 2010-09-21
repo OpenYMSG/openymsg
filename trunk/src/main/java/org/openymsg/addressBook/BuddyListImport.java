@@ -24,8 +24,10 @@ public class BuddyListImport {
     private static final Log log = LogFactory.getLog(BuddyListImport.class);
     private Roster roster;
     private String cookieLine;
+    private String username; //used for logging
 
-    public BuddyListImport(Roster roster, String[] sessionCookies) {
+    public BuddyListImport(String username, Roster roster, String[] sessionCookies) {
+        this.username = username; 
         if (sessionCookies != null) {
             cookieLine = /* FIXME "Cookie: "+ */
             "Y=" + sessionCookies[NetworkConstants.COOKIE_Y] + "; " + "T=" + sessionCookies[NetworkConstants.COOKIE_T];
@@ -72,11 +74,11 @@ public class BuddyListImport {
 
                     // get the root element
                     Element docEle = dom.getDocumentElement();
-                    log.trace("Root is: " + docEle);
+                    log.trace("user: " + username + " Root is: " + docEle);
 
                     // get a nodelist of elements
                     NodeList nl = docEle.getElementsByTagName("ct");
-                    log.trace("Found ct elements: " + nl.getLength());
+                    log.trace("user: " + username + " Found ct elements: " + nl.getLength());
 
                     if (nl != null && nl.getLength() > 0) {
                         for (int i = 0; i < nl.getLength(); i++) {
@@ -92,19 +94,18 @@ public class BuddyListImport {
                         }
                     }
                     else {
-                        log.debug("No node list found for ct. AddressBook empty?");
+                        log.debug("user: " + username + " No node list found for ct. AddressBook empty?");
                     }
                 }
                 catch (Exception pce) {
-                    log.error("Failed reading xml addressbook", pce);
+                    log.error("user: " + username + " Failed reading xml addressbook", pce);
                 }
             }
             else {
-                log.warn("responseCode from http is: " + responseCode);
+                log.warn("user: " + username + " responseCode from http is: " + responseCode);
             }
         }
 
-        // "Cookie: T=%s; Y=%s\r\n"
     }
 
     private YahooAddressBookEntry getContact(Element empEl) {
@@ -116,17 +117,18 @@ public class BuddyListImport {
         String groupName = getTextValue(empEl, "li");
 
         if (isEmpty(id) && isEmpty(lcsid)) {
-            log.warn("Failed building user firstname: " + firstName + ", lastname: " + lastName + ", nickname: "
-                    + nickName + ", groupName: " + groupName + ", element: " + empEl);
+            log.debug("user: " + username + " Failed building user firstname: " + firstName 
+                    + ", lastname: " + lastName + ", nickname: " + nickName 
+                    + ", groupName: " + groupName 
+                    + ", element: " + empEl + "/" + empEl.getAttributes());
         }
         if (isEmpty(id) && !isEmpty(lcsid)) {
             id = lcsid;
         }
-        YahooAddressBookEntry user = new YahooAddressBookEntry(id, firstName, lastName, nickName, groupName);
-        // log.trace("firstname: " + firstName + ", lastname: " + lastName + ", nickname: " + nickName + ", groupName: "
-        // + groupName);
-        // System.out.println("id: " + id + ", firstname: " + firstName + ", lastname: " + lastName + ", nickname: " +
-        // nickName + ", groupName: " + groupName);
+        YahooAddressBookEntry user = new YahooAddressBookEntry(id, firstName, lastName, 
+                nickName, groupName);
+        // log.trace("firstname: " + firstName + ", lastname: " + lastName + ", nickname: " + 
+        //        nickName + ", groupName: " + groupName);
 
         return user;
     }
@@ -136,7 +138,7 @@ public class BuddyListImport {
     }
 
     private String getTextValue(Element ele, String tagName) {
-        String textVal = null;
+//        String textVal = null;
         return ele.getAttribute(tagName);
         // if(nl != null && nl.getLength() > 0) {
         // Element el = (Element)nl.item(0);
