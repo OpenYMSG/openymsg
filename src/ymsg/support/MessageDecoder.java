@@ -196,7 +196,7 @@ public class MessageDecoder
 			// -----already swallowed the opening '<', so add that to the start 
 			// -----of the new out buffer and let the parser pick up from the 
 			// -----next character.  (Unswallow last character!)
-			out.append('<');  pos--;
+			out.append("&lt;");  pos--;
 		}
 	}
 
