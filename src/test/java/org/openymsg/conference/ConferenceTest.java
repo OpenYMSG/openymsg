@@ -45,6 +45,25 @@ public class ConferenceTest extends YahooTestAbstract {
         }
     }
 
+    @Test
+    public void testCreateConferenceWithoutInvitingAnyone() throws IllegalStateException, IllegalIdentityException, IOException, InterruptedException {
+        String msg = "test sending invite";
+        String[] users = new String[0];
+        sess1.addSessionListener(createSess1Listener());
+        YahooConference conference1 = sess1.createConference("conferencename2323", users, msg);
+        Thread.sleep(3000);
+        sess1.sendConferenceMessage(conference1, "here is the first message");
+        Thread.sleep(3000);
+        sess1.extendConference(conference1, sess2.getLoginID().getId(), "Another try");
+        Thread.sleep(3000);
+        sess1.leaveConference(conference1);
+        Thread.sleep(3000);
+        System.out.println ("Conferences");
+        for (YahooConference conference : sess1.getConferences()) {
+            System.out.println("conference: " + conference);
+        }
+    }
+    
     private SessionListener createSess1Listener() {
         return new SessionAdapter() {
 
