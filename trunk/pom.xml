@@ -19,12 +19,17 @@
   	</developer>
   	<developer>
   		<id>neilhart</id>
+  		<name>Neil Hart</name>
   	</developer>
   	<developer>
   		<id>guusdk</id>
   		<name>Guus der Kinderen</name>
   		<email>guus.der.kinderen@gmail.com</email>
   		<timezone>+1</timezone>
+  	</developer>
+  	<developer>
+  		<id>damencho</id>
+  		<name>Damian Minkov</name>
   	</developer>
   </developers>
   <licenses>
