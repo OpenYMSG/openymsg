@@ -685,7 +685,24 @@ public class Session implements StatusConstants, FriendManager {
         return createConference(users, msg, loginID);
     }
 
+    public YahooConference createConference(String name, String[] users, String msg) throws IllegalStateException, IOException,
+        IllegalIdentityException {
+        for (int i = 0; i < users.length; i++) {
+            if (primaryID.getId().equals(users[i]) || loginID.getId().equals(users[i])
+                    || identities.containsKey(users[i])) {
+                throw new IllegalIdentityException(users[i] + " is an identity of this session and cannot be used here");
+            }
+        }
+        return createConference(name, users, msg, loginID);
+    }
+
     public YahooConference createConference(String[] users, String msg, YahooIdentity yid)
+            throws IllegalStateException, IOException, IllegalIdentityException {
+        String conferenceName = getConferenceName(yid.getId());
+        return createConference(conferenceName, users, msg, yid);
+    }
+
+    public YahooConference createConference(String conferenceName, String[] users, String msg, YahooIdentity yid)
             throws IllegalStateException, IOException, IllegalIdentityException {
         checkStatus();
 
@@ -701,7 +718,6 @@ public class Session implements StatusConstants, FriendManager {
             }
         }
 
-        String conferenceName = getConferenceName(yid.getId());
         transmitConfInvite(users, yid.getId(), conferenceName, msg);
         return getConference(conferenceName);
     }
