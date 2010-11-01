@@ -1,6 +1,7 @@
 Changes from 0.5.1 to 0.5.2
 Fixes for Conference Room
-	Adding additional people to conference room was failing
+	Adding additional people to conference room was failing.
+	Allow for explicit naming of a new conference.
 Lowered logging level in buddy import
 
 Public API Changes
