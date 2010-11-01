@@ -26,7 +26,7 @@ public class ConferenceTest extends YahooTestAbstract {
         sess1.addSessionListener(createSess1Listener());
         YahooConference conference1 = sess1.createConference(users, msg);
         Thread.sleep(3000);
-        YahooConference conference2 = sess2.getConference("nimbuzzpresencetest531-0");
+        YahooConference conference2 = sess2.getConference(conference1.getName());
         sess1.sendConferenceMessage(conference1, "here is the first message");
         Thread.sleep(3000);
         sess2.sendConferenceMessage(conference2, "here is the second message");
