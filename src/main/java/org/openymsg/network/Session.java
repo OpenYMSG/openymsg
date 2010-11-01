@@ -246,7 +246,7 @@ public class Session implements StatusConstants, FriendManager {
             throw new IllegalArgumentException("Argument 'sessionListener' cannot be null.");
         }
         if (!sessionListeners.remove(sessionListener)) {
-            log.warn("SessionListener not found to be removed");
+            log.warn("SessionListener not found to be removed.", new Throwable());
         }
     }
 
