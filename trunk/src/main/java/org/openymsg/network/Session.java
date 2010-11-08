@@ -706,6 +706,10 @@ public class Session implements StatusConstants, FriendManager {
             throws IllegalStateException, IOException, IllegalIdentityException {
         checkStatus();
 
+        if (!isValidConferenceName(conferenceName)) {
+            throw new IllegalArgumentException("This name is not a valid conference name: " + conferenceName);
+        }
+        
         if (!identities.containsKey(yid.getId())) {
             throw new IllegalIdentityException("The YahooIdentity '" + yid.getId()
                     + "'is not a valid identity for this session.");
@@ -3827,6 +3831,43 @@ public class Session implements StatusConstants, FriendManager {
         String uuid = UUID.randomUUID().toString();
         String conferencePart = uuid.substring(0, 12) + "--";
         return yid + "-" + conferencePart;
+    }
+
+    /**
+     * Verifies that the a particular name is of suitable format for a conference name. Conference names shoudl start
+     * with the Yahoo ID of the initiating user, followed by a dash (-), eg: <tt>SomeUserID-3432622</tt>. Tests indicate
+     * that the part after the dash is free form (and can even be absent).
+     * 
+     * @param name
+     *            The name to verify.
+     * @return <tt>true</tt> if the name is a valid conference name, otherwise <tt>false</tt>.
+     */
+    public boolean isValidConferenceName(String name) {
+        if (name == null) {
+            return false;
+        }
+
+        // Not ending with "--" does not cause any issues, as far as I've been able to determine. - Guus
+
+        // The part after "<yid>-" appears to be freeform. So far, there are no known limitations. Tests show that it
+        // can even be absent ( <yid>- is a valid name in itself).
+        
+        if (name.startsWith(primaryID.getId() + "-")) {
+            return true;
+        }
+       
+        if (name.startsWith(loginID.getId() + "-")) {
+            return true;
+        }
+
+        // I assume (but did not verify) that all of the other ID's are fine. - Guus
+        for(String alternateID : identities.keySet()) {
+            if (name.startsWith(alternateID + "-")) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     public YahooConference getConference(String room) throws NoSuchConferenceException {
