@@ -28,9 +28,9 @@ public class SessionConferenceInviteEvent extends AbstractSessionConferenceEvent
     private Set<YahooUser> invitedUsers;
     private Set<YahooUser> currentUsers;
 
-    public SessionConferenceInviteEvent(Object o, String to, String from, 
+    public SessionConferenceInviteEvent(Object o, String to, String from, String message,
             YahooConference conference, Set<YahooUser> invitedUsers, Set<YahooUser> currentUsers) {
-        super(o, to, from, null, conference);
+        super(o, to, from, message, conference);
         this.invitedUsers = invitedUsers;
         this.currentUsers = currentUsers;
     }

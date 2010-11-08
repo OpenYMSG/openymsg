@@ -328,6 +328,7 @@ public class InputThread extends Thread {
             String otherInvitedUserIdsCommaSeparated = pkt.getValue("51");
             String to = pkt.getValue("1");
             String from = pkt.getValue("50");
+            String message = pkt.getValue("58");
             Set<YahooUser> invitedUsers = getUsers(invitedUserIds);
             Set<YahooUser> currentUsers = getUsers(currentUserIds);
             Set<YahooUser> otherInvitedUsers = getUsers(otherInvitedUserIdsCommaSeparated);
@@ -335,7 +336,7 @@ public class InputThread extends Thread {
             
             // Create event
             SessionConferenceInviteEvent se = new SessionConferenceInviteEvent(this, to,
-                    from, yc, invitedUsers, currentUsers);
+                    from, message, yc, invitedUsers, currentUsers);
             // Add the users
             yc.addUsers(invitedUserIds);
             yc.addUsers(currentUserIds);
