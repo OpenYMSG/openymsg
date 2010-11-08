@@ -1,4 +1,5 @@
 Changes from 0.5.1 to 0.5.2
+Conference invite events should contain invite messages if they're provided.
 Empty valued protocol package content should be allowed.
 Fixes for Conference Room
 	Adding additional people to conference room was failing.
