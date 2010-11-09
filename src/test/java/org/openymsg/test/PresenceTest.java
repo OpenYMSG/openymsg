@@ -46,11 +46,6 @@ public class PresenceTest {
 
     private static String RECVPWD = PropertiesAvailableTest.getPassword(RECEIVER);
 
-    @Test
-    public void testDefaultStatus() throws Exception {
-        assertEquals(Status.AVAILABLE, new Session().getStatus());
-    }
-
     // @Test
     public void testSetInitalStatus() throws Exception {
         // test initial state: set your state before logging in.
