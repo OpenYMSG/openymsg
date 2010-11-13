@@ -70,6 +70,7 @@ public interface ServiceConstants
 
     public final static int SERVICE_Y7_AUTHORIZATION = 0xd6;    /* YMSG13 */
 
+    public final static int SERVICE_Y6_VISIBILITY_TOGGLE= 0xc5;  // 197
     public final static int SERVICE_Y6_STATUS_UPDATE= 0xc6;
     public final static int SERVICE_STATUS_15 = 0xf0;
     public final static int SERVICE_LIST_15 = 0xf1;

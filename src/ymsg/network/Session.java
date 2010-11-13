@@ -245,8 +245,15 @@ public class Session implements StatusConstants, ServiceConstants, NetworkConsta
             throw new IllegalArgumentException("Unstarted sessions can be available or invisible only");
         if(s==STATUS_CUSTOM)
             throw new IllegalArgumentException("Cannot set custom state without message");
+        long oldStatus = status;
         status=s;  customStatusMessage=null;
-        if(sessionStatus==MESSAGING)  _doStatus();
+        if(sessionStatus==MESSAGING)  
+        {
+            _doStatus();
+
+            if(oldStatus == STATUS_INVISIBLE)
+                transmitToggleVisibility(true);
+        }
     }
 
     public synchronized void setStatus(String m,boolean b)
@@ -260,6 +267,7 @@ public class Session implements StatusConstants, ServiceConstants, NetworkConsta
 
     private void _doStatus() throws IllegalStateException,IOException
     {   if(status==STATUS_AVAILABLE)  transmitIsBack();
+        else if(status==STATUS_INVISIBLE)  transmitToggleVisibility(false);
         else if(status==STATUS_CUSTOM)  transmitIsAway(customStatusMessage,customStatusBusy);
         else  transmitIsAway();
     }
@@ -1111,7 +1119,7 @@ public class Session implements StatusConstants, ServiceConstants, NetworkConsta
         body.addElement("10",status+"");
 //        sendPacket(body,SERVICE_ISAWAY,status);             // 0x03
 	    body.addElement("138", "");
-        sendPacket(body,SERVICE_Y6_STATUS_UPDATE,status);
+        sendPacket(body,SERVICE_Y6_STATUS_UPDATE, STATUS_AVAILABLE);
     }
 
     protected void transmitIsAway(String msg,boolean a) throws IOException
@@ -1124,7 +1132,18 @@ public class Session implements StatusConstants, ServiceConstants, NetworkConsta
             else body.addElement("47","0");  // 0=back
 	    body.addElement("138", "");
 //        sendPacket(body,SERVICE_ISAWAY,status);             // 0x03
-        sendPacket(body,SERVICE_Y6_STATUS_UPDATE,status);
+        sendPacket(body,SERVICE_Y6_STATUS_UPDATE,STATUS_AVAILABLE);
+    }
+
+    protected void transmitToggleVisibility(boolean visible) throws IOException
+    {
+        PacketBodyBuffer body = new PacketBodyBuffer();
+        if(visible)
+            body.addElement("13", "1");
+        else
+            body.addElement("13", "2");
+
+        sendPacket(body,SERVICE_Y6_VISIBILITY_TOGGLE,STATUS_AVAILABLE);
     }
 
     // -----------------------------------------------------------------
@@ -1135,11 +1154,11 @@ public class Session implements StatusConstants, ServiceConstants, NetworkConsta
     // AVAILABLE and INVISIBLE.
     // -----------------------------------------------------------------
     protected void transmitIsBack() throws IOException
-    {       	System.out.println(this.loginID + "transmitIsBack");
+    {       	//System.out.println(this.loginID + "transmitIsBack");
     		PacketBodyBuffer body = new PacketBodyBuffer();
     	    body.addElement("10", status + "");
     	    body.addElement("138", "");
-        sendPacket(body,SERVICE_Y6_STATUS_UPDATE,status);             // 0x04
+        sendPacket(body,SERVICE_Y6_STATUS_UPDATE,STATUS_AVAILABLE);             // 0x04
     }
 
     // -----------------------------------------------------------------
