@@ -156,7 +156,7 @@ public class HTTPConnectionHandler extends ConnectionHandler {
      * Do nothing more than make a note that we are on/off line
      */
     @Override
-    void open() {
+    void open(boolean searchForAddress) {
         connected = true;
         synchronized (this) // In case two threads call open()
         {

@@ -92,6 +92,8 @@ import org.openymsg.roster.Roster;
  * @author S.E. Morris
  */
 public class Session implements StatusConstants, FriendManager {
+    private static final String LOGIN_YAHOO_COM = "login.yahoo.com";
+
     /** Primary Yahoo ID: the real account id. */
     private YahooIdentity primaryID;
 
@@ -161,9 +163,12 @@ public class Session implements StatusConstants, FriendManager {
     /** Message number to be included in sending a message */
     private int messageNumber;
 
-    private int keepAliveCount;
+    private long pingTimestamp;
 
     private ArrayList<YMSG9Packet> queueOfList15 = new ArrayList<YMSG9Packet>();
+    
+    private String yahooLoginHost = LOGIN_YAHOO_COM;
+
 
     // used to simulate failures
 //     static private int triesBeforeFailure = 0;
@@ -194,6 +199,11 @@ public class Session implements StatusConstants, FriendManager {
      * @throws NumberFormatException
      */
     public Session(ConnectionHandler connectionHandler) throws NumberFormatException {
+        this(connectionHandler, LOGIN_YAHOO_COM);
+    }
+
+    public Session(ConnectionHandler connectionHandler, String yahooLoginHost) throws NumberFormatException {
+        this.yahooLoginHost = yahooLoginHost;
         if (connectionHandler != null) {
             network = connectionHandler;
         }
@@ -246,7 +256,7 @@ public class Session implements StatusConstants, FriendManager {
             throw new IllegalArgumentException("Argument 'sessionListener' cannot be null.");
         }
         if (!sessionListeners.remove(sessionListener)) {
-            log.warn("SessionListener not found to be removed.", new Throwable());
+            log.warn("SessionListener not found to be removed");
         }
     }
 
@@ -268,9 +278,9 @@ public class Session implements StatusConstants, FriendManager {
      */
     public void login(String username, String password) throws IllegalStateException, IOException,
             AccountLockedException, LoginRefusedException, FailedLoginException {
-        this.login(username, password, true);
+        this.login(username, password, true, false);
     }
-
+    
     /**
      * Call this to connect to the Yahoo server and do all the initial handshaking and accepting of data
      * 
@@ -281,7 +291,8 @@ public class Session implements StatusConstants, FriendManager {
      * @param createPingerTask
      *            Session will do it's own thread for pings and keepAlives
      */
-    public void login(String username, String password, boolean createPingerTask) throws IllegalStateException,
+    public void login(String username, String password, boolean createPingerTask, boolean searchForAddress) 
+        throws IllegalStateException,
             IOException, AccountLockedException, LoginRefusedException, FailedLoginException {
         identities = new HashMap<String, YahooIdentity>();
         conferences = new Hashtable<String, YahooConference>();
@@ -325,7 +336,7 @@ public class Session implements StatusConstants, FriendManager {
             // Create the socket and threads (ipThread, sessionPingRunnable and
             // maybe eventDispatchQueue)
             log.trace("Opening session...");
-            openSession(createPingerTask);
+            openSession(createPingerTask, searchForAddress);
 
             // Begin login process
             log.trace("Transmitting auth...");
@@ -418,12 +429,15 @@ public class Session implements StatusConstants, FriendManager {
      * @return true if a ping was sent
      */
     public boolean sendKeepAliveAndPing() {
+        boolean pingSent = false;
         try {
-            this.transmitKeepAlive();
-            if (keepAliveCount++ % NetworkConstants.PING_TO_KEEPALIVE_RATIO == 0) {
+            long now = System.currentTimeMillis();
+            if (now - pingTimestamp > NetworkConstants.PING_TIMEOUT_IN_SECS * 1000) {
                 this.transmitPings();
-                return true;
+                pingTimestamp = now;
+                pingSent = true;
             }
+            this.transmitKeepAlive();
         }
         catch (IOException ex) {
             if (ex instanceof SocketException) {
@@ -439,7 +453,7 @@ public class Session implements StatusConstants, FriendManager {
                 log.error("Could not send keep-alive to: " + this.getSessionID() + "/" + this.getLoginID(), ex);
             }
         }
-        return false;
+        return pingSent;
 
     }
 
@@ -685,31 +699,10 @@ public class Session implements StatusConstants, FriendManager {
         return createConference(users, msg, loginID);
     }
 
-    public YahooConference createConference(String name, String[] users, String msg) throws IllegalStateException, IOException,
-        IllegalIdentityException {
-        for (int i = 0; i < users.length; i++) {
-            if (primaryID.getId().equals(users[i]) || loginID.getId().equals(users[i])
-                    || identities.containsKey(users[i])) {
-                throw new IllegalIdentityException(users[i] + " is an identity of this session and cannot be used here");
-            }
-        }
-        return createConference(name, users, msg, loginID);
-    }
-
     public YahooConference createConference(String[] users, String msg, YahooIdentity yid)
-            throws IllegalStateException, IOException, IllegalIdentityException {
-        String conferenceName = getConferenceName(yid.getId());
-        return createConference(conferenceName, users, msg, yid);
-    }
-
-    public YahooConference createConference(String conferenceName, String[] users, String msg, YahooIdentity yid)
             throws IllegalStateException, IOException, IllegalIdentityException {
         checkStatus();
 
-        if (!isValidConferenceName(conferenceName)) {
-            throw new IllegalArgumentException("This name is not a valid conference name: " + conferenceName);
-        }
-        
         if (!identities.containsKey(yid.getId())) {
             throw new IllegalIdentityException("The YahooIdentity '" + yid.getId()
                     + "'is not a valid identity for this session.");
@@ -722,6 +715,7 @@ public class Session implements StatusConstants, FriendManager {
             }
         }
 
+        String conferenceName = getConferenceName(yid.getId());
         transmitConfInvite(users, yid.getId(), conferenceName, msg);
         return getConference(conferenceName);
     }
@@ -1064,6 +1058,22 @@ public class Session implements StatusConstants, FriendManager {
         body.addElement("1", loginID.getId());
         sendPacket(body, ServiceType.AUTH);
     }
+
+    /**
+     * Transmit an VERIFY packet, as a way of introduction to the server. As we do not know our primary ID yet, both 0 and
+     * 1 use loginID .
+     */
+    protected void transmitVerify() throws IOException {
+        if (sessionStatus != SessionState.CONNECTING) {
+            throw new IllegalStateException(
+                    "Cannot transmit an VERIFY packet if you're not completely unconnected to the Yahoo Network. Current state: "
+                            + sessionStatus);
+        }
+
+        final PacketBodyBuffer body = new PacketBodyBuffer();
+        sendPacket(body, ServiceType.VERIFY);
+    }
+
 
     /**
      * Transmit an AUTHRESP packet, the second part of our login process. As we do not know our primary ID yet, both 0
@@ -1886,7 +1896,7 @@ public class Session implements StatusConstants, FriendManager {
     }
 
     private String[] yahooAuth16Stage1(String seed) throws LoginRefusedException, IOException, NoSuchAlgorithmException {
-        String authLink = "https://login.yahoo.com/config/pwtoken_get?src=ymsgr&ts=&login=" + loginID.getId()
+        String authLink = "https://" + yahooLoginHost + "/config/pwtoken_get?src=ymsgr&ts=&login=" + loginID.getId()
                 + "&passwd=" + URLEncoder.encode(password, "UTF-8") + "&chal=" + URLEncoder.encode(seed, "UTF-8");
 
         URL u = new URL(authLink);
@@ -1974,7 +1984,7 @@ public class Session implements StatusConstants, FriendManager {
 
     private String[] yahooAuth16Stage2(String token, String seed) throws LoginRefusedException, IOException,
             NoSuchAlgorithmException {
-        String loginLink = "https://login.yahoo.com/config/pwtoken_login?src=ymsgr&ts=&token=" + token;
+        String loginLink = "https://" + yahooLoginHost + "/config/pwtoken_login?src=ymsgr&ts=&token=" + token;
 
         URL u = new URL(loginLink);
         URLConnection uc = u.openConnection();
@@ -3503,9 +3513,9 @@ public class Session implements StatusConstants, FriendManager {
     /**
      * Start threads
      */
-    private void openSession(boolean createPingerTask) throws IOException {
+    private void openSession(boolean createPingerTask, boolean searchForAddress) throws IOException {
         // Open the socket, create input and output streams
-        network.open();
+        network.open(searchForAddress);
         // Create a thread to handle input from network
         initThread();
         // Add a TimerTask to periodically send ping packets for our connection
@@ -3831,43 +3841,6 @@ public class Session implements StatusConstants, FriendManager {
         String uuid = UUID.randomUUID().toString();
         String conferencePart = uuid.substring(0, 12) + "--";
         return yid + "-" + conferencePart;
-    }
-
-    /**
-     * Verifies that the a particular name is of suitable format for a conference name. Conference names shoudl start
-     * with the Yahoo ID of the initiating user, followed by a dash (-), eg: <tt>SomeUserID-3432622</tt>. Tests indicate
-     * that the part after the dash is free form (and can even be absent).
-     * 
-     * @param name
-     *            The name to verify.
-     * @return <tt>true</tt> if the name is a valid conference name, otherwise <tt>false</tt>.
-     */
-    public boolean isValidConferenceName(String name) {
-        if (name == null) {
-            return false;
-        }
-
-        // Not ending with "--" does not cause any issues, as far as I've been able to determine. - Guus
-
-        // The part after "<yid>-" appears to be freeform. So far, there are no known limitations. Tests show that it
-        // can even be absent ( <yid>- is a valid name in itself).
-        
-        if (name.startsWith(primaryID.getId() + "-")) {
-            return true;
-        }
-       
-        if (name.startsWith(loginID.getId() + "-")) {
-            return true;
-        }
-
-        // I assume (but did not verify) that all of the other ID's are fine. - Guus
-        for(String alternateID : identities.keySet()) {
-            if (name.startsWith(alternateID + "-")) {
-                return true;
-            }
-        }
-        
-        return false;
     }
 
     public YahooConference getConference(String room) throws NoSuchConferenceException {

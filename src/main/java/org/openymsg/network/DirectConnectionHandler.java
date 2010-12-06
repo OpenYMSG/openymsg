@@ -26,6 +26,7 @@ import java.net.SocketException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openymsg.network.task.GetConnectionServer;
 
 /**
  * 
@@ -44,17 +45,20 @@ public class DirectConnectionHandler extends ConnectionHandler {
     private YMSG9InputStream ips; // For receiving messages
 
     private DataOutputStream ops; // For sending messages
+    
+    private  Integer socketSize;
 
     private static final Log log = LogFactory.getLog(DirectConnectionHandler.class);
 
-    public DirectConnectionHandler(String h, int p) {
+    public DirectConnectionHandler(String h, int p, Integer socketSize) {
         host = h;
         port = p;
         dontUseFallbacks = true;
+        this.socketSize = socketSize;
     }
 
     public DirectConnectionHandler(int p) {
-        this(Util.directHost(), p);
+        this(Util.directHost(), p, null);
     }
 
     public DirectConnectionHandler(boolean fl) {
@@ -63,7 +67,7 @@ public class DirectConnectionHandler extends ConnectionHandler {
     }
 
     public DirectConnectionHandler() {
-        this(Util.directHost(), Util.directPort());
+        this(Util.directHost(), Util.directPort(), null);
         dontUseFallbacks = false;
     }
 
@@ -88,9 +92,22 @@ public class DirectConnectionHandler extends ConnectionHandler {
      * turn - upon failure will return the last exception (the one for the final port).
      */
     @Override
-    void open() throws SocketException, IOException {
+    void open(boolean searchForAddress) throws SocketException, IOException {
         if (dontUseFallbacks) {
+            if (searchForAddress) {
+                GetConnectionServer getConnection = new GetConnectionServer();
+                String otherHost = getConnection.getIpAddress();
+                if (otherHost != null) {
+                    log.info("Swapping host: " + otherHost);
+                    host = otherHost;
+                }
+            }
             socket = new Socket(host, port);
+            if (socketSize != null) {
+                int oldSocketSize = socket.getReceiveBufferSize();
+                socket.setReceiveBufferSize(socketSize);
+                log.debug("Socket before: " + oldSocketSize + ", after: " + socket.getReceiveBufferSize());
+            }
         }
         else {
             int[] fallbackPorts = Util.directPorts();
