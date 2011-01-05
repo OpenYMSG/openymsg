@@ -52,10 +52,7 @@ public class PacketBodyBuffer {
      * @throws UnsupportedEncodingException
      */
     void addString(String s) throws UnsupportedEncodingException, IOException {
-        if (s != null) {
-            baos.write(s.getBytes(charEncoding));
-        }
-        // note that empty values still need to be ended with a separator!
+        baos.write(s.getBytes(charEncoding));
         baos.write(SEPARATOR[0]);
         baos.write(SEPARATOR[1]);
     }
@@ -63,20 +60,10 @@ public class PacketBodyBuffer {
     /**
      * Add key/value pair to buffer. Note: this method is NOT thread safe.
      * 
-     * The Yahoo network accepts empty values, and therefore they are accepted by this method. Empty keys are not, and
-     * will cause an {@link IllegalArgumentException} to be thrown.
-     * 
-     * @param key
-     *            The identifier (cannot be <tt>null</tt> or empty).
-     * @param value
-     *            The value (can be <tt>null</tt> or empty).
      * @throws IOException
      * @throws UnsupportedEncodingException
      */
     public void addElement(String key, String value) throws UnsupportedEncodingException, IOException {
-        if (key == null || key.trim().length() == 0) {
-            throw new IllegalArgumentException("Argument 'key' cannot be null or an empty String.");
-        }
         addString(key);
         addString(value);
     }

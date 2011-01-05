@@ -88,7 +88,7 @@ public abstract class NetworkConstants {
      * Amount of seconds between sending subsequent keep-alive packets.
      */
     public final static int KEEPALIVE_TIMEOUT_IN_SECS = 60; // 1 minute
-    public final static int PING_TO_KEEPALIVE_RATIO = 60; // 1 hour
+    public final static int PING_TIMEOUT_IN_SECS = 58 * 60; // 1 hour
 
     // Buzz string
     public final static String BUZZ = "<ding>";
