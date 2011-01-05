@@ -28,7 +28,7 @@ import java.io.IOException;
 public abstract class ConnectionHandler {
     abstract void install(Session session);
 
-    abstract void open(boolean searchForAddress) throws IOException;
+    abstract void open() throws IOException;
 
     abstract void close() throws IOException;
 
