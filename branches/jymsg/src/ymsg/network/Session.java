@@ -3220,7 +3220,7 @@ public class Session implements StatusConstants, ServiceConstants, NetworkConsta
         throws IOException
     {
         PacketBodyBuffer body = new PacketBodyBuffer();
-        body.addElement("4", loginID);
+        body.addElement("1", loginID);
         body.addElement("5", friend);
         body.addElement("13", "1");
         sendPacket(body, SERVICE_PICTURE);
