@@ -45,6 +45,18 @@
     <tag>trunk</tag>
     <url>http://openymsg.svn.sourceforge.net/svnroot/openymsg</url>
   </scm>
+  <distributionManagement>
+	<repository>
+		<id>maven</id>
+		<name>Releases</name>
+		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+	</repository>
+	<snapshotRepository>
+		<id>snapshot</id>
+		<name>Snapshots</name>
+		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+	</snapshotRepository>
+  </distributionManagement>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.test.skip>true</maven.test.skip>
@@ -65,6 +77,19 @@
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
