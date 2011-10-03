@@ -1,3 +1,9 @@
+Changes from 0.5.2 to 0.6.0
+Setting up pom for maven repository (why I changed the version to 0.6)
+Using Yahoo's servers to get ip address of IM servers.  This is the proper load balancing for Yahoo.  Need to call ConnectionHandler.open(searchForAddress).
+Better timing of pings to be done every 1 hour.
+Better logging of login failure.  
+
 Changes from 0.5.1 to 0.5.2
 Conference invite events should contain invite messages if they're provided.
 Empty valued protocol package content should be allowed.

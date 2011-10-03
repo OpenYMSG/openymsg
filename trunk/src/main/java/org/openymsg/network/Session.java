@@ -33,6 +33,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,9 +50,15 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jdom.JDOMException;
+import org.openymsg.addressBook.BuddyAdd;
 import org.openymsg.addressBook.BuddyListImport;
 import org.openymsg.network.challenge.ChallengeResponseV16;
 import org.openymsg.network.challenge.ChallengeResponseV10;
@@ -92,6 +99,8 @@ import org.openymsg.roster.Roster;
  * @author S.E. Morris
  */
 public class Session implements StatusConstants, FriendManager {
+    private static final String LOGIN_YAHOO_COM = "login.yahoo.com";
+
     /** Primary Yahoo ID: the real account id. */
     private YahooIdentity primaryID;
 
@@ -161,14 +170,21 @@ public class Session implements StatusConstants, FriendManager {
     /** Message number to be included in sending a message */
     private int messageNumber;
 
-    private int keepAliveCount;
+    private long pingTimestamp;
 
     private ArrayList<YMSG9Packet> queueOfList15 = new ArrayList<YMSG9Packet>();
+    
+    private String yahooLoginHost = LOGIN_YAHOO_COM;
+
+    private String[] sessionCookies;
+
 
     // used to simulate failures
 //     static private int triesBeforeFailure = 0;
 
     private static final Log log = LogFactory.getLog(Session.class);
+
+    private static final int LOGIN_HTTP_TIMEOUT = 10000;
 
     /**
      * Creates a new Session based on a ConnectionHandler as configured in the current System properties.
@@ -194,6 +210,11 @@ public class Session implements StatusConstants, FriendManager {
      * @throws NumberFormatException
      */
     public Session(ConnectionHandler connectionHandler) throws NumberFormatException {
+        this(connectionHandler, LOGIN_YAHOO_COM);
+    }
+
+    public Session(ConnectionHandler connectionHandler, String yahooLoginHost) throws NumberFormatException {
+        this.yahooLoginHost = yahooLoginHost;
         if (connectionHandler != null) {
             network = connectionHandler;
         }
@@ -268,9 +289,9 @@ public class Session implements StatusConstants, FriendManager {
      */
     public void login(String username, String password) throws IllegalStateException, IOException,
             AccountLockedException, LoginRefusedException, FailedLoginException {
-        this.login(username, password, true);
+        this.login(username, password, true, false);
     }
-
+    
     /**
      * Call this to connect to the Yahoo server and do all the initial handshaking and accepting of data
      * 
@@ -281,7 +302,8 @@ public class Session implements StatusConstants, FriendManager {
      * @param createPingerTask
      *            Session will do it's own thread for pings and keepAlives
      */
-    public void login(String username, String password, boolean createPingerTask) throws IllegalStateException,
+    public void login(String username, String password, boolean createPingerTask, boolean searchForAddress) 
+        throws IllegalStateException,
             IOException, AccountLockedException, LoginRefusedException, FailedLoginException {
         identities = new HashMap<String, YahooIdentity>();
         conferences = new Hashtable<String, YahooConference>();
@@ -325,7 +347,7 @@ public class Session implements StatusConstants, FriendManager {
             // Create the socket and threads (ipThread, sessionPingRunnable and
             // maybe eventDispatchQueue)
             log.trace("Opening session...");
-            openSession(createPingerTask);
+            openSession(createPingerTask, searchForAddress);
 
             // Begin login process
             log.trace("Transmitting auth...");
@@ -418,12 +440,15 @@ public class Session implements StatusConstants, FriendManager {
      * @return true if a ping was sent
      */
     public boolean sendKeepAliveAndPing() {
+        boolean pingSent = false;
         try {
-            this.transmitKeepAlive();
-            if (keepAliveCount++ % NetworkConstants.PING_TO_KEEPALIVE_RATIO == 0) {
+            long now = System.currentTimeMillis();
+            if (now - pingTimestamp > NetworkConstants.PING_TIMEOUT_IN_SECS * 1000) {
                 this.transmitPings();
-                return true;
+                pingTimestamp = now;
+                pingSent = true;
             }
+            this.transmitKeepAlive();
         }
         catch (IOException ex) {
             if (ex instanceof SocketException) {
@@ -439,7 +464,7 @@ public class Session implements StatusConstants, FriendManager {
                 log.error("Could not send keep-alive to: " + this.getSessionID() + "/" + this.getLoginID(), ex);
             }
         }
-        return false;
+        return pingSent;
 
     }
 
@@ -1064,6 +1089,22 @@ public class Session implements StatusConstants, FriendManager {
         body.addElement("1", loginID.getId());
         sendPacket(body, ServiceType.AUTH);
     }
+
+    /**
+     * Transmit an VERIFY packet, as a way of introduction to the server. As we do not know our primary ID yet, both 0 and
+     * 1 use loginID .
+     */
+    protected void transmitVerify() throws IOException {
+        if (sessionStatus != SessionState.CONNECTING) {
+            throw new IllegalStateException(
+                    "Cannot transmit an VERIFY packet if you're not completely unconnected to the Yahoo Network. Current state: "
+                            + sessionStatus);
+        }
+
+        final PacketBodyBuffer body = new PacketBodyBuffer();
+        sendPacket(body, ServiceType.VERIFY);
+    }
+
 
     /**
      * Transmit an AUTHRESP packet, the second part of our login process. As we do not know our primary ID yet, both 0
@@ -1883,21 +1924,46 @@ public class Session implements StatusConstants, FriendManager {
         catch (IOException e) {
             e.printStackTrace();
         }
+        this.sessionCookies = sessionCookies;
     }
 
     private String[] yahooAuth16Stage1(String seed) throws LoginRefusedException, IOException, NoSuchAlgorithmException {
-        String authLink = "https://login.yahoo.com/config/pwtoken_get?src=ymsgr&ts=&login=" + loginID.getId()
+        String authLink = "https://" + yahooLoginHost + "/config/pwtoken_get?src=ymsgr&ts=&login=" + loginID.getId()
                 + "&passwd=" + URLEncoder.encode(password, "UTF-8") + "&chal=" + URLEncoder.encode(seed, "UTF-8");
 
         URL u = new URL(authLink);
         URLConnection uc = u.openConnection();
-
-        if (uc instanceof HttpURLConnection) {
+        uc.setConnectTimeout(LOGIN_HTTP_TIMEOUT);
+        
+        if (uc instanceof HttpsURLConnection) {
+            HttpsURLConnection httpUc = (HttpsURLConnection) uc;
             // used to simulate failures
 //             if  (triesBeforeFailure++ % 3 == 0) {
 //                 throw new SocketException("Test failure");
 //             }
-            int responseCode = ((HttpURLConnection) uc).getResponseCode();
+            if (!yahooLoginHost.equalsIgnoreCase(LOGIN_YAHOO_COM))
+            {
+                httpUc.setHostnameVerifier(new HostnameVerifier() {
+                    
+                    public boolean verify(String hostname, SSLSession session) {
+                        Principal principal = null;
+                        try {
+                            principal = session.getPeerPrincipal();
+                        }
+                        catch (SSLPeerUnverifiedException e) {
+                        }
+                        String localName = "no set";
+                        if (principal != null)
+                        {
+                            localName  = principal.getName();
+                        }
+                        log.debug("Hostname verify: " + hostname + "localName: " + localName);
+                        return true;
+                    }
+                });
+            }
+
+            int responseCode = httpUc.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 InputStream in = uc.getInputStream();
 
@@ -1913,7 +1979,7 @@ public class Session implements StatusConstants, FriendManager {
                 if (toks.countTokens() <= 0) {
                     // errrorrrr
                     throw new LoginRefusedException("Login Failed, wrong response in stage 1:"
-                            + ((HttpURLConnection) uc).getResponseMessage());
+                            + httpUc.getResponseMessage());
                 }
 
                 int responseNo = -1;
@@ -1922,7 +1988,7 @@ public class Session implements StatusConstants, FriendManager {
                 }
                 catch (NumberFormatException e) {
                     throw new LoginRefusedException("Login Failed, wrong response in stage 1:"
-                            + ((HttpURLConnection) uc).getResponseMessage());
+                            + httpUc.getResponseMessage());
                 }
 
                 if (responseNo != 0 || !toks.hasMoreTokens()) {
@@ -1974,13 +2040,26 @@ public class Session implements StatusConstants, FriendManager {
 
     private String[] yahooAuth16Stage2(String token, String seed) throws LoginRefusedException, IOException,
             NoSuchAlgorithmException {
-        String loginLink = "https://login.yahoo.com/config/pwtoken_login?src=ymsgr&ts=&token=" + token;
+        String loginLink = "https://" + yahooLoginHost + "/config/pwtoken_login?src=ymsgr&ts=&token=" + token;
 
         URL u = new URL(loginLink);
         URLConnection uc = u.openConnection();
+        uc.setConnectTimeout(LOGIN_HTTP_TIMEOUT);
 
-        if (uc instanceof HttpURLConnection) {
-            int responseCode = ((HttpURLConnection) uc).getResponseCode();
+        if (uc instanceof HttpsURLConnection) {
+            HttpsURLConnection httpUc = (HttpsURLConnection) uc;
+
+            if (!yahooLoginHost.equalsIgnoreCase(LOGIN_YAHOO_COM))
+            {
+                httpUc.setHostnameVerifier(new HostnameVerifier() {
+                    
+                    public boolean verify(String hostname, SSLSession session) {
+                        return true;
+                    }
+                });
+            }
+
+            int responseCode = httpUc.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 InputStream in = uc.getInputStream();
 
@@ -2000,7 +2079,7 @@ public class Session implements StatusConstants, FriendManager {
                 if (toks.countTokens() <= 0) {
                     // errrorrrr
                     throw new LoginRefusedException("Login Failed, wrong response in stage 2:"
-                            + ((HttpURLConnection) uc).getResponseMessage());
+                            + httpUc.getResponseMessage());
                 }
 
                 try {
@@ -2008,7 +2087,7 @@ public class Session implements StatusConstants, FriendManager {
                 }
                 catch (NumberFormatException e) {
                     throw new LoginRefusedException("Login Failed, wrong response in stage 2:"
-                            + ((HttpURLConnection) uc).getResponseMessage());
+                            + httpUc.getResponseMessage());
                 }
 
                 if (responseNo != 0 || !toks.hasMoreTokens()) {
@@ -2900,7 +2979,29 @@ public class Session implements StatusConstants, FriendManager {
     }
 
     protected void receiveStatus15(YMSG9Packet pkt) {
-        updateFriendsStatus(pkt);
+        // Incomplete
+        if (pkt.status == 9) {
+            if (cachePacket == null) {
+                cachePacket = pkt;
+            }
+            else {
+                cachePacket.append(pkt);
+            }
+        } else {
+            try {
+                Thread.sleep(1000 * 3);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (cachePacket == null)
+                updateFriendsStatus(pkt);
+            else {
+                cachePacket.append(pkt);
+                updateFriendsStatus(cachePacket);
+            }
+            cachePacket = null;
+        }
     }
 
     /**
@@ -2923,6 +3024,7 @@ public class Session implements StatusConstants, FriendManager {
         // Complete: this is the final packet
         if (pkt.exists("59")) {
             _receiveList(cachePacket);
+            cachePacket = null;
         }
     }
 
@@ -3503,9 +3605,9 @@ public class Session implements StatusConstants, FriendManager {
     /**
      * Start threads
      */
-    private void openSession(boolean createPingerTask) throws IOException {
+    private void openSession(boolean createPingerTask, boolean searchForAddress) throws IOException {
         // Open the socket, create input and output streams
-        network.open();
+        network.open(searchForAddress);
         // Create a thread to handle input from network
         initThread();
         // Add a TimerTask to periodically send ping packets for our connection

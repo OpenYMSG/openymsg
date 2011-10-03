@@ -60,7 +60,7 @@ public class EventDispatcher extends Thread {
      */
     public void kill() {
         quitFlag = true;
-        interrupt();
+//        interrupt();
     }
 
     /**
