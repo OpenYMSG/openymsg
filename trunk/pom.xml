@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.sf.openymsg</groupId>
   <artifactId>openymsg</artifactId>
   <name>OpenYMSG library</name>
-  <version>0.6.0</version>
+  <version>0.6.1-SNAPSHOT</version>
   <description>OpenYMSG is an Java library that implements the Yahoo Instant
 	 	Messenger protocol.</description>
   <issueManagement>
@@ -37,10 +37,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.6.0</connection>
-    <developerConnection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.6.0</developerConnection>
-    <tag>trunk</tag>
-    <url>http://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.6.0</url>
+    <connection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg</connection>
+    <developerConnection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg</developerConnection>
+    <url>http://openymsg.svn.sourceforge.net/svnroot/openymsg</url>
   </scm>
   <distributionManagement>
 	<repository>
