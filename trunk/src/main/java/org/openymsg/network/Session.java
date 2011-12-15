@@ -42,8 +42,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Timer;
@@ -58,7 +60,6 @@ import javax.net.ssl.SSLSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jdom.JDOMException;
-import org.openymsg.addressBook.BuddyAdd;
 import org.openymsg.addressBook.BuddyListImport;
 import org.openymsg.network.challenge.ChallengeResponseV16;
 import org.openymsg.network.challenge.ChallengeResponseV10;
@@ -168,7 +169,7 @@ public class Session implements StatusConstants, FriendManager {
     private SessionPictureHandler pictureHandler = null;
 
     /** Message number to be included in sending a message */
-    private int messageNumber;
+    private int messageNumber = new Random().nextInt(1000000);
 
     private long pingTimestamp;
 
@@ -177,6 +178,8 @@ public class Session implements StatusConstants, FriendManager {
     private String yahooLoginHost = LOGIN_YAHOO_COM;
 
     private String[] sessionCookies;
+
+    private LinkedList<String> previousIds = new LinkedList<String>();
 
 
     // used to simulate failures
@@ -3472,15 +3475,22 @@ public class Session implements StatusConstants, FriendManager {
                 final String message = pkt.getValue("14");
                 final String id = pkt.getValue("429");
 
-                final SessionEvent se = new SessionEvent(this, to, from, message);
-                if (se.getMessage().equalsIgnoreCase(NetworkConstants.BUZZ)) {
-                    eventDispatchQueue.append(se, ServiceType.X_BUZZ);
+                if (id == null || !previousIds.contains(from + id))
+                {
+                    final SessionEvent se = new SessionEvent(this, to, from, message);
+                    if (se.getMessage().equalsIgnoreCase(NetworkConstants.BUZZ)) {
+                        eventDispatchQueue.append(se, ServiceType.X_BUZZ);
+                    }
+                    else {
+                        eventDispatchQueue.append(se, ServiceType.MESSAGE);
+                    }
                 }
-                else {
-                    eventDispatchQueue.append(se, ServiceType.MESSAGE);
-                }
-
+                
                 if (id != null) {
+                    previousIds.addLast(from + id);
+                    if (previousIds.size() > 10)
+                        previousIds.removeFirst();
+                    
                     /*
                      * Send acknowledgement. If we don't do this then the official Yahoo Messenger client for Windows
                      * will send us the same message 7 seconds later as an offline message. This is true for at least
