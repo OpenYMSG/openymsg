@@ -3,7 +3,7 @@
   <groupId>net.sf.openymsg</groupId>
   <artifactId>openymsg</artifactId>
   <name>OpenYMSG library</name>
-  <version>0.6.2-SNAPSHOT</version>
+  <version>0.7.0-SNAPSHOT</version>
   <description>OpenYMSG is an Java library that implements the Yahoo Instant
 	 	Messenger protocol.</description>
   <url>http://sourceforge.net/projects/openymsg/</url>
@@ -38,9 +38,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.6.0</connection>
-    <developerConnection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.6.0</developerConnection>
-    <url>http://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.6.0</url>
+    <connection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.7.0</connection>
+    <developerConnection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.7.0</developerConnection>
+    <url>http://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.7.0</url>
   </scm>
   <distributionManagement>
 	<repository>
@@ -75,31 +75,25 @@
           </descriptorRefs>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>sign-artifacts</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>sign</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
   <dependencies>
     <dependency>
-      <groupId>jdom</groupId>
-      <artifactId>jdom</artifactId>
-      <version>1.0</version>
-    </dependency>
-    <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
       <version>1.1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>6.3.1</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Legacy -->    
+    <dependency>
+      <groupId>jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -114,4 +108,32 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <profiles>
+    <profile>
+      <id>release-sign-artifacts</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>  
 </project>
