@@ -4,7 +4,7 @@ public enum MessageStatus {
 	//TODO - match order 
     DEFAULT(0),
     SERVER_ACK(1),    
-    TYPING(0x16),
+    NOTIFY(0x16),
     WEBLOGIN(0x5a55aa55),
     OFFLINE(0x5a55aa56);
     

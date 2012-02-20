@@ -7,7 +7,6 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.SessionConfig;
-import org.openymsg.AuthenticationState;
 import org.openymsg.execute.Request;
 import org.openymsg.network.url.URLStreamBuilder;
 import org.openymsg.network.url.URLStreamBuilderImpl;

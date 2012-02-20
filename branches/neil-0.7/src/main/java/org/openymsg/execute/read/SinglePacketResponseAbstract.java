@@ -10,6 +10,7 @@ public abstract class SinglePacketResponseAbstract implements SinglePacketRespon
 	public void execute(YMSG9Packet packet) {
 		this.packet = packet;
 		this.execute();
+		this.packet = null;
 	}
 
 	protected abstract void execute();

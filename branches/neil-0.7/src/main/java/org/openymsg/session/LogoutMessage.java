@@ -1,4 +1,4 @@
-package org.openymsg.auth;
+package org.openymsg.session;
 
 import java.io.IOException;
 

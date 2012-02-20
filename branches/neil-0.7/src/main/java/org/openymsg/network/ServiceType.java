@@ -80,7 +80,7 @@ public enum ServiceType {
     LOGON(0x1),
     MAILSTAT(0x9),
     MESSAGE(0x6),
-    MESSAGE_ACK(0xfb),
+    MESSAGE_ACK(0xfb), //251
     NEWMAIL(0xb),
     NEWPERSONMAIL(0xe),
     NOTIFY(0x4b),
@@ -98,7 +98,7 @@ public enum ServiceType {
     STEALTH_SESSION(0xba),
     SYSMESSAGE(0x14),
     UNKNOWN001(0xe4),
-    UNKNOWN002(0xef),
+    UNKNOWN002(0xef), //239
     UNKNOWN003(0x3330),
     UNKNOWN005(0x6c6f),
     USERSTAT(0xa),
@@ -122,13 +122,15 @@ public enum ServiceType {
     Y7_FILETRANSFER(0xdc),
     Y7_FILETRANSFERACCEPT(0xde),
     Y7_FILETRANSFERINFO(0xdd),
+    
+    UNKNOWN_SOMETHING_WITH_DUPLICATELOGIN_LOGOUT(0x7D1);
 
-    // Home made service numbers, used in event dispatch only
-    Y7_MINGLE(0xe1),
-    Y7_PHOTO_SHARING(0xd2),
-    YAB_UPDATE(0xc4),
-    YAHOO_SERVICE_SMS_MSG(0x02ea),
-    YAHOO_SERVICE_WEBLOGIN(0x0226);
+//    // Home made service numbers, used in event dispatch only
+//    Y7_MINGLE(0xe1),
+//    Y7_PHOTO_SHARING(0xd2),
+//    YAB_UPDATE(0xc4),
+//    YAHOO_SERVICE_SMS_MSG(0x02ea),
+//    YAHOO_SERVICE_WEBLOGIN(0x0226);
 
     /**
      * Returns the enum-value that matches the integer representation. Throws an IllegalArgumentException if no such
