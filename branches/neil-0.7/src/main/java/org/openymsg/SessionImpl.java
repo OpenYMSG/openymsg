@@ -42,6 +42,7 @@ public class SessionImpl implements Session {
 
 	@Override
 	public void login(String username, String password) {
+		this.initialize(username);
 		this.authorize.login(username, password);
 	}
 
@@ -50,7 +51,7 @@ public class SessionImpl implements Session {
 		executor.initialize(config);
 		this.authorize = new SessionAuthorizeImpl(config, executor);
 		this.session = new SessionSessionImpl(username, executor);
-		this.contact = new SessionContactImpl(executor);
+		this.contact = new SessionContactImpl(executor, username);
 		this.status = new SessionStatusImpl(executor);
 		this.message = new SessionMessageImpl(executor, username, this.callback);
 		this.conference = new SessionConferenceImpl(username, executor);
@@ -128,6 +129,26 @@ public class SessionImpl implements Session {
 	@Override
 	public ConferenceStatus getConferenceStatus(String conferenceId) {
 		return this.conference.getConferenceStatus(conferenceId);
+	}
+
+	@Override
+	public void acceptFriendAuthorization(Contact contact) throws IllegalStateException {
+		this.contact.acceptFriendAuthorization(contact);
+	}
+
+	@Override
+	public void rejectFriendAuthorization(Contact contact, String message) throws IllegalStateException {
+		this.contact.rejectFriendAuthorization(contact, message);
+	}
+
+	@Override
+	public void removeFromGroup(Contact contact, String groupId) {
+		this.contact.removeFromGroup(contact, groupId);
+	}
+
+	@Override
+	public void addToGroup(Contact contact, String groupId) throws IllegalArgumentException {
+		this.contact.addToGroup(contact, groupId);
 	}
 
 }
