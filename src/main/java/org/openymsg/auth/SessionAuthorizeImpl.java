@@ -4,7 +4,6 @@ import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.AuthenticationState;
 import org.openymsg.SessionConfig;
 import org.openymsg.auth.challenge.ChalllengeRespondBuilder;
 import org.openymsg.execute.Executor;
@@ -25,7 +24,6 @@ public class SessionAuthorizeImpl implements SessionAuthorize {
 		this.executor = executor;
 		this.executor.register(ServiceType.AUTH, new LoginInitResponse(this));
 		this.executor.register(ServiceType.AUTHRESP, new LoginFailureResponse(this));
-		this.executor.register(ServiceType.LIST, new ListResponse());
 	}
 
 	/**
@@ -43,23 +41,6 @@ public class SessionAuthorizeImpl implements SessionAuthorize {
 		else {
 			throw new RuntimeException("Don't call login when status is: " + executionState);
 		}
-	}
-
-	/**
-	 * Logs off the current session.
-	 * 
-	 */
-	@Override
-	public void logout() {
-		log.trace("logout: " + username);
-		ExecutorState executionState = this.executor.getState();
-		if (executionState.isConnected()) {
-			executor.execute(new LogoutMessage(username));
-		}
-		else {
-			log.info("Trying to logout when not connected: " + username);
-		}
-		this.executor.execute(new ShutdownRequest(this.executor));
 	}
 
 	public void setState(AuthenticationState state) {

@@ -12,6 +12,7 @@ public abstract class MultiplePacketListResponse implements MultiplePacketRespon
 	public void execute(List<YMSG9Packet> packets) {
 		this.packets = packets;
 		this.execute();
+		this.packets = null;
 	}
 	
 	abstract protected void execute();
