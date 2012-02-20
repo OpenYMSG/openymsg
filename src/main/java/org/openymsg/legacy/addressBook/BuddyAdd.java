@@ -11,7 +11,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.legacy.network.NetworkConstants;
 import org.openymsg.legacy.network.Util;
-import org.openymsg.legacy.roster.Roster;
 
 public class BuddyAdd {
     
@@ -68,8 +67,7 @@ public class BuddyAdd {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 InputStream responseStream = uc.getInputStream();
                  byte[] buff = new byte[256];
-                 int read = -1;
-                 while ((read = responseStream.read(buff)) != -1) {
+                 while ((responseStream.read(buff)) != -1) {
                  String buffLine = new String(buff);
                  log.trace(buffLine);
                  }
