@@ -10,7 +10,7 @@ public class SessionSessionImpl implements SessionSession {
 	private static final Log log = LogFactory.getLog(SessionSessionImpl.class);
 	private String username;
 	private Executor executor;
-	
+
 	public SessionSessionImpl(String username, Executor executor) {
 		this.username = username;
 		this.executor = executor;
@@ -18,9 +18,18 @@ public class SessionSessionImpl implements SessionSession {
 		this.executor.register(ServiceType.LOGOFF, new PagerLogoffResponse());
 	}
 
+	// TODO - looks cool
+	// /**
+	// * Ask server to return refreshed stats for this session. Server will send back a USERSTAT and truncated NEWMAIL
+	// * packet.
+	// */
+	// public void refreshStats() throws IllegalStateException, IOException {
+	// checkStatus();
+	// transmitUserStat();
+	// }
+
 	/**
 	 * Logs off the current session.
-	 * 
 	 */
 	@Override
 	public void logout() {
