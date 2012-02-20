@@ -7,5 +7,8 @@ public interface Conference {
 	String getId();
 
 	Set<String> getMemberIds();
+	
+	// TODO - message is transient
+	// String getMessage();
 
 }

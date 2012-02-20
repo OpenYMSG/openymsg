@@ -5,17 +5,29 @@ import java.util.Set;
 import org.openymsg.Conference;
 
 public class ConferenceImpl implements Conference {
+	private String id;
+	private Set<String> memberIds;
+
+	// private String message;
+
+	public ConferenceImpl(String id) {
+		this.id = id;
+	}
 
 	@Override
 	public String getId() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.id;
 	}
 
 	@Override
 	public Set<String> getMemberIds() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.memberIds;
 	}
+
+	// TODO - message is transient?
+	// @Override
+	// public String getMessage() {
+	// return this.message;
+	// }
 
 }
