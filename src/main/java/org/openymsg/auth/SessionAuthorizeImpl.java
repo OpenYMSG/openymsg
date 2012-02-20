@@ -38,7 +38,7 @@ public class SessionAuthorizeImpl implements SessionAuthorize {
 		this.password = password;
 		ExecutorState executionState = this.executor.getState();
 		if (executionState.isLoginable()) {
-			executor.execute(new LoginInitRequest(username));
+			executor.execute(new LoginInitMessage(username));
 		}
 		else {
 			throw new RuntimeException("Don't call login when status is: " + executionState);
@@ -54,7 +54,7 @@ public class SessionAuthorizeImpl implements SessionAuthorize {
 		log.trace("logout: " + username);
 		ExecutorState executionState = this.executor.getState();
 		if (executionState.isConnected()) {
-			executor.execute(new LogoutRequest(username));
+			executor.execute(new LogoutMessage(username));
 		}
 		else {
 			log.info("Trying to logout when not connected: " + username);
@@ -100,7 +100,7 @@ public class SessionAuthorizeImpl implements SessionAuthorize {
 			e.printStackTrace();
 			return;
 		}
-		this.executor.execute(new LoginCompleteRequest(username, cookieY, cookieT, challenge, cookieB));
+		this.executor.execute(new LoginCompleteMessage(username, cookieY, cookieT, challenge, cookieB));
 	}
 
 }

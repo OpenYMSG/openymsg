@@ -15,7 +15,7 @@ import org.openymsg.execute.Request;
 import org.openymsg.execute.SinglePacketResponse;
 import org.openymsg.execute.read.dispatch.PacketReaderImpl;
 import org.openymsg.execute.write.PacketWriterImpl;
-import org.openymsg.message.MessageMover;
+import org.openymsg.message.YJMessageMover;
 import org.openymsg.network.ConnectionHandler;
 import org.openymsg.network.ConnectionHandlerStatus;
 import org.openymsg.network.ServiceType;
