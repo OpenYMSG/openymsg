@@ -19,13 +19,13 @@ import org.openymsg.network.url.URLStreamBuilderStatus;
  */
 public class PasswordTokenRequest implements Request {
 	private static final Log log = LogFactory.getLog(PasswordTokenRequest.class);
-	private final SessionAuthorizeImpl sessionAuthorize;
+	private final SessionAuthenticationImpl sessionAuthorize;
 	private SessionConfig config;
 	private String username;
 	private String password;
 	private String seed;
 
-	public PasswordTokenRequest(SessionAuthorizeImpl sessionAuthorize, SessionConfig config, String username,
+	public PasswordTokenRequest(SessionAuthenticationImpl sessionAuthorize, SessionConfig config, String username,
 			String password, String seed) {
 		super();
 		this.sessionAuthorize = sessionAuthorize;
@@ -80,28 +80,28 @@ public class PasswordTokenRequest implements Request {
 		if (responseNo != 0 || !toks.hasMoreTokens()) {
 			switch (responseNo) {
 			case 1235:
-				log.info("Login Failed, Invalid username" + AuthenticationState.BADUSERNAME);
-				sessionAuthorize.setState(AuthenticationState.BADUSERNAME);
+				log.info("Login Failed, Invalid username" + AuthenticationFailure.BADUSERNAME);
+				sessionAuthorize.setFailureState(AuthenticationFailure.BADUSERNAME);
 				break;
 			case 1212:
-				log.info("Login Failed, Wrong password" + AuthenticationState.BAD);
-				sessionAuthorize.setState(AuthenticationState.BAD);
+				log.info("Login Failed, Wrong password" + AuthenticationFailure.BAD);
+				sessionAuthorize.setFailureState(AuthenticationFailure.BAD);
 				break;
 			case 1213:
-				log.info("Login locked: Too many failed login attempts" + AuthenticationState.LOCKED);
-				sessionAuthorize.setState(AuthenticationState.LOCKED);
+				log.info("Login locked: Too many failed login attempts" + AuthenticationFailure.LOCKED);
+				sessionAuthorize.setFailureState(AuthenticationFailure.LOCKED);
 				break;
 			case 1236:
-				log.info("Login locked" + AuthenticationState.LOCKED);
-				sessionAuthorize.setState(AuthenticationState.LOCKED);
+				log.info("Login locked" + AuthenticationFailure.LOCKED);
+				sessionAuthorize.setFailureState(AuthenticationFailure.LOCKED);
 				break;
 			case 100:
-				log.info("Username or password missing" + AuthenticationState.BAD);
-				sessionAuthorize.setState(AuthenticationState.BAD);
+				log.info("Username or password missing" + AuthenticationFailure.BAD);
+				sessionAuthorize.setFailureState(AuthenticationFailure.BAD);
 				break;
 			default:
-				log.info("Login Failed, Unkown error" + AuthenticationState.BAD);
-				sessionAuthorize.setState(AuthenticationState.BAD);
+				log.warn("Login Failed, unchecked error: " + responseNo);
+				sessionAuthorize.setFailureState(AuthenticationFailure.NO_REASON);
 			}
 			return;
 		}

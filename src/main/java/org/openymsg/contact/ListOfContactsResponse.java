@@ -1,7 +1,9 @@
 package org.openymsg.contact;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -29,8 +31,8 @@ public class ListOfContactsResponse extends MultiplePacketListResponse {
 		// }
 		String username = null;
 		YahooProtocol protocol = YahooProtocol.YAHOO;
-		ContactGroup currentListGroup = null;
-		// ArrayList<ContactGroupImpl> receivedGroups = new ArrayList<ContactGroupImpl>();
+		ContactGroupImpl currentListGroup = null;
+		Map<String, ContactGroupImpl> receivedGroups = new HashMap<String, ContactGroupImpl>();
 
 		Set<Contact> usersOnFriendsList = new HashSet<Contact>();
 		Set<Contact> usersOnIgnoreList = new HashSet<Contact>();
@@ -101,7 +103,11 @@ public class ListOfContactsResponse extends MultiplePacketListResponse {
 				case 300: /* This is 318 before a group, 319 before any s/n in a group, and 320 before any ignored s/n. */
 					break;
 				case 65: /* This is the group */
-					currentListGroup = new ContactGroupImpl(value);
+					currentListGroup = receivedGroups.get(value);
+					if (currentListGroup == null) {
+						currentListGroup = new ContactGroupImpl(value);
+						receivedGroups.put(value, currentListGroup);
+					}
 					break;
 				case 7: /* buddy's s/n */
 					username = value;
@@ -158,6 +164,10 @@ public class ListOfContactsResponse extends MultiplePacketListResponse {
 		if (!usersOnPendingList.isEmpty()) {
 			listener.addPending(usersOnPendingList);
 		}
+		
+		if (!receivedGroups.values().isEmpty()) {
+			listener.addGroups(new HashSet<ContactGroup>(receivedGroups.values()));
+		}
 
 		// Now that we've parsed the buddy list, we can consider login succcess
 		// sessionStatus = SessionState.LOGGED_ON;
@@ -171,13 +181,6 @@ public class ListOfContactsResponse extends MultiplePacketListResponse {
 		// primaryID.setPrimaryIdentity(true);
 		// loginID.setPrimaryIdentity(true);
 
-		// Set initial presence to 'available'
-		// try {
-		// setStatus(Status.AVAILABLE);
-		// }
-		// catch (java.io.IOException e) {
-		// log.trace("Failed to set status to available");
-		// }
 	}
 
 	private YahooProtocol getUserProtocol(String protocolString, String who) {

@@ -4,25 +4,25 @@ import java.util.Set;
 
 import org.openymsg.Conference;
 import org.openymsg.ConferenceStatus;
+import org.openymsg.Contact;
 
 /**
  * Conference Services for Yahoo. 
  * Not sure if the conferenceId can contain non-alphanumeric characters.
  * Also unsure of Unicode characters for any of the String field.
- * Not sure about invited ids for MSN and other non-default Yahoo protocols
  * @author neilhart
  *
  */
 public interface SessionConference {
 	/**
-	 * Create a conference and invite a set of yahoo ids.  The yahoo ids do not need to be in the your list of contacts.
+	 * Create a conference and invite a set of yahoo ids.  The Contacts do not need to be in the your list of contacts.
 	 * Either the conferenceId or the message will show as the conference name for the invited users.  
 	 * @param conferenceId unique name for the conference.  Sometimes this shows as the conference name.
-	 * @param invitedIds set of yahoo ids.  
-	 * @param message invite message.  Sometimes this shows as the conference name.
+	 * @param contacts set of yahoo ids to invite  
+	 * @param message invite message.  Sometimes this shows as the conference name.  Can be null.
 	 * @return new Conference
 	 */
-	Conference createConference(String conferenceId, Set<String> invitedIds, String message) ;
+	Conference createConference(String conferenceId, Set<Contact> contacts, String message) ;
 
 	/**
 	 * Send a message to the conference.
@@ -55,13 +55,13 @@ public interface SessionConference {
 	void declineConferenceInvite(Conference conference, String message) throws IllegalArgumentException;
 
 	/**
-	 * Invite another yahoo id to the conference with a messages.  Invited id does not need to be a contact.
+	 * Invite another yahoo id to the conference with a messages.  contact does not need to be current contact.
 	 * @param conference conference in the invite
-	 * @param invitedId yahoo id
+	 * @param contact yahoo id to invite
 	 * @param message invite message.  May be null
 	 * @throws IllegalArgumentException if conference doesn't exist
 	 */
-	void extendConference(Conference conference, String invitedId, String message) throws IllegalArgumentException;
+	void extendConference(Conference conference, Contact contact, String message) throws IllegalArgumentException;
 	
 	/**
 	 * Get the Conference with the matching id.  Null if id is not matched.

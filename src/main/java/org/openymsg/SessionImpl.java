@@ -3,10 +3,15 @@ package org.openymsg;
 import java.io.IOException;
 import java.util.Set;
 
-import org.openymsg.auth.SessionAuthorize;
-import org.openymsg.auth.SessionAuthorizeImpl;
+import org.openymsg.auth.SessionAuthentication;
+import org.openymsg.auth.SessionAuthenticationCallback;
+import org.openymsg.auth.SessionAuthenticationImpl;
 import org.openymsg.conference.SessionConference;
 import org.openymsg.conference.SessionConferenceImpl;
+import org.openymsg.connection.ConnectionInfo;
+import org.openymsg.connection.ConnectionState;
+import org.openymsg.connection.SessionConnectionCallback;
+import org.openymsg.connection.SessionConnectionImpl;
 import org.openymsg.contact.SessionContact;
 import org.openymsg.contact.SessionContactImpl;
 import org.openymsg.execute.dispatch.ExecutorImpl;
@@ -24,10 +29,11 @@ import org.openymsg.unknown.SessionUnknown;
 
 public class SessionImpl implements Session {
 	private SessionConfig config;
+	private SessionConnectionImpl connection;
 	private SessionCallback callback;
 	private SessionSession session;
 	private SessionMessage message;
-	private SessionAuthorize authorize;
+	private SessionAuthentication authorize;
 	private SessionContact contact;
 	private SessionStatus status;
 	private SessionConference conference;
@@ -40,16 +46,19 @@ public class SessionImpl implements Session {
 		this.callback = callback;
 	}
 
+	/**
+	 * {@inheritDoc} Initialize the connection and login to yahoo and return immediately.
+	 */
 	@Override
-	public void login(String username, String password) {
+	public void login(String username, String password) throws IllegalArgumentException, IllegalStateException {
 		this.initialize(username);
 		this.authorize.login(username, password);
 	}
 
 	private void initialize(String username) {
 		ExecutorImpl executor = new ExecutorImpl(username);
-		executor.initialize(config);
-		this.authorize = new SessionAuthorizeImpl(config, executor);
+		this.connection = new SessionConnectionImpl(executor, this.config);
+		this.authorize = new SessionAuthenticationImpl(this.config, executor);
 		this.session = new SessionSessionImpl(username, executor);
 		this.contact = new SessionContactImpl(executor, username);
 		this.status = new SessionStatusImpl(executor);
@@ -91,8 +100,8 @@ public class SessionImpl implements Session {
 	}
 
 	@Override
-	public Conference createConference(String conferenceId, Set<String> invitedIds, String message) {
-		return this.conference.createConference(conferenceId, invitedIds, message);
+	public Conference createConference(String conferenceId, Set<Contact> contacts, String message) {
+		return this.conference.createConference(conferenceId, contacts, message);
 	}
 
 	@Override
@@ -116,9 +125,9 @@ public class SessionImpl implements Session {
 	}
 
 	@Override
-	public void extendConference(Conference conference, String invitedId, String message)
+	public void extendConference(Conference conference, Contact contact, String message)
 			throws IllegalArgumentException {
-		this.conference.extendConference(conference, invitedId, message);
+		this.conference.extendConference(conference, contact, message);
 	}
 
 	@Override
@@ -142,13 +151,53 @@ public class SessionImpl implements Session {
 	}
 
 	@Override
-	public void removeFromGroup(Contact contact, String groupId) {
-		this.contact.removeFromGroup(contact, groupId);
+	public void removeFromGroup(Contact contact, ContactGroup group) {
+		this.contact.removeFromGroup(contact, group);
 	}
 
 	@Override
-	public void addToGroup(Contact contact, String groupId) throws IllegalArgumentException {
-		this.contact.addToGroup(contact, groupId);
+	public void addToGroup(Contact contact, ContactGroup group) throws IllegalArgumentException {
+		this.contact.addToGroup(contact, group);
+	}
+
+	@Override
+	public Set<Contact> getContacts() {
+		return this.contact.getContacts();
+	}
+
+	@Override
+	public Set<ContactGroup> getContactGroups() {
+		return this.contact.getContactGroups();
+	}
+
+	@Override
+	public ConnectionState getConnectionState() {
+		return this.connection.getConnectionState();
+	}
+
+	@Override
+	public ConnectionInfo getConnectionInfo() {
+		return this.connection.getConnectionInfo();
+	}
+
+	@Override
+	public void addListener(SessionConnectionCallback listener) {
+		this.connection.addListener(listener);
+	}
+
+	@Override
+	public boolean removeListener(SessionConnectionCallback listener) {
+		return this.connection.removeListener(listener);
+	}
+
+	@Override
+	public void addListener(SessionAuthenticationCallback listener) {
+		this.authorize.addListener(listener);
+	}
+
+	@Override
+	public boolean removeListener(SessionAuthenticationCallback listener) {
+		return this.authorize.removeListener(listener);
 	}
 
 }

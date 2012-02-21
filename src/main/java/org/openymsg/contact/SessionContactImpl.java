@@ -1,6 +1,7 @@
 package org.openymsg.contact;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,10 +9,12 @@ import org.openymsg.Contact;
 import org.openymsg.ContactGroup;
 import org.openymsg.execute.Executor;
 import org.openymsg.network.ServiceType;
+import org.openymsg.util.CollectionUtils;
 
 public class SessionContactImpl implements SessionContact, SessionContactCallback {
 	private Executor executor;
 	private Set<Contact> contacts = new HashSet<Contact>();
+	private Set<ContactGroup> contactGroups = new HashSet<ContactGroup>();
 	private String username;
 
 	public SessionContactImpl(Executor executor, String username) {
@@ -38,14 +41,16 @@ public class SessionContactImpl implements SessionContact, SessionContactCallbac
 	 * @throws IOException if any problem occured related to creating or sending the request to the Yahoo network.
 	 */
 	@Override
-	public void addToGroup(Contact contact, String groupId) throws IllegalArgumentException {
+	public void addToGroup(Contact contact, ContactGroup group) throws IllegalArgumentException {
 		// log.trace("Adding new user: " + userId + ", group: " + groupId + ", protocol: " + yahooProtocol);
 		// TODO: perhaps we should check the roster to make sure that this
 		// friend does not already exist.
-		if (groupId == null || groupId.length() == 0) {
-			throw new IllegalArgumentException("Argument 'groupId' cannot be null or an empty String.");
+		//TODO validate group
+		//TODO check if user already in group
+		if (group == null) {
+			throw new IllegalArgumentException("Argument 'group' cannot be null");
 		}
-		this.executor.execute(new ContactAddRequestMessage(this.username, contact, groupId));
+		this.executor.execute(new ContactAddRequestMessage(this.username, contact, group));
 		// transmitFriendAdd(userId, groupId, yahooProtocol);
 	}
 
@@ -60,11 +65,11 @@ public class SessionContactImpl implements SessionContact, SessionContactCallbac
 	 * @throws IOException on any problem while trying to create or send the packet.
 	 */
 	@Override
-	public void removeFromGroup(Contact contact, String groupId) {
-		if (groupId == null || groupId.length() == 0) {
-			throw new IllegalArgumentException("Argument 'groupId' cannot be null or an empty String.");
+	public void removeFromGroup(Contact contact, ContactGroup group) {
+		if (group == null) {
+			throw new IllegalArgumentException("Argument 'group' cannot be null.");
 		}
-		this.executor.execute(new ContactRemoveRequestMessage(this.username, contact, groupId));
+		this.executor.execute(new ContactRemoveRequestMessage(this.username, contact, group));
 	}
 
 	@Override
@@ -106,5 +111,20 @@ public class SessionContactImpl implements SessionContact, SessionContactCallbac
 //		for (Contact contact : usersOnPendingList) {
 			// System.err.println("pending:" + contactImpl.getId() + "/" + contactImpl.getProtocol());
 //		}
+	}
+
+	@Override
+	public Set<Contact> getContacts() {
+		return CollectionUtils.protectedSet(this.contacts);
+	}
+
+	@Override
+	public Set<ContactGroup> getContactGroups() {
+		return CollectionUtils.protectedSet(this.contactGroups);
+	}
+
+	@Override
+	public void addGroups(Set<ContactGroup> contactGroups) {
+		this.contactGroups.addAll(contactGroups);
 	}
 }

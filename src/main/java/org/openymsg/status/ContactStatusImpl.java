@@ -155,4 +155,44 @@ public class ContactStatusImpl implements ContactStatus {
 				+ customStatusMessage + ", customStatus=" + customStatus + ", idleTime=" + idleTime + "]";
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((customStatus == null) ? 0 : customStatus.hashCode());
+		result = prime * result + ((customStatusMessage == null) ? 0 : customStatusMessage.hashCode());
+		result = prime * result + (int) (idleTime ^ (idleTime >>> 32));
+		result = prime * result + (ignored ? 1231 : 1237);
+		result = prime * result + (onChat ? 1231 : 1237);
+		result = prime * result + (onPager ? 1231 : 1237);
+		result = prime * result + ((status == null) ? 0 : status.hashCode());
+		result = prime * result + stealth;
+		result = prime * result + (stealthBlocked ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		ContactStatusImpl other = (ContactStatusImpl) obj;
+		if (customStatus == null) {
+			if (other.customStatus != null) return false;
+		}
+		else if (!customStatus.equals(other.customStatus)) return false;
+		if (customStatusMessage == null) {
+			if (other.customStatusMessage != null) return false;
+		}
+		else if (!customStatusMessage.equals(other.customStatusMessage)) return false;
+		if (idleTime != other.idleTime) return false;
+		if (ignored != other.ignored) return false;
+		if (onChat != other.onChat) return false;
+		if (onPager != other.onPager) return false;
+		if (status != other.status) return false;
+		if (stealth != other.stealth) return false;
+		if (stealthBlocked != other.stealthBlocked) return false;
+		return true;
+	}
+
 }

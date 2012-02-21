@@ -3,6 +3,7 @@ package org.openymsg.conference;
 import java.io.IOException;
 
 import org.openymsg.Conference;
+import org.openymsg.Contact;
 import org.openymsg.execute.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
@@ -26,8 +27,9 @@ public class SendConfereneMessage implements Message {
 	public PacketBodyBuffer getBody() throws IOException {
         PacketBodyBuffer body = new PacketBodyBuffer();
         body.addElement("1", username);
-        for (String member : this.conference.getMemberIds()) {
-            body.addElement("53", member);
+        for (Contact user : this.conference.getMembers()) {
+            body.addElement("53", user.getId());
+            //TODO - handle protocol
         }
         body.addElement("57", this.conference.getId());
         body.addElement("14", message);

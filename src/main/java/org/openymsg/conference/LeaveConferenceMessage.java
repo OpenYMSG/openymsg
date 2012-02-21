@@ -1,9 +1,9 @@
 package org.openymsg.conference;
 
 import java.io.IOException;
-import java.util.Set;
 
 import org.openymsg.Conference;
+import org.openymsg.Contact;
 import org.openymsg.execute.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
@@ -23,12 +23,12 @@ public class LeaveConferenceMessage implements Message {
 	
 	@Override
 	public PacketBodyBuffer getBody() throws IOException {
-        final Set<String> users = conference.getMemberIds();
         // Send decline packet to Yahoo
         PacketBodyBuffer body = new PacketBodyBuffer();
         body.addElement("1", this.username);
-        for (String user : users) {
-            body.addElement("3", user);
+        for (Contact user : this.conference.getMembers()) {
+            body.addElement("3", user.getId());
+            //TODO - handle protocol
         }
         body.addElement("57", conference.getId());
         return body;

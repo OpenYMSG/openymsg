@@ -13,9 +13,9 @@ import org.openymsg.execute.read.SinglePacketResponseAbstract;
  */
 public class LoginFailureResponse extends SinglePacketResponseAbstract {
 	private static final Log log = LogFactory.getLog(LoginFailureResponse.class);
-	private final SessionAuthorizeImpl sessionAuthorize;
+	private final SessionAuthenticationImpl sessionAuthorize;
 
-	public LoginFailureResponse(SessionAuthorizeImpl sessionAuthorize) {
+	public LoginFailureResponse(SessionAuthenticationImpl sessionAuthorize) {
 		this.sessionAuthorize = sessionAuthorize;
 	}
 
@@ -24,13 +24,13 @@ public class LoginFailureResponse extends SinglePacketResponseAbstract {
 		log.trace("Received AUTHRESP packet.");
 		if (this.packet.exists("66")) {
 			long l = Long.parseLong(this.packet.getValue("66"));
-			AuthenticationState state = null;
+			AuthenticationFailure state = null;
 			try {
-				state = AuthenticationState.getStatus(l);
+				state = AuthenticationFailure.getStatus(l);
 			}
 			catch (Exception e1) {
 				log.warn ("AUTHRESP says: authentication  without an unknown reason: " + l);
-				sessionAuthorize.setState(AuthenticationState.NO_REASON);
+				sessionAuthorize.setFailureState(AuthenticationFailure.NO_REASON);
 			}
 			switch (state) {
 			// Account locked out?
@@ -45,33 +45,33 @@ public class LoginFailureResponse extends SinglePacketResponseAbstract {
 					u = null;
 				}
 				log.info("AUTHRESP says: authentication failed! " + state);
-				sessionAuthorize.setState(state);
+				sessionAuthorize.setFailureState(state);
 				break;
 
 			// Bad login (password?)
 			case BAD2:
 			case BAD:
 				log.info("AUTHRESP says: authentication failed! " + state);
-				sessionAuthorize.setState(state);
+				sessionAuthorize.setFailureState(state);
 				break;
 
 			// unknown account?
 			case BADUSERNAME:
 				log.info("AUTHRESP says: authentication failed! " + state);
-				sessionAuthorize.setState(state);
+				sessionAuthorize.setFailureState(state);
 				break;
 			case INVALID_CREDENTIALS:
 				log.info("AUTHRESP says: authentication failed! " + state);
-				sessionAuthorize.setState(state);
+				sessionAuthorize.setFailureState(state);
 				break;
 			default:
 				log.warn("AUTHRESP says: authentication without an unchecked reason: " + state);
-				sessionAuthorize.setState(state);
+				sessionAuthorize.setFailureState(state);
 			}
 		}
 		else {
-			log.info("AUTHRESP says: authentication failed without a reason" + AuthenticationState.NO_REASON);
-			sessionAuthorize.setState(AuthenticationState.NO_REASON);
+			log.info("AUTHRESP says: authentication failed without a reason" + AuthenticationFailure.NO_REASON);
+			sessionAuthorize.setFailureState(AuthenticationFailure.NO_REASON);
 		}
 	}
 

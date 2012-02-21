@@ -21,7 +21,7 @@ public interface SessionMessage {
 	 * @param to Recipient of the buzz.
 	 * @throws IllegalStateException
 	 */
-	void sendBuzz(Contact to) throws IllegalStateException;
+	void sendBuzz(Contact contact) throws IllegalStateException;
 
 	void sendTypingNotification(Contact contact, boolean isTyping) throws IOException;
 	

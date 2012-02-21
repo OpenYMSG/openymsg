@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openymsg.Contact;
 import org.openymsg.Status;
 import org.openymsg.execute.Executor;
 import org.openymsg.network.ServiceType;
@@ -13,7 +14,7 @@ import org.openymsg.network.ServiceType;
 public class SessionStatusImpl implements SessionStatus {
 	private static final Log log = LogFactory.getLog(SessionStatusImpl.class);
 	private Executor executor;
-	private Map<String, ContactStatusImpl> statuses = new HashMap<String, ContactStatusImpl>();
+	private Map<Contact, ContactStatusImpl> statuses = new HashMap<Contact, ContactStatusImpl>();
 
 	public SessionStatusImpl(Executor executor) {
 		this.executor = executor;
@@ -74,13 +75,13 @@ public class SessionStatusImpl implements SessionStatus {
 		this.executor.execute(new StatusChangeRequest(Status.CUSTOM, message));
 	}
 
-	public ContactStatusImpl getStatus(String userId) {
-		return this.statuses.get(userId);
+	public ContactStatusImpl getStatus(Contact contact) {
+		return this.statuses.get(contact);
 	}
 
-	public void addStatus(String userId, ContactStatusImpl status) {
-		log.info("Status change for: " + userId + " " + status);
-		this.statuses.put(userId, status);
+	public void addStatus(Contact contact, ContactStatusImpl status) {
+		log.info("Status change for: " + contact + " " + status);
+		this.statuses.put(contact, status);
 	}
 
 }
