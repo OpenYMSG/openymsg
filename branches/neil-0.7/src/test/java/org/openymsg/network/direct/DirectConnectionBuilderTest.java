@@ -2,7 +2,7 @@ package org.openymsg.network.direct;
 
 import org.openymsg.SessionConfig;
 import org.openymsg.SessionConfigImpl;
-import org.openymsg.network.ConnectionHandlerStatus;
+import org.openymsg.connection.ConnectionInfo;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -20,7 +20,7 @@ public class DirectConnectionBuilderTest {
 	public void connectViaCapacityServers() {
 		builder.with(config).useCapacityServers();
 		builder.build();
-		ConnectionHandlerStatus handlerStatus = builder.getHandlerStatus();
+		ConnectionInfo handlerStatus = builder.getHandlerStatus();
 		System.out.println(handlerStatus);
 	}
 
@@ -28,7 +28,7 @@ public class DirectConnectionBuilderTest {
 	public void connectViaScsServers() {
 		builder.with(config).useScsServers();
 		builder.build();
-		ConnectionHandlerStatus handlerStatus = builder.getHandlerStatus();
+		ConnectionInfo handlerStatus = builder.getHandlerStatus();
 		System.out.println(handlerStatus);
 	}
 }

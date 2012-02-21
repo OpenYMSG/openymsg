@@ -19,11 +19,11 @@ import org.openymsg.network.url.URLStreamBuilderStatus;
  */
 public class PasswordTokenLoginRequest implements Request {
 	private static final Log log = LogFactory.getLog(PasswordTokenLoginRequest.class);
-	private final SessionAuthorizeImpl sessionAuthorize;
+	private final SessionAuthenticationImpl sessionAuthorize;
 	private SessionConfig config;
 	private String token;
 
-	public PasswordTokenLoginRequest(SessionAuthorizeImpl sessionAuthorize, SessionConfig config, String token) {
+	public PasswordTokenLoginRequest(SessionAuthenticationImpl sessionAuthorize, SessionConfig config, String token) {
 		this.sessionAuthorize = sessionAuthorize;
 		this.config = config;
 		this.token = token;
@@ -86,12 +86,13 @@ public class PasswordTokenLoginRequest implements Request {
 		}
 		catch (NumberFormatException e) {
 			log.warn("Login Failed, wrong response in stage 2:");
+			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE2);
 			// TODO handle failure
 			return;
 		}
 
 		if (responseNo != 0 || !toks.hasMoreTokens()) {
-			sessionAuthorize.setState(AuthenticationState.BAD);
+			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE2);
 			log.warn("Login Failed, Unkown error");
 			// TODO handle failure
 			return;
@@ -111,7 +112,7 @@ public class PasswordTokenLoginRequest implements Request {
 		}
 
 		if (crumb == null || cookieT == null || cookieY == null) {
-			sessionAuthorize.setState(AuthenticationState.BAD);
+			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE2);
 			log.warn("Login Failed, Unkown error");
 			// TODO handle failure
 			return;

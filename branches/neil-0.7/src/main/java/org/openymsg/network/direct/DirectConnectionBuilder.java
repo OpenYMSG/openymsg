@@ -11,8 +11,8 @@ import java.util.Collection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.SessionConfig;
+import org.openymsg.connection.ConnectionInfo;
 import org.openymsg.network.CapacityServers;
-import org.openymsg.network.ConnectionHandlerStatus;
 import org.openymsg.network.NetworkConstants;
 
 public class DirectConnectionBuilder {
@@ -21,9 +21,9 @@ public class DirectConnectionBuilder {
 	private boolean scsBuilding;
 	private Socket socket;
 	private SessionConfig config;
-	private ConnectionHandlerStatus handlerStatus;
+	private ConnectionInfo handlerStatus;
 	
-	public ConnectionHandlerStatus getHandlerStatus() {
+	public ConnectionInfo getHandlerStatus() {
 		return handlerStatus;
 	}
 
@@ -48,7 +48,7 @@ public class DirectConnectionBuilder {
 	}
 
 	public DirectConnectionHandler build() {
-		handlerStatus = new ConnectionHandlerStatus();
+		handlerStatus = new ConnectionInfo();
 		DirectConnectionHandler connection = null;
 		boolean connected = false;
 		if (capacityBuilding) {
@@ -65,7 +65,7 @@ public class DirectConnectionBuilder {
 		return connection;
 	}
 
-	protected boolean connectViaScsServers(SessionConfig config, ConnectionHandlerStatus handlerStatus) {
+	protected boolean connectViaScsServers(SessionConfig config, ConnectionInfo handlerStatus) {
 		String[] scsHosts = config.getScsHosts();//NetworkConstants.SCS_HOSTS;
 		for (String scsHost : scsHosts) {
 			try {
@@ -90,7 +90,7 @@ public class DirectConnectionBuilder {
 		return false;
 	}
 
-	protected boolean connectViaCapacityServers(SessionConfig config, ConnectionHandlerStatus handlerStatus) {
+	protected boolean connectViaCapacityServers(SessionConfig config, ConnectionInfo handlerStatus) {
 		CapacityServers capacityServers = new CapacityServers(config);
 		Collection<String> ipAddresses = capacityServers.getIpAddresses();
 		handlerStatus.setCapacityIpAddresses(ipAddresses);

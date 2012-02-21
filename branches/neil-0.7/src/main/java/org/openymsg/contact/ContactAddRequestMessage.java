@@ -3,6 +3,7 @@ package org.openymsg.contact;
 import java.io.IOException;
 
 import org.openymsg.Contact;
+import org.openymsg.ContactGroup;
 import org.openymsg.execute.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
@@ -27,12 +28,12 @@ public class ContactAddRequestMessage implements Message {
 
 	private final String username;
 	private final Contact contact;
-	private final String groupId;
+	private final ContactGroup group;
 
-	public ContactAddRequestMessage(String username, Contact contact, String groupId) {
+	public ContactAddRequestMessage(String username, Contact contact, ContactGroup group) {
 		this.username = username;
 		this.contact = contact;
-		this.groupId = groupId;
+		this.group = group;
 	}
 
 	@Override
@@ -45,7 +46,7 @@ public class ContactAddRequestMessage implements Message {
         body.addElement("241", "" + this.contact.getProtocol().getValue()); // type
         body.addElement("301", "319");
         body.addElement("303", "319");
-        body.addElement("65", groupId);
+        body.addElement("65", this.group.getName());
         body.addElement("14", "");
         body.addElement("216", "");
         body.addElement("254", "");

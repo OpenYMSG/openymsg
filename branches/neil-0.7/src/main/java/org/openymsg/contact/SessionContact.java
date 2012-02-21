@@ -1,9 +1,16 @@
 package org.openymsg.contact;
 
+import java.util.Set;
+
 import org.openymsg.Contact;
+import org.openymsg.ContactGroup;
 
 public interface SessionContact {
 
+	Set<Contact> getContacts();
+	
+	Set<ContactGroup> getContactGroups();
+	
 	void acceptFriendAuthorization(Contact contact) throws IllegalStateException;
 
 	void rejectFriendAuthorization(Contact contact, String message) throws IllegalStateException;
@@ -16,8 +23,8 @@ public interface SessionContact {
 	 * @param groupId Group to remove the contact from.
 	 * @throws IllegalArgumentException if one of the arguments is null or an empty String.
 	 */
-	void removeFromGroup(Contact contact, String groupId);
+	void removeFromGroup(Contact contact, ContactGroup group);
 
-	void addToGroup(Contact contact, String groupId) throws IllegalArgumentException;
+	void addToGroup(Contact contact, ContactGroup group) throws IllegalArgumentException;
 
 }

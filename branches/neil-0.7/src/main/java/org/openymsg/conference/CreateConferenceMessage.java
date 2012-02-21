@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.openymsg.Conference;
+import org.openymsg.Contact;
 import org.openymsg.execute.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
@@ -16,13 +17,13 @@ import org.openymsg.network.ServiceType;
 public class CreateConferenceMessage implements Message {
 	private String username;
 	private Conference conference;
-	private Set<String> invitedIds;
+	private Set<Contact> contacts;
 	private String message;
 
-	public CreateConferenceMessage(String username, Conference conference, Set<String> invitedIds, String message) {
+	public CreateConferenceMessage(String username, Conference conference, Set<Contact> contacts, String message) {
 		this.username = username;
 		this.conference = conference;
-		this.invitedIds = invitedIds;
+		this.contacts = contacts;
 		this.message = message;
 	}
 
@@ -31,8 +32,9 @@ public class CreateConferenceMessage implements Message {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", this.username);
 		body.addElement("57", this.conference.getId());
-		for (String user : this.invitedIds) {
-			body.addElement("52", user);
+		for (Contact contact : this.contacts) {
+			body.addElement("52", contact.getId());
+			//TODO - handle protocol
 		}
 		body.addElement("58", this.message);
 		body.addElement("97", "1");

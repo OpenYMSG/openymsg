@@ -1,7 +1,5 @@
 package org.openymsg.status;
 
-import java.io.IOException;
-
 import org.openymsg.Status;
 
 public interface SessionStatus {

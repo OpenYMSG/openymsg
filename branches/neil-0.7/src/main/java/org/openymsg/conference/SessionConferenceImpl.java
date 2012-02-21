@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.openymsg.Conference;
 import org.openymsg.ConferenceStatus;
+import org.openymsg.Contact;
 import org.openymsg.execute.Executor;
 
 public class SessionConferenceImpl implements SessionConference {
@@ -41,12 +42,12 @@ public class SessionConferenceImpl implements SessionConference {
 	}
 
 	@Override
-	public Conference createConference(String conferenceId, Set<String> invitedIds, String message) {
+	public Conference createConference(String conferenceId, Set<Contact> contacts, String message) {
 		// TODO - how do you invite MSN users?
 		// checkStatus();
 		// TODO - how to add invited ids to conference
 		Conference conference = new ConferenceImpl(conferenceId);
-		this.executor.execute(new CreateConferenceMessage(username, conference, invitedIds, message));
+		this.executor.execute(new CreateConferenceMessage(username, conference, contacts, message));
 		return conference;
 	}
 
@@ -57,14 +58,14 @@ public class SessionConferenceImpl implements SessionConference {
 	}
 
 	@Override
-	public void extendConference(Conference conference, String invitedId, String message) throws IllegalStateException {
+	public void extendConference(Conference conference, Contact contact, String message) throws IllegalStateException {
 //		checkStatus();
 
 //		final String id = username;
 //		if (primaryID.getId().equals(id) || loginID.getId().equals(id) || identities.containsKey(id)) {
 //			throw new IllegalIdentityException(id + " is an identity of this session and cannot be used here");
 //		}
-		this.executor.execute(new ExtendConferenceMessage(username, conference, invitedId, message));
+		this.executor.execute(new ExtendConferenceMessage(username, conference, contact, message));
 	}
 
 	@Override

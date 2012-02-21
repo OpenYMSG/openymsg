@@ -1,13 +1,17 @@
 package org.openymsg.mail;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openymsg.execute.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
 
 public class NewMailResponse implements SinglePacketResponse {
-
+	private static final Log log = LogFactory.getLog(NewMailResponse.class);
+	
 	@Override
 	public void execute(YMSG9Packet packet) {
-		// TODO Auto-generated method stub
+		String count = packet.getValue("9");
+		log.info("new mail count: " + count);
 	}
 
 }

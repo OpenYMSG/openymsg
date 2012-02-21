@@ -6,6 +6,11 @@ import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
+/**
+ * 
+ * @author neilhart
+ *
+ */
 public interface Message {
 	PacketBodyBuffer getBody() throws IOException ;
 

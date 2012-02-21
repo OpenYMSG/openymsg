@@ -1,10 +1,15 @@
 package org.openymsg.execute;
 
-public interface Executor extends PacketReader, PacketWriter, ExecutorStateMonitoring {
+import org.openymsg.network.ConnectionHandler;
+
+
+public interface Executor extends PacketReader, PacketWriter {
 	void execute(Request request);
 
 	void schedule(Runnable runnable, int repeatTimeInMillis);
 
 	void schedule(Message message, int repeatTimeInMillis);
+
+	void initializeConnection(ConnectionHandler connection);
 
 }

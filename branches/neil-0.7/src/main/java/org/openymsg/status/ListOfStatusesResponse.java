@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openymsg.Contact;
 import org.openymsg.Status;
 import org.openymsg.YahooProtocol;
 import org.openymsg.execute.read.MultiplePacketListResponse;
@@ -29,7 +30,7 @@ public class ListOfStatusesResponse extends MultiplePacketListResponse {
 			return;
 		}
 		YMSG9Packet primaryPacket = this.packets.get(0);
-		for (int i = 0; i < this.packets.size(); i++) {
+		for (int i = 1; i < this.packets.size(); i++) {
 			primaryPacket.append(this.packets.get(i));
 		}
 		this.updateFriendsStatus(primaryPacket);
@@ -44,7 +45,6 @@ public class ListOfStatusesResponse extends MultiplePacketListResponse {
         // If LOGOFF packet, the packet's user status is wrong (available)
         final boolean logoff = (pkt.service == ServiceType.LOGOFF);
         // Process online friends data
-
         // Process each friend
         Iterator<String[]> iter = pkt.entries().iterator();
         long longStatus = 0;
@@ -61,6 +61,7 @@ public class ListOfStatusesResponse extends MultiplePacketListResponse {
             String[] s = iter.next();
 
             int key = Integer.valueOf(s[0]);
+            System.out.println("key: " + key);
             String value = s[1];
             // log.info("Key: " + key + ", value: " + value);
             switch (key) {
@@ -108,6 +109,7 @@ public class ListOfStatusesResponse extends MultiplePacketListResponse {
                 customStatus = value;
                 break;
             case 97:
+            	//TODO - unicodeStatus
                 boolean unicodeStatusMessage = value.equals("1");
                 break;
             case 138:
@@ -117,6 +119,7 @@ public class ListOfStatusesResponse extends MultiplePacketListResponse {
                 protocol = getUserProtocol(value, userId);
                 break;
             case 244:
+            	//TODO - track version
                 String clientVersion = value;
                 break;
             case 137:
@@ -141,7 +144,8 @@ public class ListOfStatusesResponse extends MultiplePacketListResponse {
                 + ", idleTime: " + idleTime + ", customMessage: " + customMessage + ", customStatus: " + customStatus
                 + ", longStatus: " + longStatus + ", protocol: " + protocol);
         Status newStatus = Status.AVAILABLE;
-        ContactStatusImpl status = sessionStatus.getStatus(userId);
+        Contact contact = new Contact(userId, protocol);
+        ContactStatusImpl status = sessionStatus.getStatus(contact);
         //TODO - handle this
         // When we add a friend, we get a status update before
         // getting a confirmation FRIENDADD packet (crazy!)
@@ -197,7 +201,7 @@ public class ListOfStatusesResponse extends MultiplePacketListResponse {
 //        	log.info("setIdleTime: " + idleTime);
         	status.setIdleTime(Long.parseLong(idleTime));
         }
-        this.sessionStatus.addStatus(userId, status);
+        this.sessionStatus.addStatus(contact, status);
     }
     
     private YahooProtocol getUserProtocol(String protocolString, String who) {
