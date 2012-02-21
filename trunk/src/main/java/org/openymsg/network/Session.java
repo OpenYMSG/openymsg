@@ -1737,10 +1737,10 @@ public class Session implements StatusConstants, FriendManager {
 
     protected String buildMessageNumber() {
         String blankMessageNumber = "0000000000000000";
-        String messageNumber = "" + this.messageNumber++;
-        messageNumber = blankMessageNumber.substring(0, blankMessageNumber.length() - messageNumber.length())
-                + messageNumber;
-        return messageNumber;
+        String messageNumberString = "" + this.messageNumber++;
+        messageNumberString = blankMessageNumber.substring(0, blankMessageNumber.length() - messageNumberString.length())
+                + messageNumberString;
+        return messageNumberString;
     }
 
     /**

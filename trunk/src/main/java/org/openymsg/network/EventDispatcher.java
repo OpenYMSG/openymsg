@@ -111,7 +111,12 @@ public class EventDispatcher extends Thread {
 
             while (!queue.isEmpty()) {
                 final FireEvent event = queue.remove(0);
-                runEventNOW(event);
+                try {
+                    runEventNOW(event);
+                }
+                catch (Exception e) {
+                    log.error("Failed proceessing runEventNOW", e);
+                }
             }
         }
     }

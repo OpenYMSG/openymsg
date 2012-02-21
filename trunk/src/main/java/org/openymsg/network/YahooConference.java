@@ -23,6 +23,9 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * As conference packets can be received in an inconvenient order, this class carries a lot of code to compensate.
  * Conference packets can actually arrive both before and (probably) after the formal lifetime of the conference (from
@@ -42,6 +45,8 @@ import java.util.Set;
  */
 public class YahooConference // Cannot be serialised
 {
+    private static final Log log = LogFactory.getLog(YahooConference.class);
+    
     protected Set<YahooUser> users; // YahooUser's in this conference
 
     protected String room; // Room name
@@ -111,8 +116,14 @@ public class YahooConference // Cannot be serialised
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer("name=").append(room).append(" users=").append(users.size()).append(" id=")
-                .append(identity.getId()).append(" closed?=").append(closed);
+        StringBuffer sb = new StringBuffer("name=");
+        try {
+            sb.append(room).append(" users=").append(users.size()).append(" id=")
+                    .append(identity.getId()).append(" closed?=").append(closed);
+        }
+        catch (Exception e) {
+            log.error("Failed toString on conference: " + this.room);
+        }
         return sb.toString();
     }
 

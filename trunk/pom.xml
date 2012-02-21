@@ -3,7 +3,7 @@
   <groupId>net.sf.openymsg</groupId>
   <artifactId>openymsg</artifactId>
   <name>OpenYMSG library</name>
-  <version>0.6.2-SNAPSHOT</version>
+  <version>0.6.2</version>
   <description>OpenYMSG is an Java library that implements the Yahoo Instant
 	 	Messenger protocol.</description>
   <url>http://sourceforge.net/projects/openymsg/</url>
@@ -38,9 +38,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.6.0</connection>
-    <developerConnection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.6.0</developerConnection>
-    <url>http://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.6.0</url>
+    <connection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/trunk</connection>
+    <developerConnection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/trunk</developerConnection>
+    <url>http://openymsg.svn.sourceforge.net/svnroot/openymsg/trunk</url>
   </scm>
   <distributionManagement>
 	<repository>
@@ -75,19 +75,6 @@
           </descriptorRefs>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>sign-artifacts</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>sign</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
   <dependencies>
@@ -114,4 +101,32 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+	<profiles>
+		<profile>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>performRelease</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
