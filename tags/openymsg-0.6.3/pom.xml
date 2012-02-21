@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>net.sf.openymsg</groupId>
+  <artifactId>openymsg</artifactId>
+  <name>OpenYMSG library</name>
+  <version>0.6.3</version>
+  <description>OpenYMSG is an Java library that implements the Yahoo Instant
+	 	Messenger protocol.</description>
+  <url>http://sourceforge.net/projects/openymsg/</url>
+  <issueManagement>
+  </issueManagement>
+  <inceptionYear>2007</inceptionYear>
+  <developers>
+  	<developer>
+  		<id>jadestorm</id>
+  		<name>Daniel Henninger</name>
+  	</developer>
+  	<developer>
+  		<id>neilhart</id>
+  		<name>Neil Hart</name>
+  	</developer>
+  	<developer>
+  		<id>guusdk</id>
+  		<name>Guus der Kinderen</name>
+  		<email>guus.der.kinderen@gmail.com</email>
+  		<timezone>+1</timezone>
+  	</developer>
+  	<developer>
+  		<id>damencho</id>
+  		<name>Damian Minkov</name>
+  	</developer>
+  </developers>
+  <licenses>
+    <license>
+      <name>GNU General Public License Version2</name>
+      <url>http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.6.3</connection>
+    <developerConnection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.6.3</developerConnection>
+    <url>http://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.6.3</url>
+  </scm>
+  <distributionManagement>
+	<repository>
+		<id>sonatype-nexus-staging</id>
+		<name>Nexus Staging Repository</name>
+		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+	</repository>
+	<snapshotRepository>
+		<id>sonatype-nexus-snapshot</id>
+		<name>Nexus Staging Snapshots</name>
+		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+	</snapshotRepository>
+  </distributionManagement>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.test.skip>true</maven.test.skip>
+  </properties>  
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.4</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit-addons</groupId>
+      <artifactId>junit-addons</artifactId>
+      <version>1.4</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+	<profiles>
+		<profile>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>performRelease</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

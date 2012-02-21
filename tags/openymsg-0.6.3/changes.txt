@@ -1,0 +1,33 @@
+Changes from 0.5.2 to 0.6.0
+Setting up pom for maven repository (why I changed the version to 0.6)
+Using Yahoo's servers to get ip address of IM servers.  This is the proper load balancing for Yahoo.  Need to call ConnectionHandler.open(searchForAddress).
+Better timing of pings to be done every 1 hour.
+Better logging of login failure.  
+
+Changes from 0.5.1 to 0.5.2
+Conference invite events should contain invite messages if they're provided.
+Empty valued protocol package content should be allowed.
+Fixes for Conference Room
+	Adding additional people to conference room was failing.
+	Allow for explicit naming of a new conference.
+Lowered logging level in buddy import
+
+Public API Changes
+	none
+
+Changes from 0.5.0 to 0.5.1
+Fixes for Conference Room
+	Conference room contains the message which is normally the name of the conference room
+	Conference room id is more random to avoid naming conflicts
+Failure looking up login.yahoo.com host at login now causes LoginException instead of a YMSG9BadFormatException	
+Lowered logging level of handling unknown service type and in some other areas
+
+Public API Changes
+	YahooConference constructor
+	Session.acceptConferenceInvite	
+	Session.declineConferenceInvite
+	SessionAdapter.conferenceInviteReceived
+	SessionAdapter.conferenceInviteDeclinedReceived
+	SessionAdapter.conferenceLogonReceived
+	SessionAdapter.conferenceLogoffReceived
+	SessionAdapter.conferenceMessageReceived
