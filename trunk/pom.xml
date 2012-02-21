@@ -3,7 +3,7 @@
   <groupId>net.sf.openymsg</groupId>
   <artifactId>openymsg</artifactId>
   <name>OpenYMSG library</name>
-  <version>0.6.3</version>
+  <version>0.6.4-SNAPSHOT</version>
   <description>OpenYMSG is an Java library that implements the Yahoo Instant
 	 	Messenger protocol.</description>
   <url>http://sourceforge.net/projects/openymsg/</url>
@@ -38,9 +38,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.6.3</connection>
-    <developerConnection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.6.3</developerConnection>
-    <url>http://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.6.3</url>
+    <connection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/trunk</connection>
+    <developerConnection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/trunk</developerConnection>
+    <url>http://openymsg.svn.sourceforge.net/svnroot/openymsg/trunk</url>
   </scm>
   <distributionManagement>
 	<repository>
