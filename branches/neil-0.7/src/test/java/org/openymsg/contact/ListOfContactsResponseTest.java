@@ -10,7 +10,10 @@ import org.openymsg.Contact;
 import org.openymsg.ContactGroup;
 import org.openymsg.PacketReader;
 import org.openymsg.YahooProtocol;
+import org.openymsg.group.ContactGroupImpl;
+import org.openymsg.group.SessionGroupImpl;
 import org.openymsg.network.YMSG9Packet;
+import org.openymsg.status.SessionStatusImpl;
 import org.testng.annotations.Test;
 
 public class ListOfContactsResponseTest {
@@ -18,16 +21,18 @@ public class ListOfContactsResponseTest {
 	@Test
 	public void testSimple() {
 		String test= "Magic:YMSG Version:16 Length:796 Service:LIST_15 Status:DEFAULT SessionId:0x47e133  [302] [318] [300] [318] [65] [Bros] [302] [319] [300] [319] [7] [alfa11] [223] [1] [301] [319] [300] [319] [7] [neiliiihart] [301] [319] [300] [319] [7] [neilivhart] [301] [319] [300] [319] [7] [neilnexthart] [301] [319] [300] [319] [7] [neilvhart] [301] [319] [300] [319] [7] [nybilld21] [301] [319] [300] [319] [7] [nybilld22] [301] [319] [300] [319] [7] [nybilld290] [301] [319] [300] [319] [7] [pjpudge1414] [301] [319] [300] [319] [7] [yfmrfr] [301] [319] [300] [319] [7] [yjaddme113] [301] [319] [300] [319] [7] [yjaddme114] [301] [319] [300] [319] [7] [yjaddme402] [223] [1] [301] [319] [300] [319] [7] [yjaddme405] [223] [1] [301] [319] [300] [319] [7] [yjaddme78a] [223] [1] [301] [319] [300] [319] [7] [yjaddme80a] [223] [1] [301] [319] [300] [319] [7] [yjaddme83] [223] [1] [301] [319] [303] [319] [301] [318] [300] [318] [65] [BuddiesYJ2] [302] [319] [300] [319] [7] [yjaddme10] [301] [319] [303] [319] [301] [318] [303] [318]";
-		SessionContactCallback listener = Mockito.mock(SessionContactCallback.class);
-		ListOfContactsResponse response = new ListOfContactsResponse(listener);
+		SessionContactImpl sessionContact = Mockito.mock(SessionContactImpl.class);
+		SessionGroupImpl sessionGroup = Mockito.mock(SessionGroupImpl.class);
+		SessionStatusImpl sessionStatus = Mockito.mock(SessionStatusImpl.class);
+		ListOfContactsResponse response = new ListOfContactsResponse(sessionContact, sessionGroup, sessionStatus);
 		YMSG9Packet packet = PacketReader.readString(test);
 		List<YMSG9Packet> packets = new ArrayList<YMSG9Packet>();
 		packets.add(packet);
 		response.execute(packets);
-		Mockito.verify(listener).addContacts(this.getContacts());
-//		Mockito.verify(listener).addIgnored(new HashSet<Contact>());
-		Mockito.verify(listener).addPending(this.getPendingContacts());
-		Mockito.verify(listener).addGroups(this.getGroups());
+		Mockito.verify(sessionContact).addedContacts(this.getContacts());
+		Mockito.verify(sessionStatus).addedIgnored(new HashSet<Contact>());
+		Mockito.verify(sessionStatus).addedPending(this.getPendingContacts());
+		Mockito.verify(sessionGroup).addedGroups(this.getGroups());
 	}
 	
 	private Set<ContactGroup> getGroups() {

@@ -42,8 +42,8 @@ public class KeepAliveRequest implements Message{
 		return MessageStatus.DEFAULT;
 	}
 
-	@Override
-	public void messageProcessed() {
-	}
-
+//	@Override
+//	public void messageProcessed() {
+//	}
+//
 }

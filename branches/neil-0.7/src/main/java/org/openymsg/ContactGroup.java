@@ -20,5 +20,13 @@ public interface ContactGroup {
 	 * @return group name
 	 */
 	String getName();
+	
+	/**
+	 * Is the group still active.  False if it has been deleted.  A deleted group has no contacts.
+	 * If a group is created with the same name, it will be a new instance.  A group will not become active
+	 * after it is deleted
+	 * @return false if deleted
+	 */
+	boolean isActive();
 
 }

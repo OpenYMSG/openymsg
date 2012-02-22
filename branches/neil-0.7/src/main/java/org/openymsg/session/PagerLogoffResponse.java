@@ -2,7 +2,8 @@ package org.openymsg.session;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.execute.read.SinglePacketResponseAbstract;
+import org.openymsg.execute.SinglePacketResponse;
+import org.openymsg.network.YMSG9Packet;
 import org.openymsg.status.LogoutState;
 
 //TODO - connection isn't closed yet
@@ -12,14 +13,14 @@ import org.openymsg.status.LogoutState;
  * session state to be failed, and flag the end of login. Note: we don't throw exceptions on the input thread, but
  * instead we pass them to the thread which called login()
  */
-public class PagerLogoffResponse extends SinglePacketResponseAbstract{
+public class PagerLogoffResponse implements SinglePacketResponse{
 	private static final Log log = LogFactory.getLog(PagerLogoffResponse.class);
 
 	@Override
-	protected void execute() {
+	public void execute(YMSG9Packet packet) {
 		log.trace("Received Pager Logoff packet.");
-		if (this.packet.exists("66")) {
-			long l = Long.parseLong(this.packet.getValue("66"));
+		if (packet.exists("66")) {
+			long l = Long.parseLong(packet.getValue("66"));
 			LogoutState state = null;
 			try {
 				state = LogoutState.getStatus(l);

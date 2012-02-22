@@ -2,7 +2,6 @@ package org.openymsg.session;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.connection.ConnectionState;
 import org.openymsg.execute.Executor;
 import org.openymsg.network.ServiceType;
 

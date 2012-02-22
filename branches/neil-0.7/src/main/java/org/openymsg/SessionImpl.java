@@ -15,6 +15,8 @@ import org.openymsg.connection.SessionConnectionImpl;
 import org.openymsg.contact.SessionContact;
 import org.openymsg.contact.SessionContactImpl;
 import org.openymsg.execute.dispatch.ExecutorImpl;
+import org.openymsg.group.SessionGroup;
+import org.openymsg.group.SessionGroupImpl;
 import org.openymsg.keepalive.SessionKeepAlive;
 import org.openymsg.keepalive.SessionKeepAliveImpl;
 import org.openymsg.mail.SessionMail;
@@ -35,6 +37,7 @@ public class SessionImpl implements Session {
 	private SessionMessage message;
 	private SessionAuthentication authorize;
 	private SessionContact contact;
+	private SessionGroup group;
 	private SessionStatus status;
 	private SessionConference conference;
 	private SessionKeepAlive keepAlive;
@@ -61,6 +64,7 @@ public class SessionImpl implements Session {
 		this.authorize = new SessionAuthenticationImpl(this.config, executor);
 		this.session = new SessionSessionImpl(username, executor);
 		this.contact = new SessionContactImpl(executor, username);
+		this.group = new SessionGroupImpl();
 		this.status = new SessionStatusImpl(executor);
 		this.message = new SessionMessageImpl(executor, username, this.callback);
 		this.conference = new SessionConferenceImpl(username, executor);
@@ -156,8 +160,8 @@ public class SessionImpl implements Session {
 	}
 
 	@Override
-	public void addToGroup(Contact contact, ContactGroup group) throws IllegalArgumentException {
-		this.contact.addToGroup(contact, group);
+	public void addContact(Contact contact, ContactGroup group) throws IllegalArgumentException {
+		this.contact.addContact(contact, group);
 	}
 
 	@Override
@@ -167,7 +171,7 @@ public class SessionImpl implements Session {
 
 	@Override
 	public Set<ContactGroup> getContactGroups() {
-		return this.contact.getContactGroups();
+		return this.group.getContactGroups();
 	}
 
 	@Override

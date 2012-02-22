@@ -12,23 +12,26 @@ import org.openymsg.Contact;
 import org.openymsg.ContactGroup;
 import org.openymsg.YahooProtocol;
 import org.openymsg.execute.read.MultiplePacketListResponse;
+import org.openymsg.group.ContactGroupImpl;
+import org.openymsg.group.SessionGroupImpl;
 import org.openymsg.network.YMSG9Packet;
+import org.openymsg.status.SessionStatusImpl;
 
 public class ListOfContactsResponse extends MultiplePacketListResponse {
 	private static final Log log = LogFactory.getLog(ListOfContactsResponse.class);
-	private SessionContactCallback listener;
+	private SessionContactImpl sessionContact;
+	private SessionGroupImpl sessionGroup;
+	private SessionStatusImpl sessionStatus;
 
-	public ListOfContactsResponse(SessionContactCallback listener) {
-		this.listener = listener;
+	public ListOfContactsResponse(SessionContactImpl sessionContact, SessionGroupImpl sessionGroup, SessionStatusImpl sessionStatus) {
+		this.sessionContact = sessionContact;
+		this.sessionGroup = sessionGroup;
+		this.sessionStatus = sessionStatus;
 	}
 
 	@Override
-	public void execute() // 0x55
+	public void execute() 
 	{
-		// queueOfList15.add(pkt);
-		// if (pkt.status != 0) {
-		// return;
-		// }
 		String username = null;
 		YahooProtocol protocol = YahooProtocol.YAHOO;
 		ContactGroupImpl currentListGroup = null;
@@ -66,6 +69,7 @@ public class ListOfContactsResponse extends MultiplePacketListResponse {
 						Contact yu = null;
 						if (currentListGroup != null) {
 							for (Contact friend : usersOnFriendsList) {
+								//TODO - don't compare id
 								if (friend.getId().equals(username)) {
 									yu = friend;
 									currentListGroup.add(yu);
@@ -113,7 +117,7 @@ public class ListOfContactsResponse extends MultiplePacketListResponse {
 					username = value;
 					break;
 				case 241: /* another protocol user */
-					protocol = getUserProtocol(value, username);
+					protocol = YahooProtocol.getProtocolOrDefault(value, username);
 					break;
 				case 59: /* somebody told cookies come here too, but im not sure */
 					break;
@@ -154,19 +158,19 @@ public class ListOfContactsResponse extends MultiplePacketListResponse {
 		}
 
 		if (!usersOnFriendsList.isEmpty()) {
-			listener.addContacts(usersOnFriendsList);
+			sessionContact.addedContacts(usersOnFriendsList);
 		}
 
 		if (!usersOnIgnoreList.isEmpty()) {
-			listener.addIgnored(usersOnIgnoreList);
+			sessionStatus.addedIgnored(usersOnIgnoreList);
 		}
 
 		if (!usersOnPendingList.isEmpty()) {
-			listener.addPending(usersOnPendingList);
+			sessionStatus.addedPending(usersOnPendingList);
 		}
 		
 		if (!receivedGroups.values().isEmpty()) {
-			listener.addGroups(new HashSet<ContactGroup>(receivedGroups.values()));
+			sessionGroup.addedGroups(new HashSet<ContactGroup>(receivedGroups.values()));
 		}
 
 		// Now that we've parsed the buddy list, we can consider login succcess
@@ -181,16 +185,6 @@ public class ListOfContactsResponse extends MultiplePacketListResponse {
 		// primaryID.setPrimaryIdentity(true);
 		// loginID.setPrimaryIdentity(true);
 
-	}
-
-	private YahooProtocol getUserProtocol(String protocolString, String who) {
-		try {
-			return YahooProtocol.getProtocol(protocolString);
-		}
-		catch (IllegalArgumentException e) {
-			log.error("Failed finding protocol: " + protocolString + " for user: " + who);
-			return YahooProtocol.YAHOO;
-		}
 	}
 
 	@Override

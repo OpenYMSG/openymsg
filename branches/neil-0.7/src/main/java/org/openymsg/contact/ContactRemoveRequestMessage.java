@@ -60,9 +60,9 @@ public class ContactRemoveRequestMessage implements Message {
 		return MessageStatus.DEFAULT;
 	}
 
-	@Override
-	public void messageProcessed() {
-		//TODO - remove contact
-	}
+//	@Override
+//	public void messageProcessed() {
+//		//TODO - remove contact
+//	}
 
 }

@@ -43,8 +43,4 @@ public class ContactAddRequestDecline implements Message {
 		return MessageStatus.DEFAULT;
 	}
 
-	@Override
-	public void messageProcessed() {
-	}
-
 }

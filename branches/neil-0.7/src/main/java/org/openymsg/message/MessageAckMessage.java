@@ -45,8 +45,4 @@ public class MessageAckMessage implements Message {
 		return MessageStatus.DEFAULT;
 	}
 
-	@Override
-	public void messageProcessed() {
-	}
-
 }

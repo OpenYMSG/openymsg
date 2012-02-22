@@ -1,5 +1,8 @@
 package org.openymsg;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public enum YahooProtocol {
     /**
      * Different Yahoo messaging protocols
@@ -9,6 +12,7 @@ public enum YahooProtocol {
     MSN(2),
     LOTUS(9);
 
+	private static final Log log = LogFactory.getLog(YahooProtocol.class);
     // Unique long representation of this Status.
     private int value;
 
@@ -58,8 +62,30 @@ public enum YahooProtocol {
         if (protocol == null || protocol.trim().length() == 0) {
             return YahooProtocol.YAHOO;
         }
-        int value = Integer.parseInt(protocol);
+        int value;
+		try {
+			value = Integer.parseInt(protocol);
+		}
+		catch (Exception e) {
+	        throw new IllegalArgumentException("No YahooProtocol matching string value '" + protocol + "'.");
+		}
         return YahooProtocol.getProtocol(value);
     }
+
+	public boolean isYahoo() {
+		return this.equals(YAHOO);
+	}
+
+    public static YahooProtocol getProtocolOrDefault(String protocolString, String who) {
+        try {
+            return YahooProtocol.getProtocol(protocolString);
+        }
+        catch (IllegalArgumentException e) {
+            log.error("Failed finding protocol: " + protocolString + " for user: " + who);
+            return YahooProtocol.YAHOO;
+        }
+    }
+
+
 
 }

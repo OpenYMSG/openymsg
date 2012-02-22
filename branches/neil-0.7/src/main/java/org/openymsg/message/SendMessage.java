@@ -84,9 +84,4 @@ public class SendMessage implements Message {
         return false;
     }
 
-	@Override
-	public void messageProcessed() {
-	}
-
-
 }

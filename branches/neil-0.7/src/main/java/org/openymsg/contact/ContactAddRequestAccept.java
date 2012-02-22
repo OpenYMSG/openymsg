@@ -38,9 +38,9 @@ public class ContactAddRequestAccept implements Message {
 		return MessageStatus.DEFAULT;
 	}
 
-	@Override
-	public void messageProcessed() {
-		//TODO add contact
-	}
+//	@Override
+//	public void messageProcessed() {
+//		//TODO add contact
+//	}
 
 }

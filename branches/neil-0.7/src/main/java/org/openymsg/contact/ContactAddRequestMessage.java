@@ -39,19 +39,20 @@ public class ContactAddRequestMessage implements Message {
 	@Override
 	public PacketBodyBuffer getBody() throws IOException {
         PacketBodyBuffer body = new PacketBodyBuffer();
-        body.addElement("1", username); // ???: effective id?
+        body.addElement("14", ""); // C0 80 - TODO message
+        body.addElement("65", this.group.getName());
+        body.addElement("97", "1"); //TODO - UNICODE?
+        body.addElement("216", ""); //first name TODO
+        body.addElement("254", ""); //last name TODO
+        body.addElement("1", username);
         body.addElement("302", "319");
         body.addElement("300", "319");
         body.addElement("7", this.contact.getId());
-        body.addElement("241", "" + this.contact.getProtocol().getValue()); // type
+        if (!this.contact.getProtocol().isYahoo()) {
+        	body.addElement("241", "" + this.contact.getProtocol().getValue()); // type
+        }
         body.addElement("301", "319");
         body.addElement("303", "319");
-        body.addElement("65", this.group.getName());
-        body.addElement("14", "");
-        body.addElement("216", "");
-        body.addElement("254", "");
-        body.addElement("97", "1");
-        // body.addElement("334", "0"); not used in 16
 		return body;
 	}
 
@@ -63,10 +64,6 @@ public class ContactAddRequestMessage implements Message {
 	@Override
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
-	}
-
-	@Override
-	public void messageProcessed() {
 	}
 
 }

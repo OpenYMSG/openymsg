@@ -52,12 +52,12 @@ public class CreateConferenceMessage implements Message {
 		return MessageStatus.DEFAULT;
 	}
 
-	@Override
-	public void messageProcessed() {
-		// TODO - add conference
-		// Create a new conference object
-		// conferences.put(room, new YahooConference(identities.get(yid.toLowerCase()), room, msg, this, false));
-		// Send request to Yahoo
-	}
+//	@Override
+//	public void messageProcessed() {
+//		// TODO - add conference
+//		// Create a new conference object
+//		// conferences.put(room, new YahooConference(identities.get(yid.toLowerCase()), room, msg, this, false));
+//		// Send request to Yahoo
+//	}
 
 }

@@ -1,8 +1,9 @@
 package org.openymsg.message;
 
-import org.openymsg.execute.read.SinglePacketResponseAbstract;
+import org.openymsg.execute.SinglePacketResponse;
+import org.openymsg.network.YMSG9Packet;
 
-public class MessageOnlineResponse extends SinglePacketResponseAbstract {
+public class MessageOnlineResponse implements SinglePacketResponse {
 	private final static String BUZZ = "<ding>";
 	private SessionMessageImpl session;
 
@@ -11,14 +12,14 @@ public class MessageOnlineResponse extends SinglePacketResponseAbstract {
 	}
 
 	@Override
-	protected void execute() {
+	public void execute(YMSG9Packet packet) {
 		// Sent while we are online
 		// TODO - handle indentity
 		// TODO - handle MSN
 		// final String to = this.packet.getValue("5");
-		String from = this.packet.getValue("4");
-		String message = this.packet.getValue("14");
-		String id = this.packet.getValue("429");
+		String from = packet.getValue("4");
+		String message = packet.getValue("14");
+		String id = packet.getValue("429");
 		this.session.receivedMessage(from, message, id);
 
 		// TODO - handle message

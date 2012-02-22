@@ -8,19 +8,23 @@ import java.util.Set;
 import org.openymsg.Contact;
 import org.openymsg.ContactGroup;
 import org.openymsg.execute.Executor;
+import org.openymsg.group.ContactGroupRenameMessage;
+import org.openymsg.group.SessionGroupImpl;
 import org.openymsg.network.ServiceType;
+import org.openymsg.status.SessionStatusImpl;
 import org.openymsg.util.CollectionUtils;
 
 public class SessionContactImpl implements SessionContact, SessionContactCallback {
 	private Executor executor;
-	private Set<Contact> contacts = new HashSet<Contact>();
-	private Set<ContactGroup> contactGroups = new HashSet<ContactGroup>();
 	private String username;
-
+	private Set<Contact> contacts = Collections.synchronizedSet(new HashSet<Contact>());
+	private SessionGroupImpl sessionGroup;
+	private SessionStatusImpl sessionStatus;
+	
 	public SessionContactImpl(Executor executor, String username) {
 		this.executor = executor;
 		this.username = username;
-		this.executor.register(ServiceType.LIST_15, new ListOfContactsResponse(this));
+		this.executor.register(ServiceType.LIST_15, new ListOfContactsResponse(this, sessionGroup, sessionStatus));
 	}
 
     public void renameGroup(ContactGroup group, String newName) throws IllegalStateException, IOException {
@@ -29,45 +33,38 @@ public class SessionContactImpl implements SessionContact, SessionContactCallbac
 //        transmitGroupRename(group, newName);
     }
 
-
-	/**
-	 * Sends a new request to become friends to the user. This is a subscription request, to which to other user should
-	 * reply to. Responses will arrive asynchronously.
-	 * 
-	 * @param userId Yahoo id of user to add as a new friend.
-	 * @param groupId Name of the group to add the new friend to.
-	 * @throws IllegalArgumentException if one of the arguments is null or an empty String.
-	 * @throws IllegalStateException if this session is not logged onto the Yahoo network correctly.
-	 * @throws IOException if any problem occured related to creating or sending the request to the Yahoo network.
-	 */
 	@Override
-	public void addToGroup(Contact contact, ContactGroup group) throws IllegalArgumentException {
+	public void addContact(Contact contact, ContactGroup group) throws IllegalArgumentException {
 		// log.trace("Adding new user: " + userId + ", group: " + groupId + ", protocol: " + yahooProtocol);
 		// TODO: perhaps we should check the roster to make sure that this
 		// friend does not already exist.
 		//TODO validate group
 		//TODO check if user already in group
+		if (contact == null) {
+			throw new IllegalArgumentException("Argument 'contact' cannot be null");
+		}
 		if (group == null) {
 			throw new IllegalArgumentException("Argument 'group' cannot be null");
 		}
+		if (this.contacts.contains(contact)) {
+			throw new IllegalArgumentException("Contact already exists");
+		}
 		this.executor.execute(new ContactAddRequestMessage(this.username, contact, group));
-		// transmitFriendAdd(userId, groupId, yahooProtocol);
 	}
 
-	/**
-	 * Instructs the Yahoo network to remove this friend from the particular group on the roster of the current user. If
-	 * this is the last group that the user is removed from, the user is effectively removed from the roster.
-	 * 
-	 * @param friendId Yahoo IDof the contact to remove from a group.
-	 * @param groupId Group to remove the contact from.
-	 * @throws IllegalArgumentException if one of the arguments is null or an empty String.
-	 * @throws IllegalStateException if this session is not logged onto the Yahoo network correctly.
-	 * @throws IOException on any problem while trying to create or send the packet.
-	 */
 	@Override
 	public void removeFromGroup(Contact contact, ContactGroup group) {
+		if (contact == null) {
+			throw new IllegalArgumentException("Argument 'group' cannot be null.");
+		}
 		if (group == null) {
 			throw new IllegalArgumentException("Argument 'group' cannot be null.");
+		}
+		if (!this.sessionGroup.getContactGroups().contains(group)) {
+			throw new IllegalArgumentException("Not an existing group");
+		}
+		if (!group.getContacts().contains(contact)) {
+			throw new IllegalArgumentException("Contact not in group");
 		}
 		this.executor.execute(new ContactRemoveRequestMessage(this.username, contact, group));
 	}
@@ -91,7 +88,7 @@ public class SessionContactImpl implements SessionContact, SessionContactCallbac
 	// }
 
 	@Override
-	public void addContacts(Set<Contact> usersOnFriendsList) {
+	public void addedContacts(Set<Contact> usersOnFriendsList) {
 		this.contacts.addAll(usersOnFriendsList);
 //		for (Contact contact : usersOnFriendsList) {
 			// System.err.println("add: " + contactImpl.getId() + "/" + contactImpl.getProtocol() + "/" +
@@ -100,31 +97,23 @@ public class SessionContactImpl implements SessionContact, SessionContactCallbac
 	}
 
 	@Override
-	public void addIgnored(Set<Contact> usersOnIgnoreList) {
-		for (Contact contact : usersOnIgnoreList) {
-			System.err.println("ignored: " + contact);
-		}
-	}
-
-	@Override
-	public void addPending(Set<Contact> usersOnPendingList) {
-//		for (Contact contact : usersOnPendingList) {
-			// System.err.println("pending:" + contactImpl.getId() + "/" + contactImpl.getProtocol());
-//		}
-	}
-
-	@Override
 	public Set<Contact> getContacts() {
 		return CollectionUtils.protectedSet(this.contacts);
 	}
 
-	@Override
-	public Set<ContactGroup> getContactGroups() {
-		return CollectionUtils.protectedSet(this.contactGroups);
+	public boolean possibleContact(Contact contact) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
-	@Override
-	public void addGroups(Set<ContactGroup> contactGroups) {
-		this.contactGroups.addAll(contactGroups);
+	public void contactAddFailure(Contact contact, ContactAddFailure failure) {
+		// TODO Auto-generated method stub
+		
 	}
+
+	public void contactAddFailure(Contact contact, ContactAddFailure failure, String friendAddStatus) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
