@@ -63,10 +63,4 @@ public class LoginCompleteMessage implements Message {
 		return MessageStatus.WEBLOGIN;
 	}
 
-	@Override
-	public void messageProcessed() {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

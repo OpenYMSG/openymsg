@@ -4,14 +4,15 @@ import java.net.URL;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.execute.read.SinglePacketResponseAbstract;
+import org.openymsg.execute.SinglePacketResponse;
+import org.openymsg.network.YMSG9Packet;
 
 /**
  * Process an incoming AUTHRESP packet. If we get one of these it means the logon process has failed. Set the
  * session state to be failed, and flag the end of login. Note: we don't throw exceptions on the input thread, but
  * instead we pass them to the thread which called login()
  */
-public class LoginFailureResponse extends SinglePacketResponseAbstract {
+public class LoginFailureResponse implements SinglePacketResponse {
 	private static final Log log = LogFactory.getLog(LoginFailureResponse.class);
 	private final SessionAuthenticationImpl sessionAuthorize;
 
@@ -20,10 +21,10 @@ public class LoginFailureResponse extends SinglePacketResponseAbstract {
 	}
 
 	@Override
-	public void execute() {
+	public void execute(YMSG9Packet packet) {
 		log.trace("Received AUTHRESP packet.");
-		if (this.packet.exists("66")) {
-			long l = Long.parseLong(this.packet.getValue("66"));
+		if (packet.exists("66")) {
+			long l = Long.parseLong(packet.getValue("66"));
 			AuthenticationFailure state = null;
 			try {
 				state = AuthenticationFailure.getStatus(l);
@@ -39,7 +40,7 @@ public class LoginFailureResponse extends SinglePacketResponseAbstract {
 				@SuppressWarnings("unused")
 				URL u;
 				try {
-					u = new URL(this.packet.getValue("20"));
+					u = new URL(packet.getValue("20"));
 				}
 				catch (Exception e) {
 					u = null;

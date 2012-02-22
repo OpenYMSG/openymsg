@@ -3,8 +3,8 @@ package org.openymsg.connection;
 import org.openymsg.SessionConfig;
 import org.openymsg.execute.Executor;
 import org.openymsg.execute.Request;
+import org.openymsg.network.ConnectionBuilder;
 import org.openymsg.network.ConnectionHandler;
-import org.openymsg.network.direct.DirectConnectionBuilder;
 
 public class ConnectionInitalize implements Request {
 	private SessionConfig config;
@@ -19,8 +19,9 @@ public class ConnectionInitalize implements Request {
 
 	@Override
 	public void run() {
-		DirectConnectionBuilder builder = new DirectConnectionBuilder();
-		ConnectionHandler connection = builder.with(config).useCapacityServers().useScsServers().build();
+		ConnectionBuilder builder = config.getBuilder();
+		ConnectionHandler connection = builder.useCapacityServers().useScsServers().build();
+		connection.addListener(monitor);
 		ConnectionInfo status = builder.getHandlerStatus();
 		if (status.isConnected()) {
 			this.executor.initializeConnection(connection);

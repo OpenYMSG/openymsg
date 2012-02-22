@@ -42,9 +42,9 @@ public class AcceptConferenceMessage implements Message {
 		return MessageStatus.DEFAULT;
 	}
 
-	@Override
-	public void messageProcessed() {
-		//TODO - join conference?
-	}
+//	@Override
+//	public void messageProcessed() {
+//		//TODO - join conference?
+//	}
 
 }

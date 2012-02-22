@@ -8,7 +8,9 @@ import java.net.UnknownHostException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openymsg.network.ConnectionBuilder;
 import org.openymsg.network.NetworkConstants;
+import org.openymsg.network.direct.DirectConnectionBuilder;
 
 /**
  * Default SessionConfig
@@ -81,5 +83,10 @@ public class SessionConfigImpl implements SessionConfig {
 	@Override
 	public String[] getScsHosts() {
 		return NetworkConstants.SCS_HOSTS;
+	}
+
+	@Override
+	public ConnectionBuilder getBuilder() {
+		return new DirectConnectionBuilder().with(this);
 	}
 }

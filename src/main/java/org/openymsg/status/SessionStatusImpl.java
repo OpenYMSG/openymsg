@@ -3,6 +3,7 @@ package org.openymsg.status;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -83,5 +84,28 @@ public class SessionStatusImpl implements SessionStatus {
 		log.info("Status change for: " + contact + " " + status);
 		this.statuses.put(contact, status);
 	}
+
+	public void addPending(Contact contact) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void publishPending(Contact contact) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void addedIgnored(Set<Contact> usersOnIgnoreList) {
+		for (Contact contact : usersOnIgnoreList) {
+			System.err.println("ignored: " + contact);
+		}
+	}
+
+	public void addedPending(Set<Contact> usersOnPendingList) {
+//		for (Contact contact : usersOnPendingList) {
+			// System.err.println("pending:" + contactImpl.getId() + "/" + contactImpl.getProtocol());
+//		}
+	}
+
 
 }

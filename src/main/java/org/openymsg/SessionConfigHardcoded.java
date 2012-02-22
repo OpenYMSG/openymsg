@@ -8,7 +8,9 @@ import java.net.UnknownHostException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openymsg.network.ConnectionBuilder;
 import org.openymsg.network.NetworkConstants;
+import org.openymsg.network.direct.DirectConnectionBuilder;
 
 public class SessionConfigHardcoded implements SessionConfig {
 	private static final Log log = LogFactory.getLog(SessionConfigImpl.class);
@@ -77,5 +79,10 @@ public class SessionConfigHardcoded implements SessionConfig {
 	public String[] getScsHosts() {
 		String[] ips = { "67.195.187.252", "67.195.187.197" }; 
 		return ips;
+	}
+
+	@Override
+	public ConnectionBuilder getBuilder() {
+		return new DirectConnectionBuilder().with(this);
 	}
 }

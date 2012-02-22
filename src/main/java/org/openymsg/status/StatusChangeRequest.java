@@ -51,10 +51,4 @@ public class StatusChangeRequest implements Message {
 		return MessageStatus.DEFAULT;
 	}
 
-	@Override
-	public void messageProcessed() {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

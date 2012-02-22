@@ -24,7 +24,8 @@ public class DispatcherMessageRequest implements Request {
 			PacketBodyBuffer body = null;
 			try {
 				body = this.message.getBody();
-				this.message.messageProcessed();
+				//TODO handle messages with extra
+//				this.message.messageProcessed();
 			}
 			catch (IOException e) {
 				//TODO handle exception

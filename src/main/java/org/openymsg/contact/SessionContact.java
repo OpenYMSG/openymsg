@@ -8,9 +8,7 @@ import org.openymsg.ContactGroup;
 public interface SessionContact {
 
 	Set<Contact> getContacts();
-	
-	Set<ContactGroup> getContactGroups();
-	
+
 	void acceptFriendAuthorization(Contact contact) throws IllegalStateException;
 
 	void rejectFriendAuthorization(Contact contact, String message) throws IllegalStateException;
@@ -25,6 +23,14 @@ public interface SessionContact {
 	 */
 	void removeFromGroup(Contact contact, ContactGroup group);
 
-	void addToGroup(Contact contact, ContactGroup group) throws IllegalArgumentException;
+	/**
+	 * Add a new Contact.  The contact will be added to the ContactGroup.  This is not for adding an existing contact to another group
+	 * @param contact new contact
+	 * @param group existing group 
+	 * @throws IllegalArgumentException if either contact or group is null or contact already exists
+	 */
+	//TODO what to do for new group
+	void addContact(Contact contact, ContactGroup group) throws IllegalArgumentException;
 
+//	void moveToGroup(Contact contact, ContactGroup group) throws IllegalArgumentException;
 }

@@ -65,8 +65,4 @@ public class TypingNotificationMessage implements Message {
 		return MessageStatus.NOTIFY;
 	}
 
-	@Override
-	public void messageProcessed() {
-	}
-
 }

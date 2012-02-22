@@ -51,9 +51,9 @@ public class ExtendConferenceMessage implements Message {
 		return MessageStatus.DEFAULT;
 	}
 
-	@Override
-	public void messageProcessed() {
-		//TODO - add they are invited?
-	}
+//	@Override
+//	public void messageProcessed() {
+//		//TODO - add they are invited?
+//	}
 
 }

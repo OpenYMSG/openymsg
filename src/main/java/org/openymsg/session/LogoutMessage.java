@@ -35,10 +35,4 @@ public class LogoutMessage implements Message {
 		return MessageStatus.DEFAULT;
 	}
 
-	@Override
-	public void messageProcessed() {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

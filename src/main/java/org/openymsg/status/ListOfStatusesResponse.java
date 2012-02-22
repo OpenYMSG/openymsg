@@ -116,7 +116,7 @@ public class ListOfStatusesResponse extends MultiplePacketListResponse {
                 clearIdleTime = value;
                 break;
             case 241:
-                protocol = getUserProtocol(value, userId);
+                protocol = YahooProtocol.getProtocolOrDefault(value, userId);
                 break;
             case 244:
             	//TODO - track version
@@ -204,14 +204,4 @@ public class ListOfStatusesResponse extends MultiplePacketListResponse {
         this.sessionStatus.addStatus(contact, status);
     }
     
-    private YahooProtocol getUserProtocol(String protocolString, String who) {
-        try {
-            return YahooProtocol.getProtocol(protocolString);
-        }
-        catch (IllegalArgumentException e) {
-            log.error("Failed finding protocol: " + protocolString + " for user: " + who);
-            return YahooProtocol.YAHOO;
-        }
-    }
-
 }

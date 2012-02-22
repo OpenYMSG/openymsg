@@ -4,10 +4,13 @@ import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.ConnectionHandler;
+import org.openymsg.network.ConnectionHandlerCallback;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.PacketBodyBuffer;
@@ -22,6 +25,7 @@ public class DirectConnectionHandler implements ConnectionHandler {
 	private YMSG9InputStream ips;
 	private DataOutputStream ops;
 	private long sessionId;
+	private Set<ConnectionHandlerCallback> listeners = new HashSet<ConnectionHandlerCallback>();
 
 	public DirectConnectionHandler(Socket socket) {
 		this.socket = socket;
@@ -29,9 +33,18 @@ public class DirectConnectionHandler implements ConnectionHandler {
 			ips = new YMSG9InputStream(socket.getInputStream());
 			ops = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 		}
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		catch (IOException e) {//TODO handle failure
+			log.info("Failed creating streams", e);
+			this.notifyListeners();
+		}
+	}
+
+	//TODO pass failure
+	private void notifyListeners() {
+		synchronized (this.listeners) {
+			for (ConnectionHandlerCallback listener : this.listeners) {
+				listener.connectionEnded();
+			}
 		}
 	}
 
@@ -70,10 +83,9 @@ public class DirectConnectionHandler implements ConnectionHandler {
 			ops.flush();
 		}
 		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.info("sending packet", e);
+			this.notifyListeners();
 		}
-		// }
 	}
 
 	/**
@@ -102,7 +114,8 @@ public class DirectConnectionHandler implements ConnectionHandler {
 
 		}
 		catch (IOException e) {
-			log.error("Failed reading connection", e);
+			log.info("Failed reading connection", e);
+			this.notifyListeners();
 		}
 		catch (UnknowServiceException e) {
 			log.warn("unknown service: " + e.getPacket());
@@ -124,5 +137,10 @@ public class DirectConnectionHandler implements ConnectionHandler {
 		this.ips = null;
 		this.ops = null;
 		this.socket = null;
+	}
+
+	@Override
+	public void addListener(ConnectionHandlerCallback listener) {
+		this.listeners.add(listener);
 	}
 }

@@ -11,7 +11,7 @@ public class ConnectionReader implements Runnable {
 	private ConnectionHandler connection;
 	private ReaderRegistry registry;
 	private boolean isFinished = false;
-	
+
 	public ConnectionReader(ConnectionHandler connection, ReaderRegistry registry) {
 		this.connection = connection;
 		this.registry = registry;
@@ -26,8 +26,9 @@ public class ConnectionReader implements Runnable {
 		}
 		try {
 			YMSG9Packet packet = connection.receivePacket();
-			if (packet != null){
+			while (packet != null) {
 				registry.received(packet);
+				packet = connection.receivePacket();
 			}
 		}
 		catch (Exception e) {

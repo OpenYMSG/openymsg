@@ -26,8 +26,4 @@ public class PingRequest implements Message {
 		return MessageStatus.DEFAULT;
 	}
 
-	@Override
-	public void messageProcessed() {
-	}
-
 }

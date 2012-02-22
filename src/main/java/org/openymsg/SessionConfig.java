@@ -3,6 +3,8 @@ package org.openymsg;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 
+import org.openymsg.network.ConnectionBuilder;
+
 /**
  * Configuration for the communicating to Yahoo. Properties should be static once the Session has the instance.
  * This should have instruction for either the direct connection or http.
@@ -13,6 +15,8 @@ public interface SessionConfig {
 
 	String getLoginHost();
 
+	ConnectionBuilder getBuilder();
+	
 	/**
 	 * Login URL
 	 * 

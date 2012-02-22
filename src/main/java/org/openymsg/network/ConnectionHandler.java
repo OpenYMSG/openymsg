@@ -20,4 +20,6 @@ public interface ConnectionHandler {
 	YMSG9Packet receivePacket();
 
 	void shutdown();
+	
+	void addListener(ConnectionHandlerCallback listener);
 }

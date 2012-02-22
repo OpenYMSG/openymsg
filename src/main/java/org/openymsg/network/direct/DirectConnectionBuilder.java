@@ -13,9 +13,10 @@ import org.apache.commons.logging.LogFactory;
 import org.openymsg.SessionConfig;
 import org.openymsg.connection.ConnectionInfo;
 import org.openymsg.network.CapacityServers;
+import org.openymsg.network.ConnectionBuilder;
 import org.openymsg.network.NetworkConstants;
 
-public class DirectConnectionBuilder {
+public class DirectConnectionBuilder implements ConnectionBuilder {
 	private static final Log log = LogFactory.getLog(DirectConnectionBuilder.class);
 	private boolean capacityBuilding;
 	private boolean scsBuilding;
@@ -23,6 +24,7 @@ public class DirectConnectionBuilder {
 	private SessionConfig config;
 	private ConnectionInfo handlerStatus;
 	
+	@Override
 	public ConnectionInfo getHandlerStatus() {
 		return handlerStatus;
 	}
@@ -31,22 +33,26 @@ public class DirectConnectionBuilder {
 		
 	}
 
-	public DirectConnectionBuilder with(SessionConfig config) {
+	@Override
+	public ConnectionBuilder with(SessionConfig config) {
 		this.config = config;
 		return this;
 	}
 
 
-	public DirectConnectionBuilder useCapacityServers() {
+	@Override
+	public ConnectionBuilder useCapacityServers() {
 		this.capacityBuilding = true;
 		return this;
 	}
 
-	public DirectConnectionBuilder useScsServers() {
+	@Override
+	public ConnectionBuilder useScsServers() {
 		this.scsBuilding = true;
 		return this;
 	}
 
+	@Override
 	public DirectConnectionHandler build() {
 		handlerStatus = new ConnectionInfo();
 		DirectConnectionHandler connection = null;

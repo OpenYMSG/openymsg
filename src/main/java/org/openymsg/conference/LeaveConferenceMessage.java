@@ -44,12 +44,12 @@ public class LeaveConferenceMessage implements Message {
 		return MessageStatus.DEFAULT;
 	}
 
-	@Override
-	public void messageProcessed() {
-		//TODO - close conference
-//      // Flag this conference as now dead
-//      YahooConference yc = getConference(room);
-//      yc.closeConference();
-	}
+//	@Override
+//	public void messageProcessed() {
+//		//TODO - close conference
+////      // Flag this conference as now dead
+////      YahooConference yc = getConference(room);
+////      yc.closeConference();
+//	}
 
 }

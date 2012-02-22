@@ -18,5 +18,5 @@ public interface Message {
 
 	MessageStatus getMessageStatus();
 	
-	void messageProcessed();
+//	void messageProcessed();
 }
