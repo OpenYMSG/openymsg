@@ -1,4 +1,4 @@
-package org.openymsg.contact;
+package org.openymsg.group;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -10,7 +10,8 @@ import org.openymsg.util.CollectionUtils;
 
 public class ContactGroupImpl implements ContactGroup {
 	private String name;
-	private Set<Contact> contacts = new HashSet<Contact>();
+	boolean active;
+	private Set<Contact> contacts = Collections.synchronizedSet(new HashSet<Contact>());
 
 	public ContactGroupImpl(String name) {
 		this.name = name;
@@ -49,6 +50,11 @@ public class ContactGroupImpl implements ContactGroup {
 		}
 		else if (!name.equals(other.name)) return false;
 		return true;
+	}
+
+	@Override
+	public boolean isActive() {
+		return this.active;
 	}
 
 }

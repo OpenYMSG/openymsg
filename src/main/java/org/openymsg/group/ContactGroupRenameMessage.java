@@ -1,4 +1,4 @@
-package org.openymsg.contact;
+package org.openymsg.group;
 
 import java.io.IOException;
 
@@ -29,7 +29,7 @@ public class ContactGroupRenameMessage implements Message {
 	@Override
 	public PacketBodyBuffer getBody() throws IOException {
         PacketBodyBuffer body = new PacketBodyBuffer();
-        body.addElement("1", this.username); // ???: effective id?
+        body.addElement("1", this.username);
         body.addElement("65", this.group.getName());
         body.addElement("67", this.newGroupName);
 		return body;
@@ -45,9 +45,9 @@ public class ContactGroupRenameMessage implements Message {
 		return MessageStatus.DEFAULT;
 	}
 
-	@Override
-	public void messageProcessed() {
-		//TODO change group name
-	}
+//	@Override
+//	public void messageProcessed() {
+//		//TODO change group name
+//	}
 
 }
