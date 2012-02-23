@@ -11,7 +11,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.SessionConfig;
+import org.openymsg.config.SessionConfig;
 
 /**
  * Ask the capacity servers for an ip address to open a socket.

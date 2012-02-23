@@ -10,7 +10,7 @@ import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.SessionConfig;
+import org.openymsg.config.SessionConfig;
 import org.openymsg.connection.ConnectionInfo;
 import org.openymsg.network.CapacityServers;
 import org.openymsg.network.ConnectionBuilder;

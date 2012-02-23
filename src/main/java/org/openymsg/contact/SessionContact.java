@@ -17,6 +17,7 @@ public interface SessionContact {
 	 * Instructs the Yahoo network to remove this friend from the particular group on the roster of the current user. If
 	 * this is the last group that the user is removed from, the user is effectively removed from the roster.
 	 * 
+	 * @category Contact
 	 * @param friendId Yahoo IDof the contact to remove from a group.
 	 * @param groupId Group to remove the contact from.
 	 * @throws IllegalArgumentException if one of the arguments is null or an empty String.
@@ -25,6 +26,8 @@ public interface SessionContact {
 
 	/**
 	 * Add a new Contact.  The contact will be added to the ContactGroup.  This is not for adding an existing contact to another group
+	 * @category Contact
+
 	 * @param contact new contact
 	 * @param group existing group 
 	 * @throws IllegalArgumentException if either contact or group is null or contact already exists

@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.SessionConfig;
+import org.openymsg.config.SessionConfig;
 import org.openymsg.execute.Executor;
 import org.openymsg.network.ConnectionHandlerCallback;
 
@@ -18,22 +18,21 @@ public class SessionConnectionImpl implements SessionConnection, ConnectionHandl
 	private Set<SessionConnectionCallback> listeners = Collections
 			.synchronizedSet(new HashSet<SessionConnectionCallback>());
 
-	public SessionConnectionImpl(Executor executor, SessionConfig sessionConfig) {
+	public SessionConnectionImpl(Executor executor) {
 		this.executor = executor;
 		this.state = ConnectionState.UNSTARTED;
-		this.initialize(sessionConfig);
 	}
 
-	private void initialize(SessionConfig sessionConfig) {
+	/**
+	 * initialize the connection based on the config. Config options should not change
+	 * @param sessionConfig configuration
+	 */
+	public void initialize(SessionConfig sessionConfig) {
 		//TODO - maybe needed for restart?
 		// ConnectionState state = this.getConnectionState();
 		// if (state.isStartable()) {
 		this.setState(ConnectionState.CONNECTING);
 		this.executor.execute(new ConnectionInitalize(sessionConfig, executor, this));
-		// }
-		// else {
-		// throw new IllegalStateException("Don't call initalize when state is: " + state);
-		// }
 	}
 
 	@Override

@@ -11,7 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.SessionConfig;
+import org.openymsg.config.SessionConfig;
 import org.openymsg.execute.Request;
 import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.url.URLStreamBuilder;
@@ -35,7 +35,7 @@ public class AddressBookRequest implements Request {
 	}
 
 	@Override
-	public void run() {
+	public void execute() {
 		String cookie = String.format(NetworkConstants.ADDRESSBOOK_COOKIE_FORMAT, this.cookieY, this.cookieT);
 		URLStreamBuilder builder = new URLStreamBuilderImpl().url(NetworkConstants.ADDRESSBOOK_URL).timeout(config.getConnectionTimeout()).cookie(cookie);
 		URLStreamBuilderStatus status = builder.build();
@@ -138,5 +138,11 @@ public class AddressBookRequest implements Request {
         //
         // return textVal;
     }
+
+	@Override
+	public void failure(Exception ex) {
+		//TODO - what to do
+		log.error("Failed running", ex);
+	}
 
 }

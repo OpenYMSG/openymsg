@@ -21,7 +21,7 @@ public class SimpleExecutor { //implements Dispatcher {
 			log.warn("Not executing: " + request + ", " + this.executor.isShutdown());
 		}
 		else {
-			executor.execute(request);
+			executor.execute(new RequestWrapper(request));
 		}
 	}
 	

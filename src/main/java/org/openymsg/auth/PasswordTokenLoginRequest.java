@@ -6,7 +6,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.SessionConfig;
+import org.openymsg.config.SessionConfig;
 import org.openymsg.execute.Request;
 import org.openymsg.network.url.URLStreamBuilder;
 import org.openymsg.network.url.URLStreamBuilderImpl;
@@ -30,7 +30,7 @@ public class PasswordTokenLoginRequest implements Request {
 	}
 
 	@Override
-	public void run() {
+	public void execute() {
 		try {
 			this.yahooAuth16Stage2(token);
 		}
@@ -77,7 +77,7 @@ public class PasswordTokenLoginRequest implements Request {
 		StringTokenizer toks = new StringTokenizer(reponse, "\r\n");
 		if (toks.countTokens() <= 0) {
 			log.warn("Login Failed, wrong response in stage 2:");
-			// TODO handle failure
+			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE2);
 			return;
 		}
 
@@ -87,14 +87,12 @@ public class PasswordTokenLoginRequest implements Request {
 		catch (NumberFormatException e) {
 			log.warn("Login Failed, wrong response in stage 2:");
 			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE2);
-			// TODO handle failure
 			return;
 		}
 
 		if (responseNo != 0 || !toks.hasMoreTokens()) {
 			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE2);
 			log.warn("Login Failed, Unkown error");
-			// TODO handle failure
 			return;
 		}
 
@@ -114,7 +112,6 @@ public class PasswordTokenLoginRequest implements Request {
 		if (crumb == null || cookieT == null || cookieY == null) {
 			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE2);
 			log.warn("Login Failed, Unkown error");
-			// TODO handle failure
 			return;
 		}
 
@@ -129,6 +126,12 @@ public class PasswordTokenLoginRequest implements Request {
 		// return yahooAuth16Stage3(crumb + seed, cookieY, cookieT);
 
 //		log.warn("Login Failed, unable to retrieve stage 2 url");
+	}
+
+	@Override
+	public void failure(Exception ex) {
+		log.error("Failed token login", ex);
+		sessionAuthorize.setFailureState(AuthenticationFailure.STAGE2);
 	}
 
 }

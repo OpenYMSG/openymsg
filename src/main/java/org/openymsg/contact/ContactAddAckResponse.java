@@ -91,6 +91,7 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 		boolean contactWasAdded = sessionContact.possibleContact(contact);
 		boolean groupWasAdded = sessionGroup.possibleAddGroup(group);
 		sessionStatus.publishPending(contact);
+		log.info("Contact was added: " + contactWasAdded + " along with the group: " + groupWasAdded);
 	}
 
 }
