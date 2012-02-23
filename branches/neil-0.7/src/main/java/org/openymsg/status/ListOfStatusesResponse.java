@@ -62,7 +62,6 @@ public class ListOfStatusesResponse extends MultiplePacketListResponse {
             String[] s = iter.next();
 
             int key = Integer.valueOf(s[0]);
-            System.out.println("key: " + key);
             String value = s[1];
             // log.info("Key: " + key + ", value: " + value);
             switch (key) {

@@ -9,8 +9,10 @@ import org.openymsg.Contact;
 import org.openymsg.ContactGroup;
 import org.openymsg.execute.Executor;
 import org.openymsg.group.ContactGroupRenameMessage;
+import org.openymsg.group.SessionGroup;
 import org.openymsg.group.SessionGroupImpl;
 import org.openymsg.network.ServiceType;
+import org.openymsg.status.SessionStatus;
 import org.openymsg.status.SessionStatusImpl;
 import org.openymsg.util.CollectionUtils;
 
@@ -24,9 +26,17 @@ public class SessionContactImpl implements SessionContact, SessionContactCallbac
 	public SessionContactImpl(Executor executor, String username) {
 		this.executor = executor;
 		this.username = username;
-		this.executor.register(ServiceType.LIST_15, new ListOfContactsResponse(this, sessionGroup, sessionStatus));
 	}
 
+	public void initialize() throws IllegalStateException {
+		if (this.sessionGroup == null) {
+			throw new IllegalStateException("SessionGroup is not set");
+		}
+		if (this.sessionStatus == null) {
+			throw new IllegalStateException("SessionStatus is not set");
+		}
+		this.executor.register(ServiceType.LIST_15, new ListOfContactsResponse(this, sessionGroup, sessionStatus));
+	}
     public void renameGroup(ContactGroup group, String newName) throws IllegalStateException, IOException {
 //        checkStatus();
     	this.executor.execute(new ContactGroupRenameMessage(username, group, newName));
@@ -114,6 +124,14 @@ public class SessionContactImpl implements SessionContact, SessionContactCallbac
 	public void contactAddFailure(Contact contact, ContactAddFailure failure, String friendAddStatus) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void setGroupSession(SessionGroupImpl sessionGroup) {
+		this.sessionGroup = sessionGroup;
+	}
+
+	public void setStatusSession(SessionStatusImpl sessionStatus) {
+		this.sessionStatus = sessionStatus;
 	}
 
 }
