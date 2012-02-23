@@ -1,4 +1,4 @@
-package org.openymsg;
+package org.openymsg.config;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
@@ -12,12 +12,7 @@ import org.openymsg.network.ConnectionBuilder;
 import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.direct.DirectConnectionBuilder;
 
-/**
- * Default SessionConfig
- * @author neilhart
- *
- */
-public class SessionConfigImpl implements SessionConfig {
+public class SessionConfigHardcoded implements SessionConfig {
 	private static final Log log = LogFactory.getLog(SessionConfigImpl.class);
 	
     @Override
@@ -55,7 +50,7 @@ public class SessionConfigImpl implements SessionConfig {
 
 	@Override
     public String[] getCapacityHosts() {
-        return NetworkConstants.CAPACITY_HOSTS;
+        return new String[0];
     }
 
 	@Override
@@ -82,7 +77,8 @@ public class SessionConfigImpl implements SessionConfig {
 
 	@Override
 	public String[] getScsHosts() {
-		return NetworkConstants.SCS_HOSTS;
+		String[] ips = { "67.195.187.252", "67.195.187.197" }; 
+		return ips;
 	}
 
 	@Override

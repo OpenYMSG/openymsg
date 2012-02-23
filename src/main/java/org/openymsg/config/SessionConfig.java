@@ -1,4 +1,4 @@
-package org.openymsg;
+package org.openymsg.config;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
