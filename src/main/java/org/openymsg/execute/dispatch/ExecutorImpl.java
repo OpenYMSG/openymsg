@@ -86,6 +86,7 @@ public class ExecutorImpl implements Executor {
 
 	@Override
 	public void schedule(Message message, int repeatTimeInMillis) {
+//		DispatcherMessageRequest request = new DispatcherMessageRequest(message, this))
 		throw new RuntimeException();
 		// TODO Auto-generated method stub
 		

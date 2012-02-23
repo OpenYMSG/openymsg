@@ -14,6 +14,11 @@ public class SessionGroupImpl implements SessionGroup, SessionGroupCallback {
 	private String username;
 	private Set<ContactGroup> contactGroups = Collections.synchronizedSet(new HashSet<ContactGroup>());
 
+	public SessionGroupImpl(Executor executor, String username) {
+		this.executor = executor;
+		this.username = username;
+	}
+
     public void renameGroup(ContactGroup group, String newName) throws IllegalStateException, IOException {
 //      checkStatus();
   	this.executor.execute(new ContactGroupRenameMessage(username, group, newName));

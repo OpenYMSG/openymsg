@@ -37,9 +37,9 @@ public class SessionImpl implements Session {
 	private SessionSession session;
 	private SessionMessage message;
 	private SessionAuthentication authorize;
-	private SessionContact contact;
-	private SessionGroup group;
-	private SessionStatus status;
+	private SessionContactImpl contact;
+	private SessionGroupImpl group;
+	private SessionStatusImpl status;
 	private SessionConference conference;
 	@SuppressWarnings("unused")
 	private SessionKeepAlive keepAlive;
@@ -69,13 +69,16 @@ public class SessionImpl implements Session {
 		this.authorize = new SessionAuthenticationImpl(this.config, executor);
 		this.session = new SessionSessionImpl(username, executor);
 		this.contact = new SessionContactImpl(executor, username);
-		this.group = new SessionGroupImpl();
+		this.group = new SessionGroupImpl(executor, username);
 		this.status = new SessionStatusImpl(executor);
+		this.contact.setGroupSession(this.group);
+		this.contact.setStatusSession(this.status);
+		this.contact.initialize();
 		this.message = new SessionMessageImpl(executor, username, this.callback);
 		this.conference = new SessionConferenceImpl(username, executor);
 		this.mail = new SessionMailImpl(executor);
 		this.unknown = new SessionUnknown(executor);
-		this.keepAlive = new SessionKeepAliveImpl(executor, username);
+//		this.keepAlive = new SessionKeepAliveImpl(executor, username);
 	}
 
 	@Override
