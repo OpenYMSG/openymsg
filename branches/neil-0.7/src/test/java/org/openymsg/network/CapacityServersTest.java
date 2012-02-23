@@ -3,8 +3,8 @@ package org.openymsg.network;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.openymsg.SessionConfig;
-import org.openymsg.SessionConfigImpl;
+import org.openymsg.config.SessionConfig;
+import org.openymsg.config.SessionConfigImpl;
 import org.testng.annotations.Test;
 
 public class CapacityServersTest {

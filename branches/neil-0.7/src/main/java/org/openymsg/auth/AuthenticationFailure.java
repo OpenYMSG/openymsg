@@ -27,6 +27,8 @@ package org.openymsg.auth;
 public enum AuthenticationFailure {
 	/** Local implementation value used when Failure is not found */
 	NO_REASON(-100),
+	/** Local implementation value used when failure is in stage1 authentication url */
+	STAGE1(-99),
 	/** Local implementation value used when failure is in stage2 authentication url */
 	STAGE2(-99),
 	/** Account unknown? */

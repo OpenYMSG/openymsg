@@ -1,7 +1,7 @@
 package org.openymsg.network.direct;
 
-import org.openymsg.SessionConfig;
-import org.openymsg.SessionConfigImpl;
+import org.openymsg.config.SessionConfig;
+import org.openymsg.config.SessionConfigImpl;
 import org.openymsg.connection.ConnectionInfo;
 import org.openymsg.network.ConnectionBuilder;
 import org.testng.annotations.BeforeMethod;

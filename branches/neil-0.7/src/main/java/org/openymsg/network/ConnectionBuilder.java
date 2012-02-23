@@ -1,19 +1,18 @@
 package org.openymsg.network;
 
-import org.openymsg.SessionConfig;
+import org.openymsg.config.SessionConfig;
 import org.openymsg.connection.ConnectionInfo;
-import org.openymsg.network.direct.DirectConnectionHandler;
 
 public interface ConnectionBuilder {
 
-	public abstract ConnectionInfo getHandlerStatus();
+	ConnectionInfo getHandlerStatus();
 
-	public abstract ConnectionBuilder with(SessionConfig config);
+	ConnectionBuilder with(SessionConfig config);
 
-	public abstract ConnectionBuilder useCapacityServers();
+	ConnectionBuilder useCapacityServers();
 
-	public abstract ConnectionBuilder useScsServers();
+	ConnectionBuilder useScsServers();
 
-	public abstract DirectConnectionHandler build();
+	ConnectionHandler build();
 
 }

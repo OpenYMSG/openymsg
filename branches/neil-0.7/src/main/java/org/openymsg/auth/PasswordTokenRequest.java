@@ -5,7 +5,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.SessionConfig;
+import org.openymsg.config.SessionConfig;
 import org.openymsg.execute.Request;
 import org.openymsg.network.url.URLStreamBuilder;
 import org.openymsg.network.url.URLStreamBuilderImpl;
@@ -15,7 +15,6 @@ import org.openymsg.network.url.URLStreamBuilderStatus;
  * Open a HTTP connection with a get token URL with the user's credentials and retrieve authorization and a token.
  * 
  * @author neilhart
- * 
  */
 public class PasswordTokenRequest implements Request {
 	private static final Log log = LogFactory.getLog(PasswordTokenRequest.class);
@@ -36,15 +35,11 @@ public class PasswordTokenRequest implements Request {
 	}
 
 	@Override
-	public void run() {
-		this.yahooAuth16Stage1();
-	}
-
-	private void yahooAuth16Stage1() { // String seed
+	public void execute() { // String seed
 		String authLink = config.getPasswordTokenGetUrl(username, password, seed);
 		if (authLink == null) {
 			log.error("Failed creating url for: " + username + "/" + password + "/" + seed);
-			// TODO handle failure
+			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE1);
 			return;
 		}
 
@@ -55,7 +50,7 @@ public class PasswordTokenRequest implements Request {
 
 		if (!status.isCorrect()) {
 			log.warn("Failed retrieving response for url: " + authLink);
-			// TODO handle failure
+			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE1);
 			return;
 		}
 
@@ -63,7 +58,7 @@ public class PasswordTokenRequest implements Request {
 		StringTokenizer toks = new StringTokenizer(response, "\r\n");
 		if (toks.countTokens() <= 0) {
 			log.warn("Login Failed, wrong response in stage 1");
-			// TODO handle failure
+			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE1);
 			return;
 		}
 
@@ -73,7 +68,7 @@ public class PasswordTokenRequest implements Request {
 		}
 		catch (NumberFormatException e) {
 			log.warn("Login Failed, wrong response in stage 1");
-			// TODO handle failure
+			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE1);
 			return;
 		}
 
@@ -115,5 +110,11 @@ public class PasswordTokenRequest implements Request {
 		ymsgr = ymsgr.replaceAll("ymsgr=", "");
 		sessionAuthorize.setYmsgr(ymsgr);
 		return;
+	}
+
+	@Override
+	public void failure(Exception ex) {
+		log.error("Failed token request", ex);
+		sessionAuthorize.setFailureState(AuthenticationFailure.STAGE1);
 	}
 }

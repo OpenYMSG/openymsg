@@ -3,6 +3,8 @@ package org.openymsg;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 
+import org.openymsg.config.SessionConfig;
+import org.openymsg.config.SessionConfigImpl;
 import org.testng.annotations.Test;
 
 public class SessionConfigImplTest {

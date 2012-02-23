@@ -1,5 +1,7 @@
 package org.openymsg;
 
+import java.util.Set;
+
 import org.openymsg.auth.SessionAuthentication;
 import org.openymsg.conference.SessionConference;
 import org.openymsg.connection.SessionConnection;
@@ -23,4 +25,11 @@ public interface Session extends SessionConnection, SessionAuthentication, Sessi
 	@Override
 	void login(String username, String password) throws IllegalArgumentException, IllegalStateException;
 
+	/**
+	 * @throws IllegalStateException if Session is not in correct state
+	 */
+	@Override
+	Set<ContactGroup> getContactGroups() throws IllegalStateException;
+
+	
 }

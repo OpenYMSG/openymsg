@@ -8,6 +8,7 @@ import org.openymsg.auth.SessionAuthenticationCallback;
 import org.openymsg.auth.SessionAuthenticationImpl;
 import org.openymsg.conference.SessionConference;
 import org.openymsg.conference.SessionConferenceImpl;
+import org.openymsg.config.SessionConfig;
 import org.openymsg.connection.ConnectionInfo;
 import org.openymsg.connection.ConnectionState;
 import org.openymsg.connection.SessionConnectionCallback;
@@ -40,8 +41,11 @@ public class SessionImpl implements Session {
 	private SessionGroup group;
 	private SessionStatus status;
 	private SessionConference conference;
+	@SuppressWarnings("unused")
 	private SessionKeepAlive keepAlive;
+	@SuppressWarnings("unused")
 	private SessionUnknown unknown;
+	@SuppressWarnings("unused")
 	private SessionMail mail;
 
 	public SessionImpl(SessionConfig config, SessionCallback callback) {
@@ -60,7 +64,8 @@ public class SessionImpl implements Session {
 
 	private void initialize(String username) {
 		ExecutorImpl executor = new ExecutorImpl(username);
-		this.connection = new SessionConnectionImpl(executor, this.config);
+		this.connection = new SessionConnectionImpl(executor);
+		this.connection.initialize(this.config);
 		this.authorize = new SessionAuthenticationImpl(this.config, executor);
 		this.session = new SessionSessionImpl(username, executor);
 		this.contact = new SessionContactImpl(executor, username);

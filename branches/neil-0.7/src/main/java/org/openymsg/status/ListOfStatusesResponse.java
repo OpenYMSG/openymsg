@@ -57,6 +57,7 @@ public class ListOfStatusesResponse extends MultiplePacketListResponse {
         String customStatus = null;
         YahooProtocol protocol = YahooProtocol.YAHOO;
         String userId = null;
+        String clientVersion = null;
         while (iter.hasNext()) {
             String[] s = iter.next();
 
@@ -72,7 +73,7 @@ public class ListOfStatusesResponse extends MultiplePacketListResponse {
                 // check and see if we have one
                 if (userId != null) {
                     updateFriendStatus(logoff, userId, onChat, onPager, visibility, clearIdleTime, idleTime,
-                            customMessage, customStatus, longStatus, protocol);
+                            customMessage, customStatus, longStatus, protocol, clientVersion);
                     longStatus = 0;
                     onChat = null;
                     onPager = null;
@@ -82,6 +83,7 @@ public class ListOfStatusesResponse extends MultiplePacketListResponse {
                     customMessage = null;
                     customStatus = null;
                     userId = null;
+                    clientVersion = null;
                     protocol = YahooProtocol.YAHOO;
 
                 }
@@ -120,7 +122,7 @@ public class ListOfStatusesResponse extends MultiplePacketListResponse {
                 break;
             case 244:
             	//TODO - track version
-                String clientVersion = value;
+                clientVersion = value;
                 break;
             case 137:
                 idleTime = value;
@@ -132,13 +134,13 @@ public class ListOfStatusesResponse extends MultiplePacketListResponse {
         }
         if (userId != null) {
             updateFriendStatus(logoff, userId, onChat, onPager, visibility, clearIdleTime, idleTime, customMessage,
-                    customStatus, longStatus, protocol);
+                    customStatus, longStatus, protocol, clientVersion);
         }
 
     }
     private void updateFriendStatus(boolean logoff, String userId, Boolean onChat, Boolean onPager, String visibility,
             String clearIdleTime, String idleTime, String customMessage, String customStatus, long longStatus,
-            YahooProtocol protocol) {
+            YahooProtocol protocol, String clientVersion) {
         log.trace("UpdateFriendStatus arguments: logoff: " + logoff + ", user: " + userId + ", onChat: " + onChat
                 + ", onPager: " + onPager + ", visibility: " + visibility + ", clearIdleTime: " + clearIdleTime
                 + ", idleTime: " + idleTime + ", customMessage: " + customMessage + ", customStatus: " + customStatus

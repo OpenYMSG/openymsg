@@ -75,7 +75,7 @@ public class ListOfContactsResponse extends MultiplePacketListResponse {
 									currentListGroup.add(yu);
 									if (!yu.getProtocol().equals(protocol)
 											&& yu.getProtocol().equals(YahooProtocol.YAHOO)) {
-										log.debug("Switching protocols because user is in list more that once: "
+										log.warn("Switching protocols because user is in list more that once: "
 												+ yu.getId() + " from: " + yu.getProtocol() + " to: " + protocol);
 										yu.setProtocol(protocol);
 									}
