@@ -1,12 +1,28 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
-  <HEAD>
-    <TITLE>API Overview</TITLE>
-  </HEAD>
-  <BODY>
-    Short overview of the API.
-    <H1>Overview</H1>
-    <img src="doc-files/Openymsg.jpg">
-    <H1>Developer Info</H1>
-  </BODY>
+<HEAD>
+<TITLE>API Overview</TITLE>
+</HEAD>
+<BODY>
+	This library is a replacement for Yahoo Instant Messenger version
+	9.0.0.2162.
+	<H1>Overview</H1>
+	<h2>Reasons for rewrite</h2>
+	Single Threaded. Before there were 2 threads. Thread-safe. All changes
+	are on the single thread. Interfaces to protect internals. Easier to
+	provide multiple implementation. Easier for testing. More modular.
+	Easier to make changes. Easier to test. Better tolerance for login
+	failures. Consistent use of version 9 protocol.
+
+	<h2>Current Limitations</h2>
+	Multiple Identities are not supported. Connecting via HTTP is not
+	supported.
+	<H1>Developer Info</H1>
+	<img src="doc-files/Openymsg.jpg">
+	<H2>Version of Yahoo Instant Messenger</H2>
+	Make sure that the protocol that is used is from version 9.0.0.2162.
+	Many versions of Yahoo have a slightly different protocol. There may be
+	issues with using some old and some new protocols. This project should
+	be designed to support multiple protocols, but that is not yet done.
+</BODY>
 </HTML>

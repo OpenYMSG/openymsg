@@ -1,11 +1,10 @@
-package org.openymsg.status;
+package org.openymsg.session;
 
 public enum LogoutState {
     NO_REASON(-1, false), // don't know, this is when no reason is sent
     DUPLICATE_LOGIN1(42, true),     //42 - Account has signed in from another location
     DUPLICATE_LOGIN2(99, true),
     UNKNOWN_52(52, false); // don't know
-//    YAHOO_LOGOFF(-100), // Yahoo has told us to log off
 
     private long value;
     private boolean duplicateLogin;

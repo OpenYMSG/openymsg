@@ -2,6 +2,8 @@ package org.openymsg.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openymsg.Contact;
+import org.openymsg.YahooProtocol;
 import org.openymsg.execute.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
 
@@ -26,17 +28,23 @@ public class MessageOfflineResponse implements SinglePacketResponse {
 	private void extractOfflineMessage(int i, YMSG9Packet packet) {
 		// TODO handle identities?
 		// final String to = this.packet.getNthValue("5", i);
-		final String from = packet.getNthValue("4", i);
-		final String message = packet.getNthValue("14", i);
-		final String timestamp = packet.getNthValue("15", i);
+		String from = packet.getNthValue("4", i);
+		String fed = packet.getValue("241");
+		String message = packet.getNthValue("14", i);
+		String timestamp = packet.getNthValue("15", i);
+		YahooProtocol protocol = YahooProtocol.YAHOO;
+		if (fed != null) {
+			protocol = YahooProtocol.getProtocolOrDefault(fed, from);
+		}
+		Contact contact = new Contact(from, protocol); 
 
 		if (timestamp == null || timestamp.length() == 0) {
 			log.warn("Offline message with no timestamp");
-			this.session.receivedOfflineMessage(from, message, 0L);
+			this.session.receivedOfflineMessage(contact, message, 0L);
 		}
 		else {
 			long timestampInMillis = 1000 * Long.parseLong(timestamp);
-			this.session.receivedOfflineMessage(from, message, timestampInMillis);
+			this.session.receivedOfflineMessage(contact, message, timestampInMillis);
 		}
 	}
 
