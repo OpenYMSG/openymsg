@@ -25,6 +25,7 @@ package org.openymsg;
  * @author S.E. Morris
  */
 public enum Status {
+	OFFLINE(-100), //Internal missing value
     ERROR(-1),
     AVAILABLE(0),
     BRB(1),
@@ -38,10 +39,10 @@ public enum Status {
     STEPPEDOUT(9),
     INVISIBLE(12),
     CUSTOM(99),
-    IDLE(999),
-    OFFLINE(0x5a55aa56),
-    WEBLOGIN(0x5a55aa55),
-    TYPING(0x16);
+    IDLE(999);
+//    OFFLINE(0x5a55aa56),
+//    WEBLOGIN(0x5a55aa55),
+//    TYPING(0x16);
 
     // Unique long representation of this Status.
     private long value;

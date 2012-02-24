@@ -79,7 +79,7 @@ public class PasswordTokenRequest implements Request {
 				sessionAuthorize.setFailureState(AuthenticationFailure.BADUSERNAME);
 				break;
 			case 1212:
-				log.info("Login Failed, Wrong password" + AuthenticationFailure.BAD);
+				log.info("Login Failed, Wrong password: " + AuthenticationFailure.BAD);
 				sessionAuthorize.setFailureState(AuthenticationFailure.BAD);
 				break;
 			case 1213:

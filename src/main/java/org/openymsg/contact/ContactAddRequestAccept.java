@@ -22,9 +22,8 @@ public class ContactAddRequestAccept implements Message {
         PacketBodyBuffer body = new PacketBodyBuffer();
         body.addElement("1", this.username);
         body.addElement("5", this.contact.getId());
-        body.addElement("241", this.contact.getProtocol().getStringValue());
+        body.addElement("241", this.contact.getProtocol().getStringValue()); //TODO - is this there for regular yahoo users?
         body.addElement("13", "1");// Accept Authorization
-        // body.addElement("334", ""); not therein v16
 		return body;
 	}
 

@@ -5,6 +5,8 @@ import java.io.IOException;
 import org.openymsg.Contact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.execute.Executor;
+import org.openymsg.execute.read.NoOpResponse;
+import org.openymsg.network.ServiceType;
 
 public class SessionMessageImpl implements SessionMessage {
 	// Buzz string
@@ -19,13 +21,13 @@ public class SessionMessageImpl implements SessionMessage {
 		this.executor = executor;
 		this.username = username;
 		this.callback = callback;
+		this.executor.register(ServiceType.MESSAGE_ACK, new NoOpResponse());
+		this.executor.register(ServiceType.MESSAGE, new MessageResponse(this));
 	}
 
 	/**
 	 * Send a buzz message
-	 * 
-	 * @param to
-	 *            Recipient of the buzz.
+	 * @param to Recipient of the buzz.
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 */
@@ -35,11 +37,8 @@ public class SessionMessageImpl implements SessionMessage {
 
 	/**
 	 * Send a chat message.
-	 * 
-	 * @param to
-	 *            Yahoo ID of the user to transmit the message.
-	 * @param message
-	 *            The message to transmit.
+	 * @param to Yahoo ID of the user to transmit the message.
+	 * @param message The message to transmit.
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 */
@@ -56,38 +55,24 @@ public class SessionMessageImpl implements SessionMessage {
 			throw new IllegalArgumentException("Message cannot be null");
 		}
 
-		String contactType = this.getType(contact);
-
 		String messageId = buildMessageNumber();
 
-		this.executor.execute(new SendMessage(username, contact.getId(), contactType, message, messageId));
+		this.executor.execute(new SendMessage(username, contact, message, messageId));
 	}
-	
-    /**
-     * notify to friend the typing start or end action message parameters Version: 16 Service: Notify (75) Status:
-     * Notify (22)
-     * 
-     * 49: TYPING 1: userId 14: <empty> 13: 1 or 0 5: sendingToId
-     * 
-     * @param friend
-     *            user whose sending message
-     * @param isTyping
-     *            true if start typing, false if typing end up
-     * @throws IOException
-     */
-	@Override
-    public void sendTypingNotification(Contact contact, boolean isTyping) throws IOException {
-    	//TODO type for msn users
-//        String type = this.getType(friend);
-		this.executor.execute(new TypingNotificationMessage(username, contact, isTyping));
-//        transmitNotify(friend, primaryID.getId(), isTyping, " ", NOTIFY_TYPING, type);
-    }
 
-	protected String getType(Contact contact) {
-		if (contact == null || contact.getProtocol() == null) {
-			return YahooProtocol.YAHOO.getStringValue();
-		}
-		return contact.getProtocol().getStringValue();
+	/**
+	 * notify to friend the typing start or end action message parameters Version: 16 Service: Notify (75) Status:
+	 * Notify (22) 49: TYPING 1: userId 14: <empty> 13: 1 or 0 5: sendingToId
+	 * @param friend user whose sending message
+	 * @param isTyping true if start typing, false if typing end up
+	 * @throws IOException
+	 */
+	@Override
+	public void sendTypingNotification(Contact contact, boolean isTyping) throws IOException {
+		// TODO type for msn users
+		// String type = this.getType(friend);
+		this.executor.execute(new TypingNotificationMessage(username, contact, isTyping));
+		// transmitNotify(friend, primaryID.getId(), isTyping, " ", NOTIFY_TYPING, type);
 	}
 
 	protected String buildMessageNumber() {
@@ -99,21 +84,21 @@ public class SessionMessageImpl implements SessionMessage {
 		return messageNumber;
 	}
 
-	public void receivedMessage(String contactId, String message, String messageId) {
-		this.executor.execute(new MessageAckMessage(username, contactId, messageId));
-		this.callback.receivedMessage(contactId, message);
+	public void receivedMessage(Contact contact, String message, String messageId) {
+		this.executor.execute(new MessageAckMessage(username, contact, messageId));
+		this.callback.receivedMessage(contact, message);
 	}
 
-	public void receivedBuzz(String contactId, String id) {
-		this.callback.receivedBuzz(contactId);
+	public void receivedBuzz(Contact contact, String id) {
+		this.callback.receivedBuzz(contact);
 	}
 
-	public void receivedOfflineMessage(String from, String message, long timestampInMillis) {
+	public void receivedOfflineMessage(Contact contact, String message, long timestampInMillis) {
 		if (timestampInMillis == 0) {
-			this.callback.receivedMessage(from, message);
+			this.callback.receivedMessage(contact, message);
 		}
 		else {
-			this.callback.receivedOfflineMessage(from, message, timestampInMillis);
+			this.callback.receivedOfflineMessage(contact, message, timestampInMillis);
 		}
 	}
 

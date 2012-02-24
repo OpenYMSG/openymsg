@@ -1,5 +1,7 @@
 package org.openymsg.message;
 
+import org.openymsg.Contact;
+import org.openymsg.YahooProtocol;
 import org.openymsg.execute.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
 
@@ -13,22 +15,28 @@ public class MessageOnlineResponse implements SinglePacketResponse {
 
 	@Override
 	public void execute(YMSG9Packet packet) {
+		// TODO check for more that one message
 		// Sent while we are online
 		// TODO - handle indentity
-		// TODO - handle MSN
 		// final String to = this.packet.getValue("5");
 		String from = packet.getValue("4");
+		String fed = packet.getValue("241");
 		String message = packet.getValue("14");
 		String id = packet.getValue("429");
-		this.session.receivedMessage(from, message, id);
+		String timestamp = packet.getValue("15"); // Messages from MSN have timestamp
+		String value252 = packet.getValue("252"); // something from MSN
+		String value455 = packet.getValue("455"); // something from MSN
 
-		// TODO - handle message
-		// final SessionEvent se = new SessionEvent(this, to, from, message);
+		YahooProtocol protocol = YahooProtocol.YAHOO;
+		if (fed != null) {
+			protocol = YahooProtocol.getProtocolOrDefault(fed, from);
+		}
+		Contact contact = new Contact(from, protocol);
 		if (message.equalsIgnoreCase(BUZZ)) {
-			this.session.receivedBuzz(from, id);
+			this.session.receivedBuzz(contact, id);
 		}
 		else {
-			this.session.receivedMessage(from, message, id);
+			this.session.receivedMessage(contact, message, id);
 		}
 	}
 

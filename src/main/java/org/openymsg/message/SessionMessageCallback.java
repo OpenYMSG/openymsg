@@ -1,5 +1,7 @@
 package org.openymsg.message;
 
+import org.openymsg.Contact;
+
 
 /**
  * Receiving messages and typing status from Yahoo.  The contactId may not be a contact but a non-contact Yahoo Id.
@@ -8,9 +10,8 @@ package org.openymsg.message;
  *
  */
 public interface SessionMessageCallback {
-	//TODO how to handle MSN users
-	void receivedMessage(String contactId, String message);
-	void receivedBuzz(String contactId);
-	void receivedOfflineMessage(String contactId, String message, long timestampInMillis);
-	void receivedTypingNotification(String contactId, boolean isTyping);
+	void receivedMessage(Contact from, String message);
+	void receivedBuzz(Contact from);
+	void receivedOfflineMessage(Contact from, String message, long timestampInMillis);
+	void receivedTypingNotification(Contact from, boolean isTyping);
 }

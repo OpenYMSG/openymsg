@@ -4,7 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.execute.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
-import org.openymsg.status.LogoutState;
 
 //TODO - connection isn't closed yet
 //TODO - really a Pager Log off

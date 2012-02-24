@@ -2,6 +2,7 @@ package org.openymsg.message;
 
 import java.io.IOException;
 
+import org.openymsg.Contact;
 import org.openymsg.execute.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
@@ -13,12 +14,12 @@ import org.openymsg.network.ServiceType;
  */
 public class MessageAckMessage implements Message {
 	private String username;
-	private String from;
+	private Contact contact;
 	private String messageId;
 
-	public MessageAckMessage(String username, String from, String messageId) {
+	public MessageAckMessage(String username, Contact contact, String messageId) {
 		this.username = username;
-		this.from = from;
+		this.contact = contact;
 		this.messageId = messageId;
 	}
 
@@ -26,7 +27,8 @@ public class MessageAckMessage implements Message {
 	public PacketBodyBuffer getBody() throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", username);
-		body.addElement("5", from);
+		body.addElement("5", contact.getId());
+		protocol;
 		body.addElement("302", "430");
 		body.addElement("430", messageId);
 		body.addElement("303", "430");

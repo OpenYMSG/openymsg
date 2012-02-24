@@ -40,7 +40,8 @@ import java.util.List;
 public class YMSG9Packet {
     public String magic; // Header 1
 
-    public int version, length; // Header 2
+    public int version;
+    public int length; // Header 2
 
     public ServiceType service;
 
