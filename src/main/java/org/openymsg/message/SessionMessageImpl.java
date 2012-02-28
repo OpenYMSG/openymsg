@@ -3,7 +3,6 @@ package org.openymsg.message;
 import java.io.IOException;
 
 import org.openymsg.Contact;
-import org.openymsg.YahooProtocol;
 import org.openymsg.execute.Executor;
 import org.openymsg.execute.read.NoOpResponse;
 import org.openymsg.network.ServiceType;

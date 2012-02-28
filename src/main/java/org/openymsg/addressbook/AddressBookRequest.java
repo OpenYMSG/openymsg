@@ -12,11 +12,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.config.SessionConfig;
-import org.openymsg.execute.Request;
+import org.openymsg.execute.dispatch.Request;
 import org.openymsg.network.NetworkConstants;
+import org.openymsg.network.url.URLStream;
 import org.openymsg.network.url.URLStreamBuilder;
 import org.openymsg.network.url.URLStreamBuilderImpl;
-import org.openymsg.network.url.URLStreamBuilderStatus;
+import org.openymsg.network.url.URLStreamStatus;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -37,9 +38,11 @@ public class AddressBookRequest implements Request {
 	@Override
 	public void execute() {
 		String cookie = String.format(NetworkConstants.ADDRESSBOOK_COOKIE_FORMAT, this.cookieY, this.cookieT);
-		URLStreamBuilder builder = new URLStreamBuilderImpl().url(NetworkConstants.ADDRESSBOOK_URL).timeout(config.getConnectionTimeout()).cookie(cookie);
-		URLStreamBuilderStatus status = builder.build();
-		InputStream in = builder.getInputStream();
+		URLStreamBuilder builder = new URLStreamBuilderImpl().url(NetworkConstants.ADDRESSBOOK_URL)
+				.timeout(config.getConnectionTimeout()).cookie(cookie);
+		URLStream stream = builder.build();
+		URLStreamStatus status = builder.getStatus();
+		InputStream in = stream.getInputStream();
 
 		if (!status.isCorrect()) {
 			log.warn("Failed retrieving response for url: " + NetworkConstants.ADDRESSBOOK_URL);
@@ -99,49 +102,46 @@ public class AddressBookRequest implements Request {
 		}
 	}
 
-    private YahooAddressBookEntry getContact(Element empEl) {
-        String id = getTextValue(empEl, "yi");
-        String lcsid = getTextValue(empEl, "lcsid");
-        String firstName = getTextValue(empEl, "fn");
-        String lastName = getTextValue(empEl, "ln");
-        String nickName = getTextValue(empEl, "nn");
-        String groupName = getTextValue(empEl, "li");
+	private YahooAddressBookEntry getContact(Element empEl) {
+		String id = getTextValue(empEl, "yi");
+		String lcsid = getTextValue(empEl, "lcsid");
+		String firstName = getTextValue(empEl, "fn");
+		String lastName = getTextValue(empEl, "ln");
+		String nickName = getTextValue(empEl, "nn");
+		String groupName = getTextValue(empEl, "li");
 
-        if (isEmpty(id) && isEmpty(lcsid)) {
-            log.debug("Failed building user firstname: " + firstName 
-                    + ", lastname: " + lastName + ", nickname: " + nickName 
-                    + ", groupName: " + groupName 
-                    + ", element: " + empEl + "/" + empEl.getAttributes());
-        }
-        if (isEmpty(id) && !isEmpty(lcsid)) {
-            id = lcsid;
-        }
-        YahooAddressBookEntry user = new YahooAddressBookEntry(id, firstName, lastName, 
-                nickName, groupName);
-        // log.trace("firstname: " + firstName + ", lastname: " + lastName + ", nickname: " + 
-        //        nickName + ", groupName: " + groupName);
+		if (isEmpty(id) && isEmpty(lcsid)) {
+			log.debug("Failed building user firstname: " + firstName + ", lastname: " + lastName + ", nickname: "
+					+ nickName + ", groupName: " + groupName + ", element: " + empEl + "/" + empEl.getAttributes());
+		}
+		if (isEmpty(id) && !isEmpty(lcsid)) {
+			id = lcsid;
+		}
+		YahooAddressBookEntry user = new YahooAddressBookEntry(id, firstName, lastName, nickName, groupName);
+		// log.trace("firstname: " + firstName + ", lastname: " + lastName + ", nickname: " +
+		// nickName + ", groupName: " + groupName);
 
-        return user;
-    }
+		return user;
+	}
 
-    private boolean isEmpty(String id) {
-        return id == null || id.length() == 0;
-    }
+	private boolean isEmpty(String id) {
+		return id == null || id.length() == 0;
+	}
 
-    private String getTextValue(Element ele, String tagName) {
-//        String textVal = null;
-        return ele.getAttribute(tagName);
-        // if(nl != null && nl.getLength() > 0) {
-        // Element el = (Element)nl.item(0);
-        // textVal = el.getFirstChild().getNodeValue();
-        // }
-        //
-        // return textVal;
-    }
+	private String getTextValue(Element ele, String tagName) {
+		// String textVal = null;
+		return ele.getAttribute(tagName);
+		// if(nl != null && nl.getLength() > 0) {
+		// Element el = (Element)nl.item(0);
+		// textVal = el.getFirstChild().getNodeValue();
+		// }
+		//
+		// return textVal;
+	}
 
 	@Override
 	public void failure(Exception ex) {
-		//TODO - what to do
+		// TODO - what to do
 		log.error("Failed running", ex);
 	}
 

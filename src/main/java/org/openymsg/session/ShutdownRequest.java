@@ -3,7 +3,7 @@ package org.openymsg.session;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.execute.Executor;
-import org.openymsg.execute.Request;
+import org.openymsg.execute.dispatch.Request;
 
 public class ShutdownRequest implements Request {
 	private static final Log log = LogFactory.getLog(ShutdownRequest.class);

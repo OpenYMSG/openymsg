@@ -4,7 +4,7 @@ import java.net.URL;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.execute.SinglePacketResponse;
+import org.openymsg.execute.read.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
 
 /**

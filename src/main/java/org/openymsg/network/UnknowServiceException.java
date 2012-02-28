@@ -2,7 +2,6 @@ package org.openymsg.network;
 
 /**
  * @author Giancarlo Frison - Nimbuzz B.V. <giancarlo@nimbuzz.com>
- * 
  */
 public class UnknowServiceException extends RuntimeException {
 	private static final long serialVersionUID = -606709859886555442L;

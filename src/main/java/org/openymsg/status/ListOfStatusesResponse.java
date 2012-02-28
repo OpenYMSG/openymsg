@@ -1,13 +1,14 @@
 package org.openymsg.status;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.Contact;
 import org.openymsg.Status;
 import org.openymsg.YahooProtocol;
-import org.openymsg.execute.read.MultiplePacketListResponse;
+import org.openymsg.execute.read.MultiplePacketResponse;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.YMSG9Packet;
 
@@ -15,7 +16,7 @@ import org.openymsg.network.YMSG9Packet;
  * LOGON packets can contain multiple friend status sections, ISAWAY and ISBACK packets contain only one. Update the
  * YahooUser details and fire event. status == 0 is a single status
  */
-public class ListOfStatusesResponse extends MultiplePacketListResponse {
+public class ListOfStatusesResponse implements MultiplePacketResponse {
 	private static final Log log = LogFactory.getLog(ListOfStatusesResponse.class);
 	private SessionStatusImpl sessionStatus;
 
@@ -24,14 +25,14 @@ public class ListOfStatusesResponse extends MultiplePacketListResponse {
 	}
 
 	@Override
-	public void execute() {
-		if (this.packets.isEmpty()) {
+	public void execute(List<YMSG9Packet> packets) {
+		if (packets.isEmpty()) {
 			log.info("Not status packets");
 			return;
 		}
-		YMSG9Packet primaryPacket = this.packets.get(0);
-		for (int i = 1; i < this.packets.size(); i++) {
-			primaryPacket.append(this.packets.get(i));
+		YMSG9Packet primaryPacket = packets.get(0);
+		for (int i = 1; i < packets.size(); i++) {
+			primaryPacket.append(packets.get(i));
 		}
 		this.updateFriendsStatus(primaryPacket);
 	}

@@ -12,7 +12,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.connection.ConnectionInfo;
-import org.openymsg.network.CapacityServers;
 import org.openymsg.network.ConnectionBuilder;
 import org.openymsg.network.NetworkConstants;
 
@@ -23,14 +22,14 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 	private Socket socket;
 	private SessionConfig config;
 	private ConnectionInfo handlerStatus;
-	
+
 	@Override
-	public ConnectionInfo getHandlerStatus() {
+	public ConnectionInfo getConnectionInfo() {
 		return handlerStatus;
 	}
 
 	public DirectConnectionBuilder() {
-		
+
 	}
 
 	@Override
@@ -38,7 +37,6 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 		this.config = config;
 		return this;
 	}
-
 
 	@Override
 	public ConnectionBuilder useCapacityServers() {
@@ -72,7 +70,7 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 	}
 
 	protected boolean connectViaScsServers(SessionConfig config, ConnectionInfo handlerStatus) {
-		String[] scsHosts = config.getScsHosts();//NetworkConstants.SCS_HOSTS;
+		String[] scsHosts = config.getScsHosts();// NetworkConstants.SCS_HOSTS;
 		for (String scsHost : scsHosts) {
 			try {
 				InetAddress[] inetAddresses = InetAddress.getAllByName(scsHost);

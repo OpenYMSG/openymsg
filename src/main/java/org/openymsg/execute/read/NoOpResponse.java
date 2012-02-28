@@ -1,6 +1,5 @@
 package org.openymsg.execute.read;
 
-import org.openymsg.execute.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
 
 public class NoOpResponse implements SinglePacketResponse {

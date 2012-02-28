@@ -1,6 +1,6 @@
 package org.openymsg.unknown;
 
-import org.openymsg.execute.PacketReader;
+import org.openymsg.execute.read.PacketReader;
 import org.openymsg.network.ServiceType;
 
 /**

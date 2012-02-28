@@ -21,7 +21,7 @@ public class DirectConnectionBuilderTest {
 	public void connectViaCapacityServers() {
 		builder.with(config).useCapacityServers();
 		builder.build();
-		ConnectionInfo handlerStatus = builder.getHandlerStatus();
+		ConnectionInfo handlerStatus = builder.getConnectionInfo();
 		System.out.println(handlerStatus);
 	}
 
@@ -29,7 +29,7 @@ public class DirectConnectionBuilderTest {
 	public void connectViaScsServers() {
 		builder.with(config).useScsServers();
 		builder.build();
-		ConnectionInfo handlerStatus = builder.getHandlerStatus();
+		ConnectionInfo handlerStatus = builder.getConnectionInfo();
 		System.out.println(handlerStatus);
 	}
 }

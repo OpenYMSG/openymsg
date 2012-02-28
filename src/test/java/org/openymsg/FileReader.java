@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import org.openymsg.network.YMSG9InputStream;
+import org.openymsg.network.direct.YMSG9InputStream;
 
 public class FileReader {
 	public FileReader(String filename) {

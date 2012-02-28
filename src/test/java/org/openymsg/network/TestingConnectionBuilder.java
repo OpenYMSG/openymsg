@@ -15,7 +15,7 @@ public class TestingConnectionBuilder implements ConnectionBuilder {
 	}
 
 	@Override
-	public ConnectionInfo getHandlerStatus() {
+	public ConnectionInfo getConnectionInfo() {
 		if (this.connect) {
 			this.connectionInfo.setCapacityIpAddressConnected(new Socket());
 		}

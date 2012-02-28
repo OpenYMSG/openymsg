@@ -16,7 +16,6 @@ import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.UnknowServiceException;
-import org.openymsg.network.YMSG9InputStream;
 import org.openymsg.network.YMSG9Packet;
 
 public class DirectConnectionHandler implements ConnectionHandler {
@@ -33,13 +32,13 @@ public class DirectConnectionHandler implements ConnectionHandler {
 			ips = new YMSG9InputStream(socket.getInputStream());
 			ops = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 		}
-		catch (IOException e) {//TODO handle failure
+		catch (IOException e) {// TODO handle failure
 			log.info("Failed creating streams", e);
 			this.notifyListeners();
 		}
 	}
 
-	//TODO pass failure
+	// TODO pass failure
 	private void notifyListeners() {
 		synchronized (this.listeners) {
 			for (ConnectionHandlerCallback listener : this.listeners) {
@@ -50,11 +49,8 @@ public class DirectConnectionHandler implements ConnectionHandler {
 
 	/**
 	 * Note: the term 'packet' here refers to a YMSG message, not a TCP packet (although in almost all cases the two
-	 * will be synonymous). This is to avoid confusion with a 'YMSG message' - the actual discussion packet.
-	 * 
-	 * service - the Yahoo service number status - the Yahoo status number (not sessionStatus!) body - the payload of
-	 * the packet
-	 * 
+	 * will be synonymous). This is to avoid confusion with a 'YMSG message' - the actual discussion packet. service -
+	 * the Yahoo service number status - the Yahoo status number (not sessionStatus!) body - the payload of the packet
 	 * Note: it is assumed that 'ops' will have been set by the time this method is called.
 	 */
 	@Override
@@ -103,8 +99,9 @@ public class DirectConnectionHandler implements ConnectionHandler {
 				YMSG9Packet packet = ips.readPacket();
 				if (this.sessionId == 0) {
 					this.sessionId = packet.sessionId;
-				} else if (this.sessionId != packet.sessionId) {
-					log.warn("Problem with not matching session ids: " + this.sessionId + " and " + packet.sessionId);
+				}
+				else if (this.sessionId != packet.sessionId) {
+					log.error("Problem with not matching session ids: " + this.sessionId + " and " + packet.sessionId);
 				}
 				return packet;
 			}
@@ -142,5 +139,11 @@ public class DirectConnectionHandler implements ConnectionHandler {
 	@Override
 	public void addListener(ConnectionHandlerCallback listener) {
 		this.listeners.add(listener);
+	}
+
+	@Override
+	public void removeListener(ConnectionHandlerCallback listener) {
+		// TODO Auto-generated method stub
+
 	}
 }

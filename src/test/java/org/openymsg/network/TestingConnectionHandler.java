@@ -8,8 +8,8 @@ import org.apache.commons.logging.LogFactory;
 
 public class TestingConnectionHandler implements ConnectionHandler {
 	private static final Log log = LogFactory.getLog(TestingConnectionHandler.class);
-	private LinkedBlockingQueue<YMSG9Packet> incomingPackets = new LinkedBlockingQueue<YMSG9Packet>(); 
-	private LinkedBlockingQueue<OutgoingPacket> outgoingPackets = new LinkedBlockingQueue<OutgoingPacket>(); 
+	private LinkedBlockingQueue<YMSG9Packet> incomingPackets = new LinkedBlockingQueue<YMSG9Packet>();
+	private LinkedBlockingQueue<OutgoingPacket> outgoingPackets = new LinkedBlockingQueue<OutgoingPacket>();
 
 	@Override
 	public void sendPacket(PacketBodyBuffer body, ServiceType service, MessageStatus status) {
@@ -25,11 +25,11 @@ public class TestingConnectionHandler implements ConnectionHandler {
 	public void addPacket(YMSG9Packet packet) {
 		this.incomingPackets.add(packet);
 	}
-	
+
 	public OutgoingPacket getOutgoingPacket() throws InterruptedException {
 		return this.outgoingPackets.poll(500, TimeUnit.MILLISECONDS);
 	}
-	
+
 	@Override
 	public void shutdown() {
 		log.info("shutdown");
@@ -38,6 +38,11 @@ public class TestingConnectionHandler implements ConnectionHandler {
 	@Override
 	public void addListener(ConnectionHandlerCallback listener) {
 		log.info("no op add listener");
+	}
+
+	@Override
+	public void removeListener(ConnectionHandlerCallback listener) {
+		log.info("no op remove listener");
 	}
 
 }

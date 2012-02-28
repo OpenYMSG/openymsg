@@ -1,6 +1,5 @@
 package org.openymsg.network.url;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -19,15 +18,13 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 	private static final Log log = LogFactory.getLog(URLStreamBuilderImpl.class);
 	private String url;
 	private int timeout;
-	private URLStreamBuilderStatus status;
+	private URLStreamStatus status;
 	private String cookie;
 	private boolean keepHeaders;
 	private boolean keepData;
-	private InputStream inputStream;
-	private Map<String, List<String>> headers;
 
 	public URLStreamBuilderImpl() {
-		this.status = new URLStreamBuilderStatus();
+		this.status = new URLStreamStatus();
 	}
 
 	@Override
@@ -61,51 +58,7 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 	}
 
 	@Override
-	public Map<String, List<String>> getHeaders() {
-		return headers;
-	}
-
-
-	@Override
-	public InputStream getInputStream() {
-		return this.inputStream;
-	}
-
-	public ByteArrayOutputStream getOutputStream() {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		InputStream in = this.getInputStream();
-
-		if (in == null)
-			return null;
-
-		try {
-
-			int read = -1;
-			byte[] buff = new byte[256];
-			while ((read = in.read(buff)) != -1) {
-				out.write(buff, 0, read);
-			}
-			in.close();
-		}
-		catch (IOException e) {
-			log.warn("Failed extracting response");
-			// TODO handle failure
-		}
-		finally {
-			if (in != null) {
-				try {
-					in.close();
-				}
-				catch (IOException e) {
-					log.warn("Failed closing stream");
-					// TODO handle failure
-				}
-			}
-		}
-		return out;
-	}
-
-	public URLStreamBuilderStatus build() {
+	public URLStream build() {
 		URL u;
 		try {
 			u = new URL(url);
@@ -113,7 +66,7 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 		catch (MalformedURLException e) {
 			log.warn("Failed opening url: " + url, e);
 			this.status.setMalformedURLException(e);
-			return status;
+			return null;
 		}
 		URLConnection uc;
 		try {
@@ -122,7 +75,7 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 		catch (IOException e) {
 			log.warn("Failed connection url: " + u, e);
 			this.status.setUrlConnectionException(e);
-			return status;
+			return null;
 		}
 
 		if (cookie != null) {
@@ -175,29 +128,31 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 			catch (IOException e) {
 				log.warn("Failed reading responseCode and responseMessage", e);
 				this.status.setResponseException(e);
-				return status;
+				return null;
 			}
 			this.status.setResponseCode(responseCode);
 			this.status.setResponseMessage(responseMessage);
 			if (responseCode == HttpURLConnection.HTTP_OK) {
 				try {
+					InputStream inputStream = null;
+					Map<String, List<String>> headers = null;
 					if (this.keepData) {
-						this.inputStream = uc.getInputStream();
+						inputStream = uc.getInputStream();
 					}
 					if (this.keepHeaders) {
-						this.headers = httpUc.getHeaderFields();
+						headers = httpUc.getHeaderFields();
 					}
-					return status;
+					return new URLStream(inputStream, headers);
 				}
 				catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					return status;
+					return null;
 				}
 			}
 			else {
 				log.warn("Failed opening login url: " + url + " return code: " + responseCode);
-				return status;
+				return null;
 			}
 		}
 		else {
@@ -207,7 +162,12 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 			}
 			log.error("Failed opening login url: " + url + " returns: " + ucType);
 			// TODO handle failure
-			return status;
+			return null;
 		}
+	}
+
+	@Override
+	public URLStreamStatus getStatus() {
+		return this.status;
 	}
 }

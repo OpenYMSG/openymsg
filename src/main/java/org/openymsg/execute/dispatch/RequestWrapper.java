@@ -1,6 +1,5 @@
 package org.openymsg.execute.dispatch;
 
-import org.openymsg.execute.Request;
 
 public class RequestWrapper implements Runnable {
 	private Request request;

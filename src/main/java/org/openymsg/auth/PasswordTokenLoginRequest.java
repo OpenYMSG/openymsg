@@ -7,15 +7,15 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.config.SessionConfig;
-import org.openymsg.execute.Request;
+import org.openymsg.execute.dispatch.Request;
+import org.openymsg.network.url.URLStream;
 import org.openymsg.network.url.URLStreamBuilder;
 import org.openymsg.network.url.URLStreamBuilderImpl;
-import org.openymsg.network.url.URLStreamBuilderStatus;
+import org.openymsg.network.url.URLStreamStatus;
 
 /**
- * Open a HTTP connection with a login URL with a generated token and retrieve some cookies and a crumb. 
+ * Open a HTTP connection with a login URL with a generated token and retrieve some cookies and a crumb.
  * @author neilhart
- *
  */
 public class PasswordTokenLoginRequest implements Request {
 	private static final Log log = LogFactory.getLog(PasswordTokenLoginRequest.class);
@@ -43,9 +43,11 @@ public class PasswordTokenLoginRequest implements Request {
 	private void yahooAuth16Stage2(String token) {
 		String loginLink = config.getPasswordTokenLoginUrl(token);
 
-		URLStreamBuilder builder = new URLStreamBuilderImpl().url(loginLink).timeout(config.getConnectionTimeout()).keepData(true).keepHeaders(true);
-		URLStreamBuilderStatus status = builder.build();
-		ByteArrayOutputStream out = builder.getOutputStream();
+		URLStreamBuilder builder = new URLStreamBuilderImpl().url(loginLink).timeout(config.getConnectionTimeout())
+				.keepData(true).keepHeaders(true);
+		URLStream stream = builder.build();
+		URLStreamStatus status = builder.getStatus();
+		ByteArrayOutputStream out = stream.getOutputStream();
 
 		if (!status.isCorrect()) {
 			log.warn("Failed retrieving response for url: " + loginLink);
@@ -61,7 +63,7 @@ public class PasswordTokenLoginRequest implements Request {
 		String reponse = out.toString();
 
 		// TODO handle cookieB
-		List<String> cookies = builder.getHeaders().get("Set-Cookie");
+		List<String> cookies = stream.getHeaders().get("Set-Cookie");
 		String cookieB = null;
 		for (String cookieLine : cookies) {
 			StringTokenizer toks = new StringTokenizer(cookieLine, ";");
@@ -125,7 +127,7 @@ public class PasswordTokenLoginRequest implements Request {
 		this.sessionAuthorize.setCookiesAndCrumb(cookieY, cookieT, crumb, cookieB);
 		// return yahooAuth16Stage3(crumb + seed, cookieY, cookieT);
 
-//		log.warn("Login Failed, unable to retrieve stage 2 url");
+		// log.warn("Login Failed, unable to retrieve stage 2 url");
 	}
 
 	@Override

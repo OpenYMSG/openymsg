@@ -13,10 +13,8 @@ import org.openymsg.connection.ConnectionInfo;
 import org.openymsg.connection.ConnectionState;
 import org.openymsg.connection.SessionConnectionCallback;
 import org.openymsg.connection.SessionConnectionImpl;
-import org.openymsg.contact.SessionContact;
 import org.openymsg.contact.SessionContactImpl;
-import org.openymsg.execute.dispatch.ExecutorImpl;
-import org.openymsg.group.SessionGroup;
+import org.openymsg.execute.ExecutorImpl;
 import org.openymsg.group.SessionGroupImpl;
 import org.openymsg.keepalive.SessionKeepAlive;
 import org.openymsg.keepalive.SessionKeepAliveImpl;
@@ -26,7 +24,6 @@ import org.openymsg.message.SessionMessage;
 import org.openymsg.message.SessionMessageImpl;
 import org.openymsg.session.SessionSession;
 import org.openymsg.session.SessionSessionImpl;
-import org.openymsg.status.SessionStatus;
 import org.openymsg.status.SessionStatusImpl;
 import org.openymsg.unknown.SessionUnknown;
 
@@ -78,7 +75,7 @@ public class SessionImpl implements Session {
 		this.conference = new SessionConferenceImpl(username, executor);
 		this.mail = new SessionMailImpl(executor);
 		this.unknown = new SessionUnknown(executor);
-//		this.keepAlive = new SessionKeepAliveImpl(executor, username);
+		this.keepAlive = new SessionKeepAliveImpl(executor, username);
 	}
 
 	@Override

@@ -4,7 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.execute.Executor;
-import org.openymsg.execute.Request;
+import org.openymsg.execute.dispatch.Request;
 import org.openymsg.network.ConnectionBuilder;
 import org.openymsg.network.ConnectionHandler;
 
@@ -25,7 +25,7 @@ public class ConnectionInitalize implements Request {
 		ConnectionBuilder builder = config.getBuilder();
 		ConnectionHandler connection = builder.useCapacityServers().useScsServers().build();
 		connection.addListener(monitor);
-		ConnectionInfo status = builder.getHandlerStatus();
+		ConnectionInfo status = builder.getConnectionInfo();
 		if (status.isConnected()) {
 			this.executor.initializeConnection(connection);
 			this.monitor.setState(ConnectionState.CONNECTED, status);

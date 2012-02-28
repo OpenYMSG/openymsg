@@ -1,25 +1,23 @@
 package org.openymsg.execute.write;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
-import org.openymsg.execute.Message;
-import org.openymsg.execute.PacketWriter;
+import org.openymsg.execute.dispatch.Dispatcher;
 import org.openymsg.network.ConnectionHandler;
 
 public class PacketWriterImpl implements PacketWriter {
-	private ScheduledThreadPoolExecutor executor = null;
+	private Dispatcher executor = null;
 	private ConcurrentLinkedQueue<Message> queue = new ConcurrentLinkedQueue<Message>();
-	private WaitForConnectionReader reader;
+	private ConnectionWriter reader;
 
-	public PacketWriterImpl(ScheduledThreadPoolExecutor executor) {
+	public PacketWriterImpl(Dispatcher executor) {
 		this.executor = executor;
-		this.reader = new WaitForConnectionReader(queue, this.executor);
-		this.executor.scheduleAtFixedRate(this.reader, 0, 200, TimeUnit.MILLISECONDS);
+		this.reader = new ConnectionWriter(queue, this.executor);
+		this.executor.schedule(this.reader, 200);
 	}
-	
-	public void setConnection(ConnectionHandler connection) {
+
+	@Override
+	public void initializeConnection(ConnectionHandler connection) {
 		this.reader.setConnection(connection);
 	}
 
@@ -31,4 +29,5 @@ public class PacketWriterImpl implements PacketWriter {
 	@Override
 	public void shutdown() {
 	}
+
 }

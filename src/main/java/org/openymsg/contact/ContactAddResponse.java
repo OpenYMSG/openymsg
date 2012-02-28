@@ -3,8 +3,9 @@ package org.openymsg.contact;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.Contact;
+import org.openymsg.Name;
 import org.openymsg.YahooProtocol;
-import org.openymsg.execute.SinglePacketResponse;
+import org.openymsg.execute.read.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
 
 /**
@@ -12,6 +13,11 @@ import org.openymsg.network.YMSG9Packet;
  */
 public class ContactAddResponse implements SinglePacketResponse {
 	private static final Log log = LogFactory.getLog(ContactAddResponse.class);
+	private SessionContactCallback sessionContact;
+
+	public ContactAddResponse(SessionContactCallback sessionContact) {
+		this.sessionContact = sessionContact;
+	}
 
 	@Override
 	public void execute(YMSG9Packet packet) {
@@ -22,9 +28,14 @@ public class ContactAddResponse implements SinglePacketResponse {
 
 		YahooProtocol protocol;
 		String who = packet.getValue("4");
-		String msg = packet.getValue("14");
+		String message = packet.getValue("14");
+		// TODO - UTF8
 		String fname = packet.getValue("216");
 		String lname = packet.getValue("254");
+		Name contactName = null;
+		if (fname != null || lname != null) {
+			contactName = new Name(fname, lname);
+		}
 		String id = packet.getValue("5");
 		String authStatus = packet.getValue("13");
 		String protocolString = packet.getValue("241");
@@ -33,21 +44,23 @@ public class ContactAddResponse implements SinglePacketResponse {
 		if (packet.status == 1) {
 			if (authStatus.equals("1")) {
 				log.trace("A friend accepted our authorization request: " + contact);
+				sessionContact.contactAddAccepted(contact);
 			}
 			else if (authStatus.equals("2")) {
 				log.trace("A friend refused our subscription request: " + contact);
+				sessionContact.contactAddDeclined(contact, message);
 			}
 			else {
-				log.info("Unexpected authorization packet. Do not know how to handle: " + packet);
+				log.error("Unexpected authorization packet. Do not know how to handle: " + packet);
 			}
 		}
 		else if (packet.status == 3) {
 			log.trace("Someone is sending us a subscription request: " + contact);
+			sessionContact.contactAddRequest(contact, contactName, message);
 		}
 		else {
-			log.info("Unexpected authorization packet. Do not know how to handle: " + packet);
+			log.error("Unexpected authorization packet. Do not know how to handle: " + packet);
 		}
 
 	}
-
 }
