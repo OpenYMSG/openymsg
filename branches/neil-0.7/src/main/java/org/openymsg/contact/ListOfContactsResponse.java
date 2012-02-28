@@ -3,6 +3,7 @@ package org.openymsg.contact;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,27 +12,27 @@ import org.apache.commons.logging.LogFactory;
 import org.openymsg.Contact;
 import org.openymsg.ContactGroup;
 import org.openymsg.YahooProtocol;
-import org.openymsg.execute.read.MultiplePacketListResponse;
+import org.openymsg.execute.read.MultiplePacketResponse;
 import org.openymsg.group.ContactGroupImpl;
 import org.openymsg.group.SessionGroupImpl;
 import org.openymsg.network.YMSG9Packet;
 import org.openymsg.status.SessionStatusImpl;
 
-public class ListOfContactsResponse extends MultiplePacketListResponse {
+public class ListOfContactsResponse implements MultiplePacketResponse {
 	private static final Log log = LogFactory.getLog(ListOfContactsResponse.class);
 	private SessionContactImpl sessionContact;
 	private SessionGroupImpl sessionGroup;
 	private SessionStatusImpl sessionStatus;
 
-	public ListOfContactsResponse(SessionContactImpl sessionContact, SessionGroupImpl sessionGroup, SessionStatusImpl sessionStatus) {
+	public ListOfContactsResponse(SessionContactImpl sessionContact, SessionGroupImpl sessionGroup,
+			SessionStatusImpl sessionStatus) {
 		this.sessionContact = sessionContact;
 		this.sessionGroup = sessionGroup;
 		this.sessionStatus = sessionStatus;
 	}
 
 	@Override
-	public void execute() 
-	{
+	public void execute(List<YMSG9Packet> packets) {
 		String username = null;
 		YahooProtocol protocol = YahooProtocol.YAHOO;
 		ContactGroupImpl currentListGroup = null;
@@ -69,7 +70,7 @@ public class ListOfContactsResponse extends MultiplePacketListResponse {
 						Contact yu = null;
 						if (currentListGroup != null) {
 							for (Contact friend : usersOnFriendsList) {
-								//TODO - don't compare id
+								// TODO - don't compare id
 								if (friend.getId().equals(username)) {
 									yu = friend;
 									currentListGroup.add(yu);
@@ -157,8 +158,8 @@ public class ListOfContactsResponse extends MultiplePacketListResponse {
 
 		}
 
-		if (!usersOnFriendsList.isEmpty()) {
-			sessionContact.addedContacts(usersOnFriendsList);
+		for (Contact contact : usersOnFriendsList) {
+			sessionContact.addedContact(contact);
 		}
 
 		if (!usersOnIgnoreList.isEmpty()) {
@@ -168,7 +169,7 @@ public class ListOfContactsResponse extends MultiplePacketListResponse {
 		if (!usersOnPendingList.isEmpty()) {
 			sessionStatus.addedPending(usersOnPendingList);
 		}
-		
+
 		if (!receivedGroups.values().isEmpty()) {
 			sessionGroup.addedGroups(new HashSet<ContactGroup>(receivedGroups.values()));
 		}

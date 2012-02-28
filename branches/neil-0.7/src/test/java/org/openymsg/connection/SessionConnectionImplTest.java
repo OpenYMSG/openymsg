@@ -4,7 +4,7 @@ import org.mockito.Mockito;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.config.TestingSessionConfig;
 import org.openymsg.execute.Executor;
-import org.openymsg.execute.dispatch.ExecutorImpl;
+import org.openymsg.execute.ExecutorImpl;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;

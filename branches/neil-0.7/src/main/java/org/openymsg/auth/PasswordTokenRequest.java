@@ -6,14 +6,14 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.config.SessionConfig;
-import org.openymsg.execute.Request;
+import org.openymsg.execute.dispatch.Request;
+import org.openymsg.network.url.URLStream;
 import org.openymsg.network.url.URLStreamBuilder;
 import org.openymsg.network.url.URLStreamBuilderImpl;
-import org.openymsg.network.url.URLStreamBuilderStatus;
+import org.openymsg.network.url.URLStreamStatus;
 
 /**
  * Open a HTTP connection with a get token URL with the user's credentials and retrieve authorization and a token.
- * 
  * @author neilhart
  */
 public class PasswordTokenRequest implements Request {
@@ -45,8 +45,9 @@ public class PasswordTokenRequest implements Request {
 
 		URLStreamBuilder builder = new URLStreamBuilderImpl().url(authLink).timeout(config.getConnectionTimeout())
 				.keepData(true);
-		URLStreamBuilderStatus status = builder.build();
-		ByteArrayOutputStream out = builder.getOutputStream();
+		URLStream stream = builder.build();
+		URLStreamStatus status = builder.getStatus();
+		ByteArrayOutputStream out = stream.getOutputStream();
 
 		if (!status.isCorrect()) {
 			log.warn("Failed retrieving response for url: " + authLink);

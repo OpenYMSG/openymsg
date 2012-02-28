@@ -6,7 +6,7 @@ import java.util.Set;
 import org.openymsg.Contact;
 import org.openymsg.ContactGroup;
 import org.openymsg.execute.Executor;
-import org.openymsg.execute.dispatch.ExecutorImpl;
+import org.openymsg.execute.ExecutorImpl;
 import org.openymsg.group.ContactGroupImpl;
 import org.openymsg.group.SessionGroupImpl;
 import org.openymsg.network.OutgoingPacket;

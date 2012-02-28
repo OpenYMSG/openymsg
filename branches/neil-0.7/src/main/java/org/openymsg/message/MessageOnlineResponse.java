@@ -2,7 +2,7 @@ package org.openymsg.message;
 
 import org.openymsg.Contact;
 import org.openymsg.YahooProtocol;
-import org.openymsg.execute.SinglePacketResponse;
+import org.openymsg.execute.read.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
 
 public class MessageOnlineResponse implements SinglePacketResponse {

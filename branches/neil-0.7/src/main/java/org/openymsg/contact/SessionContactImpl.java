@@ -7,12 +7,11 @@ import java.util.Set;
 
 import org.openymsg.Contact;
 import org.openymsg.ContactGroup;
+import org.openymsg.Name;
 import org.openymsg.execute.Executor;
 import org.openymsg.group.ContactGroupRenameMessage;
-import org.openymsg.group.SessionGroup;
 import org.openymsg.group.SessionGroupImpl;
 import org.openymsg.network.ServiceType;
-import org.openymsg.status.SessionStatus;
 import org.openymsg.status.SessionStatusImpl;
 import org.openymsg.util.CollectionUtils;
 
@@ -22,7 +21,7 @@ public class SessionContactImpl implements SessionContact, SessionContactCallbac
 	private Set<Contact> contacts = Collections.synchronizedSet(new HashSet<Contact>());
 	private SessionGroupImpl sessionGroup;
 	private SessionStatusImpl sessionStatus;
-	
+
 	public SessionContactImpl(Executor executor, String username) {
 		this.executor = executor;
 		this.username = username;
@@ -36,20 +35,22 @@ public class SessionContactImpl implements SessionContact, SessionContactCallbac
 			throw new IllegalStateException("SessionStatus is not set");
 		}
 		this.executor.register(ServiceType.LIST_15, new ListOfContactsResponse(this, sessionGroup, sessionStatus));
+		this.executor.register(ServiceType.FRIENDADD, new ContactAddResponse(this));
 	}
-    public void renameGroup(ContactGroup group, String newName) throws IllegalStateException, IOException {
-//        checkStatus();
-    	this.executor.execute(new ContactGroupRenameMessage(username, group, newName));
-//        transmitGroupRename(group, newName);
-    }
+
+	public void renameGroup(ContactGroup group, String newName) throws IllegalStateException, IOException {
+		// checkStatus();
+		this.executor.execute(new ContactGroupRenameMessage(username, group, newName));
+		// transmitGroupRename(group, newName);
+	}
 
 	@Override
 	public void addContact(Contact contact, ContactGroup group) throws IllegalArgumentException {
 		// log.trace("Adding new user: " + userId + ", group: " + groupId + ", protocol: " + yahooProtocol);
 		// TODO: perhaps we should check the roster to make sure that this
 		// friend does not already exist.
-		//TODO validate group
-		//TODO check if user already in group
+		// TODO validate group
+		// TODO check if user already in group
 		if (contact == null) {
 			throw new IllegalArgumentException("Argument 'contact' cannot be null");
 		}
@@ -98,12 +99,12 @@ public class SessionContactImpl implements SessionContact, SessionContactCallbac
 	// }
 
 	@Override
-	public void addedContacts(Set<Contact> usersOnFriendsList) {
-		this.contacts.addAll(usersOnFriendsList);
-//		for (Contact contact : usersOnFriendsList) {
-			// System.err.println("add: " + contactImpl.getId() + "/" + contactImpl.getProtocol() + "/" +
-			// contactImpl.getGroupIds());
-//		}
+	public void addedContact(Contact contact) {
+		this.contacts.add(contact);
+		// for (Contact contact : usersOnFriendsList) {
+		// System.err.println("add: " + contactImpl.getId() + "/" + contactImpl.getProtocol() + "/" +
+		// contactImpl.getGroupIds());
+		// }
 	}
 
 	@Override
@@ -118,12 +119,12 @@ public class SessionContactImpl implements SessionContact, SessionContactCallbac
 
 	public void contactAddFailure(Contact contact, ContactAddFailure failure) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void contactAddFailure(Contact contact, ContactAddFailure failure, String friendAddStatus) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void setGroupSession(SessionGroupImpl sessionGroup) {
@@ -132,6 +133,30 @@ public class SessionContactImpl implements SessionContact, SessionContactCallbac
 
 	public void setStatusSession(SessionStatusImpl sessionStatus) {
 		this.sessionStatus = sessionStatus;
+	}
+
+	@Override
+	public void contactAddAccepted(Contact contact) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void contactAddDeclined(Contact contact, String message) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void contactAddRequest(Contact contact, Name name, String message) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removedContact(Contact contacts) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

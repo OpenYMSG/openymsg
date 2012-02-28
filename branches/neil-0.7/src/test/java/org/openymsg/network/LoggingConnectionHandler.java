@@ -10,7 +10,7 @@ public class LoggingConnectionHandler implements ConnectionHandler {
 	@Override
 	public void sendPacket(PacketBodyBuffer body, ServiceType service, MessageStatus status) {
 		log.info("Sent packet: Magic:YMSG Version:16 Length:" + body.getBuffer().length + " Service:" + service
-				+ " Status:" + status + " SessionId:" + (sessionId  & 0xFFFFFFFF) + " " + body);
+				+ " Status:" + status + " SessionId:" + (sessionId & 0xFFFFFFFF) + " " + body);
 	}
 
 	@Override
@@ -26,6 +26,11 @@ public class LoggingConnectionHandler implements ConnectionHandler {
 	@Override
 	public void addListener(ConnectionHandlerCallback listener) {
 		log.info("no op add listener");
+	}
+
+	@Override
+	public void removeListener(ConnectionHandlerCallback listener) {
+		log.info("no op remove listener");
 	}
 
 }
