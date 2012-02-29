@@ -1,28 +1,23 @@
-package org.openymsg.execute.read.dispatch;
+package org.openymsg.execute.read;
 
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import org.openymsg.execute.MultiplePacketResponse;
-import org.openymsg.execute.PacketReader;
-import org.openymsg.execute.SinglePacketResponse;
-import org.openymsg.execute.read.impl.ReaderRegistry;
+import org.openymsg.execute.dispatch.Dispatcher;
 import org.openymsg.network.ConnectionHandler;
 import org.openymsg.network.ServiceType;
 
 public class PacketReaderImpl implements PacketReader {
 	private ReaderRegistry registry;
 	private ConnectionReader reader;
-	private ScheduledThreadPoolExecutor executor;
+	private Dispatcher executor;
 
-	public PacketReaderImpl(ScheduledThreadPoolExecutor executor) {
+	public PacketReaderImpl(Dispatcher executor) {
 		this.executor = executor;
 		this.registry = new ReaderRegistry();
 	}
 
-	public void setConnection(ConnectionHandler connection) {
+	@Override
+	public void initializeConnection(ConnectionHandler connection) {
 		this.reader = new ConnectionReader(connection, this.registry);
-		this.executor.scheduleWithFixedDelay(this.reader, 0, 500, TimeUnit.MILLISECONDS);
+		this.executor.schedule(this.reader, 500);
 	}
 
 	@Override
@@ -48,7 +43,6 @@ public class PacketReaderImpl implements PacketReader {
 	@Override
 	public void shutdown() {
 		this.reader.finished();
-		this.executor.remove(this.reader);
 		this.registry.clear();
 	}
 

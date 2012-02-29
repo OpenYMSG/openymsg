@@ -9,10 +9,10 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DispatcherScheduledExecutorService extends ScheduledThreadPoolExecutor {
-	private static final Log log = LogFactory.getLog(DispatcherScheduledExecutorService.class);
+public class DispatcherExecutorService extends ScheduledThreadPoolExecutor {
+	private static final Log log = LogFactory.getLog(DispatcherExecutorService.class);
 
-	public DispatcherScheduledExecutorService(String username) {
+	public DispatcherExecutorService(String username) {
 		super(1, new NamedThreadFactory(username));
 		this.setKeepAliveTime(5, TimeUnit.SECONDS);
 	}
