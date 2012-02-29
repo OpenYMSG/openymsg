@@ -1,12 +1,12 @@
-package org.openymsg.execute.read.dispatch;
+package org.openymsg.execute.read;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.execute.read.impl.ReaderRegistry;
+import org.openymsg.execute.dispatch.Request;
 import org.openymsg.network.ConnectionHandler;
 import org.openymsg.network.YMSG9Packet;
 
-public class ConnectionReader implements Runnable {
+public class ConnectionReader implements Request {
 	private static final Log log = LogFactory.getLog(ConnectionReader.class);
 	private ConnectionHandler connection;
 	private ReaderRegistry registry;
@@ -18,26 +18,27 @@ public class ConnectionReader implements Runnable {
 	}
 
 	@Override
-	public void run() {
+	public void execute() {
 		log.trace("Running");
 		if (this.isFinished) {
 			log.info("Running when finished");
 			return;
 		}
-		try {
-			YMSG9Packet packet = connection.receivePacket();
-			while (packet != null) {
-				registry.received(packet);
-				packet = connection.receivePacket();
-			}
-		}
-		catch (Exception e) {
-			log.error("Failed reading connection", e);
+		YMSG9Packet packet = connection.receivePacket();
+		while (packet != null) {
+			registry.received(packet);
+			packet = connection.receivePacket();
 		}
 	}
 
 	public void finished() {
 		this.isFinished = true;
+	}
+
+	@Override
+	public void failure(Exception ex) {
+		// TODO Auto-generated method stub
+		log.error("Failed reading connection", ex);
 	}
 
 }

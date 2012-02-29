@@ -16,7 +16,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
  */
-package org.openymsg.network;
+package org.openymsg.network.direct;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -26,6 +26,9 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openymsg.network.ServiceType;
+import org.openymsg.network.UnknowServiceException;
+import org.openymsg.network.YMSG9Packet;
 
 /**
  * A YMSG9 packet has a 20 byte fixed format header. The first four bytes are the magic code "YMSG". The next four

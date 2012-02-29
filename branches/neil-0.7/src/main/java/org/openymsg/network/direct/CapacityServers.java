@@ -1,4 +1,4 @@
-package org.openymsg.network;
+package org.openymsg.network.direct;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -12,6 +12,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.config.SessionConfig;
+import org.openymsg.network.NetworkConstants;
 
 /**
  * Ask the capacity servers for an ip address to open a socket.

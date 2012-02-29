@@ -1,10 +1,8 @@
-package org.openymsg.execute.read.impl;
+package org.openymsg.execute.read;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openymsg.execute.MultiplePacketResponse;
-import org.openymsg.execute.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
 
 public class CollectPacketResponse implements SinglePacketResponse {

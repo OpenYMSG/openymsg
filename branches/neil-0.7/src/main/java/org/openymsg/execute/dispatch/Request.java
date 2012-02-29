@@ -1,4 +1,4 @@
-package org.openymsg.execute;
+package org.openymsg.execute.dispatch;
 
 public interface Request {
 	

@@ -1,10 +1,11 @@
-package org.openymsg.network;
+package org.openymsg.network.direct;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.openymsg.config.SessionConfig;
 import org.openymsg.config.SessionConfigImpl;
+import org.openymsg.network.direct.CapacityServers;
 import org.testng.annotations.Test;
 
 public class CapacityServersTest {

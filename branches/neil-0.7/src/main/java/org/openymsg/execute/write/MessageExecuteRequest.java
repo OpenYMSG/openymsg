@@ -4,19 +4,18 @@ import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.execute.Message;
-import org.openymsg.execute.Request;
+import org.openymsg.execute.dispatch.Request;
 import org.openymsg.network.ConnectionHandler;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
-public class DispatcherMessageRequest implements Request {
-	private static final Log log = LogFactory.getLog(DispatcherMessageRequest.class);
+public class MessageExecuteRequest implements Request {
+	private static final Log log = LogFactory.getLog(MessageExecuteRequest.class);
 	private Message message;
 	private ConnectionHandler connection;
 
-	public DispatcherMessageRequest(Message message, ConnectionHandler connection) {
+	public MessageExecuteRequest(Message message, ConnectionHandler connection) {
 		this.message = message;
 		this.connection = connection;
 	}
