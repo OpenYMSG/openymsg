@@ -20,8 +20,6 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 	private int timeout;
 	private URLStreamStatus status;
 	private String cookie;
-	private boolean keepHeaders;
-	private boolean keepData;
 
 	public URLStreamBuilderImpl() {
 		this.status = new URLStreamStatus();
@@ -46,19 +44,8 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 	}
 
 	@Override
-	public URLStreamBuilder keepHeaders(boolean keepHeaders) {
-		this.keepHeaders = keepHeaders;
-		return this;
-	}
-
-	@Override
-	public URLStreamBuilder keepData(boolean keepData) {
-		this.keepData = keepData;
-		return this;
-	}
-
-	@Override
 	public URLStream build() {
+		log.info("URL is: " + url);
 		URL u;
 		try {
 			u = new URL(url);
@@ -134,14 +121,8 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 			this.status.setResponseMessage(responseMessage);
 			if (responseCode == HttpURLConnection.HTTP_OK) {
 				try {
-					InputStream inputStream = null;
-					Map<String, List<String>> headers = null;
-					if (this.keepData) {
-						inputStream = uc.getInputStream();
-					}
-					if (this.keepHeaders) {
-						headers = httpUc.getHeaderFields();
-					}
+					InputStream inputStream = uc.getInputStream();
+					Map<String, List<String>> headers = httpUc.getHeaderFields();
 					return new URLStream(inputStream, headers);
 				}
 				catch (IOException e) {

@@ -15,6 +15,10 @@ import org.openymsg.connection.ConnectionInfo;
 import org.openymsg.network.ConnectionBuilder;
 import org.openymsg.network.NetworkConstants;
 
+/**
+ * Builder for DirectConnection.
+ * @author neilhart
+ */
 public class DirectConnectionBuilder implements ConnectionBuilder {
 	private static final Log log = LogFactory.getLog(DirectConnectionBuilder.class);
 	private boolean capacityBuilding;

@@ -43,8 +43,7 @@ public class PasswordTokenLoginRequest implements Request {
 	private void yahooAuth16Stage2(String token) {
 		String loginLink = config.getPasswordTokenLoginUrl(token);
 
-		URLStreamBuilder builder = new URLStreamBuilderImpl().url(loginLink).timeout(config.getConnectionTimeout())
-				.keepData(true).keepHeaders(true);
+		URLStreamBuilder builder = new URLStreamBuilderImpl().url(loginLink).timeout(config.getConnectionTimeout());
 		URLStream stream = builder.build();
 		URLStreamStatus status = builder.getStatus();
 		ByteArrayOutputStream out = stream.getOutputStream();
@@ -60,7 +59,8 @@ public class PasswordTokenLoginRequest implements Request {
 		String cookieY = null;
 		String cookieT = null;
 
-		String reponse = out.toString();
+		String response = out.toString();
+		log.info("response: " + response);
 
 		// TODO handle cookieB
 		List<String> cookies = stream.getHeaders().get("Set-Cookie");
@@ -76,7 +76,7 @@ public class PasswordTokenLoginRequest implements Request {
 		}
 
 		// StringTokenizer
-		StringTokenizer toks = new StringTokenizer(reponse, "\r\n");
+		StringTokenizer toks = new StringTokenizer(response, "\r\n");
 		if (toks.countTokens() <= 0) {
 			log.warn("Login Failed, wrong response in stage 2:");
 			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE2);

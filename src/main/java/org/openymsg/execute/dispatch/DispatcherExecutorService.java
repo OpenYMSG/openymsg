@@ -6,15 +6,17 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class DispatcherExecutorService extends ScheduledThreadPoolExecutor {
-	private static final Log log = LogFactory.getLog(DispatcherExecutorService.class);
+	DispatcherExecutorCallback callback;
 
-	public DispatcherExecutorService(String username) {
-		super(1, new NamedThreadFactory(username));
+	public DispatcherExecutorService(String name, DispatcherExecutorCallback callback) {
+		super(1, new NamedThreadFactory(name), new RejectionWrapper(callback));
+		this.callback = callback;
 		this.setKeepAliveTime(5, TimeUnit.SECONDS);
+	}
+
+	public DispatcherExecutorService(String name) {
+		this(name, new DispatcherExecutorLoggingCallback());
 	}
 
 	@Override
@@ -37,7 +39,7 @@ public class DispatcherExecutorService extends ScheduledThreadPoolExecutor {
 			}
 		}
 		if (t != null) {
-			log.error("got Exception running: " + r, t);
+			this.callback.afterExecute(r, t);
 		}
 	}
 

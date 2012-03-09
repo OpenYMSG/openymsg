@@ -1,4 +1,6 @@
-package org.openymsg.network;
+package org.openymsg.network.direct;
+
+import org.openymsg.network.YMSG9Packet;
 
 /**
  * @author Giancarlo Frison - Nimbuzz B.V. <giancarlo@nimbuzz.com>
