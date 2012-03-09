@@ -14,18 +14,18 @@ public class SessionConnectionImplTest {
 	private String username;
 	private Executor executor;
 	private SessionConnectionCallback listener;
-		
+
 	@BeforeClass
 	public void setUp() {
 		username = "testuser";
 	}
-	
+
 	@BeforeMethod
 	public void setUpMethod() {
 		executor = new ExecutorImpl(username);
 		listener = Mockito.mock(SessionConnectionCallback.class);
 	}
-	
+
 	@AfterMethod
 	public void tearDownMethod() {
 		executor.shutdown();
@@ -48,7 +48,7 @@ public class SessionConnectionImplTest {
 		sessionConnection.addListener(listener);
 		Mockito.verify(listener).connectionSuccessful();
 	}
-	
+
 	@Test
 	public void testFailed() {
 		SessionConfig sessionConfig = new TestingSessionConfig(false);
@@ -65,7 +65,7 @@ public class SessionConnectionImplTest {
 		sessionConnection.initialize(sessionConfig);
 		sessionConnection.addListener(listener);
 		Mockito.verify(listener).connectionSuccessful();
-		//TODO - Cause connection failure
+		// TODO - Cause connection failure
 	}
 
 }

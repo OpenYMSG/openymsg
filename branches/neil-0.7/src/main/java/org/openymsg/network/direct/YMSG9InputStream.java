@@ -27,7 +27,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.ServiceType;
-import org.openymsg.network.UnknowServiceException;
 import org.openymsg.network.YMSG9Packet;
 
 /**

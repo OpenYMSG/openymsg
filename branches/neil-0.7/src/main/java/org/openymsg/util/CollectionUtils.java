@@ -20,4 +20,8 @@ public class CollectionUtils {
 		return Collections.unmodifiableSet(new HashSet<T>(set));
 	}
 
+	public static <T> Set<T> unmodifiableSet(Set<? extends T> set) {
+		return Collections.unmodifiableSet(set);
+	}
+
 }

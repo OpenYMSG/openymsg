@@ -43,8 +43,7 @@ public class PasswordTokenRequest implements Request {
 			return;
 		}
 
-		URLStreamBuilder builder = new URLStreamBuilderImpl().url(authLink).timeout(config.getConnectionTimeout())
-				.keepData(true);
+		URLStreamBuilder builder = new URLStreamBuilderImpl().url(authLink).timeout(config.getConnectionTimeout());
 		URLStream stream = builder.build();
 		URLStreamStatus status = builder.getStatus();
 		ByteArrayOutputStream out = stream.getOutputStream();
@@ -56,6 +55,7 @@ public class PasswordTokenRequest implements Request {
 		}
 
 		String response = out.toString();
+		log.info("response: " + response);
 		StringTokenizer toks = new StringTokenizer(response, "\r\n");
 		if (toks.countTokens() <= 0) {
 			log.warn("Login Failed, wrong response in stage 1");

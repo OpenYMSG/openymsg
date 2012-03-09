@@ -15,7 +15,6 @@ import org.openymsg.network.MessageStatus;
 import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
-import org.openymsg.network.UnknowServiceException;
 import org.openymsg.network.YMSG9Packet;
 
 public class DirectConnectionHandler implements ConnectionHandler {

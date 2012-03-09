@@ -3,8 +3,6 @@ package org.openymsg.conference;
 import java.io.IOException;
 
 import org.openymsg.Conference;
-import org.openymsg.Contact;
-import org.openymsg.execute.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
@@ -12,26 +10,20 @@ import org.openymsg.network.ServiceType;
 /**
  * Transmit an CONFLOGOFF packet. We send one of these when we wish to leave a conference.
  */
-public class LeaveConferenceMessage implements Message {
-	public LeaveConferenceMessage(String username, Conference conference) {
-		this.username = username;
-		this.conference = conference;
+public class LeaveConferenceMessage extends AbstractConferenceMessage {
+
+	public LeaveConferenceMessage(String username, Conference conference, ConferenceMembership membership) {
+		super(username, conference, membership);
 	}
 
-	private String username;
-	private Conference conference;
-	
 	@Override
 	public PacketBodyBuffer getBody() throws IOException {
-        // Send decline packet to Yahoo
-        PacketBodyBuffer body = new PacketBodyBuffer();
-        body.addElement("1", this.username);
-        for (Contact user : this.conference.getMembers()) {
-            body.addElement("3", user.getId());
-            //TODO - handle protocol
-        }
-        body.addElement("57", conference.getId());
-        return body;
+		// Send decline packet to Yahoo
+		PacketBodyBuffer body = new PacketBodyBuffer();
+		this.writeUsername(body, "1");
+		this.writeMembers(body, "3");
+		this.writeConference(body, "57");
+		return body;
 	}
 
 	@Override
@@ -44,12 +36,12 @@ public class LeaveConferenceMessage implements Message {
 		return MessageStatus.DEFAULT;
 	}
 
-//	@Override
-//	public void messageProcessed() {
-//		//TODO - close conference
-////      // Flag this conference as now dead
-////      YahooConference yc = getConference(room);
-////      yc.closeConference();
-//	}
+	// @Override
+	// public void messageProcessed() {
+	// //TODO - close conference
+	// // // Flag this conference as now dead
+	// // YahooConference yc = getConference(room);
+	// // yc.closeConference();
+	// }
 
 }
