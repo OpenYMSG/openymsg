@@ -37,7 +37,6 @@ public class ConnectionReader implements Request {
 
 	@Override
 	public void failure(Exception ex) {
-		// TODO Auto-generated method stub
 		log.error("Failed reading connection", ex);
 	}
 

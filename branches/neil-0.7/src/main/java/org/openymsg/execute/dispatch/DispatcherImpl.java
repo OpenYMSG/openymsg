@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DispatcherImpl implements Dispatcher { // implements Dispatcher {
+public class DispatcherImpl implements Dispatcher {
 	private static final Log log = LogFactory.getLog(DispatcherImpl.class);
 	private DispatcherExecutorService executor = null;
 	private boolean shutdown;
@@ -15,18 +15,21 @@ public class DispatcherImpl implements Dispatcher { // implements Dispatcher {
 	}
 
 	@Override
-	public void execute(Request request) {
+	public void execute(Request request) throws IllegalStateException {
 		if (this.shutdown) {
-			log.warn("Not executing: " + request + ", " + this.executor.isShutdown());
-		}
-		else {
+			throw new IllegalStateException("Not executing because shutdown");
+		} else {
 			executor.execute(new RequestWrapper(request));
 		}
 	}
 
 	@Override
-	public void schedule(Request request, long delay) {
-		this.executor.scheduleWithFixedDelay(new RequestWrapper(request), 0, delay, TimeUnit.MILLISECONDS);
+	public void schedule(Request request, long delay) throws IllegalStateException {
+		if (this.shutdown) {
+			throw new IllegalStateException("Not executing because shutdown");
+		} else {
+			this.executor.scheduleWithFixedDelay(new RequestWrapper(request), 0, delay, TimeUnit.MILLISECONDS);
+		}
 	}
 
 	@Override
