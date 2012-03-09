@@ -17,13 +17,13 @@ public class ExecutorImpl implements Executor {
 	boolean connectionSet = false;
 	private PacketWriterImpl writer;
 	private PacketReaderImpl reader;
-	private Dispatcher simple;
+	private Dispatcher dispatcher;
 
 	public ExecutorImpl(String username) {
 		DispatcherExecutorService executor = new DispatcherExecutorService(username);
-		this.simple = new DispatcherImpl(executor);
-		this.writer = new PacketWriterImpl(this.simple);
-		this.reader = new PacketReaderImpl(this.simple);
+		this.dispatcher = new DispatcherImpl(executor);
+		this.writer = new PacketWriterImpl(this.dispatcher);
+		this.reader = new PacketReaderImpl(this.dispatcher);
 	}
 
 	@Override
@@ -61,25 +61,19 @@ public class ExecutorImpl implements Executor {
 	}
 
 	@Override
-	public void execute(Request request) {
-		this.simple.execute(request);
-		// if (this.shutdown) {
-		// log.warn("Not executing: " + request + ", " + this.executor.isShutdown());
-		// }
-		// else {
-		// executor.execute(request);
-		// }
+	public void execute(Request request) throws IllegalStateException {
+		this.dispatcher.execute(request);
 	}
 
 	@Override
 	public void shutdown() {
 		this.reader.shutdown();
 		this.writer.shutdown();
-		this.simple.shutdown();
+		this.dispatcher.shutdown();
 	}
 
 	@Override
 	public void schedule(Request request, long repeatInterval) {
-		this.simple.schedule(request, repeatInterval);
+		this.dispatcher.schedule(request, repeatInterval);
 	}
 }
