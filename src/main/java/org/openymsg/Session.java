@@ -5,15 +5,14 @@ import java.util.Set;
 import org.openymsg.auth.SessionAuthentication;
 import org.openymsg.conference.SessionConference;
 import org.openymsg.connection.SessionConnection;
-import org.openymsg.contact.SessionContact;
-import org.openymsg.group.SessionGroup;
+import org.openymsg.contact.group.SessionGroup;
+import org.openymsg.contact.roster.SessionContact;
+import org.openymsg.contact.status.SessionStatus;
 import org.openymsg.message.SessionMessage;
 import org.openymsg.session.SessionSession;
-import org.openymsg.status.SessionStatus;
 
 /**
  * Services for all Yahoo Messenger functionality.
- * 
  * @author neilhart
  */
 public interface Session extends SessionConnection, SessionAuthentication, SessionSession, SessionMessage,
@@ -31,5 +30,4 @@ public interface Session extends SessionConnection, SessionAuthentication, Sessi
 	@Override
 	Set<ContactGroup> getContactGroups() throws IllegalStateException;
 
-	
 }

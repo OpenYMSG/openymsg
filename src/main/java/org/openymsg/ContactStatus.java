@@ -1,6 +1,6 @@
 package org.openymsg;
 
-import org.openymsg.status.StatusMessage;
+import org.openymsg.contact.status.StatusMessage;
 
 public interface ContactStatus {
 	StatusMessage getStatus();
