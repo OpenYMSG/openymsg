@@ -13,9 +13,10 @@ import org.openymsg.connection.ConnectionInfo;
 import org.openymsg.connection.ConnectionState;
 import org.openymsg.connection.SessionConnectionCallback;
 import org.openymsg.connection.SessionConnectionImpl;
-import org.openymsg.contact.SessionContactImpl;
+import org.openymsg.contact.group.SessionGroupImpl;
+import org.openymsg.contact.roster.SessionContactImpl;
+import org.openymsg.contact.status.SessionStatusImpl;
 import org.openymsg.execute.ExecutorImpl;
-import org.openymsg.group.SessionGroupImpl;
 import org.openymsg.keepalive.SessionKeepAlive;
 import org.openymsg.keepalive.SessionKeepAliveImpl;
 import org.openymsg.mail.SessionMail;
@@ -24,7 +25,6 @@ import org.openymsg.message.SessionMessage;
 import org.openymsg.message.SessionMessageImpl;
 import org.openymsg.session.SessionSession;
 import org.openymsg.session.SessionSessionImpl;
-import org.openymsg.status.SessionStatusImpl;
 import org.openymsg.unknown.SessionUnknown;
 
 public class SessionImpl implements Session {
