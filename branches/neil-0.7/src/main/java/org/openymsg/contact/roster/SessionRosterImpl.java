@@ -1,7 +1,6 @@
 package org.openymsg.contact.roster;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,14 +14,14 @@ import org.openymsg.execute.Executor;
 import org.openymsg.network.ServiceType;
 import org.openymsg.util.CollectionUtils;
 
-public class SessionContactImpl implements SessionContact, SessionContactCallback {
+public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	private Executor executor;
 	private String username;
-	private Set<Contact> contacts = Collections.synchronizedSet(new HashSet<Contact>());
+	private Set<Contact> contacts = new HashSet<Contact>();
 	private SessionGroupImpl sessionGroup;
 	private SessionStatusImpl sessionStatus;
 
-	public SessionContactImpl(Executor executor, String username) {
+	public SessionRosterImpl(Executor executor, String username) {
 		this.executor = executor;
 		this.username = username;
 	}
