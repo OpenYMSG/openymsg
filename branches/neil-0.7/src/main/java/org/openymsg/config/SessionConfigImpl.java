@@ -62,13 +62,6 @@ public class SessionConfigImpl implements SessionConfig {
 
 	@Override
 	public InetSocketAddress getLocalSocket() {
-		// try {
-		// return new InetSocketAddress(InetAddress.getLocalHost(), 5050);
-		// }
-		// catch (UnknownHostException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
 		return null;
 	}
 

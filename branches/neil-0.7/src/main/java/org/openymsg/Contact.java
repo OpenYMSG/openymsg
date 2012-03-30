@@ -3,12 +3,11 @@ package org.openymsg;
 /**
  * Identity of a contact. This consists of two parts: id and protocol. Most of the time the protocol is
  * YahooProtocol.YAHOO.
- * 
  * @author neilhart
  */
 public class Contact {
 	/** unique name within a specific protocol */
-	private String id;
+	private String name;
 	/** system the id is on. Mostly YahooProtocol.YAHOO */
 	private YahooProtocol protocol;
 
@@ -24,7 +23,7 @@ public class Contact {
 		if (protocol == null) {
 			throw new IllegalArgumentException("protocol cannot be null");
 		}
-		this.id = id;
+		this.name = id;
 		this.protocol = protocol;
 	}
 
@@ -46,16 +45,15 @@ public class Contact {
 	}
 
 	/**
-	 * Get the id of the Contact
-	 * @return id
+	 * Get the name of the Contact
+	 * @return name
 	 */
-	public String getId() {
-		return this.id;
+	public String getName() {
+		return this.name;
 	}
 
 	/**
-	 * Fix the protocol for a contact.  Should not be used.
-	 * This changes the hash
+	 * Fix the protocol for a contact. Should not be used. This changes the hash
 	 * @param protocol new protocol
 	 */
 	@Deprecated
@@ -65,7 +63,7 @@ public class Contact {
 
 	@Override
 	public String toString() {
-		return "Contact [id=" + id + ", protocol=" + protocol + "]";
+		return "Contact [name=" + name + ", protocol=" + protocol + "]";
 	}
 
 	/**
@@ -75,7 +73,7 @@ public class Contact {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((protocol == null) ? 0 : protocol.hashCode());
 		return result;
 	}
@@ -89,10 +87,9 @@ public class Contact {
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
 		Contact other = (Contact) obj;
-		if (id == null) {
-			if (other.id != null) return false;
-		}
-		else if (!id.equals(other.id)) return false;
+		if (name == null) {
+			if (other.name != null) return false;
+		} else if (!name.equals(other.name)) return false;
 		if (protocol != other.protocol) return false;
 		return true;
 	}

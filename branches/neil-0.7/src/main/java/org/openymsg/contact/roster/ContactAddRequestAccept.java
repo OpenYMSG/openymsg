@@ -21,7 +21,7 @@ public class ContactAddRequestAccept implements Message {
 	public PacketBodyBuffer getBody() throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", this.username);
-		body.addElement("5", this.contact.getId());
+		body.addElement("5", this.contact.getName());
 		body.addElement("241", this.contact.getProtocol().getStringValue()); // TODO - is this there for regular yahoo
 																				// users?
 		body.addElement("13", "1");// Accept Authorization

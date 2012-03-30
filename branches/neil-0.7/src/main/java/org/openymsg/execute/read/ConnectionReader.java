@@ -19,6 +19,7 @@ public class ConnectionReader implements Request {
 
 	@Override
 	public void execute() {
+		// TODO - how long runs, starvation
 		log.trace("Running");
 		if (this.isFinished) {
 			log.info("Running when finished");

@@ -12,4 +12,5 @@ public interface SessionGroup {
 	 */
 	Set<ContactGroup> getContactGroups();
 
+	void addGroup(String groupName);
 }

@@ -6,7 +6,7 @@ import org.openymsg.auth.SessionAuthentication;
 import org.openymsg.conference.SessionConference;
 import org.openymsg.connection.SessionConnection;
 import org.openymsg.contact.group.SessionGroup;
-import org.openymsg.contact.roster.SessionContact;
+import org.openymsg.contact.roster.SessionRoster;
 import org.openymsg.contact.status.SessionStatus;
 import org.openymsg.message.SessionMessage;
 import org.openymsg.session.SessionSession;
@@ -16,7 +16,7 @@ import org.openymsg.session.SessionSession;
  * @author neilhart
  */
 public interface Session extends SessionConnection, SessionAuthentication, SessionSession, SessionMessage,
-		SessionContact, SessionGroup, SessionStatus, SessionConference {
+		SessionRoster, SessionGroup, SessionStatus, SessionConference {
 
 	/**
 	 * @throws IllegalStateException if Session is not in correct state

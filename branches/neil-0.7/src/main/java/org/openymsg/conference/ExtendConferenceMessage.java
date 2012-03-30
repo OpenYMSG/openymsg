@@ -26,7 +26,7 @@ public class ExtendConferenceMessage extends AbstractConferenceMessage {
 	public PacketBodyBuffer getBody() throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		this.writeUsername(body, "1");
-		body.addElement("51", this.contact.getId());
+		body.addElement("51", this.contact.getName());
 		// TODO - handle protocol
 		this.writeConference(body, "57");
 		this.writeMembers(body, "53");

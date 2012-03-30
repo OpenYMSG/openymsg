@@ -20,11 +20,11 @@ import org.openymsg.network.YMSG9Packet;
 
 public class ListOfContactsResponse implements MultiplePacketResponse {
 	private static final Log log = LogFactory.getLog(ListOfContactsResponse.class);
-	private SessionContactImpl sessionContact;
+	private SessionRosterImpl sessionContact;
 	private SessionGroupImpl sessionGroup;
 	private SessionStatusImpl sessionStatus;
 
-	public ListOfContactsResponse(SessionContactImpl sessionContact, SessionGroupImpl sessionGroup,
+	public ListOfContactsResponse(SessionRosterImpl sessionContact, SessionGroupImpl sessionGroup,
 			SessionStatusImpl sessionStatus) {
 		this.sessionContact = sessionContact;
 		this.sessionGroup = sessionGroup;
@@ -71,13 +71,13 @@ public class ListOfContactsResponse implements MultiplePacketResponse {
 						if (currentListGroup != null) {
 							for (Contact friend : usersOnFriendsList) {
 								// TODO - don't compare id
-								if (friend.getId().equals(username)) {
+								if (friend.getName().equals(username)) {
 									yu = friend;
 									currentListGroup.add(yu);
 									if (!yu.getProtocol().equals(protocol)
 											&& yu.getProtocol().equals(YahooProtocol.YAHOO)) {
 										log.warn("Switching protocols because user is in list more that once: "
-												+ yu.getId() + " from: " + yu.getProtocol() + " to: " + protocol);
+												+ yu.getName() + " from: " + yu.getProtocol() + " to: " + protocol);
 										yu.setProtocol(protocol);
 									}
 								}
@@ -131,7 +131,7 @@ public class ListOfContactsResponse implements MultiplePacketResponse {
 				Contact yu = null;
 				if (currentListGroup != null) {
 					for (Contact friend : usersOnFriendsList) {
-						if (friend.getId().equals(username)) {
+						if (friend.getName().equals(username)) {
 							yu = friend;
 							currentListGroup.add(yu);
 						}

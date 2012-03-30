@@ -33,7 +33,7 @@ public class CreateConferenceMessage implements Message {
 		body.addElement("1", this.username);
 		body.addElement("57", this.conference.getId());
 		for (Contact contact : this.contacts) {
-			body.addElement("52", contact.getId());
+			body.addElement("52", contact.getName());
 			//TODO - handle protocol
 		}
 		body.addElement("58", this.message);

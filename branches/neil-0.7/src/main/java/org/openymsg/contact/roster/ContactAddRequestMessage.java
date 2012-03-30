@@ -36,12 +36,12 @@ public class ContactAddRequestMessage implements Message {
 		body.addElement("14", ""); // C0 80 - TODO message
 		body.addElement("65", this.group.getName());
 		body.addElement("97", "1"); // TODO - UNICODE?
-		body.addElement("216", ""); // first name TODO
-		body.addElement("254", ""); // last name TODO
+		body.addElement("216", ""); // TODO first name
+		body.addElement("254", ""); // TODO last name
 		body.addElement("1", username);
 		body.addElement("302", "319");
 		body.addElement("300", "319");
-		body.addElement("7", this.contact.getId());
+		body.addElement("7", this.contact.getName());
 		if (!this.contact.getProtocol().isYahoo()) {
 			body.addElement("241", "" + this.contact.getProtocol().getValue()); // type
 		}

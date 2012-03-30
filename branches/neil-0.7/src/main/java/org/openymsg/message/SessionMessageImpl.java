@@ -68,10 +68,7 @@ public class SessionMessageImpl implements SessionMessage {
 	 */
 	@Override
 	public void sendTypingNotification(Contact contact, boolean isTyping) throws IOException {
-		// TODO type for msn users
-		// String type = this.getType(friend);
 		this.executor.execute(new TypingNotificationMessage(username, contact, isTyping));
-		// transmitNotify(friend, primaryID.getId(), isTyping, " ", NOTIFY_TYPING, type);
 	}
 
 	protected String buildMessageNumber() {
@@ -95,8 +92,7 @@ public class SessionMessageImpl implements SessionMessage {
 	public void receivedOfflineMessage(Contact contact, String message, long timestampInMillis) {
 		if (timestampInMillis == 0) {
 			this.callback.receivedMessage(contact, message);
-		}
-		else {
+		} else {
 			this.callback.receivedOfflineMessage(contact, message, timestampInMillis);
 		}
 	}

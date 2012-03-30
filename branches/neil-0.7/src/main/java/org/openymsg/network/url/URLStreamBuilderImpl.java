@@ -55,13 +55,19 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 			this.status.setMalformedURLException(e);
 			return null;
 		}
-		URLConnection uc;
+		URLConnection uc = null;
 		try {
 			uc = u.openConnection();
 		}
 		catch (IOException e) {
 			log.warn("Failed connection url: " + u, e);
 			this.status.setUrlConnectionException(e);
+			return null;
+		}
+
+		if (uc == null) {
+			log.warn("Failed connection url, returned null for: " + u);
+			// TODO add to status
 			return null;
 		}
 
@@ -120,23 +126,21 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 			this.status.setResponseCode(responseCode);
 			this.status.setResponseMessage(responseMessage);
 			if (responseCode == HttpURLConnection.HTTP_OK) {
+				InputStream inputStream = null;
 				try {
-					InputStream inputStream = uc.getInputStream();
-					Map<String, List<String>> headers = httpUc.getHeaderFields();
-					return new URLStream(inputStream, headers);
+					inputStream = uc.getInputStream();
 				}
 				catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					this.status.setInputStreamException(e);
 					return null;
 				}
-			}
-			else {
+				Map<String, List<String>> headers = httpUc.getHeaderFields();
+				return new URLStream(inputStream, headers);
+			} else {
 				log.warn("Failed opening login url: " + url + " return code: " + responseCode);
 				return null;
 			}
-		}
-		else {
+		} else {
 			Class<? extends URLConnection> ucType = null;
 			if (uc != null) {
 				ucType = uc.getClass();

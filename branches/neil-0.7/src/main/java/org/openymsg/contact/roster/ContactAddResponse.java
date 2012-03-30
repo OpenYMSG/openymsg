@@ -13,9 +13,9 @@ import org.openymsg.network.YMSG9Packet;
  */
 public class ContactAddResponse implements SinglePacketResponse {
 	private static final Log log = LogFactory.getLog(ContactAddResponse.class);
-	private SessionContactCallback sessionContact;
+	private SessionRosterCallback sessionContact;
 
-	public ContactAddResponse(SessionContactCallback sessionContact) {
+	public ContactAddResponse(SessionRosterCallback sessionContact) {
 		this.sessionContact = sessionContact;
 	}
 

@@ -35,7 +35,7 @@ public class ContactRemoveRequestMessage implements Message {
 	public PacketBodyBuffer getBody() throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", this.username); // ???: effective id?
-		body.addElement("7", this.contact.getId());
+		body.addElement("7", this.contact.getName());
 		// TODO - handle protocol
 		body.addElement("241", "0"); // for ack
 		body.addElement("65", this.group.getName());

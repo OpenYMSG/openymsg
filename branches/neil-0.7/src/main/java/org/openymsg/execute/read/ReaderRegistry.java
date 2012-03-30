@@ -28,8 +28,7 @@ public class ReaderRegistry {
 		}
 		if (responses.contains(response)) {
 			log.warn("Callback already registered for type: " + type + ", " + response.getClass().getSimpleName());
-		}
-		else {
+		} else {
 			responses.add(response);
 		}
 	}
@@ -41,9 +40,10 @@ public class ReaderRegistry {
 		Set<SinglePacketResponse> responses = this.registry.get(type);
 		if (responses != null && !responses.contains(response)) {
 			log.warn("Callback was not registered for: " + type + ", " + response.getClass().getSimpleName());
-		}
-		else {
-			responses.remove(response);
+		} else {
+			if (responses != null) {
+				responses.remove(response);
+			}
 		}
 	}
 

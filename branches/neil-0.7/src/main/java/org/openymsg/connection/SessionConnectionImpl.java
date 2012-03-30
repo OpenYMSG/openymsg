@@ -27,8 +27,11 @@ public class SessionConnectionImpl implements SessionConnection, ConnectionHandl
 	 * initialize the connection based on the config. Config options should not change
 	 * @param sessionConfig configuration
 	 */
-	public void initialize(SessionConfig sessionConfig) {
-		//TODO - maybe needed for restart?
+	public void initialize(SessionConfig sessionConfig) throws IllegalArgumentException {
+		if (sessionConfig == null) {
+			throw new IllegalArgumentException("sessionConfig must not be null");
+		}
+		// TODO - maybe needed for restart?
 		// ConnectionState state = this.getConnectionState();
 		// if (state.isStartable()) {
 		this.setState(ConnectionState.CONNECTING);
@@ -73,11 +76,9 @@ public class SessionConnectionImpl implements SessionConnection, ConnectionHandl
 	private void callCallback(SessionConnectionCallback listener) {
 		if (this.state == ConnectionState.CONNECTED) {
 			listener.connectionSuccessful();
-		}
-		else if (this.state == ConnectionState.FAILED_CONNECTING) {
+		} else if (this.state == ConnectionState.FAILED_CONNECTING) {
 			listener.connectionFailure();
-		}
-		else if (this.state == ConnectionState.FAILED_AFTER_CONNECTED) {
+		} else if (this.state == ConnectionState.FAILED_AFTER_CONNECTED) {
 			listener.connectionPrematurelyEnded();
 		}
 	}
@@ -86,8 +87,7 @@ public class SessionConnectionImpl implements SessionConnection, ConnectionHandl
 	public void connectionEnded() {
 		if (this.state == ConnectionState.CONNECTED) {
 			this.setState(ConnectionState.FAILED_AFTER_CONNECTED);
-		}
-		else {
+		} else {
 			log.warn("got connection ended with state: " + this.state);
 		}
 	}

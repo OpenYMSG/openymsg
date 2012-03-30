@@ -26,7 +26,7 @@ public abstract class AbstractConferenceMessage implements Message {
 
 	protected void writeMembers(PacketBodyBuffer body, String key) throws UnsupportedEncodingException, IOException {
 		for (Contact user : this.membership.getMembers()) {
-			body.addElement(key, user.getId());
+			body.addElement(key, user.getName());
 			// TODO - handle protocol
 		}
 	}

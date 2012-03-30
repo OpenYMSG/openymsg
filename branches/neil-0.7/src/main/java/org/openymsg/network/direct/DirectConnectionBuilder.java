@@ -83,8 +83,7 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 					if (openConnection(inetAddress, config)) {
 						handlerStatus.setScsIpAddressConnected(this.socket);
 						return true;
-					}
-					else {
+					} else {
 						handlerStatus.addScsIpAddressFailure(scsHost, inetAddress);
 					}
 
@@ -123,6 +122,7 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 		InetSocketAddress endpoint = new InetSocketAddress(ipAddress, NetworkConstants.DIRECT_PORT);
 		socket = new Socket();
 		if (config.getLocalSocket() != null) {
+			// TODO - check if this works?
 			try {
 				socket.setReuseAddress(true);
 				socket.bind(config.getLocalSocket());
