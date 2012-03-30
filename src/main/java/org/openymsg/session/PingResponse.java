@@ -1,4 +1,4 @@
-package org.openymsg.keepalive;
+package org.openymsg.session;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

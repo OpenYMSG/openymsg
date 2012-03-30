@@ -1,4 +1,4 @@
-package org.openymsg.keepalive;
+package org.openymsg.session;
 
 import org.openymsg.execute.write.Message;
 import org.openymsg.network.MessageStatus;

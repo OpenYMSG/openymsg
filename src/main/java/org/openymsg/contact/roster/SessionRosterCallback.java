@@ -3,7 +3,7 @@ package org.openymsg.contact.roster;
 import org.openymsg.Contact;
 import org.openymsg.Name;
 
-public interface SessionContactCallback {
+public interface SessionRosterCallback {
 
 	void addedContact(Contact contacts);
 

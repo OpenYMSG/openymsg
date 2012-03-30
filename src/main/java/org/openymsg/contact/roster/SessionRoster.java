@@ -5,7 +5,7 @@ import java.util.Set;
 import org.openymsg.Contact;
 import org.openymsg.ContactGroup;
 
-public interface SessionContact {
+public interface SessionRoster {
 
 	Set<Contact> getContacts();
 

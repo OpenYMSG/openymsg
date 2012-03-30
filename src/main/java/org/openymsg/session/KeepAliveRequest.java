@@ -1,4 +1,4 @@
-package org.openymsg.keepalive;
+package org.openymsg.session;
 
 import java.io.IOException;
 

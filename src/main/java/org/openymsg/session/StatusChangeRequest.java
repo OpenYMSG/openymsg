@@ -1,4 +1,4 @@
-package org.openymsg.contact.status;
+package org.openymsg.session;
 
 import java.io.IOException;
 
