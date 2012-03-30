@@ -98,13 +98,11 @@ public class DirectConnectionHandler implements ConnectionHandler {
 				YMSG9Packet packet = ips.readPacket();
 				if (this.sessionId == 0) {
 					this.sessionId = packet.sessionId;
-				}
-				else if (this.sessionId != packet.sessionId) {
+				} else if (this.sessionId != packet.sessionId) {
 					log.error("Problem with not matching session ids: " + this.sessionId + " and " + packet.sessionId);
 				}
 				return packet;
-			}
-			else {
+			} else {
 				log.debug("skipping with no message");
 			}
 
@@ -142,7 +140,6 @@ public class DirectConnectionHandler implements ConnectionHandler {
 
 	@Override
 	public void removeListener(ConnectionHandlerCallback listener) {
-		// TODO Auto-generated method stub
-
+		this.listeners.remove(listener);
 	}
 }

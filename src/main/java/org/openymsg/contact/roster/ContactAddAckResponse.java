@@ -17,7 +17,7 @@ import org.openymsg.network.YMSG9Packet;
  */
 public class ContactAddAckResponse implements SinglePacketResponse {
 	private static final Log log = LogFactory.getLog(ContactAddAckResponse.class);
-	private SessionContactImpl sessionContact;
+	private SessionRosterImpl sessionContact;
 	private SessionGroupImpl sessionGroup;
 	private SessionStatusImpl sessionStatus;
 
@@ -26,7 +26,7 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 		String username = packet.getValue("1");
 		String contactUsername = packet.getValue("7");
 		String groupName = packet.getValue("65");
-		String friendAddStatus = packet.getValue("66"); // 40 - failed MSN, 0 success yahoo, TODO
+		String friendAddStatus = packet.getValue("66"); // TODO what is this: 40 - failed MSN, 0 success yahoo,
 		String pending = packet.getValue("223"); // 1
 		String protocol = packet.getValue("241");
 
@@ -46,8 +46,7 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 			// log.info("Me: " + myName + " friend added: " + userId + ", pending: " + pending + ", protocol: "
 			// + protocol);
 			addContact(pending, contact, group);
-		}
-		else {
+		} else {
 			ContactAddFailure failure = ContactAddFailure.get(friendAddStatus);
 			log.warn("Me: " + username + " Friend add status is not 0: " + friendAddStatus);
 
@@ -62,8 +61,7 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 				if (!sessionContact.getContacts().contains(contact)) {
 					log.warn("Getting already in group, but can't find it.  It will be added");
 					addContact(pending, contact, group);
-				}
-				else {
+				} else {
 					sessionContact.contactAddFailure(contact, failure);
 				}
 				break;
@@ -84,8 +82,7 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 	private void addContact(String pending, Contact contact, ContactGroupImpl group) {
 		if ("1".equals(pending)) {
 			sessionStatus.addPending(contact);
-		}
-		else {
+		} else {
 			log.warn("added contact with pending: " + pending);
 		}
 		boolean contactWasAdded = sessionContact.possibleContact(contact);

@@ -67,8 +67,10 @@ public class ExecutorImpl implements Executor {
 
 	@Override
 	public void shutdown() {
-		this.reader.shutdown();
-		this.writer.shutdown();
+		if (connectionSet) {
+			this.reader.shutdown();
+			this.writer.shutdown();
+		}
 		this.dispatcher.shutdown();
 	}
 

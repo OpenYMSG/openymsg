@@ -14,44 +14,44 @@ import org.openymsg.network.direct.DirectConnectionBuilder;
 
 public class SessionConfigHardcoded implements SessionConfig {
 	private static final Log log = LogFactory.getLog(SessionConfigImpl.class);
-	
-    @Override
-    public String getLoginHost() {
-        return NetworkConstants.LOGIN_HOST;
-    }
 
-    @Override
-    public String getPasswordTokenGetUrl(String username, String password, String seed) {
-    	String encodedPassword;
+	@Override
+	public String getLoginHost() {
+		return NetworkConstants.LOGIN_HOST;
+	}
+
+	@Override
+	public String getPasswordTokenGetUrl(String username, String password, String seed) {
+		String encodedPassword;
 		try {
 			encodedPassword = URLEncoder.encode(password, "UTF-8");
 		}
 		catch (UnsupportedEncodingException e) {
 			log.error("Encoding password: " + password, e);
-			//TODO handle failure
+			// TODO handle failure
 			return null;
 		}
-    	String encodedSeed;
+		String encodedSeed;
 		try {
 			encodedSeed = URLEncoder.encode(seed, "UTF-8");
 		}
 		catch (UnsupportedEncodingException e) {
 			log.error("Encoding seed: " + seed, e);
-			//TODO handle failure
+			// TODO handle failure
 			return null;
 		}
-        return String.format(NetworkConstants.PASSWORD_TOKEN_GET_URL_FORMAT, username, encodedPassword, encodedSeed);
-    }
-
-	@Override
-	public String getPasswordTokenLoginUrl(String token) {
-        return String.format(NetworkConstants.PASSWORD_TOKEN_LOGIN_URL_FORMAT, token);
+		return String.format(NetworkConstants.PASSWORD_TOKEN_GET_URL_FORMAT, username, encodedPassword, encodedSeed);
 	}
 
 	@Override
-    public String[] getCapacityHosts() {
-        return new String[0];
-    }
+	public String getPasswordTokenLoginUrl(String token) {
+		return String.format(NetworkConstants.PASSWORD_TOKEN_LOGIN_URL_FORMAT, token);
+	}
+
+	@Override
+	public String[] getCapacityHosts() {
+		return new String[0];
+	}
 
 	@Override
 	public int getConnectionTimeout() {
@@ -60,14 +60,15 @@ public class SessionConfigHardcoded implements SessionConfig {
 
 	@Override
 	public InetSocketAddress getLocalSocket() {
+		InetAddress local = null;
 		try {
-			return  new InetSocketAddress(InetAddress.getLocalHost(), 5050);
+			local = InetAddress.getLocalHost();
 		}
 		catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.warn("Failed finding local host", e);
+			return null;
 		}
-		return null;
+		return new InetSocketAddress(local, 5050);
 	}
 
 	@Override
@@ -77,7 +78,7 @@ public class SessionConfigHardcoded implements SessionConfig {
 
 	@Override
 	public String[] getScsHosts() {
-		String[] ips = { "67.195.187.252", "67.195.187.197" }; 
+		String[] ips = { "67.195.187.252", "67.195.187.197" };
 		return ips;
 	}
 

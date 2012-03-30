@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.openymsg.Contact;
 import org.openymsg.ContactGroup;
+import org.openymsg.YahooProtocol;
 import org.openymsg.contact.group.ContactGroupImpl;
 import org.openymsg.contact.group.SessionGroupImpl;
 import org.openymsg.execute.Executor;
@@ -18,7 +19,7 @@ import org.testng.annotations.Test;
 
 public class SessionContactTest {
 	String username;
-	SessionContactImpl sessionContact;
+	SessionRosterImpl sessionContact;
 	SessionGroupImpl sessionGroup;
 	Contact contact;
 	ContactGroupImpl group;
@@ -35,9 +36,10 @@ public class SessionContactTest {
 		executor = new ExecutorImpl(username);
 		connection = new TestingConnectionHandler();
 		executor.initializeConnection(connection);
-		sessionContact = new SessionContactImpl(executor, username);
-		contact = new Contact("contactA");
+		sessionContact = new SessionRosterImpl(executor, username);
+		contact = new Contact("contactA", YahooProtocol.YAHOO);
 		group = new ContactGroupImpl("one");
+		sessionGroup = new SessionGroupImpl(executor, username);
 	}
 
 	@AfterMethod
@@ -49,7 +51,7 @@ public class SessionContactTest {
 	public void testAddContact() throws InterruptedException {
 		sessionContact.addContact(contact, group);
 		OutgoingPacket packet = connection.getOutgoingPacket();
-		System.err.println("Got a packet: " + packet);
+		// System.err.println("Got a packet: " + packet);
 	}
 
 	@Test
@@ -60,7 +62,7 @@ public class SessionContactTest {
 		sessionGroup.addedGroups(groups);
 		sessionContact.removeFromGroup(contact, group);
 		OutgoingPacket packet = connection.getOutgoingPacket();
-		System.err.println("Got a packet: " + packet);
+		// System.err.println("Got a packet: " + packet);
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)

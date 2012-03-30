@@ -43,4 +43,32 @@ public class CustomStatusMessage implements StatusMessage {
 		return this.statusMessage;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((statusMessage == null) ? 0 : statusMessage.hashCode());
+		result = prime * result + ((statusText == null) ? 0 : statusText.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		CustomStatusMessage other = (CustomStatusMessage) obj;
+		if (statusMessage == null) {
+			if (other.statusMessage != null) return false;
+		} else if (!statusMessage.equals(other.statusMessage)) return false;
+		if (statusText == null) {
+			if (other.statusText != null) return false;
+		} else if (!statusText.equals(other.statusText)) return false;
+		return true;
+	}
+
+	@Override
+	public boolean is(Status status) {
+		return this.getStatus().equals(status);
+	}
 }

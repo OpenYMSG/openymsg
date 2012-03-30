@@ -31,13 +31,7 @@ public class PasswordTokenLoginRequest implements Request {
 
 	@Override
 	public void execute() {
-		try {
-			this.yahooAuth16Stage2(token);
-		}
-		catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		this.yahooAuth16Stage2(token);
 	}
 
 	private void yahooAuth16Stage2(String token) {
@@ -102,11 +96,9 @@ public class PasswordTokenLoginRequest implements Request {
 			String t = toks.nextToken();
 			if (t.startsWith("crumb=")) {
 				crumb = t.replaceAll("crumb=", "");
-			}
-			else if (t.startsWith("Y=")) {
+			} else if (t.startsWith("Y=")) {
 				cookieY = t.replaceAll("Y=", "");
-			}
-			else if (t.startsWith("T=")) {
+			} else if (t.startsWith("T=")) {
 				cookieT = t.replaceAll("T=", "");
 			}
 		}

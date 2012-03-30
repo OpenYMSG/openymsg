@@ -8,9 +8,9 @@ import org.openymsg.execute.read.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
 
 /**
- * Process an incoming AUTHRESP packet. If we get one of these it means the logon process has failed. Set the
- * session state to be failed, and flag the end of login. Note: we don't throw exceptions on the input thread, but
- * instead we pass them to the thread which called login()
+ * Process an incoming AUTHRESP packet. If we get one of these it means the logon process has failed. Set the session
+ * state to be failed, and flag the end of login. Note: we don't throw exceptions on the input thread, but instead we
+ * pass them to the thread which called login()
  */
 public class LoginFailureResponse implements SinglePacketResponse {
 	private static final Log log = LogFactory.getLog(LoginFailureResponse.class);
@@ -30,22 +30,22 @@ public class LoginFailureResponse implements SinglePacketResponse {
 				state = AuthenticationFailure.getStatus(l);
 			}
 			catch (Exception e1) {
-				log.warn ("AUTHRESP says: authentication  without an unknown reason: " + l);
+				log.warn("AUTHRESP says: authentication  without an unknown reason: " + l);
 				sessionAuthorize.setFailureState(AuthenticationFailure.NO_REASON);
+				return;
 			}
 			switch (state) {
 			// Account locked out?
 			case LOCKED:
-				//TODO - handle the url
-				@SuppressWarnings("unused")
-				URL u;
+				// TODO - handle the url
+				URL u = null;
 				try {
 					u = new URL(packet.getValue("20"));
 				}
 				catch (Exception e) {
 					u = null;
 				}
-				log.info("AUTHRESP says: authentication failed! " + state);
+				log.info("AUTHRESP says: authentication failed with url: " + u + " and: " + state);
 				sessionAuthorize.setFailureState(state);
 				break;
 
@@ -69,8 +69,7 @@ public class LoginFailureResponse implements SinglePacketResponse {
 				log.warn("AUTHRESP says: authentication without an unchecked reason: " + state);
 				sessionAuthorize.setFailureState(state);
 			}
-		}
-		else {
+		} else {
 			log.info("AUTHRESP says: authentication failed without a reason" + AuthenticationFailure.NO_REASON);
 			sessionAuthorize.setFailureState(AuthenticationFailure.NO_REASON);
 		}

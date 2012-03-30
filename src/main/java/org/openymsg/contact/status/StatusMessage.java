@@ -10,4 +10,11 @@ public interface StatusMessage {
 	String getStatusText();
 
 	String getStatusMessage();
+
+	boolean is(Status status);
+
+	int hashCode();
+
+	boolean equals(Object obj);
+
 }

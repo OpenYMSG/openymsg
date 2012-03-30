@@ -73,7 +73,11 @@ public class ContactStatusImpl implements ContactStatus {
 	 * @param seconds The idle time of this user
 	 */
 	void setIdleTime(final long seconds) {
-		idleTime = seconds;
+		if (seconds == -1) {
+			idleTime = null;
+		} else {
+			idleTime = seconds;
+		}
 	}
 
 	/**
@@ -109,7 +113,7 @@ public class ContactStatusImpl implements ContactStatus {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (idleTime ^ (idleTime >>> 32));
+		result = prime * result + ((idleTime == null) ? 0 : idleTime.hashCode());
 		result = prime * result + (ignored ? 1231 : 1237);
 		result = prime * result + (onChat ? 1231 : 1237);
 		result = prime * result + (onPager ? 1231 : 1237);
@@ -120,24 +124,28 @@ public class ContactStatusImpl implements ContactStatus {
 	}
 
 	@Override
+	public StatusMessage getStatus() {
+		return this.status;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
 		ContactStatusImpl other = (ContactStatusImpl) obj;
-		if (idleTime != other.idleTime) return false;
+		if (idleTime == null) {
+			if (other.idleTime != null) return false;
+		} else if (!idleTime.equals(other.idleTime)) return false;
 		if (ignored != other.ignored) return false;
 		if (onChat != other.onChat) return false;
 		if (onPager != other.onPager) return false;
-		if (status != other.status) return false;
+		if (status == null) {
+			if (other.status != null) return false;
+		} else if (!status.equals(other.status)) return false;
 		if (stealth != other.stealth) return false;
 		if (stealthBlocked != other.stealthBlocked) return false;
 		return true;
-	}
-
-	@Override
-	public StatusMessage getStatus() {
-		return this.status;
 	}
 
 }

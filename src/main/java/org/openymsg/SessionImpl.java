@@ -13,12 +13,8 @@ import org.openymsg.connection.ConnectionInfo;
 import org.openymsg.connection.ConnectionState;
 import org.openymsg.connection.SessionConnectionCallback;
 import org.openymsg.connection.SessionConnectionImpl;
-import org.openymsg.contact.group.SessionGroupImpl;
-import org.openymsg.contact.roster.SessionContactImpl;
-import org.openymsg.contact.status.SessionStatusImpl;
+import org.openymsg.contact.SessionContactImpl;
 import org.openymsg.execute.ExecutorImpl;
-import org.openymsg.keepalive.SessionKeepAlive;
-import org.openymsg.keepalive.SessionKeepAliveImpl;
 import org.openymsg.mail.SessionMail;
 import org.openymsg.mail.SessionMailImpl;
 import org.openymsg.message.SessionMessage;
@@ -35,11 +31,7 @@ public class SessionImpl implements Session {
 	private SessionMessage message;
 	private SessionAuthentication authorize;
 	private SessionContactImpl contact;
-	private SessionGroupImpl group;
-	private SessionStatusImpl status;
 	private SessionConference conference;
-	@SuppressWarnings("unused")
-	private SessionKeepAlive keepAlive;
 	@SuppressWarnings("unused")
 	private SessionUnknown unknown;
 	@SuppressWarnings("unused")
@@ -66,16 +58,10 @@ public class SessionImpl implements Session {
 		this.authorize = new SessionAuthenticationImpl(this.config, executor);
 		this.session = new SessionSessionImpl(username, executor);
 		this.contact = new SessionContactImpl(executor, username);
-		this.group = new SessionGroupImpl(executor, username);
-		this.status = new SessionStatusImpl(executor);
-		this.contact.setGroupSession(this.group);
-		this.contact.setStatusSession(this.status);
-		this.contact.initialize();
 		this.message = new SessionMessageImpl(executor, username, this.callback);
 		this.conference = new SessionConferenceImpl(username, executor);
 		this.mail = new SessionMailImpl(executor);
 		this.unknown = new SessionUnknown(executor);
-		this.keepAlive = new SessionKeepAliveImpl(executor, username);
 	}
 
 	@Override
@@ -100,12 +86,12 @@ public class SessionImpl implements Session {
 
 	@Override
 	public void setStatus(Status status) throws IllegalArgumentException {
-		this.status.setStatus(status);
+		this.session.setStatus(status);
 	}
 
 	@Override
 	public void setStatus(String message, boolean showBusyIcon) throws IllegalArgumentException {
-		this.status.setStatus(message, showBusyIcon);
+		this.session.setStatus(message, showBusyIcon);
 	}
 
 	@Override
@@ -176,7 +162,7 @@ public class SessionImpl implements Session {
 
 	@Override
 	public Set<ContactGroup> getContactGroups() {
-		return this.group.getContactGroups();
+		return this.contact.getContactGroups();
 	}
 
 	@Override
@@ -207,6 +193,16 @@ public class SessionImpl implements Session {
 	@Override
 	public boolean removeListener(SessionAuthenticationCallback listener) {
 		return this.authorize.removeListener(listener);
+	}
+
+	@Override
+	public void addGroup(String groupName) {
+		this.contact.addGroup(groupName);
+	}
+
+	@Override
+	public ContactStatus getStatus(Contact contact) {
+		return this.contact.getStatus(contact);
 	}
 
 }

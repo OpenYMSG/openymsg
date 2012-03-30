@@ -23,7 +23,7 @@ public class ContactAddRequestDecline implements Message {
 	public PacketBodyBuffer getBody() throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", this.username);
-		body.addElement("7", this.contact.getId());
+		body.addElement("7", this.contact.getName());
 		// TODO elements are different, how to handle MSN
 		// body.addElement("5", this.contact.getId());
 		// body.addElement("241", this.contact.getProtocol().getStringValue());

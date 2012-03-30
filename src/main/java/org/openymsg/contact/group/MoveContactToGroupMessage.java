@@ -28,7 +28,7 @@ public class MoveContactToGroupMessage implements Message {
 		body.addElement("1", this.username);
 		body.addElement("302", "240");
 		body.addElement("300", "240");
-		body.addElement("7", this.contact.getId());
+		body.addElement("7", this.contact.getName());
 		// TODO - handle protocol
 		body.addElement("224", this.from.getName());
 		body.addElement("264", this.to.getName());

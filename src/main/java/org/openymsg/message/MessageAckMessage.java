@@ -27,7 +27,7 @@ public class MessageAckMessage implements Message {
 	public PacketBodyBuffer getBody() throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", username);
-		body.addElement("5", contact.getId());
+		body.addElement("5", contact.getName());
 		// TODO - protocol;
 		body.addElement("302", "430");
 		body.addElement("430", messageId);

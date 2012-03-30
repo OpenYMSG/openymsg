@@ -9,7 +9,7 @@ import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
 /**
- * Transmit a MESSAGE packet.
+ * Transmit a MESSAGE packet. * Doesn't support Doodling on whiteboard, whatever that is. imvironment is ":0"
  */
 public class SendMessage implements Message {
 	private String username;
@@ -24,25 +24,18 @@ public class SendMessage implements Message {
 		this.messageId = messageId;
 	}
 
-	/**
-	 * Doesn't support Doodling on whiteboard, whatever that is.
-	 * @return environment
-	 */
-	private String getImvironment() {
-		String imvironment = ";0"; // TODO - Get environment from contact
-		return imvironment;
-	}
-
 	@Override
 	public PacketBodyBuffer getBody() throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", username);
-		body.addElement("5", contact.getId());
-		if (!contact.getProtocol().isYahoo()) body.addElement("241", contact.getProtocol().getStringValue()); // TODO - placement
-		if (this.isUtf8(message)) body.addElement("97", "1");
-		body.addElement("63", getImvironment());
-		body.addElement("64", "0"); // Extension for YMSG9
-		body.addElement("206", "0"); /* 0 = no picture, 2 = picture, maybe 1 = avatar? */ //TODO never send to federated
+		body.addElement("5", contact.getName());
+		if (!contact.getProtocol().isYahoo()) {
+			body.addElement("241", contact.getProtocol().getStringValue());
+		}
+		body.addElement("97", "1");
+		body.addElement("63", ";0");
+		body.addElement("64", "0");
+		body.addElement("206", "0"); /* 0 = no picture, 2 = picture, maybe 1 = avatar? */
 		body.addElement("14", message);
 		body.addElement("429", messageId);
 		body.addElement("450", "0");

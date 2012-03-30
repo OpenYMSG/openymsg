@@ -40,4 +40,10 @@ public class SessionGroupImpl implements SessionGroup, SessionGroupCallback {
 		return false;
 	}
 
+	@Override
+	public void addGroup(String groupName) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

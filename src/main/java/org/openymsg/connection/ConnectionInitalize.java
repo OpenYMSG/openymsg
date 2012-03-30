@@ -13,7 +13,7 @@ public class ConnectionInitalize implements Request {
 	private SessionConfig config;
 	private SessionConnectionImpl monitor;
 	private Executor executor;
-	
+
 	public ConnectionInitalize(SessionConfig config, Executor executor, SessionConnectionImpl monitor) {
 		this.config = config;
 		this.executor = executor;
@@ -22,8 +22,10 @@ public class ConnectionInitalize implements Request {
 
 	@Override
 	public void execute() {
+		// TODO - reconnect, reuse ?
 		ConnectionBuilder builder = config.getBuilder();
 		ConnectionHandler connection = builder.useCapacityServers().useScsServers().build();
+		// TODO - null
 		connection.addListener(monitor);
 		ConnectionInfo status = builder.getConnectionInfo();
 		if (status.isConnected()) {
