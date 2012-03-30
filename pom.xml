@@ -51,9 +51,9 @@
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
 		</repository>
 		<snapshotRepository>
-			<id>sonatype-nexus-snapshot</id>
-			<name>Nexus Staging Snapshots</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<id>snapshot-YJ</id>
+			<name>Internal Snapshots</name>
+			<url>http://10.0.84.31/nexus/content/repositories/snapshot-YJ</url>
 		</snapshotRepository>
 	</distributionManagement>
 	<properties>
@@ -85,6 +85,18 @@
 	 				<docfilessubdirs>true</docfilessubdirs>
  				</configuration>
   			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
