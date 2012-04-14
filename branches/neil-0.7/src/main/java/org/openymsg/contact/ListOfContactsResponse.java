@@ -1,4 +1,4 @@
-package org.openymsg.contact.roster;
+package org.openymsg.contact;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,6 +14,7 @@ import org.openymsg.ContactGroup;
 import org.openymsg.YahooProtocol;
 import org.openymsg.contact.group.ContactGroupImpl;
 import org.openymsg.contact.group.SessionGroupImpl;
+import org.openymsg.contact.roster.SessionRosterImpl;
 import org.openymsg.contact.status.SessionStatusImpl;
 import org.openymsg.execute.read.MultiplePacketResponse;
 import org.openymsg.network.YMSG9Packet;
@@ -88,8 +89,7 @@ public class ListOfContactsResponse implements MultiplePacketResponse {
 								currentListGroup.add(yu);
 								usersOnFriendsList.add(yu);
 							}
-						}
-						else {
+						} else {
 							/* This buddy is on the ignore list (and therefore in no group) */
 							yu = new Contact(username, protocol);
 							usersOnIgnoreList.add(yu);
@@ -142,8 +142,7 @@ public class ListOfContactsResponse implements MultiplePacketResponse {
 						currentListGroup.add(yu);
 						usersOnFriendsList.add(yu);
 					}
-				}
-				else {
+				} else {
 					/* This buddy is on the ignore list (and therefore in no group) */
 					yu = new Contact(username, protocol);
 					usersOnIgnoreList.add(yu);
@@ -159,7 +158,7 @@ public class ListOfContactsResponse implements MultiplePacketResponse {
 		}
 
 		for (Contact contact : usersOnFriendsList) {
-			sessionContact.addedContact(contact);
+			sessionContact.loadedContact(contact);
 		}
 
 		if (!usersOnIgnoreList.isEmpty()) {
@@ -174,9 +173,11 @@ public class ListOfContactsResponse implements MultiplePacketResponse {
 			sessionGroup.addedGroups(new HashSet<ContactGroup>(receivedGroups.values()));
 		}
 
+		sessionContact.rosterLoaded();
+
 		// Now that we've parsed the buddy list, we can consider login succcess
 		// sessionStatus = SessionState.LOGGED_ON;
-		log.trace("Yahoo logged in successfully");
+		// log.trace("Yahoo logged in successfully");
 
 		// // Only one identity with v16 login
 		// identities.put(loginID.getId(), new YahooIdentity(loginID.getId()));
