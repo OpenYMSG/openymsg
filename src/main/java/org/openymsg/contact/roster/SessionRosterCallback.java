@@ -5,9 +5,11 @@ import org.openymsg.Name;
 
 public interface SessionRosterCallback {
 
-	void addedContact(Contact contacts);
+	void rosterLoaded();
 
-	void removedContact(Contact contacts);
+	void addedContact(Contact contact);
+
+	void removedContact(Contact contact);
 
 	// void contactAddSuccess(Contact contact);
 

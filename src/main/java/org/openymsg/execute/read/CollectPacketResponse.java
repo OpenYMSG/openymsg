@@ -20,7 +20,8 @@ public class CollectPacketResponse implements SinglePacketResponse {
 		if (packet.status == response.getProceedStatus()) {
 			this.finished = true;
 		} else {
-			System.err.println("status is: " + packet.status);
+			// TODO log
+			// System.err.println("status is: " + packet.status);
 		}
 		if (this.finished) {
 			this.response.execute(packets);

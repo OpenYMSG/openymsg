@@ -1,6 +1,5 @@
 package org.openymsg.connection;
 
-
 /** SessionConnection for managing connecting to Yahoo */
 public interface SessionConnection {
 	/**
@@ -28,5 +27,4 @@ public interface SessionConnection {
 	 */
 	boolean removeListener(SessionConnectionCallback listener);
 
-//	 void initialize(SessionConfig sessionConfig);
 }

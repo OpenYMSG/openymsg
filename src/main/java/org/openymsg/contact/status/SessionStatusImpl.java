@@ -7,6 +7,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.Contact;
+import org.openymsg.ContactStatus;
 import org.openymsg.execute.Executor;
 import org.openymsg.network.ServiceType;
 
@@ -15,25 +16,29 @@ import org.openymsg.network.ServiceType;
  * for MSN users Y6 Status Update for Yahoo 9 users changing status
  * @author neilhart
  */
-public class SessionStatusImpl implements SessionStatus {
+public class SessionStatusImpl implements SessionStatus, SessionStatusCallback {
 	private static final Log log = LogFactory.getLog(SessionStatusImpl.class);
 	private Executor executor;
-	private Map<Contact, ContactStatusImpl> statuses = new HashMap<Contact, ContactStatusImpl>();
+	private SessionStatusCallback callback;
+	private Map<Contact, ContactStatus> statuses = new HashMap<Contact, ContactStatus>();
 
-	public SessionStatusImpl(Executor executor) {
+	public SessionStatusImpl(Executor executor, SessionStatusCallback callback) {
 		this.executor = executor;
+		this.callback = callback;
 		SingleStatusResponse singleStatusResponse = new SingleStatusResponse(this);
-		this.executor.register(ServiceType.STATUS_15, singleStatusResponse);
+		this.executor.register(ServiceType.STATUS_15, new ListOfStatusesResponse(singleStatusResponse));
 		this.executor.register(ServiceType.Y6_STATUS_UPDATE, singleStatusResponse);
 	}
 
-	public ContactStatusImpl getStatus(Contact contact) {
+	public ContactStatus getStatus(Contact contact) {
 		return this.statuses.get(contact);
 	}
 
-	public void addStatus(Contact contact, ContactStatusImpl status) {
-		log.info("Status change for: " + contact + " " + status);
+	@Override
+	public void statusUpdate(Contact contact, ContactStatus status) {
+		log.trace("statusUpdate: " + contact + " " + status);
 		this.statuses.put(contact, status);
+		this.callback.statusUpdate(contact, status);
 	}
 
 	public void addPending(Contact contact) {

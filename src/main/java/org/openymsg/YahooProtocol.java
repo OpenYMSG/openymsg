@@ -3,10 +3,10 @@ package org.openymsg;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * Different Yahoo messaging protocols
+ */
 public enum YahooProtocol {
-	/**
-	 * Different Yahoo messaging protocols
-	 */
 	YAHOO("0"), // really nothing
 	LCS("1"),
 	MSN("2"),

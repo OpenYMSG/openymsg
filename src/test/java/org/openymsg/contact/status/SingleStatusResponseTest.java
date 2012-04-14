@@ -19,7 +19,7 @@ public class SingleStatusResponseTest {
 		response.execute(packet);
 		ContactStatusImpl status = new ContactStatusImpl();
 		status.update(Status.AVAILABLE, false, true);
-		Mockito.verify(sessionStatus).addStatus(new Contact("testuser@live.com", YahooProtocol.MSN), status);
+		Mockito.verify(sessionStatus).statusUpdate(new Contact("testuser@live.com", YahooProtocol.MSN), status);
 	}
 
 	@Test(enabled = false)
@@ -32,7 +32,7 @@ public class SingleStatusResponseTest {
 		response.execute(packet);
 		ContactStatusImpl status = new ContactStatusImpl();
 		status.update(Status.AVAILABLE, false, true);
-		Mockito.verify(sessionStatus).addStatus(new Contact("testuser", YahooProtocol.YAHOO), status);
+		Mockito.verify(sessionStatus).statusUpdate(new Contact("testuser", YahooProtocol.YAHOO), status);
 	}
 
 	@Test
@@ -44,7 +44,7 @@ public class SingleStatusResponseTest {
 		response.execute(packet);
 		ContactStatusImpl status = new ContactStatusImpl();
 		status.update(Status.AVAILABLE, false, true);
-		Mockito.verify(sessionStatus).addStatus(new Contact("testuser", YahooProtocol.YAHOO), status);
+		Mockito.verify(sessionStatus).statusUpdate(new Contact("testuser", YahooProtocol.YAHOO), status);
 	}
 
 	@Test
@@ -56,7 +56,7 @@ public class SingleStatusResponseTest {
 		response.execute(packet);
 		ContactStatusImpl status = new ContactStatusImpl();
 		status.update(Status.AWAY, false, true);
-		Mockito.verify(sessionStatus).addStatus(new Contact("testuser@live.com", YahooProtocol.MSN), status);
+		Mockito.verify(sessionStatus).statusUpdate(new Contact("testuser@live.com", YahooProtocol.MSN), status);
 	}
 
 	@Test
@@ -68,7 +68,7 @@ public class SingleStatusResponseTest {
 		response.execute(packet);
 		ContactStatusImpl status = new ContactStatusImpl();
 		status.update(Status.BUSY, false, true);
-		Mockito.verify(sessionStatus).addStatus(new Contact("testuser@live.com", YahooProtocol.MSN), status);
+		Mockito.verify(sessionStatus).statusUpdate(new Contact("testuser@live.com", YahooProtocol.MSN), status);
 	}
 
 	@Test
@@ -80,19 +80,33 @@ public class SingleStatusResponseTest {
 		response.execute(packet);
 		ContactStatusImpl status = new ContactStatusImpl();
 		status.update(Status.OFFLINE, false, false);
-		Mockito.verify(sessionStatus).addStatus(new Contact("testuser@live.com", YahooProtocol.MSN), status);
+		Mockito.verify(sessionStatus).statusUpdate(new Contact("testuser@live.com", YahooProtocol.MSN), status);
+	}
+
+	public void testSign(String test, ContactStatusImpl status, Contact contact) {
+		// String test =
+		// "Magic:YMSG Version:16 Length:95 Service:STATUS_15 Status:SERVER_ACK SessionId:0x45130f  [302] [315] [300] [315] [7] [testuser@live.com] [10] [0] [13] [1] [241] [2] [244] [6] [301] [315] [303] [315]";
+		YMSG9Packet packet = PacketReader.readString(test);
+		SessionStatusImpl sessionStatus = Mockito.mock(SessionStatusImpl.class);
+		SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
+		response.execute(packet);
+		// ContactStatusImpl status = new ContactStatusImpl();
+		// status.update(Status.AVAILABLE, false, true);
+		Mockito.verify(sessionStatus).statusUpdate(contact, status);
 	}
 
 	@Test
 	public void testSignInProtocol() {
 		String test = "Magic:YMSG Version:16 Length:95 Service:STATUS_15 Status:SERVER_ACK SessionId:0x45130f  [302] [315] [300] [315] [7] [testuser@live.com] [10] [0] [13] [1] [241] [2] [244] [6] [301] [315] [303] [315]";
-		YMSG9Packet packet = PacketReader.readString(test);
-		SessionStatusImpl sessionStatus = Mockito.mock(SessionStatusImpl.class);
-		SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
-		response.execute(packet);
+		// YMSG9Packet packet = PacketReader.readString(test);
+		// SessionStatusImpl sessionStatus = Mockito.mock(SessionStatusImpl.class);
+		// SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
+		// response.execute(packet);
 		ContactStatusImpl status = new ContactStatusImpl();
 		status.update(Status.AVAILABLE, false, true);
-		Mockito.verify(sessionStatus).addStatus(new Contact("testuser@live.com", YahooProtocol.MSN), status);
+		Contact contact = new Contact("testuser@live.com", YahooProtocol.MSN);
+		// Mockito.verify(sessionStatus).addStatus(new Contact("testuser@live.com", YahooProtocol.MSN), status);
+		testSign(test, status, contact);
 	}
 
 	@Test
@@ -104,7 +118,7 @@ public class SingleStatusResponseTest {
 		response.execute(packet);
 		ContactStatusImpl status = new ContactStatusImpl();
 		status.update(Status.AVAILABLE, false, true);
-		Mockito.verify(sessionStatus).addStatus(new Contact("testuser", YahooProtocol.YAHOO), status);
+		Mockito.verify(sessionStatus).statusUpdate(new Contact("testuser", YahooProtocol.YAHOO), status);
 	}
 
 	@Test
@@ -116,7 +130,7 @@ public class SingleStatusResponseTest {
 		response.execute(packet);
 		ContactStatusImpl status = new ContactStatusImpl();
 		status.update(Status.OFFLINE, false, false);
-		Mockito.verify(sessionStatus).addStatus(new Contact("testuser@live.com", YahooProtocol.MSN), status);
+		Mockito.verify(sessionStatus).statusUpdate(new Contact("testuser@live.com", YahooProtocol.MSN), status);
 	}
 
 	@Test
@@ -129,7 +143,7 @@ public class SingleStatusResponseTest {
 		response.execute(packet);
 		ContactStatusImpl status = new ContactStatusImpl();
 		status.update(Status.OFFLINE, false, false);
-		Mockito.verify(sessionStatus).addStatus(new Contact("testuser", YahooProtocol.YAHOO), status);
+		Mockito.verify(sessionStatus).statusUpdate(new Contact("testuser", YahooProtocol.YAHOO), status);
 	}
 
 }

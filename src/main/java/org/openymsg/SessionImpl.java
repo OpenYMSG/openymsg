@@ -1,6 +1,5 @@
 package org.openymsg;
 
-import java.io.IOException;
 import java.util.Set;
 
 import org.openymsg.auth.SessionAuthentication;
@@ -57,7 +56,7 @@ public class SessionImpl implements Session {
 		this.connection.initialize(this.config);
 		this.authorize = new SessionAuthenticationImpl(this.config, executor);
 		this.session = new SessionSessionImpl(username, executor);
-		this.contact = new SessionContactImpl(executor, username);
+		this.contact = new SessionContactImpl(executor, username, this.callback);
 		this.message = new SessionMessageImpl(executor, username, this.callback);
 		this.conference = new SessionConferenceImpl(username, executor);
 		this.mail = new SessionMailImpl(executor);
@@ -76,12 +75,12 @@ public class SessionImpl implements Session {
 
 	@Override
 	public void sendBuzz(Contact to) throws IllegalStateException {
-		this.sendBuzz(to);
+		this.message.sendBuzz(to);
 	}
 
 	@Override
-	public void sendTypingNotification(Contact contact, boolean isTyping) throws IOException {
-		this.sendTypingNotification(contact, isTyping);
+	public void sendTypingNotification(Contact contact, boolean isTyping) {
+		this.message.sendTypingNotification(contact, isTyping);
 	}
 
 	@Override
@@ -90,8 +89,8 @@ public class SessionImpl implements Session {
 	}
 
 	@Override
-	public void setStatus(String message, boolean showBusyIcon) throws IllegalArgumentException {
-		this.session.setStatus(message, showBusyIcon);
+	public void setCustomStatus(String message, boolean showBusyIcon) throws IllegalArgumentException {
+		this.session.setCustomStatus(message, showBusyIcon);
 	}
 
 	@Override
@@ -205,4 +204,8 @@ public class SessionImpl implements Session {
 		return this.contact.getStatus(contact);
 	}
 
+	@Override
+	public Set<Conference> getConferences() {
+		return this.conference.getConferences();
+	}
 }

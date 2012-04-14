@@ -54,7 +54,7 @@ public class DirectConnectionHandler implements ConnectionHandler {
 	 */
 	@Override
 	public synchronized void sendPacket(PacketBodyBuffer body, ServiceType service, MessageStatus status) {
-		log.info("Sent packet: Magic:YMSG Version:16 Length:" + body.getBuffer().length + " Service:" + service
+		log.debug("Sent packet: Magic:YMSG Version:16 Length:" + body.getBuffer().length + " Service:" + service
 				+ " Status:" + status + " SessionId:" + (sessionId & 0xFFFFFFFF) + " " + body);
 		byte[] b = body.getBuffer();
 		// Because the buffer is held at class member level, this method
@@ -103,7 +103,7 @@ public class DirectConnectionHandler implements ConnectionHandler {
 				}
 				return packet;
 			} else {
-				log.debug("skipping with no message");
+				log.trace("skipping with no message");
 			}
 
 		}

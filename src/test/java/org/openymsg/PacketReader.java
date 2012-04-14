@@ -21,8 +21,8 @@ public class PacketReader {
 		String service = tokenizer.nextToken().replaceAll("Service:", "");
 		String status = tokenizer.nextToken().replaceAll("Status:", "");
 		String sessionId = tokenizer.nextToken().replaceAll("SessionId:", "");
-		System.err.println("start: " + magic + "/" + version + "/" + length + "/" + service + "/" + status + "/"
-				+ sessionId);
+		// System.err.println("start: " + magic + "/" + version + "/" + length + "/" + service + "/" + status + "/"
+		// + sessionId);
 		YMSG9Packet packet = new YMSG9Packet();
 		packet.magic = magic;
 		// packet.length = length;

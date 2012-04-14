@@ -83,7 +83,7 @@ public class SessionSessionImpl implements SessionSession {
 	 * @throws IllegalArgumentException
 	 * @throws IOException
 	 */
-	public synchronized void setStatus(String message, boolean showBusyIcon) throws IllegalArgumentException {
+	public synchronized void setCustomStatus(String message, boolean showBusyIcon) throws IllegalArgumentException {
 		// TODO - check status
 		// if (sessionStatus == SessionState.UNSTARTED) {
 		// throw new IllegalArgumentException("Unstarted sessions can be available or invisible only");
