@@ -25,6 +25,6 @@ public class ListOfStatusesResponseTest {
 		response.execute(packets);
 		ContactStatusImpl status = new ContactStatusImpl();
 		status.update(Status.AVAILABLE, false, true);
-		Mockito.verify(sessionStatus).addStatus(new Contact("testuser", YahooProtocol.YAHOO), status);
+		Mockito.verify(sessionStatus).statusUpdate(new Contact("testuser", YahooProtocol.YAHOO), status);
 	}
 }

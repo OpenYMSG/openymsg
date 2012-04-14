@@ -10,6 +10,7 @@ import org.openymsg.network.ServiceType;
 public class SessionMessageImpl implements SessionMessage {
 	// Buzz string
 	public final static String BUZZ = "<ding>";
+	private static final String blankMessageNumber = "0000000000000000";
 	private Executor executor;
 	private String username;
 	// TODO - random messageNumber start
@@ -22,6 +23,7 @@ public class SessionMessageImpl implements SessionMessage {
 		this.callback = callback;
 		this.executor.register(ServiceType.MESSAGE_ACK, new NoOpResponse());
 		this.executor.register(ServiceType.MESSAGE, new MessageResponse(this));
+		this.executor.register(ServiceType.NOTIFY, new TypingNotificationResponse(callback));
 	}
 
 	/**
@@ -64,16 +66,13 @@ public class SessionMessageImpl implements SessionMessage {
 	 * Notify (22) 49: TYPING 1: userId 14: <empty> 13: 1 or 0 5: sendingToId
 	 * @param friend user whose sending message
 	 * @param isTyping true if start typing, false if typing end up
-	 * @throws IOException
 	 */
 	@Override
-	public void sendTypingNotification(Contact contact, boolean isTyping) throws IOException {
+	public void sendTypingNotification(Contact contact, boolean isTyping) {
 		this.executor.execute(new TypingNotificationMessage(username, contact, isTyping));
 	}
 
 	protected String buildMessageNumber() {
-		// TODO - better start point
-		String blankMessageNumber = "0000000000000000";
 		String messageNumber = "" + this.messageNumber++;
 		messageNumber = blankMessageNumber.substring(0, blankMessageNumber.length() - messageNumber.length())
 				+ messageNumber;

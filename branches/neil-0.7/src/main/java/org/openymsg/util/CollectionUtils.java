@@ -1,5 +1,6 @@
 package org.openymsg.util;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,7 +18,7 @@ public class CollectionUtils {
 	 * @return a unmodifiable copy of the underlying set
 	 */
 	// TODO - copying set isn't protected
-	public static <T> Set<T> protectedSet(Set<? extends T> set) {
+	public static <T> Set<T> protectedSet(Collection<? extends T> set) {
 		return Collections.unmodifiableSet(new HashSet<T>(set));
 	}
 

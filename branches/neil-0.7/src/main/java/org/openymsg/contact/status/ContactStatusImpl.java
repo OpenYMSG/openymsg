@@ -3,27 +3,17 @@ package org.openymsg.contact.status;
 import org.openymsg.ContactStatus;
 import org.openymsg.Status;
 
+//TODO handle stealthBlocked and stealth mode
 public class ContactStatusImpl implements ContactStatus {
 	/**
-	 * The presence status of this user (away, available, etc).
+	 * The status message a user (away, available, etc).
 	 */
-	protected StatusMessage status;
-
-	protected int stealth; // Stealth status
-
-	protected boolean onChat = false;
-	protected boolean onPager = false;
-	/**
-	 * Indicates that the user is on the ignore list (in other words: the local user does not want to receive messages
-	 * from this user).
-	 */
-	protected boolean ignored = false;
+	private StatusMessage status;
 
 	/**
-	 * Flag that determines if this user is on our StealthBlocked list (in other words, if this user is allowed to see
-	 * our details).
+	 * The presene of a user
 	 */
-	protected boolean stealthBlocked = false;
+	private ContactPresence presence;
 
 	/**
 	 * The amount of seconds that the user has been idle (or -1 if the idle time is unknown).
@@ -51,8 +41,7 @@ public class ContactStatusImpl implements ContactStatus {
 		// This is the old version, when 13=pager and 17=chat
 		update(newStatus);
 
-		this.onChat = newOnChat;
-		this.onPager = newOnPager;
+		this.presence = new ContactPresence(newOnChat, newOnPager);
 	}
 
 	/**
@@ -104,9 +93,7 @@ public class ContactStatusImpl implements ContactStatus {
 
 	@Override
 	public String toString() {
-		return "ContactStatusImpl [status=" + status + ", stealth=" + stealth + ", onChat=" + onChat + ", onPager="
-				+ onPager + ", ignored=" + ignored + ", stealthBlocked=" + stealthBlocked + ", idleTime=" + idleTime
-				+ "]";
+		return "ContactStatusImpl [status=" + status + ", presence=" + presence + ", idleTime=" + idleTime + "]";
 	}
 
 	@Override
@@ -114,17 +101,13 @@ public class ContactStatusImpl implements ContactStatus {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((idleTime == null) ? 0 : idleTime.hashCode());
-		result = prime * result + (ignored ? 1231 : 1237);
-		result = prime * result + (onChat ? 1231 : 1237);
-		result = prime * result + (onPager ? 1231 : 1237);
+		result = prime * result + ((presence == null) ? 0 : presence.hashCode());
 		result = prime * result + ((status == null) ? 0 : status.hashCode());
-		result = prime * result + stealth;
-		result = prime * result + (stealthBlocked ? 1231 : 1237);
 		return result;
 	}
 
 	@Override
-	public StatusMessage getStatus() {
+	public StatusMessage getMessage() {
 		return this.status;
 	}
 
@@ -137,14 +120,12 @@ public class ContactStatusImpl implements ContactStatus {
 		if (idleTime == null) {
 			if (other.idleTime != null) return false;
 		} else if (!idleTime.equals(other.idleTime)) return false;
-		if (ignored != other.ignored) return false;
-		if (onChat != other.onChat) return false;
-		if (onPager != other.onPager) return false;
+		if (presence == null) {
+			if (other.presence != null) return false;
+		} else if (!presence.equals(other.presence)) return false;
 		if (status == null) {
 			if (other.status != null) return false;
 		} else if (!status.equals(other.status)) return false;
-		if (stealth != other.stealth) return false;
-		if (stealthBlocked != other.stealthBlocked) return false;
 		return true;
 	}
 

@@ -29,9 +29,8 @@ public class ConnectionWriter implements Request {
 		if (message != null) {
 			MessageExecuteRequest request = new MessageExecuteRequest(message, connection);
 			this.executor.execute(request);
-		}
-		else {
-			log.debug("message is null");
+		} else {
+			log.trace("message is null");
 		}
 	}
 

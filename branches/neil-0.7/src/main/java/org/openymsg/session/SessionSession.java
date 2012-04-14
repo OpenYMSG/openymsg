@@ -23,6 +23,6 @@ public interface SessionSession {
 	 * @param showBusyIcon
 	 * @throws IllegalArgumentException
 	 */
-	void setStatus(String message, boolean showBusyIcon) throws IllegalArgumentException;
+	void setCustomStatus(String message, boolean showBusyIcon) throws IllegalArgumentException;
 
 }

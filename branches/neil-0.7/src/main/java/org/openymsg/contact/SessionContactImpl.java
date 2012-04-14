@@ -9,20 +9,22 @@ import org.openymsg.contact.group.SessionGroupImpl;
 import org.openymsg.contact.roster.SessionRosterImpl;
 import org.openymsg.contact.status.SessionStatusImpl;
 import org.openymsg.execute.Executor;
+import org.openymsg.network.ServiceType;
 
+//TODO verify, no status without a contact
 public class SessionContactImpl implements SessionContact {
 	private SessionRosterImpl sessionRoster;
 	private SessionGroupImpl sessionGroup;
-	@SuppressWarnings("unused")
 	private SessionStatusImpl sessionStatus;
+	private Executor executor;
 
-	public SessionContactImpl(Executor executor, String username) {
-		sessionRoster = new SessionRosterImpl(executor, username);
+	public SessionContactImpl(Executor executor, String username, SessionContactCallback callback) {
+		this.executor = executor;
+		sessionRoster = new SessionRosterImpl(executor, username, callback);
 		sessionGroup = new SessionGroupImpl(executor, username);
-		sessionStatus = new SessionStatusImpl(executor);
-		this.sessionRoster.setGroupSession(this.sessionGroup);
-		this.sessionRoster.setStatusSession(this.sessionStatus);
-		this.sessionRoster.initialize();
+		sessionStatus = new SessionStatusImpl(executor, callback);
+		this.executor.register(ServiceType.LIST_15, new ListOfContactsResponse(sessionRoster, sessionGroup,
+				sessionStatus));
 	}
 
 	@Override

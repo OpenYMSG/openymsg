@@ -10,6 +10,7 @@ import org.openymsg.Contact;
 import org.openymsg.ContactGroup;
 import org.openymsg.PacketReader;
 import org.openymsg.YahooProtocol;
+import org.openymsg.contact.ListOfContactsResponse;
 import org.openymsg.contact.group.ContactGroupImpl;
 import org.openymsg.contact.group.SessionGroupImpl;
 import org.openymsg.contact.status.SessionStatusImpl;
@@ -20,7 +21,7 @@ public class ListOfContactsResponseTest {
 
 	@Test
 	public void testSimple() {
-		String test = "Magic:YMSG Version:16 Length:796 Service:LIST_15 Status:DEFAULT SessionId:0x47e133  [302] [318] [300] [318] [65] [Bros] [302] [319] [300] [319] [7] [dog11] [223] [1] [301] [319] [300] [319] [7] [josephiiiapple] [301] [319] [300] [319] [7] [josephivapple] [301] [319] [300] [319] [7] [josephnextapple] [301] [319] [300] [319] [7] [josephvapple] [301] [319] [300] [319] [7] [frank21] [301] [319] [300] [319] [7] [frank22] [301] [319] [300] [319] [7] [frank290] [301] [319] [300] [319] [7] [pjpudge1414] [301] [319] [300] [319] [7] [dude1] [301] [319] [300] [319] [7] [lady113] [301] [319] [300] [319] [7] [lady114] [301] [319] [300] [319] [7] [lady402] [223] [1] [301] [319] [300] [319] [7] [lady405] [223] [1] [301] [319] [300] [319] [7] [lady78a] [223] [1] [301] [319] [300] [319] [7] [lady80a] [223] [1] [301] [319] [300] [319] [7] [lady83] [223] [1] [301] [319] [303] [319] [301] [318] [300] [318] [65] [BuddiesTH2] [302] [319] [300] [319] [7] [lady10] [301] [319] [303] [319] [301] [318] [303] [318]";
+		String test = "Magic:YMSG Version:16 Length:796 Service:LIST_15 Status:DEFAULT SessionId:0x47e133  [302] [318] [300] [318] [65] [Bros] [302] [319] [300] [319] [7] [dog11] [223] [1] [301] [319] [300] [319] [7] [josephiiiapple] [301] [319] [300] [319] [7] [josephivapple@live.com] [241] [2] [301] [319] [300] [319] [7] [josephnextapple] [301] [319] [300] [319] [7] [josephvapple] [301] [319] [300] [319] [7] [frank21] [301] [319] [300] [319] [7] [frank22] [301] [319] [300] [319] [7] [frank290] [301] [319] [300] [319] [7] [pjpudge1414] [301] [319] [300] [319] [7] [dude1] [301] [319] [300] [319] [7] [lady113] [301] [319] [300] [319] [7] [lady114] [301] [319] [300] [319] [7] [lady402] [223] [1] [301] [319] [300] [319] [7] [lady405] [223] [1] [301] [319] [300] [319] [7] [lady78a] [223] [1] [301] [319] [300] [319] [7] [lady80a] [223] [1] [301] [319] [300] [319] [7] [lady83] [223] [1] [301] [319] [303] [319] [301] [318] [300] [318] [65] [BuddiesTH2] [302] [319] [300] [319] [7] [lady10] [301] [319] [303] [319] [301] [318] [303] [318]";
 		SessionRosterImpl sessionContact = Mockito.mock(SessionRosterImpl.class);
 		SessionGroupImpl sessionGroup = Mockito.mock(SessionGroupImpl.class);
 		SessionStatusImpl sessionStatus = Mockito.mock(SessionStatusImpl.class);
@@ -30,7 +31,7 @@ public class ListOfContactsResponseTest {
 		packets.add(packet);
 		response.execute(packets);
 		for (Contact contact : this.getContacts()) {
-			Mockito.verify(sessionContact).addedContact(contact);
+			Mockito.verify(sessionContact).loadedContact(contact);
 		}
 		Mockito.verify(sessionStatus).addedPending(this.getPendingContacts());
 		Mockito.verify(sessionGroup).addedGroups(this.getGroups());
@@ -72,7 +73,7 @@ public class ListOfContactsResponseTest {
 		contacts.add(new Contact("frank290", YahooProtocol.YAHOO));
 		contacts.add(new Contact("lady83", YahooProtocol.YAHOO));
 		contacts.add(new Contact("lady113", YahooProtocol.YAHOO));
-		contacts.add(new Contact("josephivapple", YahooProtocol.YAHOO));
+		contacts.add(new Contact("josephivapple@live.com", YahooProtocol.MSN));
 		contacts.add(new Contact("lady80a", YahooProtocol.YAHOO));
 		return contacts;
 	}

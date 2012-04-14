@@ -140,13 +140,13 @@ public class SingleStatusResponse implements SinglePacketResponse {
 				+ ", longStatus: " + longStatus + ", protocol: " + protocol);
 		Status newStatus = Status.AVAILABLE;
 		Contact contact = new Contact(userId, protocol);
-		ContactStatusImpl status = sessionStatus.getStatus(contact);
+		// ContactStatusImpl status = sessionStatus.getStatus(contact);
 		// TODO - handle this
 		// When we add a friend, we get a status update before
 		// getting a confirmation FRIENDADD packet (crazy!)
-		if (status == null) {
-			status = new ContactStatusImpl();
-		}
+		// if (status == null) {
+		ContactStatusImpl status = new ContactStatusImpl();
+		// }
 
 		// TODO - do this check
 		// if (user.getProtocol() == null || !user.getProtocol().equals(protocol)) {
@@ -195,9 +195,9 @@ public class SingleStatusResponse implements SinglePacketResponse {
 			status.setIdleTime(Long.parseLong(idleTime));
 		}
 		// Hack for MSN users
-		if (contact.getProtocol().isMsn() && status.getStatus().is(Status.STEPPEDOUT)) {
+		if (contact.getProtocol().isMsn() && status.getMessage().is(Status.STEPPEDOUT)) {
 			status.update(Status.AWAY);
 		}
-		this.sessionStatus.addStatus(contact, status);
+		this.sessionStatus.statusUpdate(contact, status);
 	}
 }

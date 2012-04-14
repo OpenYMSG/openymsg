@@ -36,7 +36,8 @@ public class SessionContactTest {
 		executor = new ExecutorImpl(username);
 		connection = new TestingConnectionHandler();
 		executor.initializeConnection(connection);
-		sessionContact = new SessionRosterImpl(executor, username);
+		SessionRosterCallback callback = null;
+		sessionContact = new SessionRosterImpl(executor, username, callback);
 		contact = new Contact("contactA", YahooProtocol.YAHOO);
 		group = new ContactGroupImpl("one");
 		sessionGroup = new SessionGroupImpl(executor, username);

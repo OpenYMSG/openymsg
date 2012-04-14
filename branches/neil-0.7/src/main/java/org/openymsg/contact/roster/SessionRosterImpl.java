@@ -4,36 +4,28 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openymsg.Contact;
 import org.openymsg.ContactGroup;
 import org.openymsg.Name;
 import org.openymsg.contact.group.ContactGroupRenameMessage;
-import org.openymsg.contact.group.SessionGroupImpl;
-import org.openymsg.contact.status.SessionStatusImpl;
 import org.openymsg.execute.Executor;
 import org.openymsg.network.ServiceType;
 import org.openymsg.util.CollectionUtils;
 
 public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
+	private static final Log log = LogFactory.getLog(SessionRosterImpl.class);
 	private Executor executor;
 	private String username;
 	private Set<Contact> contacts = new HashSet<Contact>();
-	private SessionGroupImpl sessionGroup;
-	private SessionStatusImpl sessionStatus;
+	private SessionRosterCallback callback;
+	private boolean rosterLoaded = false;
 
-	public SessionRosterImpl(Executor executor, String username) {
+	public SessionRosterImpl(Executor executor, String username, SessionRosterCallback callback) {
 		this.executor = executor;
 		this.username = username;
-	}
-
-	public void initialize() throws IllegalStateException {
-		if (this.sessionGroup == null) {
-			throw new IllegalStateException("SessionGroup is not set");
-		}
-		if (this.sessionStatus == null) {
-			throw new IllegalStateException("SessionStatus is not set");
-		}
-		this.executor.register(ServiceType.LIST_15, new ListOfContactsResponse(this, sessionGroup, sessionStatus));
+		this.callback = callback;
 		this.executor.register(ServiceType.FRIENDADD, new ContactAddResponse(this));
 	}
 
@@ -70,9 +62,9 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 		if (group == null) {
 			throw new IllegalArgumentException("Argument 'group' cannot be null.");
 		}
-		if (!this.sessionGroup.getContactGroups().contains(group)) {
-			throw new IllegalArgumentException("Not an existing group");
-		}
+		// if (!this.sessionGroup.getContactGroups().contains(group)) {
+		// throw new IllegalArgumentException("Not an existing group");
+		// }
 		if (!group.getContacts().contains(contact)) {
 			throw new IllegalArgumentException("Contact not in group");
 		}
@@ -97,9 +89,23 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	// transmitList();
 	// }
 
+	public void loadedContact(Contact contact) {
+		log.trace("loadedContact: " + contact);
+		if (this.rosterLoaded) {
+			log.warn("Loading contact after roster is loaded: " + contact);
+		}
+		this.contacts.add(contact);
+		this.callback.addedContact(contact);
+	}
+
 	@Override
 	public void addedContact(Contact contact) {
+		log.trace("addedContact: " + contact);
+		if (!this.rosterLoaded) {
+			log.warn("Loading contact before roster is loaded: " + contact);
+		}
 		this.contacts.add(contact);
+		this.callback.addedContact(contact);
 		// for (Contact contact : usersOnFriendsList) {
 		// System.err.println("add: " + contactImpl.getId() + "/" + contactImpl.getProtocol() + "/" +
 		// contactImpl.getGroupIds());
@@ -116,44 +122,39 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 		return false;
 	}
 
-	public void contactAddFailure(Contact contact, ContactAddFailure failure) {
-		// TODO Auto-generated method stub
-
-	}
-
+	@Override
 	public void contactAddFailure(Contact contact, ContactAddFailure failure, String friendAddStatus) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void setGroupSession(SessionGroupImpl sessionGroup) {
-		this.sessionGroup = sessionGroup;
-	}
-
-	public void setStatusSession(SessionStatusImpl sessionStatus) {
-		this.sessionStatus = sessionStatus;
+		this.callback.contactAddFailure(contact, failure, friendAddStatus);
 	}
 
 	@Override
 	public void contactAddAccepted(Contact contact) {
-		// TODO Auto-generated method stub
-
+		this.callback.contactAddAccepted(contact);
 	}
 
 	@Override
 	public void contactAddDeclined(Contact contact, String message) {
-		// TODO Auto-generated method stub
-
+		this.callback.contactAddDeclined(contact, message);
 	}
 
 	@Override
 	public void contactAddRequest(Contact contact, Name name, String message) {
-		// TODO Auto-generated method stub
-
+		this.callback.contactAddRequest(contact, name, message);
 	}
 
 	@Override
-	public void removedContact(Contact contacts) {
+	public void removedContact(Contact contact) {
+		this.callback.removedContact(contact);
+	}
+
+	@Override
+	public void rosterLoaded() {
+		log.trace("rosterLoaded");
+		this.rosterLoaded = true;
+		this.callback.rosterLoaded();
+	}
+
+	public void contactAddFailure(Contact contact, ContactAddFailure failure) {
 		// TODO Auto-generated method stub
 
 	}

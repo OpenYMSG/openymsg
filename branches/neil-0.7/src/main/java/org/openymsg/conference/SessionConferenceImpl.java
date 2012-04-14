@@ -9,11 +9,12 @@ import org.openymsg.ConferenceStatus;
 import org.openymsg.Contact;
 import org.openymsg.execute.Executor;
 import org.openymsg.network.ServiceType;
+import org.openymsg.util.CollectionUtils;
 
 public class SessionConferenceImpl implements SessionConference, SessionConferenceCallback {
 	private String username;
 	private Executor executor;
-	private Map<String, ConferenceImpl> conferences = new HashMap<String, ConferenceImpl>();
+	private Map<String, Conference> conferences = new HashMap<String, Conference>();
 	private Map<String, ConferenceStatus> conferenceStatuses = new HashMap<String, ConferenceStatus>();
 	private Map<String, ConferenceMembership> conferenceMemberships = new HashMap<String, ConferenceMembership>();
 
@@ -110,6 +111,11 @@ public class SessionConferenceImpl implements SessionConference, SessionConferen
 	public void conferenceDeclineReceived(Conference conference, Contact contact, String message) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public Set<Conference> getConferences() {
+		return CollectionUtils.protectedSet(this.conferences.values());
 	}
 
 }

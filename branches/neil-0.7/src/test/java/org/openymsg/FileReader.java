@@ -14,20 +14,17 @@ import org.openymsg.network.direct.YMSG9InputStream;
  * @author neilhart
  */
 public class FileReader {
-	public FileReader(String filename) {
-
-	}
-
-	public static final void main(String[] args) throws UnsupportedEncodingException, IOException {
-		// File file = new File("/Users/neilhart/wireshark_export");
-		// File file = new File("/Users/neilhart/list_v15");
-		// File file = new File("/Users/neilhart/change_group");
-		URL url = FileReader.class.getClassLoader().getResource("Y6StatusInvisibleToAvailable");
+	public FileReader(String filename) throws UnsupportedEncodingException, IOException {
+		URL url = FileReader.class.getClassLoader().getResource("NotifyTypingInYahoo");
 		String fullyQualifiedFilename = url.getFile();
 		File file = new File(fullyQualifiedFilename);
 		FileInputStream stream = new FileInputStream(file);
 		YMSG9InputStream ymsg = new YMSG9InputStream(stream);
 		System.err.println(ymsg.readPacket());
+	}
+
+	public static final void main(String[] args) throws UnsupportedEncodingException, IOException {
+		new FileReader("NotifyTypingInYahoo");
 	}
 
 }

@@ -48,7 +48,7 @@ public class ReaderRegistry {
 	}
 
 	public void received(YMSG9Packet packet) {
-		log.info("received packet: " + packet);
+		log.debug("received packet: " + packet);
 		ServiceType type = packet.service;
 		Set<SinglePacketResponse> responses = this.registry.get(type);
 		if (responses == null || responses.isEmpty()) {
@@ -59,7 +59,12 @@ public class ReaderRegistry {
 			log.info("multiple responses for serviceType: + " + type);
 		}
 		for (SinglePacketResponse response : responses) {
-			response.execute(packet);
+			try {
+				response.execute(packet);
+			}
+			catch (Exception e) {
+				log.warn("Failed calling: " + packet, e);
+			}
 		}
 
 	}

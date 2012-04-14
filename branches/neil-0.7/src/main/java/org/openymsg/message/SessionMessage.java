@@ -1,7 +1,5 @@
 package org.openymsg.message;
 
-import java.io.IOException;
-
 import org.openymsg.Contact;
 
 //TODO - send message to non-contacts, including MSN
@@ -24,6 +22,11 @@ public interface SessionMessage {
 	// TODO handle offline
 	void sendBuzz(Contact contact) throws IllegalStateException;
 
-	void sendTypingNotification(Contact contact, boolean isTyping) throws IOException;
+	/**
+	 * Send notification of typing
+	 * @param contact to buddy
+	 * @param isTyping typing or done
+	 */
+	void sendTypingNotification(Contact contact, boolean isTyping);
 
 }
