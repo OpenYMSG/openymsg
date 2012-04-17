@@ -9,10 +9,16 @@ import org.openymsg.network.YMSG9Packet;
 public class ConnectionReader implements Request {
 	private static final Log log = LogFactory.getLog(ConnectionReader.class);
 	private ConnectionHandler connection;
-	private ReaderRegistry registry;
+	private ReaderRegistryImpl registry;
 	private boolean isFinished = false;
 
-	public ConnectionReader(ConnectionHandler connection, ReaderRegistry registry) {
+	public ConnectionReader(ConnectionHandler connection, ReaderRegistryImpl registry) {
+		if (connection == null) {
+			throw new IllegalArgumentException("Connection cannot be null");
+		}
+		if (registry == null) {
+			throw new IllegalArgumentException("Registry cannot be null");
+		}
 		this.connection = connection;
 		this.registry = registry;
 	}
@@ -22,7 +28,7 @@ public class ConnectionReader implements Request {
 		// TODO - how long runs, starvation
 		log.trace("Running");
 		if (this.isFinished) {
-			log.info("Running when finished");
+			log.warn("Running when finished");
 			return;
 		}
 		YMSG9Packet packet = connection.receivePacket();
@@ -37,6 +43,7 @@ public class ConnectionReader implements Request {
 	}
 
 	@Override
+	// TODO need to do something with this
 	public void failure(Exception ex) {
 		log.error("Failed reading connection", ex);
 	}

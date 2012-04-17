@@ -7,9 +7,9 @@ package org.openymsg;
  */
 public class Contact {
 	/** unique name within a specific protocol */
-	private String name;
+	private final String name;
 	/** system the id is on. Mostly YahooProtocol.YAHOO */
-	private YahooProtocol protocol;
+	private final YahooProtocol protocol;
 
 	/**
 	 * Create a new Contact
@@ -52,25 +52,13 @@ public class Contact {
 		return this.name;
 	}
 
-	/**
-	 * Fix the protocol for a contact. Should not be used. This changes the hash
-	 * @param protocol new protocol
-	 */
-	@Deprecated
-	public void setProtocol(YahooProtocol protocol) {
-		this.protocol = protocol;
-	}
-
 	@Override
 	public String toString() {
 		return "Contact [name=" + name + ", protocol=" + protocol + "]";
 	}
 
-	/**
-	 * Hash of the Contact using the id and protocol.
-	 */
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
@@ -78,14 +66,11 @@ public class Contact {
 		return result;
 	}
 
-	/**
-	 * Comparison of Contacts using id and protocol.
-	 */
 	@Override
-	public boolean equals(Object obj) {
+	public final boolean equals(Object obj) {
 		if (this == obj) return true;
 		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
+		if (!(obj instanceof Contact)) return false;
 		Contact other = (Contact) obj;
 		if (name == null) {
 			if (other.name != null) return false;
@@ -93,4 +78,5 @@ public class Contact {
 		if (protocol != other.protocol) return false;
 		return true;
 	}
+
 }

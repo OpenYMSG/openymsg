@@ -23,8 +23,11 @@ public class MessageOnlineResponse implements SinglePacketResponse {
 		String fed = packet.getValue("241");
 		String message = packet.getValue("14");
 		String id = packet.getValue("429");
+		@SuppressWarnings("unused")
 		String timestamp = packet.getValue("15"); // Messages from MSN have timestamp
+		@SuppressWarnings("unused")
 		String value252 = packet.getValue("252"); // something from MSN
+		@SuppressWarnings("unused")
 		String value455 = packet.getValue("455"); // something from MSN
 
 		YahooProtocol protocol = YahooProtocol.YAHOO;
@@ -34,8 +37,7 @@ public class MessageOnlineResponse implements SinglePacketResponse {
 		Contact contact = new Contact(from, protocol);
 		if (message.equalsIgnoreCase(BUZZ)) {
 			this.session.receivedBuzz(contact, id);
-		}
-		else {
+		} else {
 			this.session.receivedMessage(contact, message, id);
 		}
 	}

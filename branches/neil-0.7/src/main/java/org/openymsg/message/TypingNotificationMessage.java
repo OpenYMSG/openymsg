@@ -11,7 +11,8 @@ import org.openymsg.network.ServiceType;
 /**
  * Transmit a NOTIFY packet. Could be used for all sorts of purposes, but mainly games and typing notifications. Only
  * typing is supported by this API. The mode determines the type of notification, "TYPING" or "GAME"; msg holds the game
- * name (or a single space if typing). *
+ * name (or a single space if typing). * notify to friend the typing start or end action message parameters Version: 16
+ * Service: Notify (75) Status: Notify (22) 49: TYPING 1: userId 14: <empty> 13: 1 or 0 5: sendingToId
  * @param friend
  * @param yid id
  * @param on true start typing, false stop typing

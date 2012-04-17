@@ -11,16 +11,17 @@ public class TypingNotificationResponse implements SinglePacketResponse {
 	// TODO
 	public static final String NOTIFY_TYPING = "TYPING";
 	public static final String NOTIFY_GAME = "GAME";
-	private SessionMessageCallback callback;
+	private SessionMessageImpl session;
 
-	public TypingNotificationResponse(SessionMessageCallback callback) {
-		this.callback = callback;
+	public TypingNotificationResponse(SessionMessageImpl session) {
+		this.session = session;
 	}
 
 	@Override
 	public void execute(YMSG9Packet packet) {
 		// FIX: documentation says this should be Status.TYPING (0x16)
 		// if (packet.status == 0x01) {
+		@SuppressWarnings("unused")
 		String to = packet.getValue("4");
 		String from = packet.getValue("5");
 		// TODO protocol
@@ -39,7 +40,7 @@ public class TypingNotificationResponse implements SinglePacketResponse {
 
 		Contact contact = new Contact(from);
 		if (NOTIFY_TYPING.equalsIgnoreCase(type)) {
-			this.callback.receivedTypingNotification(contact, isTyping);
+			this.session.receivedTypingNotification(contact, isTyping);
 		} else if (NOTIFY_GAME.equalsIgnoreCase(type)) {
 			log.debug("Not handling game notify with: " + message);
 		} else {

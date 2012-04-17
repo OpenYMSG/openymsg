@@ -70,6 +70,9 @@ public class SessionImpl implements Session {
 
 	@Override
 	public void sendMessage(Contact contact, String message) throws IllegalStateException {
+		// TODO - check status
+		// checkStatus();
+		// TODO current contact?
 		this.message.sendMessage(contact, message);
 	}
 
