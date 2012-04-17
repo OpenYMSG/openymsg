@@ -1,7 +1,5 @@
 package org.openymsg.message;
 
-import java.io.IOException;
-
 import org.openymsg.Contact;
 import org.openymsg.execute.Executor;
 import org.openymsg.execute.read.NoOpResponse;
@@ -17,22 +15,39 @@ public class SessionMessageImpl implements SessionMessage {
 	private long messageNumber = System.currentTimeMillis();
 	private SessionMessageCallback callback;
 
-	public SessionMessageImpl(Executor executor, String username, SessionMessageCallback callback) {
+	/**
+	 * Creates the manager for sending and receiving messages and typing notification
+	 * @param executor executor
+	 * @param username user name
+	 * @param callback callback for notification of message and typing
+	 * @throws IllegalArgumentException if executor, user name, or callback is null
+	 */
+	public SessionMessageImpl(Executor executor, String username, SessionMessageCallback callback)
+			throws IllegalArgumentException {
+		if (executor == null) {
+			throw new IllegalArgumentException("Executor cannot be null");
+		}
+		if (username == null || username.trim().isEmpty()) {
+			throw new IllegalArgumentException("Username cannot be null or empty");
+		}
+		if (callback == null) {
+			throw new IllegalArgumentException("Callback cannot be null");
+		}
+
 		this.executor = executor;
 		this.username = username;
 		this.callback = callback;
 		this.executor.register(ServiceType.MESSAGE_ACK, new NoOpResponse());
 		this.executor.register(ServiceType.MESSAGE, new MessageResponse(this));
-		this.executor.register(ServiceType.NOTIFY, new TypingNotificationResponse(callback));
+		this.executor.register(ServiceType.NOTIFY, new TypingNotificationResponse(this));
 	}
 
 	/**
 	 * Send a buzz message
 	 * @param to Recipient of the buzz.
-	 * @throws IllegalStateException
-	 * @throws IOException
+	 * @throws IllegalArgumentException if contact is null
 	 */
-	public void sendBuzz(Contact to) throws IllegalStateException {
+	public void sendBuzz(Contact to) throws IllegalArgumentException {
 		sendMessage(to, BUZZ);
 	}
 
@@ -40,13 +55,11 @@ public class SessionMessageImpl implements SessionMessage {
 	 * Send a chat message.
 	 * @param to Yahoo ID of the user to transmit the message.
 	 * @param message The message to transmit.
-	 * @throws IllegalStateException
-	 * @throws IOException
+	 * @throws IllegalArgumentException if contact or message is null
 	 */
 	// TODO - handle message ask
-	public void sendMessage(Contact contact, String message) throws IllegalStateException {
-		// TODO - check status
-		// checkStatus();
+	// TODO - current contact?
+	public void sendMessage(Contact contact, String message) throws IllegalArgumentException {
 
 		if (contact == null) {
 			throw new IllegalArgumentException("Contact cannot be null");
@@ -61,14 +74,12 @@ public class SessionMessageImpl implements SessionMessage {
 		this.executor.execute(new SendMessage(username, contact, message, messageId));
 	}
 
-	/**
-	 * notify to friend the typing start or end action message parameters Version: 16 Service: Notify (75) Status:
-	 * Notify (22) 49: TYPING 1: userId 14: <empty> 13: 1 or 0 5: sendingToId
-	 * @param friend user whose sending message
-	 * @param isTyping true if start typing, false if typing end up
-	 */
 	@Override
 	public void sendTypingNotification(Contact contact, boolean isTyping) {
+		if (contact == null) {
+			throw new IllegalArgumentException("Contact cannot be null");
+		}
+
 		this.executor.execute(new TypingNotificationMessage(username, contact, isTyping));
 	}
 
@@ -79,11 +90,15 @@ public class SessionMessageImpl implements SessionMessage {
 		return messageNumber;
 	}
 
+	// TODO - send ack if ignored?
 	public void receivedMessage(Contact contact, String message, String messageId) {
-		this.executor.execute(new MessageAckMessage(username, contact, messageId));
+		if (messageId != null) {
+			this.executor.execute(new MessageAckMessage(username, contact, messageId));
+		}
 		this.callback.receivedMessage(contact, message);
 	}
 
+	// TODO - ack buzz?
 	public void receivedBuzz(Contact contact, String id) {
 		this.callback.receivedBuzz(contact);
 	}
@@ -94,6 +109,10 @@ public class SessionMessageImpl implements SessionMessage {
 		} else {
 			this.callback.receivedOfflineMessage(contact, message, timestampInMillis);
 		}
+	}
+
+	public void receivedTypingNotification(Contact contact, boolean isTyping) {
+		this.callback.receivedTypingNotification(contact, isTyping);
 	}
 
 }

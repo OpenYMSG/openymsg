@@ -21,7 +21,7 @@ public class SessionSessionImpl implements SessionSession {
 		this.executor.register(ServiceType.LOGOFF, new PagerLogoffResponse());
 		this.executor.register(ServiceType.PING, new PingResponse());
 		this.executor.schedule(new ScheduledMessageSender(this.executor, new PingRequest()), (60 * 60 * 1000));
-		this.executor.schedule(new ScheduledMessageSender(this.executor, new KeepAliveRequest(username)), (60 * 1000));
+		this.executor.schedule(new ScheduledMessageSender(this.executor, new KeepAliveMessage(username)), (60 * 1000));
 	}
 
 	// TODO - looks cool

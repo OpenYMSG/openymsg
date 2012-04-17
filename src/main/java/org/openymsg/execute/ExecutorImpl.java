@@ -32,8 +32,8 @@ public class ExecutorImpl implements Executor {
 	}
 
 	@Override
-	public void deregister(ServiceType type, SinglePacketResponse response) {
-		this.reader.deregister(type, response);
+	public boolean deregister(ServiceType type, SinglePacketResponse response) {
+		return this.reader.deregister(type, response);
 	}
 
 	@Override
@@ -42,8 +42,8 @@ public class ExecutorImpl implements Executor {
 	}
 
 	@Override
-	public void deregister(ServiceType type, MultiplePacketResponse response) {
-		this.reader.deregister(type, response);
+	public boolean deregister(ServiceType type, MultiplePacketResponse response) {
+		return this.reader.deregister(type, response);
 	}
 
 	public void initializeConnection(ConnectionHandler connection) throws IllegalStateException {

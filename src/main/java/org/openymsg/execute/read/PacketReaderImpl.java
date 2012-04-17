@@ -5,17 +5,23 @@ import org.openymsg.network.ConnectionHandler;
 import org.openymsg.network.ServiceType;
 
 public class PacketReaderImpl implements PacketReader {
-	private ReaderRegistry registry;
+	private ReaderRegistryImpl registry;
 	private ConnectionReader reader;
 	private Dispatcher executor;
 
 	public PacketReaderImpl(Dispatcher executor) {
+		if (executor == null) {
+			throw new IllegalArgumentException("Executor cannot be null");
+		}
 		this.executor = executor;
-		this.registry = new ReaderRegistry();
+		this.registry = new ReaderRegistryImpl();
 	}
 
 	@Override
 	public void initializeConnection(ConnectionHandler connection) {
+		if (connection == null) {
+			throw new IllegalArgumentException("Connection cannot be null");
+		}
 		this.reader = new ConnectionReader(connection, this.registry);
 		this.executor.schedule(this.reader, 500);
 	}
@@ -26,8 +32,8 @@ public class PacketReaderImpl implements PacketReader {
 	}
 
 	@Override
-	public void deregister(ServiceType type, SinglePacketResponse response) {
-		this.registry.deregister(type, response);
+	public boolean deregister(ServiceType type, SinglePacketResponse response) {
+		return this.registry.deregister(type, response);
 	}
 
 	@Override
@@ -36,8 +42,8 @@ public class PacketReaderImpl implements PacketReader {
 	}
 
 	@Override
-	public void deregister(ServiceType type, MultiplePacketResponse response) {
-		this.registry.deregister(type, response);
+	public boolean deregister(ServiceType type, MultiplePacketResponse response) {
+		return this.registry.deregister(type, response);
 	}
 
 	@Override
