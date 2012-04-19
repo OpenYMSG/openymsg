@@ -2,7 +2,7 @@ package org.openymsg.message;
 
 import org.mockito.Mockito;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
-import org.openymsg.Contact;
+import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.execute.Executor;
 import org.openymsg.execute.read.SinglePacketResponse;
@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 
 public class SessionMessageImplTest {
 	private String username = "testuser";
-	private Contact contact = new Contact("testbuddy", YahooProtocol.YAHOO);
+	private YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 	private Executor executor;
 	private SessionMessageCallback callback;
 	private SessionMessageImpl session;

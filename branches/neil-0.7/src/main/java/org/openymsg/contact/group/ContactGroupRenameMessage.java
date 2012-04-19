@@ -2,7 +2,7 @@ package org.openymsg.contact.group;
 
 import java.io.IOException;
 
-import org.openymsg.ContactGroup;
+import org.openymsg.YahooContactGroup;
 import org.openymsg.execute.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
@@ -17,10 +17,10 @@ import org.openymsg.network.ServiceType;
  */
 public class ContactGroupRenameMessage implements Message {
 	private final String username;
-	private final ContactGroup group;
+	private final YahooContactGroup group;
 	private final String newGroupName;
 
-	public ContactGroupRenameMessage(String username, ContactGroup group, String newGroupName) {
+	public ContactGroupRenameMessage(String username, YahooContactGroup group, String newGroupName) {
 		this.username = username;
 		this.group = group;
 		this.newGroupName = newGroupName;

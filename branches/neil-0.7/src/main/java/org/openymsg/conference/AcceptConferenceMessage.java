@@ -2,7 +2,7 @@ package org.openymsg.conference;
 
 import java.io.IOException;
 
-import org.openymsg.Conference;
+import org.openymsg.YahooConference;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
@@ -12,7 +12,7 @@ import org.openymsg.network.ServiceType;
  */
 public class AcceptConferenceMessage extends AbstractConferenceMessage {
 
-	public AcceptConferenceMessage(String username, Conference conference, ConferenceMembership membership) {
+	public AcceptConferenceMessage(String username, YahooConference conference, ConferenceMembership membership) {
 		super(username, conference, membership);
 	}
 

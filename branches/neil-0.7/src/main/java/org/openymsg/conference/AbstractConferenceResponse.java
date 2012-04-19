@@ -1,17 +1,17 @@
 package org.openymsg.conference;
 
-import org.openymsg.Conference;
+import org.openymsg.YahooConference;
 import org.openymsg.execute.read.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
 
 public abstract class AbstractConferenceResponse implements SinglePacketResponse {
-	protected SessionConferenceCallback sessionConference;
+	protected SessionConferenceImpl sessionConference;
 
-	public AbstractConferenceResponse(SessionConferenceCallback sessionConference) {
+	public AbstractConferenceResponse(SessionConferenceImpl sessionConference) {
 		this.sessionConference = sessionConference;
 	}
 
-	protected Conference getConference(YMSG9Packet packet) {
+	protected YahooConference getConference(YMSG9Packet packet) {
 		String id = packet.getValue("57");
 		return new ConferenceImpl(id);
 	}

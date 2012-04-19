@@ -2,9 +2,9 @@ package org.openymsg.conference;
 
 import java.util.Set;
 
-import org.openymsg.Conference;
-import org.openymsg.ConferenceStatus;
-import org.openymsg.Contact;
+import org.openymsg.YahooConference;
+import org.openymsg.YahooConferenceStatus;
+import org.openymsg.YahooContact;
 
 /**
  * Conference Services for Yahoo. Not sure if the conferenceId can contain non-alphanumeric characters. Also unsure of
@@ -20,7 +20,7 @@ public interface SessionConference {
 	 * @param message invite message. Sometimes this shows as the conference name. Can be null.
 	 * @return new Conference
 	 */
-	Conference createConference(String conferenceId, Set<Contact> contacts, String message);
+	YahooConference createConference(String conferenceId, Set<YahooContact> contacts, String message);
 
 	/**
 	 * Send a message to the conference.
@@ -28,21 +28,21 @@ public interface SessionConference {
 	 * @param message message to send to the conference
 	 * @throws IllegalArgumentException if conference doesn't exist
 	 */
-	void sendConferenceMessage(Conference conference, String message) throws IllegalArgumentException;
+	void sendConferenceMessage(YahooConference conference, String message) throws IllegalArgumentException;
 
 	/**
 	 * Leave a conference. One of the members may re-invite you to the conference.
 	 * @param conference conference leave
 	 * @throws IllegalArgumentException if conference doesn't exist
 	 */
-	void leaveConference(Conference conference) throws IllegalArgumentException;
+	void leaveConference(YahooConference conference) throws IllegalArgumentException;
 
 	/**
 	 * Accept a conference invite that was sent to you.
 	 * @param conference conference in the invite
 	 * @throws IllegalArgumentException if conference doesn't exist
 	 */
-	void acceptConferenceInvite(Conference conference) throws IllegalArgumentException;
+	void acceptConferenceInvite(YahooConference conference) throws IllegalArgumentException;
 
 	/**
 	 * Decline a conference invite that was sent to you with a message
@@ -50,7 +50,7 @@ public interface SessionConference {
 	 * @param message decline reason sent to the inviter, not the conference. May be null
 	 * @throws IllegalArgumentException if conference doesn't exist
 	 */
-	void declineConferenceInvite(Conference conference, String message) throws IllegalArgumentException;
+	void declineConferenceInvite(YahooConference conference, String message) throws IllegalArgumentException;
 
 	/**
 	 * Invite another yahoo id to the conference with a messages. contact does not need to be current contact.
@@ -59,21 +59,21 @@ public interface SessionConference {
 	 * @param message invite message. May be null
 	 * @throws IllegalArgumentException if conference doesn't exist
 	 */
-	void extendConference(Conference conference, Contact contact, String message) throws IllegalArgumentException;
+	void extendConference(YahooConference conference, YahooContact contact, String message) throws IllegalArgumentException;
 
 	/**
 	 * Get the Conference with the matching id. Null if id is not matched.
 	 * @param conferenceId conference id to find
 	 * @return matching Conference, null if not found.
 	 */
-	Conference getConference(String conferenceId);
+	YahooConference getConference(String conferenceId);
 
 	/**
 	 * get the ConferenceStatus with the matching id. Null if id is not matched.
 	 * @param conferenceId conference id to find
 	 * @return matching ConferenceStatus, null if not found.
 	 */
-	ConferenceStatus getConferenceStatus(String conferenceId);
+	YahooConferenceStatus getConferenceStatus(String conferenceId);
 
-	Set<Conference> getConferences();
+	Set<YahooConference> getConferences();
 }

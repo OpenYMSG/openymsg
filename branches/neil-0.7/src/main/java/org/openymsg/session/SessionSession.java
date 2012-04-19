@@ -1,6 +1,6 @@
 package org.openymsg.session;
 
-import org.openymsg.Status;
+import org.openymsg.YahooStatus;
 
 public interface SessionSession {
 	void logout();
@@ -12,7 +12,7 @@ public interface SessionSession {
 	 * @param status The new Status to be set for this user.
 	 * @throws IllegalArgumentException
 	 */
-	void setStatus(Status status) throws IllegalArgumentException;
+	void setStatus(YahooStatus status) throws IllegalArgumentException;
 
 	/**
 	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc. Legit values are in the StatusConstants

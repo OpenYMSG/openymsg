@@ -2,17 +2,17 @@ package org.openymsg.contact.roster;
 
 import java.io.IOException;
 
-import org.openymsg.Contact;
+import org.openymsg.YahooContact;
 import org.openymsg.execute.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
 public class ContactAddRequestAccept implements Message {
-	private final Contact contact;
+	private final YahooContact contact;
 	private String username;
 
-	public ContactAddRequestAccept(String username, Contact contact) {
+	public ContactAddRequestAccept(String username, YahooContact contact) {
 		this.username = username;
 		this.contact = contact;
 	}

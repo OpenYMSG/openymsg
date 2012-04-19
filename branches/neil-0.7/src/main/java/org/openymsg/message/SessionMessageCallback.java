@@ -1,6 +1,6 @@
 package org.openymsg.message;
 
-import org.openymsg.Contact;
+import org.openymsg.YahooContact;
 
 
 /**
@@ -10,8 +10,8 @@ import org.openymsg.Contact;
  *
  */
 public interface SessionMessageCallback {
-	void receivedMessage(Contact from, String message);
-	void receivedBuzz(Contact from);
-	void receivedOfflineMessage(Contact from, String message, long timestampInMillis);
-	void receivedTypingNotification(Contact from, boolean isTyping);
+	void receivedMessage(YahooContact from, String message);
+	void receivedBuzz(YahooContact from);
+	void receivedOfflineMessage(YahooContact from, String message, long timestampInMillis);
+	void receivedTypingNotification(YahooContact from, boolean isTyping);
 }

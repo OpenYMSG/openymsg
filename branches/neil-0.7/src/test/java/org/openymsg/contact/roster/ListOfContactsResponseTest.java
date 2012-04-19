@@ -6,15 +6,15 @@ import java.util.List;
 import java.util.Set;
 
 import org.mockito.Mockito;
-import org.openymsg.Contact;
-import org.openymsg.ContactGroup;
-import org.openymsg.PacketReader;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooContactGroup;
 import org.openymsg.YahooProtocol;
 import org.openymsg.contact.ListOfContactsResponse;
 import org.openymsg.contact.group.ContactGroupImpl;
 import org.openymsg.contact.group.SessionGroupImpl;
 import org.openymsg.contact.status.SessionStatusImpl;
 import org.openymsg.network.YMSG9Packet;
+import org.openymsg.testing.PacketReader;
 import org.testng.annotations.Test;
 
 public class ListOfContactsResponseTest {
@@ -30,51 +30,51 @@ public class ListOfContactsResponseTest {
 		List<YMSG9Packet> packets = new ArrayList<YMSG9Packet>();
 		packets.add(packet);
 		response.execute(packets);
-		for (Contact contact : this.getContacts()) {
+		for (YahooContact contact : this.getContacts()) {
 			Mockito.verify(sessionContact).loadedContact(contact);
 		}
 		Mockito.verify(sessionStatus).addedPending(this.getPendingContacts());
 		Mockito.verify(sessionGroup).addedGroups(this.getGroups());
 	}
 
-	private Set<ContactGroup> getGroups() {
-		Set<ContactGroup> groups = new HashSet<ContactGroup>();
+	private Set<YahooContactGroup> getGroups() {
+		Set<YahooContactGroup> groups = new HashSet<YahooContactGroup>();
 		groups.add(new ContactGroupImpl("Bros"));
 		groups.add(new ContactGroupImpl("BuddiesTH2"));
 		return groups;
 	}
 
-	private Set<Contact> getPendingContacts() {
-		Set<Contact> contacts = new HashSet<Contact>();
-		contacts.add(new Contact("dog11", YahooProtocol.YAHOO));
-		contacts.add(new Contact("lady402", YahooProtocol.YAHOO));
-		contacts.add(new Contact("lady405", YahooProtocol.YAHOO));
-		contacts.add(new Contact("lady78a", YahooProtocol.YAHOO));
-		contacts.add(new Contact("lady80a", YahooProtocol.YAHOO));
-		contacts.add(new Contact("lady83", YahooProtocol.YAHOO));
+	private Set<YahooContact> getPendingContacts() {
+		Set<YahooContact> contacts = new HashSet<YahooContact>();
+		contacts.add(new YahooContact("dog11", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("lady402", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("lady405", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("lady78a", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("lady80a", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("lady83", YahooProtocol.YAHOO));
 		return contacts;
 	}
 
-	private Set<Contact> getContacts() {
-		Set<Contact> contacts = new HashSet<Contact>();
-		contacts.add(new Contact("dude1", YahooProtocol.YAHOO));
-		contacts.add(new Contact("lady10", YahooProtocol.YAHOO));
-		contacts.add(new Contact("josephiiiapple", YahooProtocol.YAHOO));
-		contacts.add(new Contact("josephvapple", YahooProtocol.YAHOO));
-		contacts.add(new Contact("pjpudge1414", YahooProtocol.YAHOO));
-		contacts.add(new Contact("frank22", YahooProtocol.YAHOO));
-		contacts.add(new Contact("frank21", YahooProtocol.YAHOO));
-		contacts.add(new Contact("lady402", YahooProtocol.YAHOO));
-		contacts.add(new Contact("lady405", YahooProtocol.YAHOO));
-		contacts.add(new Contact("lady78a", YahooProtocol.YAHOO));
-		contacts.add(new Contact("dog11", YahooProtocol.YAHOO));
-		contacts.add(new Contact("josephnextapple", YahooProtocol.YAHOO));
-		contacts.add(new Contact("lady114", YahooProtocol.YAHOO));
-		contacts.add(new Contact("frank290", YahooProtocol.YAHOO));
-		contacts.add(new Contact("lady83", YahooProtocol.YAHOO));
-		contacts.add(new Contact("lady113", YahooProtocol.YAHOO));
-		contacts.add(new Contact("josephivapple@live.com", YahooProtocol.MSN));
-		contacts.add(new Contact("lady80a", YahooProtocol.YAHOO));
+	private Set<YahooContact> getContacts() {
+		Set<YahooContact> contacts = new HashSet<YahooContact>();
+		contacts.add(new YahooContact("dude1", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("lady10", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("josephiiiapple", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("josephvapple", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("pjpudge1414", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("frank22", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("frank21", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("lady402", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("lady405", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("lady78a", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("dog11", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("josephnextapple", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("lady114", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("frank290", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("lady83", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("lady113", YahooProtocol.YAHOO));
+		contacts.add(new YahooContact("josephivapple@live.com", YahooProtocol.MSN));
+		contacts.add(new YahooContact("lady80a", YahooProtocol.YAHOO));
 		return contacts;
 	}
 }

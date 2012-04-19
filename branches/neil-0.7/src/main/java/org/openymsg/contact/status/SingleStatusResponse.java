@@ -4,8 +4,8 @@ import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.Contact;
-import org.openymsg.Status;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooStatus;
 import org.openymsg.YahooProtocol;
 import org.openymsg.execute.read.SinglePacketResponse;
 import org.openymsg.network.ServiceType;
@@ -138,8 +138,8 @@ public class SingleStatusResponse implements SinglePacketResponse {
 				+ ", onPager: " + onPager + ", visibility: " + visibility + ", clearIdleTime: " + clearIdleTime
 				+ ", idleTime: " + idleTime + ", customMessage: " + customMessage + ", customStatus: " + customStatus
 				+ ", longStatus: " + longStatus + ", protocol: " + protocol);
-		Status newStatus = Status.AVAILABLE;
-		Contact contact = new Contact(userId, protocol);
+		YahooStatus newStatus = YahooStatus.AVAILABLE;
+		YahooContact contact = new YahooContact(userId, protocol);
 		// ContactStatusImpl status = sessionStatus.getStatus(contact);
 		// TODO - handle this
 		// When we add a friend, we get a status update before
@@ -159,11 +159,11 @@ public class SingleStatusResponse implements SinglePacketResponse {
 			logoff = true;
 		}
 		try {
-			newStatus = logoff ? Status.OFFLINE : Status.getStatus(longStatus);
+			newStatus = logoff ? YahooStatus.OFFLINE : YahooStatus.getStatus(longStatus);
 		}
 		catch (IllegalArgumentException e) {
 			log.error("missing status: " + longStatus);
-			newStatus = Status.OFFLINE;
+			newStatus = YahooStatus.OFFLINE;
 		}
 
 		if (onChat != null) {
@@ -195,8 +195,8 @@ public class SingleStatusResponse implements SinglePacketResponse {
 			status.setIdleTime(Long.parseLong(idleTime));
 		}
 		// Hack for MSN users
-		if (contact.getProtocol().isMsn() && status.getMessage().is(Status.STEPPEDOUT)) {
-			status.update(Status.AWAY);
+		if (contact.getProtocol().isMsn() && status.getMessage().is(YahooStatus.STEPPEDOUT)) {
+			status.update(YahooStatus.AWAY);
 		}
 		this.sessionStatus.statusUpdate(contact, status);
 	}

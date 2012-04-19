@@ -1,15 +1,16 @@
 package org.openymsg.message;
 
 import org.mockito.Mockito;
-import org.openymsg.Contact;
-import org.openymsg.PacketReader;
+import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.network.YMSG9Packet;
+import org.openymsg.testing.PacketReader;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class TypingNotificationResponseTest {
-	private Contact contact = new Contact("testbuddy", YahooProtocol.YAHOO);
+	private YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 	private SessionMessageImpl session;
 	private TypingNotificationResponse response;
 
@@ -37,5 +38,6 @@ public class TypingNotificationResponseTest {
 
 	@Test(enabled = false)
 	public void testProtocol() {
+		Assert.fail("not implemented");
 	}
 }

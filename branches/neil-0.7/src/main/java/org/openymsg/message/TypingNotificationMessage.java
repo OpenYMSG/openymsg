@@ -2,7 +2,7 @@ package org.openymsg.message;
 
 import java.io.IOException;
 
-import org.openymsg.Contact;
+import org.openymsg.YahooContact;
 import org.openymsg.execute.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
@@ -22,10 +22,10 @@ import org.openymsg.network.ServiceType;
 public class TypingNotificationMessage implements Message {
 	private static final String NOTIFY_TYPING = "TYPING";
 	private String username;
-	private Contact contact;
+	private YahooContact contact;
 	private boolean on;
 
-	public TypingNotificationMessage(String username, Contact contact, boolean on) {
+	public TypingNotificationMessage(String username, YahooContact contact, boolean on) {
 		this.username = username;
 		this.contact = contact;
 		this.on = on;

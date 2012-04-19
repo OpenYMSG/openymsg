@@ -2,8 +2,8 @@ package org.openymsg.contact.group;
 
 import java.io.IOException;
 
-import org.openymsg.Contact;
-import org.openymsg.ContactGroup;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooContactGroup;
 import org.openymsg.execute.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
@@ -11,11 +11,11 @@ import org.openymsg.network.ServiceType;
 
 public class MoveContactToGroupMessage implements Message {
 	private String username;
-	private Contact contact;
-	private ContactGroup from;
-	private ContactGroup to;
+	private YahooContact contact;
+	private YahooContactGroup from;
+	private YahooContactGroup to;
 
-	public MoveContactToGroupMessage(String username, Contact contact, ContactGroup from, ContactGroup to) {
+	public MoveContactToGroupMessage(String username, YahooContact contact, YahooContactGroup from, YahooContactGroup to) {
 		this.username = username;
 		this.contact = contact;
 		this.from = from;

@@ -2,8 +2,8 @@ package org.openymsg.contact.roster;
 
 import java.io.IOException;
 
-import org.openymsg.Contact;
-import org.openymsg.ContactGroup;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooContactGroup;
 import org.openymsg.execute.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
@@ -21,10 +21,10 @@ import org.openymsg.network.ServiceType;
 public class ContactAddRequestMessage implements Message {
 
 	private final String username;
-	private final Contact contact;
-	private final ContactGroup group;
+	private final YahooContact contact;
+	private final YahooContactGroup group;
 
-	public ContactAddRequestMessage(String username, Contact contact, ContactGroup group) {
+	public ContactAddRequestMessage(String username, YahooContact contact, YahooContactGroup group) {
 		this.username = username;
 		this.contact = contact;
 		this.group = group;

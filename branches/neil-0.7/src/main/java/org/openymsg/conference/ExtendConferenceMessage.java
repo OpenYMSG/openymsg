@@ -2,8 +2,8 @@ package org.openymsg.conference;
 
 import java.io.IOException;
 
-import org.openymsg.Conference;
-import org.openymsg.Contact;
+import org.openymsg.YahooConference;
+import org.openymsg.YahooContact;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
@@ -12,11 +12,11 @@ import org.openymsg.network.ServiceType;
  * Transmit an CONFADDINVITE packet. We send one of these when we wish to invite more users to our conference.
  */
 public class ExtendConferenceMessage extends AbstractConferenceMessage {
-	private Contact contact;
+	private YahooContact contact;
 	private String message;
 
-	public ExtendConferenceMessage(String username, Conference conference, ConferenceMembership membership,
-			Contact contact, String message) {
+	public ExtendConferenceMessage(String username, YahooConference conference, ConferenceMembership membership,
+			YahooContact contact, String message) {
 		super(username, conference, membership);
 		this.contact = contact;
 		this.message = message;

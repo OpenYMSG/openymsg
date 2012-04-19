@@ -6,8 +6,8 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.Contact;
-import org.openymsg.ContactGroup;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooContactGroup;
 import org.openymsg.Name;
 import org.openymsg.contact.group.ContactGroupRenameMessage;
 import org.openymsg.execute.Executor;
@@ -18,7 +18,7 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	private static final Log log = LogFactory.getLog(SessionRosterImpl.class);
 	private Executor executor;
 	private String username;
-	private Set<Contact> contacts = new HashSet<Contact>();
+	private Set<YahooContact> contacts = new HashSet<YahooContact>();
 	private SessionRosterCallback callback;
 	private boolean rosterLoaded = false;
 
@@ -29,14 +29,14 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 		this.executor.register(ServiceType.FRIENDADD, new ContactAddResponse(this));
 	}
 
-	public void renameGroup(ContactGroup group, String newName) throws IllegalStateException, IOException {
+	public void renameGroup(YahooContactGroup group, String newName) throws IllegalStateException, IOException {
 		// checkStatus();
 		this.executor.execute(new ContactGroupRenameMessage(username, group, newName));
 		// transmitGroupRename(group, newName);
 	}
 
 	@Override
-	public void addContact(Contact contact, ContactGroup group) throws IllegalArgumentException {
+	public void addContact(YahooContact contact, YahooContactGroup group) throws IllegalArgumentException {
 		// log.trace("Adding new user: " + userId + ", group: " + groupId + ", protocol: " + yahooProtocol);
 		// TODO: perhaps we should check the roster to make sure that this
 		// friend does not already exist.
@@ -55,7 +55,7 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	}
 
 	@Override
-	public void removeFromGroup(Contact contact, ContactGroup group) {
+	public void removeFromGroup(YahooContact contact, YahooContactGroup group) {
 		if (contact == null) {
 			throw new IllegalArgumentException("Argument 'group' cannot be null.");
 		}
@@ -72,13 +72,13 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	}
 
 	@Override
-	public void acceptFriendAuthorization(Contact contact) throws IllegalStateException {
+	public void acceptFriendAuthorization(YahooContact contact) throws IllegalStateException {
 		// checkStatus();
 		this.executor.execute(new ContactAddRequestAccept(this.username, contact));
 	}
 
 	@Override
-	public void rejectFriendAuthorization(Contact contact, String message) throws IllegalStateException {
+	public void rejectFriendAuthorization(YahooContact contact, String message) throws IllegalStateException {
 		// checkStatus();
 		this.executor.execute(new ContactAddRequestDecline(this.username, contact, message));
 	}
@@ -89,7 +89,7 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	// transmitList();
 	// }
 
-	public void loadedContact(Contact contact) {
+	public void loadedContact(YahooContact contact) {
 		log.trace("loadedContact: " + contact);
 		if (this.rosterLoaded) {
 			log.warn("Loading contact after roster is loaded: " + contact);
@@ -99,7 +99,7 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	}
 
 	@Override
-	public void addedContact(Contact contact) {
+	public void addedContact(YahooContact contact) {
 		log.trace("addedContact: " + contact);
 		if (!this.rosterLoaded) {
 			log.warn("Loading contact before roster is loaded: " + contact);
@@ -113,37 +113,37 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	}
 
 	@Override
-	public Set<Contact> getContacts() {
+	public Set<YahooContact> getContacts() {
 		return CollectionUtils.protectedSet(this.contacts);
 	}
 
-	public boolean possibleContact(Contact contact) {
+	public boolean possibleContact(YahooContact contact) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public void contactAddFailure(Contact contact, ContactAddFailure failure, String friendAddStatus) {
+	public void contactAddFailure(YahooContact contact, ContactAddFailure failure, String friendAddStatus) {
 		this.callback.contactAddFailure(contact, failure, friendAddStatus);
 	}
 
 	@Override
-	public void contactAddAccepted(Contact contact) {
+	public void contactAddAccepted(YahooContact contact) {
 		this.callback.contactAddAccepted(contact);
 	}
 
 	@Override
-	public void contactAddDeclined(Contact contact, String message) {
+	public void contactAddDeclined(YahooContact contact, String message) {
 		this.callback.contactAddDeclined(contact, message);
 	}
 
 	@Override
-	public void contactAddRequest(Contact contact, Name name, String message) {
+	public void contactAddRequest(YahooContact contact, Name name, String message) {
 		this.callback.contactAddRequest(contact, name, message);
 	}
 
 	@Override
-	public void removedContact(Contact contact) {
+	public void removedContact(YahooContact contact) {
 		this.callback.removedContact(contact);
 	}
 
@@ -154,7 +154,7 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 		this.callback.rosterLoaded();
 	}
 
-	public void contactAddFailure(Contact contact, ContactAddFailure failure) {
+	public void contactAddFailure(YahooContact contact, ContactAddFailure failure) {
 		// TODO Auto-generated method stub
 
 	}

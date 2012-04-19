@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mockito.Mockito;
-import org.openymsg.Contact;
-import org.openymsg.PacketReader;
-import org.openymsg.Status;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooStatus;
 import org.openymsg.YahooProtocol;
 import org.openymsg.network.YMSG9Packet;
+import org.openymsg.testing.PacketReader;
 import org.testng.annotations.Test;
 
 public class ListOfStatusesResponseTest {
@@ -24,7 +24,7 @@ public class ListOfStatusesResponseTest {
 		packets.add(packet);
 		response.execute(packets);
 		ContactStatusImpl status = new ContactStatusImpl();
-		status.update(Status.AVAILABLE, false, true);
-		Mockito.verify(sessionStatus).statusUpdate(new Contact("testuser", YahooProtocol.YAHOO), status);
+		status.update(YahooStatus.AVAILABLE, false, true);
+		Mockito.verify(sessionStatus).statusUpdate(new YahooContact("testuser", YahooProtocol.YAHOO), status);
 	}
 }

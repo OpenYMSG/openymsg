@@ -1,13 +1,11 @@
 package org.openymsg.config;
 
-import java.net.InetSocketAddress;
-
 import org.openymsg.network.ConnectionBuilder;
 import org.openymsg.network.TestingConnectionBuilder;
 
 public class TestingSessionConfig implements SessionConfig {
 	private boolean connect;
-	
+
 	public TestingSessionConfig(boolean connect) {
 		this.connect = connect;
 	}
@@ -55,12 +53,6 @@ public class TestingSessionConfig implements SessionConfig {
 	public int getConnectionTimeout() {
 		// TODO Auto-generated method stub
 		return 0;
-	}
-
-	@Override
-	public InetSocketAddress getLocalSocket() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

@@ -121,16 +121,6 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 	protected boolean openConnection(InetAddress ipAddress, SessionConfig config) {
 		InetSocketAddress endpoint = new InetSocketAddress(ipAddress, NetworkConstants.DIRECT_PORT);
 		socket = new Socket();
-		if (config.getLocalSocket() != null) {
-			// TODO - check if this works?
-			try {
-				socket.setReuseAddress(true);
-				socket.bind(config.getLocalSocket());
-			}
-			catch (IOException e) {
-				log.warn("Cannot bind to local socket: " + config.getLocalSocket(), e);
-			}
-		}
 		try {
 			socket.connect(endpoint, config.getConnectionTimeout());
 			// log.info("local" + socket.getLocalSocketAddress());
@@ -143,10 +133,10 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 			return true;
 		}
 		catch (SocketTimeoutException e) {
-			log.warn("Failed connecting to: " + endpoint + " from: " + config.getLocalSocket());
+			log.warn("Failed connecting to: " + endpoint + " from: " + socket.getLocalSocketAddress(), e);
 		}
 		catch (IOException e) {
-			log.warn("Failed connecting to: " + endpoint + " from: " + config.getLocalSocket(), e);
+			log.warn("Failed connecting to: " + endpoint + " from: " + socket.getLocalSocketAddress(), e);
 		}
 		return false;
 	}

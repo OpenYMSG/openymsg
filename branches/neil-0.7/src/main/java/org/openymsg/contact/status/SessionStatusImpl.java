@@ -6,8 +6,8 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.Contact;
-import org.openymsg.ContactStatus;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooContactStatus;
 import org.openymsg.execute.Executor;
 import org.openymsg.network.ServiceType;
 
@@ -20,7 +20,7 @@ public class SessionStatusImpl implements SessionStatus, SessionStatusCallback {
 	private static final Log log = LogFactory.getLog(SessionStatusImpl.class);
 	private Executor executor;
 	private SessionStatusCallback callback;
-	private Map<Contact, ContactStatus> statuses = new HashMap<Contact, ContactStatus>();
+	private Map<YahooContact, YahooContactStatus> statuses = new HashMap<YahooContact, YahooContactStatus>();
 
 	public SessionStatusImpl(Executor executor, SessionStatusCallback callback) {
 		this.executor = executor;
@@ -30,34 +30,34 @@ public class SessionStatusImpl implements SessionStatus, SessionStatusCallback {
 		this.executor.register(ServiceType.Y6_STATUS_UPDATE, singleStatusResponse);
 	}
 
-	public ContactStatus getStatus(Contact contact) {
+	public YahooContactStatus getStatus(YahooContact contact) {
 		return this.statuses.get(contact);
 	}
 
 	@Override
-	public void statusUpdate(Contact contact, ContactStatus status) {
+	public void statusUpdate(YahooContact contact, YahooContactStatus status) {
 		log.trace("statusUpdate: " + contact + " " + status);
 		this.statuses.put(contact, status);
 		this.callback.statusUpdate(contact, status);
 	}
 
-	public void addPending(Contact contact) {
+	public void addPending(YahooContact contact) {
 		// TODO Auto-generated method stub
 
 	}
 
-	public void publishPending(Contact contact) {
+	public void publishPending(YahooContact contact) {
 		// TODO Auto-generated method stub
 
 	}
 
-	public void addedIgnored(Set<Contact> usersOnIgnoreList) {
-		for (Contact contact : usersOnIgnoreList) {
+	public void addedIgnored(Set<YahooContact> usersOnIgnoreList) {
+		for (YahooContact contact : usersOnIgnoreList) {
 			System.err.println("ignored: " + contact);
 		}
 	}
 
-	public void addedPending(Set<Contact> usersOnPendingList) {
+	public void addedPending(Set<YahooContact> usersOnPendingList) {
 		// for (Contact contact : usersOnPendingList) {
 		// System.err.println("pending:" + contactImpl.getId() + "/" + contactImpl.getProtocol());
 		// }

@@ -22,9 +22,8 @@ public class MessageResponse implements SinglePacketResponse {
 
 	@Override
 	public void execute(YMSG9Packet packet) {
-
-		if (packet.status <= 1 || packet.status == MessageStatus.OFFLINE5.getValue()
-				|| packet.status == MessageStatus.OFFLINE.getValue()) {
+		// packet.status <= 1 || packet.status == MessageStatus.OFFLINE.getValue()
+		if (packet.status == MessageStatus.OFFLINE5.getValue()) {
 			if (!packet.exists("14")) {
 				log.info("Received message with no message");
 				return;
@@ -37,15 +36,13 @@ public class MessageResponse implements SinglePacketResponse {
 			if (imvironment != null && !";0".equals(imvironment)) {
 				log.error("Got imvironment: " + imvironment);
 			}
-			if (packet.status == MessageStatus.OFFLINE5.getValue()) {
-				this.offlineResponse.execute(packet);
-			}
-			else {
-				this.onlineResponse.execute(packet);
-			}
+			this.offlineResponse.execute(packet);
+		} else {
+			this.onlineResponse.execute(packet);
 		}
-		else if (packet.status == 2) {
-			log.error("Message was not delivered");
-		}
+		// if (packet.status == 2) {
+		// }
+		// log.error("Message was not delivered");
+		// }
 	}
 }

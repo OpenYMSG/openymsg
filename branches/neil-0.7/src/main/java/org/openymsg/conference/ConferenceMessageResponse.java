@@ -1,7 +1,7 @@
 package org.openymsg.conference;
 
-import org.openymsg.Conference;
-import org.openymsg.Contact;
+import org.openymsg.YahooConference;
+import org.openymsg.YahooContact;
 import org.openymsg.network.YMSG9Packet;
 
 /**
@@ -10,21 +10,21 @@ import org.openymsg.network.YMSG9Packet;
  */
 public class ConferenceMessageResponse extends AbstractConferenceResponse {
 
-	public ConferenceMessageResponse(SessionConferenceCallback sessionConference) {
+	public ConferenceMessageResponse(SessionConferenceImpl sessionConference) {
 		super(sessionConference);
 	}
 
 	@Override
 	public void execute(YMSG9Packet packet) {
-		Conference conference = this.getConference(packet);
+		YahooConference conference = this.getConference(packet);
 		// If we have not received an invite yet, buffer packets
 		String id = packet.getValue("57");
 		String name = packet.getValue("58");
 		String to = packet.getValue("1");
 		String from = packet.getValue("3"); // TODO - protocol
-		Contact contact = new Contact(from);
+		YahooContact contact = new YahooContact(from);
 		String message = packet.getValue("14"); // unicode
-		sessionConference.conferenceMessageReceived(conference, contact, message);
+		sessionConference.receivedConferenceMessage(conference, contact, message);
 		// TODO add invite packet?
 		// synchronized (yc) {
 		// if (!yc.isInvited()) {

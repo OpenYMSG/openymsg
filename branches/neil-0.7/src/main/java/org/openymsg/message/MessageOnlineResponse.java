@@ -1,6 +1,6 @@
 package org.openymsg.message;
 
-import org.openymsg.Contact;
+import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.execute.read.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
@@ -34,7 +34,7 @@ public class MessageOnlineResponse implements SinglePacketResponse {
 		if (fed != null) {
 			protocol = YahooProtocol.getProtocolOrDefault(fed, from);
 		}
-		Contact contact = new Contact(from, protocol);
+		YahooContact contact = new YahooContact(from, protocol);
 		if (message.equalsIgnoreCase(BUZZ)) {
 			this.session.receivedBuzz(contact, id);
 		} else {

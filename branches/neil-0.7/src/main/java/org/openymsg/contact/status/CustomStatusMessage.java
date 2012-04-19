@@ -1,6 +1,6 @@
 package org.openymsg.contact.status;
 
-import org.openymsg.Status;
+import org.openymsg.YahooStatus;
 
 /**
  * Returns the custom status, or <tt>null</tt> if no such status has been set.
@@ -29,8 +29,8 @@ public class CustomStatusMessage implements StatusMessage {
 	}
 
 	@Override
-	public Status getStatus() {
-		return Status.CUSTOM;
+	public YahooStatus getStatus() {
+		return YahooStatus.CUSTOM;
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class CustomStatusMessage implements StatusMessage {
 	}
 
 	@Override
-	public boolean is(Status status) {
+	public boolean is(YahooStatus status) {
 		return this.getStatus().equals(status);
 	}
 }

@@ -1,11 +1,11 @@
 package org.openymsg.contact.status;
 
-import org.openymsg.Status;
+import org.openymsg.YahooStatus;
 
 public class NormalStatusMessage implements StatusMessage {
-	private Status status;
+	private YahooStatus status;
 
-	public NormalStatusMessage(Status status) {
+	public NormalStatusMessage(YahooStatus status) {
 		this.status = status;
 	}
 
@@ -15,7 +15,7 @@ public class NormalStatusMessage implements StatusMessage {
 	}
 
 	@Override
-	public Status getStatus() {
+	public YahooStatus getStatus() {
 		return this.status;
 	}
 
@@ -53,7 +53,7 @@ public class NormalStatusMessage implements StatusMessage {
 	}
 
 	@Override
-	public boolean is(Status status) {
+	public boolean is(YahooStatus status) {
 		return this.getStatus().equals(status);
 	}
 

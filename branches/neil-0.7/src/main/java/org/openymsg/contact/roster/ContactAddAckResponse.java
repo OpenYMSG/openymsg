@@ -2,7 +2,7 @@ package org.openymsg.contact.roster;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.Contact;
+import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.contact.group.ContactGroupImpl;
 import org.openymsg.contact.group.SessionGroupImpl;
@@ -38,7 +38,7 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 		}
 
 		YahooProtocol yahooProtocol = YahooProtocol.getProtocolOrDefault(protocol, contactUsername);
-		Contact contact = new Contact(contactUsername, yahooProtocol);
+		YahooContact contact = new YahooContact(contactUsername, yahooProtocol);
 		ContactGroupImpl group = new ContactGroupImpl(groupName);
 		group.add(contact);
 
@@ -79,7 +79,7 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 
 	}
 
-	private void addContact(String pending, Contact contact, ContactGroupImpl group) {
+	private void addContact(String pending, YahooContact contact, ContactGroupImpl group) {
 		if ("1".equals(pending)) {
 			sessionStatus.addPending(contact);
 		} else {
