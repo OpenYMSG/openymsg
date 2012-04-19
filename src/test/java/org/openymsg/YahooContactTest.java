@@ -5,18 +5,18 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class ContactTest {
+public class YahooContactTest {
 
 	@Test
 	public void equalsContract() {
-		EqualsVerifier.forClass(Contact.class).verify();
+		EqualsVerifier.forClass(YahooContact.class).verify();
 	}
 
 	@Test
 	public void testSimple() {
 		String username = "testuser";
 		YahooProtocol protocol = YahooProtocol.LOTUS;
-		Contact contact = new Contact(username, protocol);
+		YahooContact contact = new YahooContact(username, protocol);
 		Assert.assertEquals(contact.getName(), username);
 		Assert.assertEquals(protocol, contact.getProtocol());
 	}
@@ -25,14 +25,14 @@ public class ContactTest {
 	public void testNullName() {
 		String username = null;
 		YahooProtocol protocol = YahooProtocol.LOTUS;
-		new Contact(username, protocol);
+		new YahooContact(username, protocol);
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "protocol cannot be null")
 	public void testNullProtocol() {
 		String username = "testuser";
 		YahooProtocol protocol = null;
-		new Contact(username, protocol);
+		new YahooContact(username, protocol);
 	}
 
 }

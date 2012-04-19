@@ -1,4 +1,4 @@
-package org.openymsg;
+package org.openymsg.testing;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,7 +15,7 @@ import org.openymsg.network.direct.YMSG9InputStream;
  */
 public class FileReader {
 	public FileReader(String filename) throws UnsupportedEncodingException, IOException {
-		URL url = FileReader.class.getClassLoader().getResource("NotifyTypingInYahoo");
+		URL url = FileReader.class.getClassLoader().getResource("PagerLogoffInYahoo");
 		String fullyQualifiedFilename = url.getFile();
 		File file = new File(fullyQualifiedFilename);
 		FileInputStream stream = new FileInputStream(file);

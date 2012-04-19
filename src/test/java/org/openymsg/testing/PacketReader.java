@@ -1,4 +1,4 @@
-package org.openymsg;
+package org.openymsg.testing;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.openymsg.network.MessageStatus;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.YMSG9Packet;
 
@@ -29,6 +30,7 @@ public class PacketReader {
 		packet.service = ServiceType.valueOf(service);
 		// packet.sessionId = sessionId;
 		// packet.version = version;
+		packet.status = MessageStatus.valueOf(status).getValue();
 
 		List<String> elements = new ArrayList<String>();
 		String nextFullEntry = "";

@@ -15,7 +15,7 @@ import org.openymsg.session.SessionSession;
  * Services for all Yahoo Messenger functionality.
  * @author neilhart
  */
-public interface Session extends SessionConnection, SessionAuthentication, SessionSession, SessionMessage,
+public interface YahooSession extends SessionConnection, SessionAuthentication, SessionSession, SessionMessage,
 		SessionRoster, SessionGroup, SessionStatus, SessionConference {
 
 	/**
@@ -28,6 +28,6 @@ public interface Session extends SessionConnection, SessionAuthentication, Sessi
 	 * @throws IllegalStateException if Session is not in correct state
 	 */
 	@Override
-	Set<ContactGroup> getContactGroups() throws IllegalStateException;
+	Set<YahooContactGroup> getContactGroups() throws IllegalStateException;
 
 }

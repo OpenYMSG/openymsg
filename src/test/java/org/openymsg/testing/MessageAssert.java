@@ -1,4 +1,4 @@
-package org.openymsg;
+package org.openymsg.testing;
 
 import java.io.IOException;
 import java.util.StringTokenizer;

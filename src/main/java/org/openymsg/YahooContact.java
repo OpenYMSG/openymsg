@@ -5,7 +5,7 @@ package org.openymsg;
  * YahooProtocol.YAHOO.
  * @author neilhart
  */
-public class Contact {
+public class YahooContact {
 	/** unique name within a specific protocol */
 	private final String name;
 	/** system the id is on. Mostly YahooProtocol.YAHOO */
@@ -16,7 +16,7 @@ public class Contact {
 	 * @param id id of Contact
 	 * @param protocol protocol of Contact
 	 */
-	public Contact(String id, YahooProtocol protocol) {
+	public YahooContact(String id, YahooProtocol protocol) {
 		if (id == null) {
 			throw new IllegalArgumentException("id cannot be null");
 		}
@@ -32,7 +32,7 @@ public class Contact {
 	 * @param id contact id
 	 */
 	@Deprecated
-	public Contact(String id) {
+	public YahooContact(String id) {
 		this(id, YahooProtocol.YAHOO);
 	}
 
@@ -70,8 +70,8 @@ public class Contact {
 	public final boolean equals(Object obj) {
 		if (this == obj) return true;
 		if (obj == null) return false;
-		if (!(obj instanceof Contact)) return false;
-		Contact other = (Contact) obj;
+		if (!(obj instanceof YahooContact)) return false;
+		YahooContact other = (YahooContact) obj;
 		if (name == null) {
 			if (other.name != null) return false;
 		} else if (!name.equals(other.name)) return false;
