@@ -2,7 +2,7 @@ package org.openymsg;
 
 import org.openymsg.contact.status.StatusMessage;
 
-public interface ContactStatus {
+public interface YahooContactStatus {
 	StatusMessage getMessage();
 
 	Long getIdleTime();

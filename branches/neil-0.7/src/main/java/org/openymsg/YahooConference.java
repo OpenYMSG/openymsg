@@ -4,7 +4,7 @@ package org.openymsg;
  * Conference information. A conference has a unique id.
  * @author neilhart
  */
-public interface Conference {
+public interface YahooConference {
 
 	/**
 	 * Unique id

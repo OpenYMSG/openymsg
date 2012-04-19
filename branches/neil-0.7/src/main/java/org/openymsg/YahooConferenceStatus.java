@@ -1,6 +1,6 @@
 package org.openymsg;
 
-public enum ConferenceStatus {
+public enum YahooConferenceStatus {
 	CREATED,
 	INVITED,
 	LEFT;

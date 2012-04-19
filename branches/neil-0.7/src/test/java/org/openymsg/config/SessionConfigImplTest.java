@@ -1,10 +1,7 @@
-package org.openymsg;
+package org.openymsg.config;
 
 import java.io.UnsupportedEncodingException;
-import java.net.InetSocketAddress;
 
-import org.openymsg.config.SessionConfig;
-import org.openymsg.config.SessionConfigImpl;
 import org.testng.annotations.Test;
 
 public class SessionConfigImplTest {
@@ -21,11 +18,4 @@ public class SessionConfigImplTest {
 		assert url.contains(seed);
 	}
 
-	@Test(enabled = false)
-	// TODO can we use the local socket?
-	public void getLocalSocket() {
-		SessionConfig config = new SessionConfigImpl();
-		InetSocketAddress socket = config.getLocalSocket();
-		assert !socket.isUnresolved();
-	}
 }

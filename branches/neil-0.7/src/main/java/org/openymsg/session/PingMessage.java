@@ -8,7 +8,7 @@ import org.openymsg.network.ServiceType;
 /**
  * Transmit a PING packet. Needed every hour to keep from getting knocked off by LOGGOFF 52
  */
-public class PingRequest implements Message {
+public class PingMessage implements Message {
 
 	@Override
 	public PacketBodyBuffer getBody() {

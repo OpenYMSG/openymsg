@@ -23,7 +23,7 @@ package org.openymsg;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public enum Status {
+public enum YahooStatus {
 	OFFLINE(-100), // Internal missing value
 	ERROR(-1),
 	AVAILABLE(0),
@@ -51,7 +51,7 @@ public enum Status {
 	 * Creates a new Status, based on a unique long value identifier.
 	 * @param value Unique long value for the Status to be created.
 	 */
-	private Status(long value) {
+	private YahooStatus(long value) {
 		this.value = value;
 	}
 
@@ -69,8 +69,8 @@ public enum Status {
 	 * @param value Status identifier.
 	 * @return Status identified by 'value'.
 	 */
-	public static Status getStatus(long value) {
-		final Status[] all = Status.values();
+	public static YahooStatus getStatus(long value) {
+		final YahooStatus[] all = YahooStatus.values();
 		for (int i = 0; i < all.length; i++) {
 			if (all[i].getValue() == value) {
 				return all[i];
