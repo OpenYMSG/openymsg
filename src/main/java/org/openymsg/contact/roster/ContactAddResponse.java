@@ -2,7 +2,7 @@ package org.openymsg.contact.roster;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.Contact;
+import org.openymsg.YahooContact;
 import org.openymsg.Name;
 import org.openymsg.YahooProtocol;
 import org.openymsg.execute.read.SinglePacketResponse;
@@ -40,7 +40,7 @@ public class ContactAddResponse implements SinglePacketResponse {
 		String authStatus = packet.getValue("13");
 		String protocolString = packet.getValue("241");
 		protocol = YahooProtocol.getProtocolOrDefault(protocolString, who);
-		Contact contact = new Contact(who, protocol);
+		YahooContact contact = new YahooContact(who, protocol);
 		if (packet.status == 1) {
 			if (authStatus.equals("1")) {
 				log.trace("A friend accepted our authorization request: " + contact);

@@ -1,7 +1,7 @@
 package org.openymsg.conference;
 
-import org.openymsg.Conference;
-import org.openymsg.Contact;
+import org.openymsg.YahooConference;
+import org.openymsg.YahooContact;
 import org.openymsg.network.YMSG9Packet;
 
 /**
@@ -10,19 +10,19 @@ import org.openymsg.network.YMSG9Packet;
  */
 public class ConferenceDeclineResponse extends AbstractConferenceResponse {
 
-	public ConferenceDeclineResponse(SessionConferenceCallback sessionConference) {
+	public ConferenceDeclineResponse(SessionConferenceImpl sessionConference) {
 		super(sessionConference);
 	}
 
 	@Override
 	public void execute(YMSG9Packet packet) {
 		// YahooConference yc = getOrCreateConference(pkt);
-		Conference conference = this.getConference(packet);
+		YahooConference conference = this.getConference(packet);
 		String to = packet.getValue("1");
 		String from = packet.getValue("54");
-		Contact contact = new Contact(from); // TODO protocol
+		YahooContact contact = new YahooContact(from); // TODO protocol
 		String message = packet.getValue("14");
-		sessionConference.conferenceDeclineReceived(conference, contact, message);
+		sessionConference.receivedConferenceDecline(conference, contact, message);
 		// Create event
 		// SessionConferenceDeclineInviteEvent se = new SessionConferenceDeclineInviteEvent(this, to, from, message,
 		// yc);

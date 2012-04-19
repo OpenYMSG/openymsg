@@ -2,16 +2,16 @@ package org.openymsg.message;
 
 import java.io.IOException;
 
-import org.openymsg.Contact;
-import org.openymsg.MessageAssert;
+import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
+import org.openymsg.testing.MessageAssert;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class SendMessageTest {
 	private String username = "testuser";
-	private Contact contact = new Contact("testbuddy", YahooProtocol.YAHOO);
-	private Contact contactMsn = new Contact("testbuddy@live.com", YahooProtocol.MSN);
+	private YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
+	private YahooContact contactMsn = new YahooContact("testbuddy@live.com", YahooProtocol.MSN);
 
 	@Test
 	public void testSimple() throws IOException {

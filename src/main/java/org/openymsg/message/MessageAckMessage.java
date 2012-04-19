@@ -2,7 +2,7 @@ package org.openymsg.message;
 
 import java.io.IOException;
 
-import org.openymsg.Contact;
+import org.openymsg.YahooContact;
 import org.openymsg.execute.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
@@ -14,10 +14,10 @@ import org.openymsg.network.ServiceType;
  */
 public class MessageAckMessage implements Message {
 	private String username;
-	private Contact contact;
+	private YahooContact contact;
 	private String messageId;
 
-	public MessageAckMessage(String username, Contact contact, String messageId) {
+	public MessageAckMessage(String username, YahooContact contact, String messageId) {
 		this.username = username;
 		this.contact = contact;
 		this.messageId = messageId;

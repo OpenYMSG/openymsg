@@ -4,25 +4,25 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.openymsg.Contact;
-import org.openymsg.ContactGroup;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooContactGroup;
 import org.openymsg.util.CollectionUtils;
 
-public class ContactGroupImpl implements ContactGroup {
+public class ContactGroupImpl implements YahooContactGroup {
 	private String name;
 	boolean active;
-	private Set<Contact> contacts = Collections.synchronizedSet(new HashSet<Contact>());
+	private Set<YahooContact> contacts = Collections.synchronizedSet(new HashSet<YahooContact>());
 
 	public ContactGroupImpl(String name) {
 		this.name = name;
 	}
 
-	public void add(Contact contact) {
+	public void add(YahooContact contact) {
 		this.contacts.add(contact);
 	}
 
 	@Override
-	public Set<Contact> getContacts() {
+	public Set<YahooContact> getContacts() {
 		return CollectionUtils.protectedSet(this.contacts);
 	}
 

@@ -2,9 +2,9 @@ package org.openymsg.contact.group;
 
 import java.util.Set;
 
-import org.openymsg.ContactGroup;
+import org.openymsg.YahooContactGroup;
 
 public interface SessionGroupCallback {
-	void addedGroups(Set<ContactGroup> contactGroups);
+	void addedGroups(Set<YahooContactGroup> contactGroups);
 
 }

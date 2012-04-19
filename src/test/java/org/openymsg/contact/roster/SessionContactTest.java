@@ -3,8 +3,8 @@ package org.openymsg.contact.roster;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.openymsg.Contact;
-import org.openymsg.ContactGroup;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooContactGroup;
 import org.openymsg.YahooProtocol;
 import org.openymsg.contact.group.ContactGroupImpl;
 import org.openymsg.contact.group.SessionGroupImpl;
@@ -21,7 +21,7 @@ public class SessionContactTest {
 	String username;
 	SessionRosterImpl sessionContact;
 	SessionGroupImpl sessionGroup;
-	Contact contact;
+	YahooContact contact;
 	ContactGroupImpl group;
 	TestingConnectionHandler connection;
 	Executor executor;
@@ -38,7 +38,7 @@ public class SessionContactTest {
 		executor.initializeConnection(connection);
 		SessionRosterCallback callback = null;
 		sessionContact = new SessionRosterImpl(executor, username, callback);
-		contact = new Contact("contactA", YahooProtocol.YAHOO);
+		contact = new YahooContact("contactA", YahooProtocol.YAHOO);
 		group = new ContactGroupImpl("one");
 		sessionGroup = new SessionGroupImpl(executor, username);
 	}
@@ -57,7 +57,7 @@ public class SessionContactTest {
 
 	@Test
 	public void testRemoveContact() throws InterruptedException {
-		Set<ContactGroup> groups = new HashSet<ContactGroup>();
+		Set<YahooContactGroup> groups = new HashSet<YahooContactGroup>();
 		group.add(contact);
 		groups.add(group);
 		sessionGroup.addedGroups(groups);
@@ -68,7 +68,7 @@ public class SessionContactTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testRemoveContactNotInGroup() throws InterruptedException {
-		Set<ContactGroup> groups = new HashSet<ContactGroup>();
+		Set<YahooContactGroup> groups = new HashSet<YahooContactGroup>();
 		// group.add(contact);
 		groups.add(group);
 		sessionGroup.addedGroups(groups);

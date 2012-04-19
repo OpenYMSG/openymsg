@@ -38,7 +38,7 @@ public class PasswordTokenRequest implements Request {
 	public void execute() { // String seed
 		String authLink = config.getPasswordTokenGetUrl(username, password, seed);
 		if (authLink == null) {
-			log.error("Failed creating url for: " + username + "/" + password + "/" + seed);
+			log.fatal("Failed creating url for: " + username + "/" + password + "/" + seed);
 			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE1);
 			return;
 		}
@@ -49,7 +49,7 @@ public class PasswordTokenRequest implements Request {
 		ByteArrayOutputStream out = stream.getOutputStream();
 
 		if (!status.isCorrect()) {
-			log.warn("Failed retrieving response for url: " + authLink);
+			log.fatal("Failed retrieving response for url: " + authLink);
 			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE1);
 			return;
 		}
@@ -58,7 +58,7 @@ public class PasswordTokenRequest implements Request {
 		log.info("response: " + response);
 		StringTokenizer toks = new StringTokenizer(response, "\r\n");
 		if (toks.countTokens() <= 0) {
-			log.warn("Login Failed, wrong response in stage 1");
+			log.fatal("Login Failed, wrong response in stage 1");
 			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE1);
 			return;
 		}
@@ -68,7 +68,7 @@ public class PasswordTokenRequest implements Request {
 			responseNo = Integer.valueOf(toks.nextToken());
 		}
 		catch (NumberFormatException e) {
-			log.warn("Login Failed, wrong response in stage 1");
+			log.fatal("Login Failed, wrong response in stage 1");
 			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE1);
 			return;
 		}

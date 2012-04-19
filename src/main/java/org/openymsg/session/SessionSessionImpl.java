@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.Status;
+import org.openymsg.YahooStatus;
 import org.openymsg.execute.Executor;
 import org.openymsg.execute.write.ScheduledMessageSender;
 import org.openymsg.network.ServiceType;
@@ -13,15 +13,26 @@ public class SessionSessionImpl implements SessionSession {
 	private static final Log log = LogFactory.getLog(SessionSessionImpl.class);
 	private String username;
 	private Executor executor;
+	private SessionSessionCallback callback;
+	private SessionState state;
 
-	public SessionSessionImpl(String username, Executor executor) {
+	public SessionSessionImpl(String username, Executor executor, SessionSessionCallback callback) {
+		if (executor == null) {
+			throw new IllegalArgumentException("Executor cannot be null");
+		}
+		if (username == null || username.trim().isEmpty()) {
+			throw new IllegalArgumentException("Username cannot be null or empty");
+		}
+		if (callback == null) {
+			throw new IllegalArgumentException("Callback cannot be null");
+		}
 		this.username = username;
 		this.executor = executor;
-		this.executor.register(ServiceType.LIST, new ListResponse());
-		this.executor.register(ServiceType.LOGOFF, new PagerLogoffResponse());
-		this.executor.register(ServiceType.PING, new PingResponse());
-		this.executor.schedule(new ScheduledMessageSender(this.executor, new PingRequest()), (60 * 60 * 1000));
-		this.executor.schedule(new ScheduledMessageSender(this.executor, new KeepAliveMessage(username)), (60 * 1000));
+		this.callback = callback;
+		state = SessionState.LOGGING_IN;
+		executor.register(ServiceType.LIST, new ListResponse());
+		executor.register(ServiceType.LOGOFF, new PagerLogoffResponse(username, this));
+		executor.register(ServiceType.PING, new PingResponse());
 	}
 
 	// TODO - looks cool
@@ -35,20 +46,32 @@ public class SessionSessionImpl implements SessionSession {
 	// }
 
 	/**
+	 * Notify session that login is complete
+	 */
+	public void loginComplete() {
+		if (!state.isLoggingIn()) {
+			throw new IllegalStateException("State is not logging in: " + state);
+		}
+		state = SessionState.LOGGED_IN;
+		executor.schedule(new ScheduledMessageSender(executor, new PingMessage()), (60 * 60 * 1000));
+		executor.schedule(new ScheduledMessageSender(executor, new KeepAliveMessage(username)), (60 * 1000));
+	}
+
+	/**
 	 * Logs off the current session.
 	 */
 	@Override
 	public void logout() {
 		log.trace("logout: " + username);
-		// TODO - move status check to session
-		// ConnectionState executionState = this.executor.getState();
-		// if (executionState.isConnected()) {
+		if (!state.isLoggedIn()) {
+			throw new IllegalStateException("State is not logging in: " + state);
+		}
+		state = SessionState.LOGGING_OUT;
+
 		executor.execute(new LogoutMessage(username));
-		// }
-		// else {
-		// log.info("Trying to logout when not connected: " + username);
-		// }
-		this.executor.execute(new ShutdownRequest(this.executor));
+
+		// TODO schedule this incase no response from yahoo, not here
+		executor.execute(new ShutdownRequest(executor));
 	}
 
 	/**
@@ -59,14 +82,14 @@ public class SessionSessionImpl implements SessionSession {
 	 * @throws IllegalArgumentException
 	 * @throws IOException
 	 */
-	public void setStatus(Status status) throws IllegalArgumentException {
+	public void setStatus(YahooStatus status) throws IllegalArgumentException {
 		log.debug("setting status: " + status);
-		if (status == Status.CUSTOM) {
+		if (status == YahooStatus.CUSTOM) {
 			throw new IllegalArgumentException("Cannot set custom state without message");
 		}
-		this.executor.execute(new StatusChangeRequest(status));
+		executor.execute(new StatusChangeRequest(status));
 		// TODO set internal status
-		// this.status = status;
+		// status = status;
 		// customStatusMessage = null;
 		// TODO - Check status
 		// if (sessionStatus != SessionState.UNSTARTED) {
@@ -98,7 +121,33 @@ public class SessionSessionImpl implements SessionSession {
 		// customStatusBusy = showBusyIcon;
 
 		// TODO - handle showBusy
-		this.executor.execute(new StatusChangeRequest(Status.CUSTOM, message));
+		executor.execute(new StatusChangeRequest(YahooStatus.CUSTOM, message));
+	}
+
+	public void receivedLogout(LogoutReason reason) {
+		log.info("receivedLogout: " + state + " with state: " + state);
+		if (reason == null && state.isLoggingOff()) {
+			callback.logoffNormalComplete();
+		} else {
+			callback.logoffForced(reason);
+		}
+
+		// switch (state) {
+		// case UNKNOWN_52:
+		// log.info("AUTHRESP says: Logged off with " + state);
+		// session.setState(state);
+		// break;
+		//
+		// case DUPLICATE_LOGIN1:
+		// case DUPLICATE_LOGIN2:
+		// log.info("AUTHRESP says: Logged off with Duplicate Login: " + state);
+		// session.setState(state);
+		// break;
+		// default:
+		// log.warn("AUTHRESP says: logged off with an unchecked reason: " + state);
+		// session.setState(state);
+		// }
+
 	}
 
 }

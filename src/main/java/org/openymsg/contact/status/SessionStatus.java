@@ -1,9 +1,9 @@
 package org.openymsg.contact.status;
 
-import org.openymsg.Contact;
-import org.openymsg.ContactStatus;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooContactStatus;
 
 public interface SessionStatus {
 
-	ContactStatus getStatus(Contact contact);
+	YahooContactStatus getStatus(YahooContact contact);
 }

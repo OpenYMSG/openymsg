@@ -1,10 +1,7 @@
 package org.openymsg.config;
 
 import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,19 +53,6 @@ public class SessionConfigHardcoded implements SessionConfig {
 	@Override
 	public int getConnectionTimeout() {
 		return 2 * SECOND;
-	}
-
-	@Override
-	public InetSocketAddress getLocalSocket() {
-		InetAddress local = null;
-		try {
-			local = InetAddress.getLocalHost();
-		}
-		catch (UnknownHostException e) {
-			log.warn("Failed finding local host", e);
-			return null;
-		}
-		return new InetSocketAddress(local, 5050);
 	}
 
 	@Override

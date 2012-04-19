@@ -3,8 +3,8 @@ package org.openymsg.conference;
 import java.io.IOException;
 import java.util.Set;
 
-import org.openymsg.Conference;
-import org.openymsg.Contact;
+import org.openymsg.YahooConference;
+import org.openymsg.YahooContact;
 import org.openymsg.execute.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
@@ -16,11 +16,11 @@ import org.openymsg.network.ServiceType;
  */
 public class CreateConferenceMessage implements Message {
 	private String username;
-	private Conference conference;
-	private Set<Contact> contacts;
+	private YahooConference conference;
+	private Set<YahooContact> contacts;
 	private String message;
 
-	public CreateConferenceMessage(String username, Conference conference, Set<Contact> contacts, String message) {
+	public CreateConferenceMessage(String username, YahooConference conference, Set<YahooContact> contacts, String message) {
 		this.username = username;
 		this.conference = conference;
 		this.contacts = contacts;
@@ -32,7 +32,7 @@ public class CreateConferenceMessage implements Message {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", this.username);
 		body.addElement("57", this.conference.getId());
-		for (Contact contact : this.contacts) {
+		for (YahooContact contact : this.contacts) {
 			body.addElement("52", contact.getName());
 			//TODO - handle protocol
 		}

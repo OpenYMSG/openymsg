@@ -1,7 +1,6 @@
 package org.openymsg.config;
 
 import java.io.UnsupportedEncodingException;
-import java.net.InetSocketAddress;
 import java.net.URLEncoder;
 
 import org.apache.commons.logging.Log;
@@ -58,11 +57,6 @@ public class SessionConfigImpl implements SessionConfig {
 	@Override
 	public int getConnectionTimeout() {
 		return 2 * SECOND;
-	}
-
-	@Override
-	public InetSocketAddress getLocalSocket() {
-		return null;
 	}
 
 	@Override

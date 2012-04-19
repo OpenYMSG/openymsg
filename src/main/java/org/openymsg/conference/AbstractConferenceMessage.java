@@ -3,18 +3,17 @@ package org.openymsg.conference;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import org.openymsg.Conference;
-import org.openymsg.Contact;
+import org.openymsg.YahooConference;
+import org.openymsg.YahooContact;
 import org.openymsg.execute.write.Message;
 import org.openymsg.network.PacketBodyBuffer;
 
 public abstract class AbstractConferenceMessage implements Message {
-
 	private ConferenceMembership membership;
-	private Conference conference;
+	private YahooConference conference;
 	private String username;
 
-	public AbstractConferenceMessage(String username, Conference conference, ConferenceMembership membership) {
+	public AbstractConferenceMessage(String username, YahooConference conference, ConferenceMembership membership) {
 		this.username = username;
 		this.conference = conference;
 		this.membership = membership;
@@ -25,8 +24,8 @@ public abstract class AbstractConferenceMessage implements Message {
 	}
 
 	protected void writeMembers(PacketBodyBuffer body, String key) throws UnsupportedEncodingException, IOException {
-		for (Contact user : this.membership.getMembers()) {
-			body.addElement(key, user.getName());
+		for (YahooContact contact : this.membership.getMembers()) {
+			body.addElement(key, contact.getName());
 			// TODO - handle protocol
 		}
 	}

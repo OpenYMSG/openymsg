@@ -2,7 +2,7 @@ package org.openymsg.conference;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.Conference;
+import org.openymsg.YahooConference;
 import org.openymsg.network.YMSG9Packet;
 
 /**
@@ -14,13 +14,13 @@ import org.openymsg.network.YMSG9Packet;
 public class ConferenceInviteResponse extends AbstractConferenceResponse {
 	private static final Log log = LogFactory.getLog(ConferenceInviteResponse.class);
 
-	public ConferenceInviteResponse(SessionConferenceCallback sessionConference) {
+	public ConferenceInviteResponse(SessionConferenceImpl sessionConference) {
 		super(sessionConference);
 	}
 
 	@Override
 	public void execute(YMSG9Packet packet) {
-		Conference conference = this.getConference(packet);
+		YahooConference conference = this.getConference(packet);
 		String name = packet.getValue("58");
 
 		final String[] invitedUserIds = packet.getValues("52");

@@ -2,7 +2,7 @@ package org.openymsg.message;
 
 import java.io.IOException;
 
-import org.openymsg.Contact;
+import org.openymsg.YahooContact;
 import org.openymsg.execute.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
@@ -13,11 +13,11 @@ import org.openymsg.network.ServiceType;
  */
 public class SendMessage implements Message {
 	private String username;
-	private Contact contact;
+	private YahooContact contact;
 	private String message;
 	private String messageId;
 
-	public SendMessage(String username, Contact contact, String message, String messageId) {
+	public SendMessage(String username, YahooContact contact, String message, String messageId) {
 		this.username = username;
 		this.contact = contact;
 		this.message = message;

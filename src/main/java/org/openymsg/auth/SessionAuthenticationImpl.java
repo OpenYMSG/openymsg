@@ -1,9 +1,6 @@
 package org.openymsg.auth;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,15 +14,18 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 	private Executor executor;
 	private String username;
 	private String password;
-	private Set<SessionAuthenticationCallback> listeners = Collections
-			.synchronizedSet(new HashSet<SessionAuthenticationCallback>());
 	private String seed;
+	// private Set<SessionAuthenticationCallback> listeners = Collections
+	// .synchronizedSet(new HashSet<SessionAuthenticationCallback>());
+	private SessionAuthenticationCallback callback;
 	private SessionConfig sessionConfig;
 	private AuthenticationFailure failureState;
 
-	public SessionAuthenticationImpl(SessionConfig sessionConfig, Executor executor) {
+	public SessionAuthenticationImpl(SessionConfig sessionConfig, Executor executor,
+			SessionAuthenticationCallback callback) {
 		this.sessionConfig = sessionConfig;
 		this.executor = executor;
+		this.callback = callback;
 		this.executor.register(ServiceType.AUTH, new LoginInitResponse(this));
 		this.executor.register(ServiceType.AUTHRESP, new LoginFailureResponse(this));
 	}
@@ -52,35 +52,21 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 		// }
 	}
 
-	@Override
-	public void addListener(SessionAuthenticationCallback listener) {
-		this.listeners.add(listener);
-	}
-
-	@Override
-	public boolean removeListener(SessionAuthenticationCallback listener) {
-		return this.listeners.remove(listener);
-	}
+	// @Override
+	// public void addListener(SessionAuthenticationCallback listener) {
+	// this.listeners.add(listener);
+	// }
+	//
+	// @Override
+	// public boolean removeListener(SessionAuthenticationCallback listener) {
+	// return this.listeners.remove(listener);
+	// }
 
 	protected void setFailureState(AuthenticationFailure failureState) {
 		log.info("Failed login: " + failureState);
 		this.failureState = failureState;
-		this.notifyListeners();
-//		this.executor.shutdown();
-	}
-
-	private void notifyListeners() {
-		synchronized (this.listeners) {
-			for (SessionAuthenticationCallback listener : this.listeners) {
-				if (this.failureState == null) {
-					listener.authenticationSuccess();
-				}
-				else {
-					listener.authenticationFailure(this.failureState);
-				}
-			}
-			
-		}
+		this.callback.authenticationFailure(failureState);
+		// this.executor.shutdown();
 	}
 
 	protected void setSeed(String seed) {
@@ -103,7 +89,7 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 			return;
 		}
 		this.executor.execute(new LoginCompleteMessage(username, cookieY, cookieT, challenge, cookieB));
-		this.notifyListeners();
+		this.callback.authenticationSuccess();
 	}
 
 }

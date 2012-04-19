@@ -1,17 +1,17 @@
 package org.openymsg.contact.status;
 
-import org.openymsg.Status;
+import org.openymsg.YahooStatus;
 
 public interface StatusMessage {
 	boolean isCustom();
 
-	Status getStatus();
+	YahooStatus getStatus();
 
 	String getStatusText();
 
 	String getStatusMessage();
 
-	boolean is(Status status);
+	boolean is(YahooStatus status);
 
 	int hashCode();
 

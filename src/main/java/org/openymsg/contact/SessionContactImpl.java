@@ -2,9 +2,9 @@ package org.openymsg.contact;
 
 import java.util.Set;
 
-import org.openymsg.Contact;
-import org.openymsg.ContactGroup;
-import org.openymsg.ContactStatus;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooContactGroup;
+import org.openymsg.YahooContactStatus;
 import org.openymsg.contact.group.SessionGroupImpl;
 import org.openymsg.contact.roster.SessionRosterImpl;
 import org.openymsg.contact.status.SessionStatusImpl;
@@ -28,32 +28,32 @@ public class SessionContactImpl implements SessionContact {
 	}
 
 	@Override
-	public Set<ContactGroup> getContactGroups() {
+	public Set<YahooContactGroup> getContactGroups() {
 		return this.sessionGroup.getContactGroups();
 	}
 
 	@Override
-	public Set<Contact> getContacts() {
+	public Set<YahooContact> getContacts() {
 		return this.sessionRoster.getContacts();
 	}
 
 	@Override
-	public void acceptFriendAuthorization(Contact contact) throws IllegalStateException {
+	public void acceptFriendAuthorization(YahooContact contact) throws IllegalStateException {
 		this.sessionRoster.acceptFriendAuthorization(contact);
 	}
 
 	@Override
-	public void rejectFriendAuthorization(Contact contact, String message) throws IllegalStateException {
+	public void rejectFriendAuthorization(YahooContact contact, String message) throws IllegalStateException {
 		this.sessionRoster.rejectFriendAuthorization(contact, message);
 	}
 
 	@Override
-	public void removeFromGroup(Contact contact, ContactGroup group) {
+	public void removeFromGroup(YahooContact contact, YahooContactGroup group) {
 		this.sessionRoster.removeFromGroup(contact, group);
 	}
 
 	@Override
-	public void addContact(Contact contact, ContactGroup group) throws IllegalArgumentException {
+	public void addContact(YahooContact contact, YahooContactGroup group) throws IllegalArgumentException {
 		this.sessionRoster.addContact(contact, group);
 	}
 
@@ -63,7 +63,7 @@ public class SessionContactImpl implements SessionContact {
 	}
 
 	@Override
-	public ContactStatus getStatus(Contact contact) {
+	public YahooContactStatus getStatus(YahooContact contact) {
 		return this.sessionStatus.getStatus(contact);
 	}
 

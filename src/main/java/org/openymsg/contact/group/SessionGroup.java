@@ -2,7 +2,7 @@ package org.openymsg.contact.group;
 
 import java.util.Set;
 
-import org.openymsg.ContactGroup;
+import org.openymsg.YahooContactGroup;
 
 public interface SessionGroup {
 	/**
@@ -10,7 +10,7 @@ public interface SessionGroup {
 	 * @category Group
 	 * @return all contact groups
 	 */
-	Set<ContactGroup> getContactGroups();
+	Set<YahooContactGroup> getContactGroups();
 
 	void addGroup(String groupName);
 }

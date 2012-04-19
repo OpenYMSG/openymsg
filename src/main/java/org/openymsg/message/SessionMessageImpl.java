@@ -1,6 +1,6 @@
 package org.openymsg.message;
 
-import org.openymsg.Contact;
+import org.openymsg.YahooContact;
 import org.openymsg.execute.Executor;
 import org.openymsg.execute.read.NoOpResponse;
 import org.openymsg.network.ServiceType;
@@ -47,7 +47,7 @@ public class SessionMessageImpl implements SessionMessage {
 	 * @param to Recipient of the buzz.
 	 * @throws IllegalArgumentException if contact is null
 	 */
-	public void sendBuzz(Contact to) throws IllegalArgumentException {
+	public void sendBuzz(YahooContact to) throws IllegalArgumentException {
 		sendMessage(to, BUZZ);
 	}
 
@@ -59,7 +59,7 @@ public class SessionMessageImpl implements SessionMessage {
 	 */
 	// TODO - handle message ask
 	// TODO - current contact?
-	public void sendMessage(Contact contact, String message) throws IllegalArgumentException {
+	public void sendMessage(YahooContact contact, String message) throws IllegalArgumentException {
 
 		if (contact == null) {
 			throw new IllegalArgumentException("Contact cannot be null");
@@ -75,7 +75,7 @@ public class SessionMessageImpl implements SessionMessage {
 	}
 
 	@Override
-	public void sendTypingNotification(Contact contact, boolean isTyping) {
+	public void sendTypingNotification(YahooContact contact, boolean isTyping) {
 		if (contact == null) {
 			throw new IllegalArgumentException("Contact cannot be null");
 		}
@@ -91,7 +91,7 @@ public class SessionMessageImpl implements SessionMessage {
 	}
 
 	// TODO - send ack if ignored?
-	public void receivedMessage(Contact contact, String message, String messageId) {
+	public void receivedMessage(YahooContact contact, String message, String messageId) {
 		if (messageId != null) {
 			this.executor.execute(new MessageAckMessage(username, contact, messageId));
 		}
@@ -99,11 +99,11 @@ public class SessionMessageImpl implements SessionMessage {
 	}
 
 	// TODO - ack buzz?
-	public void receivedBuzz(Contact contact, String id) {
+	public void receivedBuzz(YahooContact contact, String id) {
 		this.callback.receivedBuzz(contact);
 	}
 
-	public void receivedOfflineMessage(Contact contact, String message, long timestampInMillis) {
+	public void receivedOfflineMessage(YahooContact contact, String message, long timestampInMillis) {
 		if (timestampInMillis == 0) {
 			this.callback.receivedMessage(contact, message);
 		} else {
@@ -111,7 +111,7 @@ public class SessionMessageImpl implements SessionMessage {
 		}
 	}
 
-	public void receivedTypingNotification(Contact contact, boolean isTyping) {
+	public void receivedTypingNotification(YahooContact contact, boolean isTyping) {
 		this.callback.receivedTypingNotification(contact, isTyping);
 	}
 

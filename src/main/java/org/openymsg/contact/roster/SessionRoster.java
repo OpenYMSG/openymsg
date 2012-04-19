@@ -2,16 +2,16 @@ package org.openymsg.contact.roster;
 
 import java.util.Set;
 
-import org.openymsg.Contact;
-import org.openymsg.ContactGroup;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooContactGroup;
 
 public interface SessionRoster {
 
-	Set<Contact> getContacts();
+	Set<YahooContact> getContacts();
 
-	void acceptFriendAuthorization(Contact contact) throws IllegalStateException;
+	void acceptFriendAuthorization(YahooContact contact) throws IllegalStateException;
 
-	void rejectFriendAuthorization(Contact contact, String message) throws IllegalStateException;
+	void rejectFriendAuthorization(YahooContact contact, String message) throws IllegalStateException;
 
 	/**
 	 * Instructs the Yahoo network to remove this friend from the particular group on the roster of the current user. If
@@ -21,7 +21,7 @@ public interface SessionRoster {
 	 * @param groupId Group to remove the contact from.
 	 * @throws IllegalArgumentException if one of the arguments is null or an empty String.
 	 */
-	void removeFromGroup(Contact contact, ContactGroup group);
+	void removeFromGroup(YahooContact contact, YahooContactGroup group);
 
 	/**
 	 * Add a new Contact. The contact will be added to the ContactGroup. This is not for adding an existing contact to
@@ -32,7 +32,7 @@ public interface SessionRoster {
 	 * @throws IllegalArgumentException if either contact or group is null or contact already exists
 	 */
 	// TODO what to do for new group
-	void addContact(Contact contact, ContactGroup group) throws IllegalArgumentException;
+	void addContact(YahooContact contact, YahooContactGroup group) throws IllegalArgumentException;
 
 	// void moveToGroup(Contact contact, ContactGroup group) throws IllegalArgumentException;
 }

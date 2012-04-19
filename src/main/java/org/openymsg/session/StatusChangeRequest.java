@@ -2,7 +2,7 @@ package org.openymsg.session;
 
 import java.io.IOException;
 
-import org.openymsg.Status;
+import org.openymsg.YahooStatus;
 import org.openymsg.execute.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
@@ -13,14 +13,14 @@ import org.openymsg.network.ServiceType;
  */
 // TODO - set status back
 public class StatusChangeRequest implements Message {
-	private Status status;
+	private YahooStatus status;
 	private String customStatusMessage = null;
 
-	public StatusChangeRequest(Status status) {
+	public StatusChangeRequest(YahooStatus status) {
 		this.status = status;
 	}
 
-	public StatusChangeRequest(Status status, String customStatusMessage) {
+	public StatusChangeRequest(YahooStatus status, String customStatusMessage) {
 		this.status = status;
 		this.customStatusMessage = customStatusMessage;
 	}

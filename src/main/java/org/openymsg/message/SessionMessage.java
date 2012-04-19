@@ -1,6 +1,6 @@
 package org.openymsg.message;
 
-import org.openymsg.Contact;
+import org.openymsg.YahooContact;
 
 //TODO - send message to non-contacts, including MSN
 //non-contact, opens a Y7 Chat Session, notification message(web login)
@@ -12,7 +12,7 @@ public interface SessionMessage {
 	 * @throws IllegalStateException
 	 */
 	// TODO handle offline
-	void sendMessage(Contact contact, String message) throws IllegalStateException;
+	void sendMessage(YahooContact contact, String message) throws IllegalStateException;
 
 	/**
 	 * Send a buzz message
@@ -20,13 +20,13 @@ public interface SessionMessage {
 	 * @throws IllegalStateException
 	 */
 	// TODO handle offline
-	void sendBuzz(Contact contact) throws IllegalStateException;
+	void sendBuzz(YahooContact contact) throws IllegalStateException;
 
 	/**
 	 * Send notification of typing
 	 * @param contact to buddy
 	 * @param isTyping typing or done
 	 */
-	void sendTypingNotification(Contact contact, boolean isTyping);
+	void sendTypingNotification(YahooContact contact, boolean isTyping);
 
 }

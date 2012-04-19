@@ -1,10 +1,10 @@
 package org.openymsg.contact.status;
 
-import org.openymsg.ContactStatus;
-import org.openymsg.Status;
+import org.openymsg.YahooContactStatus;
+import org.openymsg.YahooStatus;
 
 //TODO handle stealthBlocked and stealth mode
-public class ContactStatusImpl implements ContactStatus {
+public class ContactStatusImpl implements YahooContactStatus {
 	/**
 	 * The status message a user (away, available, etc).
 	 */
@@ -25,7 +25,7 @@ public class ContactStatusImpl implements ContactStatus {
 	 * @param newStatus replacement for current Status
 	 * @param newVisibility replacement for current onChat and onPager values
 	 */
-	public void update(Status newStatus, String newVisibility) {
+	public void update(YahooStatus newStatus, String newVisibility) {
 		// This is the new version, where 13=combined pager/chat
 		final int iVisibility = (newVisibility == null) ? 0 : Integer.parseInt(newVisibility);
 		update(newStatus, (iVisibility & 2) > 0, (iVisibility & 1) > 0);
@@ -37,7 +37,7 @@ public class ContactStatusImpl implements ContactStatus {
 	 * @param newOnChat replacement for current onChat value
 	 * @param newOnPager replacement for current onPager value
 	 */
-	public void update(Status newStatus, boolean newOnChat, boolean newOnPager) {
+	public void update(YahooStatus newStatus, boolean newOnChat, boolean newOnPager) {
 		// This is the old version, when 13=pager and 17=chat
 		update(newStatus);
 
@@ -49,7 +49,7 @@ public class ContactStatusImpl implements ContactStatus {
 	 * information was provided (presumed that these values don't change in this case)
 	 * @param newStatus replacement for current Status value
 	 */
-	public void update(Status newStatus) {
+	public void update(YahooStatus newStatus) {
 		// This is the old version, when 13=pager and 17=chat
 		this.status = new NormalStatusMessage(newStatus);
 	}

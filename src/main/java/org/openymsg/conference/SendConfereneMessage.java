@@ -2,7 +2,7 @@ package org.openymsg.conference;
 
 import java.io.IOException;
 
-import org.openymsg.Conference;
+import org.openymsg.YahooConference;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
@@ -13,7 +13,7 @@ import org.openymsg.network.ServiceType;
 public class SendConfereneMessage extends AbstractConferenceMessage {
 	private String message;
 
-	public SendConfereneMessage(String username, Conference conference, ConferenceMembership membership, String message) {
+	public SendConfereneMessage(String username, YahooConference conference, ConferenceMembership membership, String message) {
 		super(username, conference, membership);
 		this.message = message;
 	}

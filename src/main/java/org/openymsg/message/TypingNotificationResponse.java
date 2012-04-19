@@ -2,7 +2,7 @@ package org.openymsg.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.Contact;
+import org.openymsg.YahooContact;
 import org.openymsg.execute.read.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
 
@@ -38,7 +38,7 @@ public class TypingNotificationResponse implements SinglePacketResponse {
 			log.warn("mode not found: " + mode);
 		}
 
-		Contact contact = new Contact(from);
+		YahooContact contact = new YahooContact(from);
 		if (NOTIFY_TYPING.equalsIgnoreCase(type)) {
 			this.session.receivedTypingNotification(contact, isTyping);
 		} else if (NOTIFY_GAME.equalsIgnoreCase(type)) {

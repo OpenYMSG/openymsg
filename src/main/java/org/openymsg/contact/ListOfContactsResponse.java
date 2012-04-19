@@ -9,8 +9,8 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.Contact;
-import org.openymsg.ContactGroup;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooContactGroup;
 import org.openymsg.YahooProtocol;
 import org.openymsg.contact.group.ContactGroupImpl;
 import org.openymsg.contact.group.SessionGroupImpl;
@@ -39,9 +39,9 @@ public class ListOfContactsResponse implements MultiplePacketResponse {
 		ContactGroupImpl currentListGroup = null;
 		Map<String, ContactGroupImpl> receivedGroups = new HashMap<String, ContactGroupImpl>();
 
-		Set<Contact> usersOnFriendsList = new HashSet<Contact>();
-		Set<Contact> usersOnIgnoreList = new HashSet<Contact>();
-		Set<Contact> usersOnPendingList = new HashSet<Contact>();
+		Set<YahooContact> usersOnFriendsList = new HashSet<YahooContact>();
+		Set<YahooContact> usersOnIgnoreList = new HashSet<YahooContact>();
+		Set<YahooContact> usersOnPendingList = new HashSet<YahooContact>();
 
 		boolean isPending = false;
 
@@ -68,9 +68,9 @@ public class ListOfContactsResponse implements MultiplePacketResponse {
 				case 301:
 					/* This is 319 before all s/n's in a group after the first. It is followed by an identical 300. */
 					if (username != null) {
-						Contact yu = null;
+						YahooContact yu = null;
 						if (currentListGroup != null) {
-							for (Contact friend : usersOnFriendsList) {
+							for (YahooContact friend : usersOnFriendsList) {
 								// TODO - don't compare id
 								if (friend.getName().equals(username)) {
 									yu = friend;
@@ -85,13 +85,13 @@ public class ListOfContactsResponse implements MultiplePacketResponse {
 							}
 							if (yu == null) {
 								/* This buddy is in a group */
-								yu = new Contact(username, protocol);
+								yu = new YahooContact(username, protocol);
 								currentListGroup.add(yu);
 								usersOnFriendsList.add(yu);
 							}
 						} else {
 							/* This buddy is on the ignore list (and therefore in no group) */
-							yu = new Contact(username, protocol);
+							yu = new YahooContact(username, protocol);
 							usersOnIgnoreList.add(yu);
 						}
 						if (isPending) {
@@ -128,9 +128,9 @@ public class ListOfContactsResponse implements MultiplePacketResponse {
 				}
 			}
 			if (username != null) {
-				Contact yu = null;
+				YahooContact yu = null;
 				if (currentListGroup != null) {
-					for (Contact friend : usersOnFriendsList) {
+					for (YahooContact friend : usersOnFriendsList) {
 						if (friend.getName().equals(username)) {
 							yu = friend;
 							currentListGroup.add(yu);
@@ -138,13 +138,13 @@ public class ListOfContactsResponse implements MultiplePacketResponse {
 					}
 					if (yu == null) {
 						/* This buddy is in a group */
-						yu = new Contact(username, protocol);
+						yu = new YahooContact(username, protocol);
 						currentListGroup.add(yu);
 						usersOnFriendsList.add(yu);
 					}
 				} else {
 					/* This buddy is on the ignore list (and therefore in no group) */
-					yu = new Contact(username, protocol);
+					yu = new YahooContact(username, protocol);
 					usersOnIgnoreList.add(yu);
 				}
 				if (isPending) {
@@ -157,7 +157,7 @@ public class ListOfContactsResponse implements MultiplePacketResponse {
 
 		}
 
-		for (Contact contact : usersOnFriendsList) {
+		for (YahooContact contact : usersOnFriendsList) {
 			sessionContact.loadedContact(contact);
 		}
 
@@ -170,7 +170,7 @@ public class ListOfContactsResponse implements MultiplePacketResponse {
 		}
 
 		if (!receivedGroups.values().isEmpty()) {
-			sessionGroup.addedGroups(new HashSet<ContactGroup>(receivedGroups.values()));
+			sessionGroup.addedGroups(new HashSet<YahooContactGroup>(receivedGroups.values()));
 		}
 
 		sessionContact.rosterLoaded();
