@@ -79,4 +79,8 @@ public enum YahooStatus {
 
 		throw new IllegalArgumentException("No Status matching long value '" + value + "'.");
 	}
+
+	public boolean isCustom() {
+		return this == YahooStatus.CUSTOM;
+	}
 }

@@ -1,22 +1,29 @@
 package org.openymsg.testing;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.openymsg.execute.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
+import org.testng.Assert;
 
 public class MessageAssert {
 
-	public static final void assertEquals(Message message, String comparisonString) throws IOException {
+	public static final void assertEquals(Message message, String comparisonString, String... excludeFields)
+			throws IOException {
 		ServiceType serviceType = message.getServiceType();
 		MessageStatus messageStatus = message.getMessageStatus();
 		PacketBodyBuffer body = message.getBody();
 		check(comparisonString, serviceType);
 		check(comparisonString, messageStatus);
-		check(comparisonString, body);
+		check(comparisonString, body, excludeFields);
 	}
 
 	private static void check(String comparisonString, ServiceType serviceType) {
@@ -39,7 +46,8 @@ public class MessageAssert {
 			failNotEquals(messageStatus.toString(), stringServiceType, "Message Status is not the same");
 	}
 
-	private static void check(String comparisonString, PacketBodyBuffer body) {
+	private static void check(String comparisonString, PacketBodyBuffer body, String... excludeFields) {
+		List excludedFieldList = excludeFields != null ? Arrays.asList(excludeFields) : Collections.EMPTY_LIST;
 		StringTokenizer tokenizer = new StringTokenizer(comparisonString, " ");
 		String token = tokenizer.nextToken();
 		while (!token.startsWith("SessionId:"))
@@ -48,25 +56,27 @@ public class MessageAssert {
 		while (tokenizer.hasMoreTokens()) {
 			String comparisonKey = tokenizer.nextToken();
 			String comparisonValue = tokenizer.nextToken();
-			String bodyKey = bodyTokenizer.nextToken();
-			String bodyValue = null;
-			// special hack for handling space as a value. this is tokenized out of the body.
-			if (comparisonValue.length() == 1) {
-				comparisonValue = tokenizer.nextToken();
-				comparisonValue = "[ ]";
-				bodyValue = " ";
-			} else {
-				bodyValue = bodyTokenizer.nextToken();
-			}
-			try {
-				// System.err.println("comparing:  " + comparisonKey + ":" + comparisonValue + "-" + bodyKey + ":"
-				// + bodyValue);
-				check(comparisonKey, comparisonValue, bodyKey, bodyValue);
-			}
-			catch (Exception e) {
-				System.err.println("Failed comparing:  " + comparisonKey + ":" + comparisonValue + "-" + bodyKey + ":"
-						+ bodyValue);
-				e.printStackTrace();
+			if (!excludedFieldList.contains(strip(comparisonKey))) {
+				String bodyKey = bodyTokenizer.nextToken();
+				String bodyValue = null;
+				// special hack for handling space as a value. this is tokenized out of the body.
+				if (comparisonValue.length() == 1) {
+					comparisonValue = tokenizer.nextToken();
+					comparisonValue = "[ ]";
+					bodyValue = " ";
+				} else {
+					bodyValue = bodyTokenizer.nextToken();
+				}
+				try {
+					// System.err.println("comparing:  " + comparisonKey + ":" + comparisonValue + "-" + bodyKey + ":"
+					// + bodyValue);
+					check(comparisonKey, comparisonValue, bodyKey, bodyValue);
+				}
+				catch (Exception e) {
+					System.err.println("Failed comparing:  " + comparisonKey + ":" + comparisonValue + "-" + bodyKey
+							+ ":" + bodyValue);
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -75,8 +85,25 @@ public class MessageAssert {
 	private static void check(String comparisonKey, String comparisonValue, String bodyKey, String bodyValue) {
 		if (!strip(comparisonKey).equals(bodyKey))
 			failNotEquals(bodyKey, strip(comparisonKey), "Body key is not the same");
-		if (!strip(comparisonValue).equals(bodyValue))
-			failNotEquals(bodyValue, strip(comparisonValue), "Body key is not the same");
+		String stripValue = strip(comparisonValue);
+		if (!stripValue.equals(bodyValue)) {
+			if (!checkIfCommaSeperated(stripValue, bodyValue)) {
+				failNotEquals(bodyValue, strip(comparisonValue), "Body value is not the same for key: " + bodyKey);
+			}
+		}
+	}
+
+	private static boolean checkIfCommaSeperated(String stripValue, String bodyValue) {
+		String[] comparisonStrings = stripValue.split(",");
+		String[] bodyStrings = bodyValue.split(",");
+		if (comparisonStrings.length == bodyStrings.length && comparisonStrings.length > 1) {
+			Set comparisonSet = new HashSet(Arrays.asList(comparisonStrings));
+			Set bodySet = new HashSet(Arrays.asList(bodyStrings));
+			Assert.assertEquals(comparisonSet, bodySet);
+			return true;
+		}
+		return false;
+
 	}
 
 	private static String strip(String string) {

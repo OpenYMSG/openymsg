@@ -10,14 +10,15 @@ import org.testng.annotations.Test;
 public class DirectConnectionBuilderTest {
 	private SessionConfig config;
 	private ConnectionBuilder builder;
-	
+
 	@BeforeMethod
 	public void setup() {
 		config = new SessionConfigImpl();
 		builder = new DirectConnectionBuilder();
 	}
-	
-	@Test
+
+	@Test()
+	// TODO needs internet
 	public void connectViaCapacityServers() {
 		builder.with(config).useCapacityServers();
 		builder.build();

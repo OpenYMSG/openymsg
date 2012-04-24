@@ -15,7 +15,7 @@ import org.openymsg.network.direct.YMSG9InputStream;
  */
 public class FileReader {
 	public FileReader(String filename) throws UnsupportedEncodingException, IOException {
-		URL url = FileReader.class.getClassLoader().getResource("PagerLogoffInYahoo");
+		URL url = FileReader.class.getClassLoader().getResource(filename);
 		String fullyQualifiedFilename = url.getFile();
 		File file = new File(fullyQualifiedFilename);
 		FileInputStream stream = new FileInputStream(file);
@@ -24,7 +24,7 @@ public class FileReader {
 	}
 
 	public static final void main(String[] args) throws UnsupportedEncodingException, IOException {
-		new FileReader("NotifyTypingInYahoo");
+		new FileReader("AddBuddyDeclineIn");
 	}
 
 }

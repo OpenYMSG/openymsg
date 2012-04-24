@@ -19,13 +19,6 @@ public interface SessionConferenceCallback {
 	void conferenceStatusUpdate(String conferenceId, YahooConferenceStatus status);
 
 	/**
-	 * Session was invited to a confernce
-	 * @param conference conference
-	 * @param message message from the invite, may be null
-	 */
-	void invitedToConference(YahooConference conference, YahooContact contact, String message);
-
-	/**
 	 * Message received from the conference
 	 * @param conference conference with the message
 	 * @param message message
@@ -36,4 +29,10 @@ public interface SessionConferenceCallback {
 
 	void receivedConferenceInvite(YahooConference conference, YahooContact inviter, Set<YahooContact> invited,
 			Set<YahooContact> members, String message);
+
+	void receivedConferenceExtend(YahooConference conference, YahooContact inviter, Set<YahooContact> invited);
+
+	void receivedConferenceAccept(YahooConference conference, YahooContact contact);
+
+	void receivedConferenceLeft(YahooConference conference, YahooContact contact);
 }

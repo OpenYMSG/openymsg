@@ -5,8 +5,8 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooContact;
-import org.openymsg.YahooStatus;
 import org.openymsg.YahooProtocol;
+import org.openymsg.YahooStatus;
 import org.openymsg.execute.read.SinglePacketResponse;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.YMSG9Packet;
@@ -143,9 +143,8 @@ public class SingleStatusResponse implements SinglePacketResponse {
 		// ContactStatusImpl status = sessionStatus.getStatus(contact);
 		// TODO - handle this
 		// When we add a friend, we get a status update before
-		// getting a confirmation FRIENDADD packet (crazy!)
+		// getting a confirmation ADD_BUDDY packet (crazy!)
 		// if (status == null) {
-		ContactStatusImpl status = new ContactStatusImpl();
 		// }
 
 		// TODO - do this check
@@ -166,38 +165,65 @@ public class SingleStatusResponse implements SinglePacketResponse {
 			newStatus = YahooStatus.OFFLINE;
 		}
 
+		ContactPresence presence = null;
+		StatusMessage status = null;
+
 		if (onChat != null) {
+			presence = new ContactPresence(onChat, onPager);
+			status = new NormalStatusMessage(newStatus);
 			// log.info("update: " + newStatus + "/" + onChat + "/" + onPager);
-			status.update(newStatus, onChat, onPager);
+			// status.update(newStatus, onChat, onPager);
 		} else if (onPager != null) {
 			// log.info("update: " + newStatus + "/" + visibility);
-			status.update(newStatus, visibility);
+			presence = getPresenceByVisibility(visibility);
+			status = new NormalStatusMessage(newStatus);
+			// status.update(newStatus, visibility);
 		} else if (logoff) {
+			presence = new ContactPresence(false, false);
+			status = new NormalStatusMessage(newStatus);
 			// logoff message doesn't have chat or pager info, but we reset those in this case.
 			// log.info("update: " + newStatus + " and false/false");
-			status.update(newStatus, false, false);
+			// status.update(newStatus, false, false);
 		} else {
 			// status update with no chat, nor pager information, so leave those values alone.
 			// log.info("update: " + newStatus);
-			status.update(newStatus);
+			status = new NormalStatusMessage(newStatus);
+			// status.update(newStatus);
 		}
 		if (customMessage != null) {
+			status = new CustomStatusMessage(customStatus, customMessage);
+
 			// log.info("update custom: " + customMessage + "/" + customStatus);
-			status.setCustom(customMessage, customStatus);
+			// status.setCustom(customMessage, customStatus);
 		}
 
+		Long statusIdleTime = getIdleTime(clearIdleTime, idleTime);
+		// Hack for MSN users
+		if (contact.getProtocol().isMsn() && status.getStatus() == YahooStatus.STEPPEDOUT) {
+			status = new NormalStatusMessage(YahooStatus.AWAY);
+		}
+		ContactStatusImpl contactStatus = new ContactStatusImpl(status, presence, statusIdleTime);
+		this.sessionStatus.statusUpdate(contact, contactStatus);
+	}
+
+	/**
+	 * Updates the YahooUser with the new values.
+	 * @param newStatus replacement for current Status
+	 * @param newVisibility replacement for current onChat and onPager values
+	 */
+	public ContactPresence getPresenceByVisibility(String visibility) {
+		// This is the new version, where 13=combined pager/chat
+		final int iVisibility = (visibility == null) ? 0 : Integer.parseInt(visibility);
+		return new ContactPresence((iVisibility & 2) > 0, (iVisibility & 1) > 0);
+	}
+
+	private Long getIdleTime(String clearIdleTime, String idleTime) {
 		if (clearIdleTime != null) {
-			// log.info("setIdleTime: -1");
-			status.setIdleTime(-1);
+			return -1L;
 		}
 		if (idleTime != null) {
-			// log.info("setIdleTime: " + idleTime);
-			status.setIdleTime(Long.parseLong(idleTime));
+			return Long.parseLong(idleTime);
 		}
-		// Hack for MSN users
-		if (contact.getProtocol().isMsn() && status.getMessage().is(YahooStatus.STEPPEDOUT)) {
-			status.update(YahooStatus.AWAY);
-		}
-		this.sessionStatus.statusUpdate(contact, status);
+		return -1L;
 	}
 }

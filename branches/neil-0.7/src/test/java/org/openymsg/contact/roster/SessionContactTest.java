@@ -50,7 +50,8 @@ public class SessionContactTest {
 
 	@Test
 	public void testAddContact() throws InterruptedException {
-		sessionContact.addContact(contact, group);
+		String message = "addContactMessag";
+		sessionContact.addContact(contact, group, message);
 		OutgoingPacket packet = connection.getOutgoingPacket();
 		// System.err.println("Got a packet: " + packet);
 	}

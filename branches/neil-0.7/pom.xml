@@ -246,7 +246,10 @@
 						<exclude>**/legacy/*.java</exclude>
 					</excludes>
 				</configuration>
-
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jdepend-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</reporting>

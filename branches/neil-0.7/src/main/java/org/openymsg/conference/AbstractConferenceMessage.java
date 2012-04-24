@@ -23,8 +23,16 @@ public abstract class AbstractConferenceMessage implements Message {
 		body.addElement(key, this.username);
 	}
 
+	// TODO don't include me
 	protected void writeMembers(PacketBodyBuffer body, String key) throws UnsupportedEncodingException, IOException {
 		for (YahooContact contact : this.membership.getMembers()) {
+			body.addElement(key, contact.getName());
+			// TODO - handle protocol
+		}
+	}
+
+	protected void writeInvited(PacketBodyBuffer body, String key) throws UnsupportedEncodingException, IOException {
+		for (YahooContact contact : this.membership.getInvited()) {
 			body.addElement(key, contact.getName());
 			// TODO - handle protocol
 		}

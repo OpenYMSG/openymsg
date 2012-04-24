@@ -32,7 +32,7 @@ public interface SessionRoster {
 	 * @throws IllegalArgumentException if either contact or group is null or contact already exists
 	 */
 	// TODO what to do for new group
-	void addContact(YahooContact contact, YahooContactGroup group) throws IllegalArgumentException;
+	void addContact(YahooContact contact, YahooContactGroup group, String message) throws IllegalArgumentException;
 
 	// void moveToGroup(Contact contact, ContactGroup group) throws IllegalArgumentException;
 }

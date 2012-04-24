@@ -109,6 +109,7 @@ public class ConferenceMembershipImpl implements ConferenceMembership {
 			successful = false;
 			log.warn("Declined contact was a member: " + decline);
 		}
+		this.declinedOrLeftContacts.add(decline);
 		return successful;
 	}
 
@@ -131,6 +132,7 @@ public class ConferenceMembershipImpl implements ConferenceMembership {
 			log.warn("Left contact was invited: " + left);
 			this.memberContacts.remove(left);
 		}
+		this.declinedOrLeftContacts.add(left);
 		return successful;
 	}
 

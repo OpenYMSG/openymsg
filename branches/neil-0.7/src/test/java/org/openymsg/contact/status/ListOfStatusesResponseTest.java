@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.mockito.Mockito;
 import org.openymsg.YahooContact;
-import org.openymsg.YahooStatus;
 import org.openymsg.YahooProtocol;
+import org.openymsg.YahooStatus;
 import org.openymsg.network.YMSG9Packet;
 import org.openymsg.testing.PacketReader;
 import org.testng.annotations.Test;
@@ -23,8 +23,7 @@ public class ListOfStatusesResponseTest {
 		List<YMSG9Packet> packets = new ArrayList<YMSG9Packet>();
 		packets.add(packet);
 		response.execute(packets);
-		ContactStatusImpl status = new ContactStatusImpl();
-		status.update(YahooStatus.AVAILABLE, false, true);
+		ContactStatusImpl status = new ContactStatusImpl(YahooStatus.AVAILABLE, false, true);
 		Mockito.verify(sessionStatus).statusUpdate(new YahooContact("testuser", YahooProtocol.YAHOO), status);
 	}
 }

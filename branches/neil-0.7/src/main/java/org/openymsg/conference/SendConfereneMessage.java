@@ -13,7 +13,8 @@ import org.openymsg.network.ServiceType;
 public class SendConfereneMessage extends AbstractConferenceMessage {
 	private String message;
 
-	public SendConfereneMessage(String username, YahooConference conference, ConferenceMembership membership, String message) {
+	public SendConfereneMessage(String username, YahooConference conference, ConferenceMembership membership,
+			String message) {
 		super(username, conference, membership);
 		this.message = message;
 	}
@@ -24,10 +25,8 @@ public class SendConfereneMessage extends AbstractConferenceMessage {
 		this.writeUsername(body, "1");
 		this.writeConference(body, "57");
 		this.writeMembers(body, "53");
-		this.writeConference(body, "57");
+		body.addElement("97", "1");
 		body.addElement("14", message);
-		// TODO - where to put this?
-		// if (Util.isUtf8(message)) body.addElement("97", "1");
 		return body;
 	}
 

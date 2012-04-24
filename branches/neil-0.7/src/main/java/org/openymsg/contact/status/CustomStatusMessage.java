@@ -13,10 +13,10 @@ import org.openymsg.YahooStatus;
 
 public class CustomStatusMessage implements StatusMessage {
 	/** An free form status message. */
-	protected String statusMessage;
+	protected final String statusMessage;
 	/** A custom status. As yet I'm unsure if these are String identifiers, or numeric or even boolean values. */
 	// TODO: Find out what values this can have (boolean, numeric, string?)
-	protected String statusText;
+	protected final String statusText;
 
 	public CustomStatusMessage(String statusText, String statusMessage) {
 		this.statusText = statusText;
@@ -44,7 +44,7 @@ public class CustomStatusMessage implements StatusMessage {
 	}
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((statusMessage == null) ? 0 : statusMessage.hashCode());
@@ -53,10 +53,10 @@ public class CustomStatusMessage implements StatusMessage {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public final boolean equals(Object obj) {
 		if (this == obj) return true;
 		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
+		if (!(obj instanceof CustomStatusMessage)) return false;
 		CustomStatusMessage other = (CustomStatusMessage) obj;
 		if (statusMessage == null) {
 			if (other.statusMessage != null) return false;

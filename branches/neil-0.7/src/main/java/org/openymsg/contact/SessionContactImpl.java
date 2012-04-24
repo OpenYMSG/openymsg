@@ -25,6 +25,10 @@ public class SessionContactImpl implements SessionContact {
 		sessionStatus = new SessionStatusImpl(executor, callback);
 		this.executor.register(ServiceType.LIST_15, new ListOfContactsResponse(sessionRoster, sessionGroup,
 				sessionStatus));
+		this.executor.register(ServiceType.REMOVE_BUDDY, new ContactRemoveAckResponse(sessionRoster, sessionGroup));
+		this.executor.register(ServiceType.ADD_BUDDY, new ContactAddAckResponse(sessionRoster, sessionGroup,
+				sessionStatus));
+
 	}
 
 	@Override
@@ -53,8 +57,9 @@ public class SessionContactImpl implements SessionContact {
 	}
 
 	@Override
-	public void addContact(YahooContact contact, YahooContactGroup group) throws IllegalArgumentException {
-		this.sessionRoster.addContact(contact, group);
+	public void addContact(YahooContact contact, YahooContactGroup group, String message)
+			throws IllegalArgumentException {
+		this.sessionRoster.addContact(contact, group, message);
 	}
 
 	@Override

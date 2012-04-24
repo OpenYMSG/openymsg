@@ -2,8 +2,8 @@ package org.openymsg.contact.status;
 
 import org.mockito.Mockito;
 import org.openymsg.YahooContact;
-import org.openymsg.YahooStatus;
 import org.openymsg.YahooProtocol;
+import org.openymsg.YahooStatus;
 import org.openymsg.network.YMSG9Packet;
 import org.openymsg.testing.PacketReader;
 import org.testng.annotations.Test;
@@ -17,8 +17,7 @@ public class SingleStatusResponseTest {
 		SessionStatusImpl sessionStatus = Mockito.mock(SessionStatusImpl.class);
 		SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
 		response.execute(packet);
-		ContactStatusImpl status = new ContactStatusImpl();
-		status.update(YahooStatus.AVAILABLE, false, true);
+		ContactStatusImpl status = new ContactStatusImpl(YahooStatus.AVAILABLE, false, true);
 		Mockito.verify(sessionStatus).statusUpdate(new YahooContact("testuser@live.com", YahooProtocol.MSN), status);
 	}
 
@@ -30,8 +29,7 @@ public class SingleStatusResponseTest {
 		SessionStatusImpl sessionStatus = Mockito.mock(SessionStatusImpl.class);
 		SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
 		response.execute(packet);
-		ContactStatusImpl status = new ContactStatusImpl();
-		status.update(YahooStatus.AVAILABLE, false, true);
+		ContactStatusImpl status = new ContactStatusImpl(YahooStatus.AVAILABLE, false, true);
 		Mockito.verify(sessionStatus).statusUpdate(new YahooContact("testuser", YahooProtocol.YAHOO), status);
 	}
 
@@ -42,8 +40,7 @@ public class SingleStatusResponseTest {
 		SessionStatusImpl sessionStatus = Mockito.mock(SessionStatusImpl.class);
 		SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
 		response.execute(packet);
-		ContactStatusImpl status = new ContactStatusImpl();
-		status.update(YahooStatus.AVAILABLE, false, true);
+		ContactStatusImpl status = new ContactStatusImpl(YahooStatus.AVAILABLE, false, true);
 		Mockito.verify(sessionStatus).statusUpdate(new YahooContact("testuser", YahooProtocol.YAHOO), status);
 	}
 
@@ -54,8 +51,7 @@ public class SingleStatusResponseTest {
 		SessionStatusImpl sessionStatus = Mockito.mock(SessionStatusImpl.class);
 		SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
 		response.execute(packet);
-		ContactStatusImpl status = new ContactStatusImpl();
-		status.update(YahooStatus.AWAY, false, true);
+		ContactStatusImpl status = new ContactStatusImpl(YahooStatus.AWAY, false, true);
 		Mockito.verify(sessionStatus).statusUpdate(new YahooContact("testuser@live.com", YahooProtocol.MSN), status);
 	}
 
@@ -66,8 +62,7 @@ public class SingleStatusResponseTest {
 		SessionStatusImpl sessionStatus = Mockito.mock(SessionStatusImpl.class);
 		SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
 		response.execute(packet);
-		ContactStatusImpl status = new ContactStatusImpl();
-		status.update(YahooStatus.BUSY, false, true);
+		ContactStatusImpl status = new ContactStatusImpl(YahooStatus.BUSY, false, true);
 		Mockito.verify(sessionStatus).statusUpdate(new YahooContact("testuser@live.com", YahooProtocol.MSN), status);
 	}
 
@@ -78,8 +73,7 @@ public class SingleStatusResponseTest {
 		SessionStatusImpl sessionStatus = Mockito.mock(SessionStatusImpl.class);
 		SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
 		response.execute(packet);
-		ContactStatusImpl status = new ContactStatusImpl();
-		status.update(YahooStatus.OFFLINE, false, false);
+		ContactStatusImpl status = new ContactStatusImpl(YahooStatus.OFFLINE, false, false);
 		Mockito.verify(sessionStatus).statusUpdate(new YahooContact("testuser@live.com", YahooProtocol.MSN), status);
 	}
 
@@ -102,8 +96,7 @@ public class SingleStatusResponseTest {
 		// SessionStatusImpl sessionStatus = Mockito.mock(SessionStatusImpl.class);
 		// SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
 		// response.execute(packet);
-		ContactStatusImpl status = new ContactStatusImpl();
-		status.update(YahooStatus.AVAILABLE, false, true);
+		ContactStatusImpl status = new ContactStatusImpl(YahooStatus.AVAILABLE, false, true);
 		YahooContact contact = new YahooContact("testuser@live.com", YahooProtocol.MSN);
 		// Mockito.verify(sessionStatus).addStatus(new Contact("testuser@live.com", YahooProtocol.MSN), status);
 		testSign(test, status, contact);
@@ -116,8 +109,7 @@ public class SingleStatusResponseTest {
 		SessionStatusImpl sessionStatus = Mockito.mock(SessionStatusImpl.class);
 		SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
 		response.execute(packet);
-		ContactStatusImpl status = new ContactStatusImpl();
-		status.update(YahooStatus.AVAILABLE, false, true);
+		ContactStatusImpl status = new ContactStatusImpl(YahooStatus.AVAILABLE, false, true);
 		Mockito.verify(sessionStatus).statusUpdate(new YahooContact("testuser", YahooProtocol.YAHOO), status);
 	}
 
@@ -128,8 +120,7 @@ public class SingleStatusResponseTest {
 		SessionStatusImpl sessionStatus = Mockito.mock(SessionStatusImpl.class);
 		SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
 		response.execute(packet);
-		ContactStatusImpl status = new ContactStatusImpl();
-		status.update(YahooStatus.OFFLINE, false, false);
+		ContactStatusImpl status = new ContactStatusImpl(YahooStatus.OFFLINE, false, false);
 		Mockito.verify(sessionStatus).statusUpdate(new YahooContact("testuser@live.com", YahooProtocol.MSN), status);
 	}
 
@@ -141,8 +132,7 @@ public class SingleStatusResponseTest {
 		SingleStatusResponse singleStatusResponse = new SingleStatusResponse(sessionStatus);
 		LogoffStatusResponse response = new LogoffStatusResponse(singleStatusResponse);
 		response.execute(packet);
-		ContactStatusImpl status = new ContactStatusImpl();
-		status.update(YahooStatus.OFFLINE, false, false);
+		ContactStatusImpl status = new ContactStatusImpl(YahooStatus.OFFLINE, false, false);
 		Mockito.verify(sessionStatus).statusUpdate(new YahooContact("testuser", YahooProtocol.YAHOO), status);
 	}
 
