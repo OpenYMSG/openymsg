@@ -34,36 +34,34 @@ public class SessionConnectionImplTest {
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNullConfig() {
 		SessionConfig sessionConfig = null;
-		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor);
+		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, listener);
 		sessionConnection.initialize(sessionConfig);
 	}
 
 	@Test
 	public void testConnection() {
 		SessionConfig sessionConfig = new TestingSessionConfig();
-		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor);
+		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, listener);
 		sessionConnection.initialize(sessionConfig);
-		sessionConnection.addListener(listener);
 		Mockito.verify(listener, Mockito.timeout(100)).connectionSuccessful();
+		sessionConnection.getConnectionState();
 	}
 
 	@Test
 	public void testFailed() {
 		SessionConfig sessionConfig = new TestingSessionConfig(false);
-		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor);
+		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, listener);
 		sessionConnection.initialize(sessionConfig);
-		sessionConnection.addListener(listener);
 		Mockito.verify(listener).connectionFailure();
 	}
 
-	@Test(enabled = false)
+	@Test
 	public void testFailLater() {
 		SessionConfig sessionConfig = new TestingSessionConfig();
-		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor);
+		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, listener);
 		sessionConnection.initialize(sessionConfig);
-		sessionConnection.addListener(listener);
-		Mockito.verify(listener).connectionSuccessful();
-		// TODO - Cause connection failure
+		sessionConnection.connectionEnded();
+		Mockito.verify(listener).connectionPrematurelyEnded();
 	}
 
 }

@@ -20,8 +20,8 @@ public class AcceptConferenceMessage extends AbstractConferenceMessage {
 	public PacketBodyBuffer getBody() throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		this.writeUsername(body, "1");
-		this.writeMembers(body, "3");
 		this.writeConference(body, "57");
+		this.writeMembers(body, "3");
 		return body;
 	}
 
@@ -34,10 +34,5 @@ public class AcceptConferenceMessage extends AbstractConferenceMessage {
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
 	}
-
-	// @Override
-	// public void messageProcessed() {
-	// //TODO - join conference?
-	// }
 
 }

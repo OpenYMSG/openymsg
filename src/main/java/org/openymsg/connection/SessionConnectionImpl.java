@@ -1,9 +1,5 @@
 package org.openymsg.connection;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.config.SessionConfig;
@@ -15,11 +11,11 @@ public class SessionConnectionImpl implements SessionConnection, ConnectionHandl
 	private Executor executor;
 	private ConnectionState state;
 	private ConnectionInfo status;
-	private Set<SessionConnectionCallback> listeners = Collections
-			.synchronizedSet(new HashSet<SessionConnectionCallback>());
+	private SessionConnectionCallback callback;
 
-	public SessionConnectionImpl(Executor executor) {
+	public SessionConnectionImpl(Executor executor, SessionConnectionCallback callback) {
 		this.executor = executor;
+		this.callback = callback;
 		this.state = ConnectionState.UNSTARTED;
 	}
 
@@ -48,23 +44,14 @@ public class SessionConnectionImpl implements SessionConnection, ConnectionHandl
 		return status;
 	}
 
-	@Override
-	public void addListener(SessionConnectionCallback listener) {
-		this.listeners.add(listener);
-		callCallback(listener);
-	}
-
-	@Override
-	public boolean removeListener(SessionConnectionCallback listener) {
-		return this.listeners.remove(listener);
-	}
-
 	protected void setState(ConnectionState state) {
 		this.state = state;
-		synchronized (listeners) {
-			for (SessionConnectionCallback listener : listeners) {
-				callCallback(listener);
-			}
+		if (this.state == ConnectionState.CONNECTED) {
+			callback.connectionSuccessful();
+		} else if (this.state == ConnectionState.FAILED_CONNECTING) {
+			callback.connectionFailure();
+		} else if (this.state == ConnectionState.FAILED_AFTER_CONNECTED) {
+			callback.connectionPrematurelyEnded();
 		}
 	}
 
@@ -73,22 +60,17 @@ public class SessionConnectionImpl implements SessionConnection, ConnectionHandl
 		this.setState(state);
 	}
 
-	private void callCallback(SessionConnectionCallback listener) {
-		if (this.state == ConnectionState.CONNECTED) {
-			listener.connectionSuccessful();
-		} else if (this.state == ConnectionState.FAILED_CONNECTING) {
-			listener.connectionFailure();
-		} else if (this.state == ConnectionState.FAILED_AFTER_CONNECTED) {
-			listener.connectionPrematurelyEnded();
-		}
-	}
-
 	@Override
 	public void connectionEnded() {
-		if (this.state == ConnectionState.CONNECTED) {
+		if (this.state != ConnectionState.DISCONNECTING) {
 			this.setState(ConnectionState.FAILED_AFTER_CONNECTED);
 		} else {
 			log.warn("got connection ended with state: " + this.state);
 		}
+	}
+
+	public void closeConnection() {
+		this.state = ConnectionState.DISCONNECTING;
+		this.executor.shutdown();
 	}
 }

@@ -26,7 +26,7 @@ public class PacketReader {
 		// + sessionId);
 		YMSG9Packet packet = new YMSG9Packet();
 		packet.magic = magic;
-		// packet.length = length;
+		packet.length = Integer.valueOf(length);
 		packet.service = ServiceType.valueOf(service);
 		// packet.sessionId = sessionId;
 		// packet.version = version;

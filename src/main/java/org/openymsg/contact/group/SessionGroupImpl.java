@@ -46,4 +46,9 @@ public class SessionGroupImpl implements SessionGroup, SessionGroupCallback {
 
 	}
 
+	public boolean possibleRemoveGroup(ContactGroupImpl group) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

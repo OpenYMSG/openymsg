@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooConference;
-import org.openymsg.YahooConferenceStatus;
 import org.openymsg.YahooContact;
 import org.openymsg.execute.Executor;
 import org.openymsg.network.ServiceType;
@@ -19,10 +18,12 @@ public class SessionConferenceImpl implements SessionConference {
 	private Executor executor;
 	private SessionConferenceCallback callback;
 	private Map<String, YahooConference> conferences = new ConcurrentHashMap<String, YahooConference>();
-	private Map<String, YahooConferenceStatus> conferenceStatuses = new ConcurrentHashMap<String, YahooConferenceStatus>();
+	// private Map<String, YahooConferenceStatus> conferenceStatuses = new ConcurrentHashMap<String,
+	// YahooConferenceStatus>();
 	private Map<String, ConferenceMembershipImpl> conferenceMemberships = new ConcurrentHashMap<String, ConferenceMembershipImpl>();
 
-	public SessionConferenceImpl(String username, Executor executor, SessionConferenceCallback callback) {
+	public SessionConferenceImpl(String username, Executor executor, SessionConferenceCallback callback)
+			throws IllegalArgumentException {
 		if (username == null) {
 			throw new IllegalArgumentException("Username cannot be null");
 		}
@@ -38,6 +39,7 @@ public class SessionConferenceImpl implements SessionConference {
 		this.executor.register(ServiceType.CONFMSG, new ConferenceMessageResponse(this));
 		this.executor.register(ServiceType.CONFINVITE, new ConferenceInviteResponse(this));
 		this.executor.register(ServiceType.CONFDECLINE, new ConferenceDeclineResponse(this));
+		this.executor.register(ServiceType.CONFLOGON, new ConferenceAcceptResponse(this));
 	}
 
 	@Override
@@ -56,7 +58,7 @@ public class SessionConferenceImpl implements SessionConference {
 	}
 
 	@Override
-	public void leaveConference(YahooConference conference) throws IllegalStateException {
+	public void leaveConference(YahooConference conference) throws IllegalArgumentException {
 		if (conference == null) {
 			throw new IllegalArgumentException("Conference cannot be null");
 		}
@@ -68,7 +70,7 @@ public class SessionConferenceImpl implements SessionConference {
 	}
 
 	@Override
-	public void acceptConferenceInvite(YahooConference conference) throws IllegalStateException {
+	public void acceptConferenceInvite(YahooConference conference) throws IllegalArgumentException {
 		if (conference == null) {
 			throw new IllegalArgumentException("Conference cannot be null");
 		}
@@ -81,7 +83,8 @@ public class SessionConferenceImpl implements SessionConference {
 
 	// TODO generate conferenceId
 	@Override
-	public YahooConference createConference(String conferenceId, Set<YahooContact> contacts, String message) {
+	public YahooConference createConference(String conferenceId, Set<YahooContact> contacts, String message)
+			throws IllegalArgumentException {
 		if (conferenceId == null || conferenceId.trim().isEmpty()) {
 			throw new IllegalArgumentException("ConferenceId cannot be null");
 		}
@@ -97,7 +100,7 @@ public class SessionConferenceImpl implements SessionConference {
 	}
 
 	@Override
-	public void declineConferenceInvite(YahooConference conference, String message) throws IllegalStateException {
+	public void declineConferenceInvite(YahooConference conference, String message) throws IllegalArgumentException {
 		if (conference == null) {
 			throw new IllegalArgumentException("Conference cannot be null");
 		}
@@ -109,12 +112,12 @@ public class SessionConferenceImpl implements SessionConference {
 	}
 
 	@Override
-	public void extendConference(YahooConference conference, YahooContact contact, String message)
-			throws IllegalStateException {
+	public void extendConference(YahooConference conference, Set<YahooContact> contacts, String message)
+			throws IllegalArgumentException {
 		if (conference == null) {
 			throw new IllegalArgumentException("Conference cannot be null");
 		}
-		if (contact == null) {
+		if (contacts == null) {
 			throw new IllegalArgumentException("Contact cannot be null");
 		}
 
@@ -126,32 +129,40 @@ public class SessionConferenceImpl implements SessionConference {
 		if (membership == null) {
 			throw new IllegalArgumentException("Unknown conference: " + conference);
 		}
-		this.executor.execute(new ExtendConferenceMessage(username, conference, membership, contact, message));
+		this.executor.execute(new ExtendConferenceMessage(username, conference, membership, contacts, message));
 	}
 
 	@Override
-	public YahooConference getConference(String conferenceId) {
+	public YahooConference getConference(String conferenceId) throws IllegalArgumentException {
+		if (conferenceId == null) {
+			throw new IllegalArgumentException("ConferenceId cannot be null");
+		}
 		return this.conferences.get(conferenceId);
 	}
 
-	@Override
-	public YahooConferenceStatus getConferenceStatus(String conferenceId) {
-		return this.conferenceStatuses.get(conferenceId);
-	}
-
-	public void conferenceStatusUpdate(String conferenceId, YahooConferenceStatus status) {
-		// TODO Auto-generated method stub
-
-	}
-
+	// @Override
+	// public YahooConferenceStatus getConferenceStatus(String conferenceId) {
+	// return this.conferenceStatuses.get(conferenceId);
+	// }
+	//
+	// public void conferenceStatusUpdate(String conferenceId, YahooConferenceStatus status) {
+	// // TODO Auto-generated method stub
+	//
+	// }
+	//
 	public void receivedConferenceMessage(YahooConference conference, YahooContact contact, String message) {
-		// TODO Auto-generated method stub
-
+		this.callback.receivedConferenceMessage(conference, contact, message);
 	}
 
 	public void receivedConferenceDecline(YahooConference conference, YahooContact contact, String message) {
-		// TODO Auto-generated method stub
-
+		ConferenceMembershipImpl membership = this.conferenceMemberships.get(conference.getId());
+		if (membership == null) {
+			log.warn("no membership for decline: " + conference);
+			membership = new ConferenceMembershipImpl();
+			this.conferenceMemberships.put(conference.getId(), membership);
+		}
+		membership.addDecline(contact);
+		this.callback.receivedConferenceDecline(conference, contact, message);
 	}
 
 	@Override
@@ -160,6 +171,9 @@ public class SessionConferenceImpl implements SessionConference {
 	}
 
 	public ConferenceMembership getConferenceMembership(YahooConference conference) {
+		if (conference == null) {
+			throw new IllegalArgumentException("Conference cannot be null");
+		}
 		return this.conferenceMemberships.get(conference.getId());
 	}
 
@@ -173,10 +187,56 @@ public class SessionConferenceImpl implements SessionConference {
 			log.debug("invited to previously added conference: " + conference);
 			// TODO reset membership?
 		}
-		// TODO add inviter?
 		// TODO add me?
 		membership.addMember(members);
 		membership.addInvited(invited);
 		this.callback.receivedConferenceInvite(conference, inviter, invited, members, message);
+	}
+
+	public void receivedConferenceInviteAck(YahooConference conference, YahooContact inviter,
+			Set<YahooContact> invited, Set<YahooContact> members, String message) {
+		ConferenceMembershipImpl membership = this.conferenceMemberships.get(conference.getId());
+		if (membership == null) {
+			membership = new ConferenceMembershipImpl();
+			this.conferenceMemberships.put(conference.getId(), membership);
+		} else {
+			log.debug("invited to previously added conference: " + conference);
+			// TODO reset membership?
+		}
+		membership.addMember(members);
+		membership.addInvited(invited);
+	}
+
+	public void receivedConferenceAccept(YahooConference conference, YahooContact contact) {
+		ConferenceMembershipImpl membership = this.conferenceMemberships.get(conference.getId());
+		if (membership == null) {
+			log.warn("no membership for accept: " + conference);
+			membership = new ConferenceMembershipImpl();
+			this.conferenceMemberships.put(conference.getId(), membership);
+		}
+		membership.addMember(contact);
+		callback.receivedConferenceAccept(conference, contact);
+	}
+
+	public void receivedConferenceExtend(YahooConference conference, YahooContact inviter, Set<YahooContact> invited) {
+		ConferenceMembershipImpl membership = this.conferenceMemberships.get(conference.getId());
+		if (membership == null) {
+			log.warn("no membership for accept: " + conference);
+			membership = new ConferenceMembershipImpl();
+			this.conferenceMemberships.put(conference.getId(), membership);
+		}
+		membership.addInvited(invited);
+		callback.receivedConferenceExtend(conference, inviter, invited);
+	}
+
+	public void receivedConferenceLeft(YahooConference conference, YahooContact contact) {
+		ConferenceMembershipImpl membership = this.conferenceMemberships.get(conference.getId());
+		if (membership == null) {
+			log.warn("no membership for accept: " + conference);
+			membership = new ConferenceMembershipImpl();
+			this.conferenceMemberships.put(conference.getId(), membership);
+		}
+		membership.addLeft(contact);
+		callback.receivedConferenceLeft(conference, contact);
 	}
 }

@@ -8,15 +8,23 @@ import org.openymsg.execute.Executor;
 import org.openymsg.execute.write.Message;
 import org.openymsg.network.YMSG9Packet;
 import org.openymsg.testing.PacketReader;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class MessageResponseTest {
 	private String username = "testuser";
 
-	@Test(enabled = false)
+	@Test
 	public void testSimple() {
-		Assert.fail("not implemented");
+		String test = "Magic:YMSG Version:16 Length:206 Service:MESSAGE Status:SERVER_ACK SessionId:0x5fcd19  [4] [testbuddy] [5] [testuser] [14] [sending message] [15] [1335299986] [63] [;0] [64] [0] [97] [1] [206] [2] [252] [GHXzmtBef5EjXVljxP9GLk4WZBJnlQ==] [429] [000000004172116E] [450] [0] [455] [GHXzmtBef5EjXVljxP9GLk4WZBJnlQ==]";
+		YMSG9Packet packet = PacketReader.readString(test);
+		SessionMessageCallback callback = Mockito.mock(SessionMessageCallback.class);
+		Executor executor = Mockito.mock(Executor.class);
+		SessionMessageImpl session = new SessionMessageImpl(executor, username, callback);
+		MessageResponse response = new MessageResponse(session);
+		response.execute(packet);
+		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
+		String message = "sending message";
+		Mockito.verify(callback).receivedMessage(contact, message);
 	}
 
 	@Test

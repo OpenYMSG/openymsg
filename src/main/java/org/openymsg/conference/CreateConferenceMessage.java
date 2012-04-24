@@ -20,7 +20,8 @@ public class CreateConferenceMessage implements Message {
 	private Set<YahooContact> contacts;
 	private String message;
 
-	public CreateConferenceMessage(String username, YahooConference conference, Set<YahooContact> contacts, String message) {
+	public CreateConferenceMessage(String username, YahooConference conference, Set<YahooContact> contacts,
+			String message) {
 		this.username = username;
 		this.conference = conference;
 		this.contacts = contacts;
@@ -31,13 +32,14 @@ public class CreateConferenceMessage implements Message {
 	public PacketBodyBuffer getBody() throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", this.username);
+		body.addElement("50", this.username); // TODO not sure why
 		body.addElement("57", this.conference.getId());
-		for (YahooContact contact : this.contacts) {
-			body.addElement("52", contact.getName());
-			//TODO - handle protocol
-		}
 		body.addElement("58", this.message);
 		body.addElement("97", "1");
+		for (YahooContact contact : this.contacts) {
+			body.addElement("52", contact.getName());
+			// TODO - handle protocol
+		}
 		body.addElement("13", "0"); // 0 for not voice. voice is 256
 		return body;
 	}
@@ -52,12 +54,12 @@ public class CreateConferenceMessage implements Message {
 		return MessageStatus.DEFAULT;
 	}
 
-//	@Override
-//	public void messageProcessed() {
-//		// TODO - add conference
-//		// Create a new conference object
-//		// conferences.put(room, new YahooConference(identities.get(yid.toLowerCase()), room, msg, this, false));
-//		// Send request to Yahoo
-//	}
+	// @Override
+	// public void messageProcessed() {
+	// // TODO - add conference
+	// // Create a new conference object
+	// // conferences.put(room, new YahooConference(identities.get(yid.toLowerCase()), room, msg, this, false));
+	// // Send request to Yahoo
+	// }
 
 }

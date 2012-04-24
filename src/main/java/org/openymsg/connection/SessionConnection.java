@@ -14,17 +14,4 @@ public interface SessionConnection {
 	 */
 	ConnectionInfo getConnectionInfo();
 
-	/**
-	 * Register interest in changes. The callback method will be called during registration.
-	 * @param listener callback for notification of changes
-	 */
-	void addListener(SessionConnectionCallback listener);
-
-	/**
-	 * Remove interest in changes.
-	 * @param listener callback for notication of changes
-	 * @return true if found and removed.
-	 */
-	boolean removeListener(SessionConnectionCallback listener);
-
 }

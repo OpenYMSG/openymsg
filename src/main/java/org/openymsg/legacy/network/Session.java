@@ -214,16 +214,13 @@ public class Session implements StatusConstants, FriendManager {
 		this.yahooLoginHost = yahooLoginHost;
 		if (connectionHandler != null) {
 			network = connectionHandler;
-		}
-		else {
+		} else {
 			Properties p = System.getProperties();
 			if (p.containsKey(NetworkConstants.SOCKS_HOST)) {
 				network = new SOCKSConnectionHandler();
-			}
-			else if (p.containsKey(NetworkConstants.PROXY_HOST) || p.containsKey(NetworkConstants.PROXY_HOST_OLD)) {
+			} else if (p.containsKey(NetworkConstants.PROXY_HOST) || p.containsKey(NetworkConstants.PROXY_HOST_OLD)) {
 				network = new HTTPConnectionHandler();
-			}
-			else {
+			} else {
 				network = new DirectConnectionHandler();
 			}
 		}
@@ -443,8 +440,7 @@ public class Session implements StatusConstants, FriendManager {
 				catch (Exception e) {
 					log.error("Failed to close session: " + this.getSessionID() + "/" + this.getLoginID(), e);
 				}
-			}
-			else {
+			} else {
 				log.error("Could not send keep-alive to: " + this.getSessionID() + "/" + this.getLoginID(), ex);
 			}
 		}
@@ -962,8 +958,7 @@ public class Session implements StatusConstants, FriendManager {
 			// Successful?
 			if (chatSessionStatus == SessionState.LOGGED_ON) {
 				currentLobby = lobby;
-			}
-			else {
+			} else {
 				currentLobby = null;
 			}
 		}
@@ -1079,8 +1074,7 @@ public class Session implements StatusConstants, FriendManager {
 			}
 
 			sendPacket(body, ServiceType.AUTHRESP, status); // 0x54
-		}
-		else {
+		} else {
 			PacketBodyBuffer body = new PacketBodyBuffer();
 			body.addElement("1", loginID.getId());
 			body.addElement("0", loginID.getId());
@@ -1698,8 +1692,7 @@ public class Session implements StatusConstants, FriendManager {
 		body.addElement("14", msg);
 		if (on) {
 			body.addElement("13", "1");
-		}
-		else {
+		} else {
 			body.addElement("13", "0");
 		}
 		body.addElement("5", friend);
@@ -1793,12 +1786,10 @@ public class Session implements StatusConstants, FriendManager {
 			if (v10 != null && v10.equals("0")) {
 				log.trace("Parsing V9 challenge...");
 				s = ChallengeResponseV9.getStrings(loginID.getId(), password, pkt.getValue("94"));
-			}
-			else if (v10 != null && v10.equals("1")) {
+			} else if (v10 != null && v10.equals("1")) {
 				log.trace("Parsing V10 challenge...");
 				s = ChallengeResponseV10.getStrings(loginID.getId(), password, pkt.getValue("94"));
-			}
-			else {
+			} else {
 				s = yahooAuth16Stage1(seed);
 			}
 		}
@@ -1821,8 +1812,7 @@ public class Session implements StatusConstants, FriendManager {
 		log.trace("Going to transmit Auth response, " + "containing the challenge...");
 		if (s.length > 2) {
 			transmitAuthResp(s[0], s[1], s[2]);
-		}
-		else {
+		} else {
 			transmitAuthResp(s[0], s[1], null);
 		}
 		loadAddressBook(s);
@@ -1930,14 +1920,12 @@ public class Session implements StatusConstants, FriendManager {
 				ymsgr = ymsgr.replaceAll("ymsgr=", "");
 
 				return yahooAuth16Stage2(ymsgr, seed);
-			}
-			else {
+			} else {
 				log.error("Failed opening login url: " + authLink + " return code: " + responseCode);
 				throw new LoginRefusedException("Login Failed, Login url: " + authLink + " return code: "
 						+ responseCode);
 			}
-		}
-		else {
+		} else {
 			Class<? extends URLConnection> ucType = null;
 			if (uc != null) {
 				ucType = uc.getClass();
@@ -2008,11 +1996,9 @@ public class Session implements StatusConstants, FriendManager {
 					String t = toks.nextToken();
 					if (t.startsWith("crumb=")) {
 						crumb = t.replaceAll("crumb=", "");
-					}
-					else if (t.startsWith("Y=")) {
+					} else if (t.startsWith("Y=")) {
 						cookieY = t.replaceAll("Y=", "");
-					}
-					else if (t.startsWith("T=")) {
+					} else if (t.startsWith("T=")) {
 						cookieT = t.replaceAll("T=", "");
 					}
 				}
@@ -2104,8 +2090,7 @@ public class Session implements StatusConstants, FriendManager {
 							+ " " + loginID, loginException);
 					sessionEvent = new SessionLogoutEvent(AuthenticationState.UNKNOWN_52);
 				}
-			}
-			else {
+			} else {
 				loginException = new LoginRefusedException("User " + loginID + " was forced off" + loginID,
 						AuthenticationState.NO_REASON);
 				log.info("AUTHRESP says: authentication failed without a reason" + " " + loginID, loginException);
@@ -2288,8 +2273,7 @@ public class Session implements StatusConstants, FriendManager {
 			if (!joining) {
 				// Did we actually accrue any *new* users in previous loop?
 				if (se.getChatUsers().length > 0) eventDispatchQueue.append(se, ServiceType.CHATJOIN);
-			}
-			else {
+			} else {
 				chatSessionStatus = SessionState.LOGGED_ON;
 			}
 			return; // ...to finally block
@@ -2488,8 +2472,7 @@ public class Session implements StatusConstants, FriendManager {
 				// Fire event
 				SessionFriendEvent se = new SessionFriendEvent(this, user);
 				eventDispatchQueue.append(se, ServiceType.Y6_STATUS_UPDATE);
-			}
-			else {
+			} else {
 				// Error
 				String m = "Contact ignore error: ";
 				switch (st) {
@@ -2612,8 +2595,7 @@ public class Session implements StatusConstants, FriendManager {
 					int eventStatus = 1;
 					ser.setStatus(eventStatus);
 					eventDispatchQueue.append(ser, ServiceType.Y7_AUTHORIZATION);
-				}
-				else if (authStatus.equals("2")) {
+				} else if (authStatus.equals("2")) {
 					log.trace("A friend refused our subscription request: " + who);
 					log.debug("roster: " + roster);
 					log.debug("who: " + who);
@@ -2625,19 +2607,16 @@ public class Session implements StatusConstants, FriendManager {
 					log.debug("eventStatus: " + eventStatus);
 					ser.setStatus(eventStatus);
 					eventDispatchQueue.append(ser, ServiceType.Y7_AUTHORIZATION);
-				}
-				else {
+				} else {
 					log.info("Unexpected authorization packet. Do not know how to handle: " + pkt);
 				}
-			}
-			else if (pkt.status == 3) {
+			} else if (pkt.status == 3) {
 				SessionAuthorizationEvent se = new SessionAuthorizationEvent(this, id, who, fname, lname, msg, protocol);
 				se.setStatus(pkt.status);
 
 				log.trace("Someone is sending us a subscription request: " + who);
 				eventDispatchQueue.append(se, ServiceType.Y7_AUTHORIZATION);
-			}
-			else {
+			} else {
 				log.info("Unexpected authorization packet. Do not know how to handle: " + pkt);
 			}
 
@@ -2674,8 +2653,7 @@ public class Session implements StatusConstants, FriendManager {
 				// Acknowledge upload
 				final SessionEvent se = new SessionEvent(this, to, from, message);
 				eventDispatchQueue.append(se, ServiceType.MESSAGE);
-			}
-			else {
+			} else {
 				// Receive file transfer
 				final String expires = pkt.getValue("38");
 				final String url = pkt.getValue("20");
@@ -2729,17 +2707,14 @@ public class Session implements StatusConstants, FriendManager {
 					// Fire event : 7=friend, 66=status, 65=group name
 					final SessionFriendEvent se = new SessionFriendEvent(this, user, groupName);
 					eventDispatchQueue.append(se, ServiceType.FRIENDADD);
-				}
-				else {
+				} else {
 					if (friendAddStatus.equals("2")) {
 						log.warn("Me: " + myName + " friend already in list: " + userId + ", pending: " + pending
 								+ ", protocol: " + protocol);
-					}
-					else if (friendAddStatus.equals("3")) {
+					} else if (friendAddStatus.equals("3")) {
 						log.warn("Me: " + myName + " friend does not exist in yahoo: " + userId + ", pending: "
 								+ pending + ", protocol: " + protocol);
-					}
-					else {
+					} else {
 						log.warn("Me: " + myName + " problem adding friend: " + userId + ", pending: " + pending
 								+ ", protocol: " + protocol + ", error code: " + friendAddStatus);
 					}
@@ -2748,12 +2723,10 @@ public class Session implements StatusConstants, FriendManager {
 						if (user == null) {
 							YahooProtocol yahooProtocol = getUserProtocol(protocol, userId);
 							user = new YahooUser(userId, groupName, yahooProtocol);
-						}
-						else if (!friendAddStatus.equals("2")) {
+						} else if (!friendAddStatus.equals("2")) {
 							log.warn("Adding friend failed and friend is in our roster: " + userId);
 						}
-					}
-					else {
+					} else {
 						user = null;
 					}
 					final SessionFriendEvent se = new SessionFriendFailureEvent(this, user, groupName, friendAddStatus);
@@ -2763,8 +2736,7 @@ public class Session implements StatusConstants, FriendManager {
 				// userId = pkt.getValue("7");
 				// groupName = pkt.getValue("65");
 				// user = new YahooUser(userId, groupName);
-			}
-			else {
+			} else {
 				log.warn("Me: " + myName + " Add buddy attempt: " + primaryID + ", " + userId + " problem: "
 						+ friendAddStatus + " not an ack: " + pkt.status);
 
@@ -2790,8 +2762,7 @@ public class Session implements StatusConstants, FriendManager {
 				groupName = pkt.getValue("65");
 				user = roster.getUser(userId);
 				user = new YahooUser(userId);
-			}
-			else {
+			} else {
 				userId = pkt.getValue("7");
 				// TODO: if this is a request to remove a user from one particular
 				// group, and that same user exists in another group, this might go
@@ -2890,12 +2861,10 @@ public class Session implements StatusConstants, FriendManager {
 		if (pkt.status == 9) {
 			if (cachePacket == null) {
 				cachePacket = pkt;
-			}
-			else {
+			} else {
 				cachePacket.append(pkt);
 			}
-		}
-		else {
+		} else {
 			try {
 				Thread.sleep(1000 * 3);
 			}
@@ -2924,8 +2893,7 @@ public class Session implements StatusConstants, FriendManager {
 		// Either cache or merge with cached packet
 		if (cachePacket == null) {
 			cachePacket = pkt;
-		}
-		else {
+		} else {
 			cachePacket.merge(pkt, concatFields);
 		}
 
@@ -2939,7 +2907,8 @@ public class Session implements StatusConstants, FriendManager {
 	/**
 	 * Handles a completely constructed LIST packet. LIST packets can come in several parts. These are being merged into
 	 * one by {@link #receiveList(YMSG9Packet)}. The final, merged packet is then used to call this method.
-	 * @param pkt A 'complete' LIST packet - the result of merging all fragmented LIST packets sent by the Yahoo Network.
+	 * @param pkt A 'complete' LIST packet - the result of merging all fragmented LIST packets sent by the Yahoo
+	 *            Network.
 	 */
 	private void _receiveList(YMSG9Packet pkt) // 0x55
 	{
@@ -3079,8 +3048,7 @@ public class Session implements StatusConstants, FriendManager {
 		try {
 			if (pkt.exists("3")) {
 				primaryID = new YahooIdentity(pkt.getValue("3").trim());
-			}
-			else {
+			} else {
 				primaryID = loginID;
 			}
 		}
@@ -3153,8 +3121,7 @@ public class Session implements StatusConstants, FriendManager {
 								usersOnFriendsList.add(yu);
 							}
 							currentListGroup.addUser(yu);
-						}
-						else {
+						} else {
 							/* This buddy is on the ignore list (and therefore in no group) */
 							yu = new YahooUser(username, new HashSet<String>(), protocol);
 							yu.setIgnored(true);
@@ -3205,8 +3172,7 @@ public class Session implements StatusConstants, FriendManager {
 						usersOnFriendsList.add(yu);
 					}
 					currentListGroup.addUser(yu);
-				}
-				else {
+				} else {
 					/* This buddy is on the ignore list (and therefore in no group) */
 					yu = new YahooUser(username, new HashSet<String>(), protocol);
 					yu.setIgnored(true);
@@ -3281,8 +3247,7 @@ public class Session implements StatusConstants, FriendManager {
 				}
 				eventDispatchQueue.append(logoutEvent, ServiceType.LOGOFF);
 				closeSession();
-			}
-			else
+			} else
 			// About friends
 			{
 				// Process optional section, friends going offline
@@ -3357,8 +3322,7 @@ public class Session implements StatusConstants, FriendManager {
 
 					if (timestamp == null || timestamp.length() == 0) {
 						se = new SessionEvent(this, to, from, message);
-					}
-					else {
+					} else {
 						final long timestampInMillis = 1000 * Long.parseLong(timestamp);
 						se = new SessionEvent(this, to, from, message, timestampInMillis);
 					}
@@ -3368,8 +3332,7 @@ public class Session implements StatusConstants, FriendManager {
 					eventDispatchQueue.append(se, ServiceType.X_OFFLINE);
 					i++;
 				}
-			}
-			else {
+			} else {
 				// Sent while we are online
 				final String to = pkt.getValue("5");
 				final String from = pkt.getValue("4");
@@ -3380,8 +3343,7 @@ public class Session implements StatusConstants, FriendManager {
 					final SessionEvent se = new SessionEvent(this, to, from, message);
 					if (se.getMessage().equalsIgnoreCase(NetworkConstants.BUZZ)) {
 						eventDispatchQueue.append(se, ServiceType.X_BUZZ);
-					}
-					else {
+					} else {
 						eventDispatchQueue.append(se, ServiceType.MESSAGE);
 					}
 				}
@@ -3424,8 +3386,7 @@ public class Session implements StatusConstants, FriendManager {
 				// mail
 				// count
 				);
-			}
-			else
+			} else
 			// Mail message
 			{
 				se = new SessionNewMailEvent(this, pkt.getValue("43"), // from
@@ -3632,8 +3593,7 @@ public class Session implements StatusConstants, FriendManager {
 		if (pkt.status == 5) {
 			if (cachePacket == null) {
 				cachePacket = pkt;
-			}
-			else {
+			} else {
 				cachePacket.append(pkt);
 			}
 			return null;
@@ -3779,15 +3739,12 @@ public class Session implements StatusConstants, FriendManager {
 
 		if (onChat != null) {
 			user.update(newStatus, onChat, onPager);
-		}
-		else if (onPager != null) {
+		} else if (onPager != null) {
 			user.update(newStatus, visibility);
-		}
-		else if (logoff) {
+		} else if (logoff) {
 			// logoff message doesn't have chat or pager info, but we reset those in this case.
 			user.update(newStatus, false, false);
-		}
-		else {
+		} else {
 			// status update with no chat, nor pager information, so leave those values alone.
 			user.update(newStatus);
 		}
@@ -3818,8 +3775,7 @@ public class Session implements StatusConstants, FriendManager {
 		final YahooUser user;
 		if (roster.containsUser(userId)) {
 			user = roster.getUser(userId);
-		}
-		else {
+		} else {
 			user = new YahooUser(userId);
 		}
 
@@ -4009,4 +3965,5 @@ public class Session implements StatusConstants, FriendManager {
 	public Collection<YahooConference> getConferences() {
 		return Collections.unmodifiableCollection(conferences.values());
 	}
+
 }

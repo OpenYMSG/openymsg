@@ -8,6 +8,8 @@ import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.ConnectionBuilder;
 import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.direct.DirectConnectionBuilder;
+import org.openymsg.network.url.URLStreamBuilder;
+import org.openymsg.network.url.URLStreamBuilderImpl;
 
 /**
  * Default SessionConfig
@@ -70,7 +72,13 @@ public class SessionConfigImpl implements SessionConfig {
 	}
 
 	@Override
-	public ConnectionBuilder getBuilder() {
+	public ConnectionBuilder getConnectionBuilder() {
 		return new DirectConnectionBuilder().with(this);
 	}
+
+	@Override
+	public URLStreamBuilder getURLStreamBuilder() {
+		return new URLStreamBuilderImpl();
+	}
+
 }

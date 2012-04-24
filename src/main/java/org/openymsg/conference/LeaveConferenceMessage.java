@@ -18,11 +18,12 @@ public class LeaveConferenceMessage extends AbstractConferenceMessage {
 
 	@Override
 	public PacketBodyBuffer getBody() throws IOException {
-		// Send decline packet to Yahoo
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		this.writeUsername(body, "1");
-		this.writeMembers(body, "3");
 		this.writeConference(body, "57");
+		// TODO merge sets to avoid dups
+		this.writeMembers(body, "3");
+		this.writeInvited(body, "3");
 		return body;
 	}
 
@@ -35,13 +36,5 @@ public class LeaveConferenceMessage extends AbstractConferenceMessage {
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
 	}
-
-	// @Override
-	// public void messageProcessed() {
-	// //TODO - close conference
-	// // // Flag this conference as now dead
-	// // YahooConference yc = getConference(room);
-	// // yc.closeConference();
-	// }
 
 }

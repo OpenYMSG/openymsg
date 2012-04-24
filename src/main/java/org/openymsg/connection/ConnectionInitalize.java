@@ -11,35 +11,35 @@ import org.openymsg.network.ConnectionHandler;
 public class ConnectionInitalize implements Request {
 	private static final Log log = LogFactory.getLog(ConnectionInitalize.class);
 	private SessionConfig config;
-	private SessionConnectionImpl monitor;
+	private SessionConnectionImpl session;
 	private Executor executor;
 
-	public ConnectionInitalize(SessionConfig config, Executor executor, SessionConnectionImpl monitor) {
+	public ConnectionInitalize(SessionConfig config, Executor executor, SessionConnectionImpl session) {
 		this.config = config;
 		this.executor = executor;
-		this.monitor = monitor;
+		this.session = session;
 	}
 
 	@Override
 	public void execute() {
 		// TODO - reconnect, reuse ?
-		ConnectionBuilder builder = config.getBuilder();
+		ConnectionBuilder builder = config.getConnectionBuilder();
 		ConnectionHandler connection = builder.useCapacityServers().useScsServers().build();
 		// TODO - null
-		connection.addListener(monitor);
+		connection.addListener(session);
 		ConnectionInfo status = builder.getConnectionInfo();
 		if (status.isConnected()) {
 			this.executor.initializeConnection(connection);
-			this.monitor.setState(ConnectionState.CONNECTED, status);
+			this.session.setState(ConnectionState.CONNECTED, status);
 		} else {
-			this.monitor.setState(ConnectionState.FAILED_CONNECTING, status);
+			this.session.setState(ConnectionState.FAILED_CONNECTING, status);
 		}
 	}
 
 	@Override
 	public void failure(Exception ex) {
 		log.warn("Failure, setting ConnectionState to: " + ConnectionState.FAILED_CONNECTING, ex);
-		this.monitor.setState(ConnectionState.FAILED_CONNECTING);
+		this.session.setState(ConnectionState.FAILED_CONNECTING);
 	}
 
 }

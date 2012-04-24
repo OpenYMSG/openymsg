@@ -2,42 +2,42 @@ package org.openymsg;
 
 import java.util.Set;
 
-import org.openymsg.auth.SessionAuthentication;
-import org.openymsg.auth.SessionAuthenticationImpl;
 import org.openymsg.conference.SessionConference;
 import org.openymsg.conference.SessionConferenceImpl;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.connection.ConnectionInfo;
 import org.openymsg.connection.ConnectionState;
-import org.openymsg.connection.SessionConnectionCallback;
 import org.openymsg.connection.SessionConnectionImpl;
 import org.openymsg.contact.SessionContactImpl;
+import org.openymsg.context.SessionCallbackHandler;
+import org.openymsg.context.SessionContext;
+import org.openymsg.context.SessionContextImpl;
+import org.openymsg.context.auth.AuthenticationFailure;
 import org.openymsg.execute.ExecutorImpl;
 import org.openymsg.mail.SessionMail;
 import org.openymsg.mail.SessionMailImpl;
 import org.openymsg.message.SessionMessage;
 import org.openymsg.message.SessionMessageImpl;
-import org.openymsg.session.SessionSession;
-import org.openymsg.session.SessionSessionImpl;
 import org.openymsg.unknown.SessionUnknown;
 
 public class SessionImpl implements YahooSession {
 	private SessionConfig config;
 	private SessionConnectionImpl connection;
 	private YahooSessionCallback callback;
-	private SessionSession session;
+	private SessionContext context;
 	private SessionMessage message;
-	private SessionAuthentication authorize;
 	private SessionContactImpl contact;
 	private SessionConference conference;
 	@SuppressWarnings("unused")
 	private SessionUnknown unknown;
 	@SuppressWarnings("unused")
 	private SessionMail mail;
+	private YahooSessionState state;
 
 	public SessionImpl(SessionConfig config, YahooSessionCallback callback) {
 		this.config = config;
-		this.callback = callback;
+		this.callback = new SessionCallbackHandler(this, callback);
+		this.state = YahooSessionState.NOT_STARTED;
 	}
 
 	/**
@@ -45,16 +45,19 @@ public class SessionImpl implements YahooSession {
 	 */
 	@Override
 	public void login(String username, String password) throws IllegalArgumentException, IllegalStateException {
+		if (!this.state.isReadyToStart()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
+		this.state = YahooSessionState.STARTED;
 		this.initialize(username);
-		this.authorize.login(username, password);
+		this.context.login(username, password);
 	}
 
 	private void initialize(String username) {
 		ExecutorImpl executor = new ExecutorImpl(username);
-		this.connection = new SessionConnectionImpl(executor);
+		this.connection = new SessionConnectionImpl(executor, callback);
 		this.connection.initialize(config);
-		this.authorize = new SessionAuthenticationImpl(config, executor, callback);
-		this.session = new SessionSessionImpl(username, executor, callback);
+		this.context = new SessionContextImpl(config, executor, username, callback);
 		this.contact = new SessionContactImpl(executor, username, callback);
 		this.message = new SessionMessageImpl(executor, username, callback);
 		this.conference = new SessionConferenceImpl(username, executor, callback);
@@ -63,106 +66,167 @@ public class SessionImpl implements YahooSession {
 	}
 
 	@Override
-	public void logout() {
-		this.session.logout();
+	public void logout() throws IllegalStateException {
+		if (!state.isLoggedIn()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
+		this.context.logout();
 	}
 
 	@Override
 	public void sendMessage(YahooContact contact, String message) throws IllegalStateException {
-		// TODO - check status
-		// checkStatus();
-		// TODO current contact?
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		this.message.sendMessage(contact, message);
 	}
 
 	@Override
 	public void sendBuzz(YahooContact to) throws IllegalStateException {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		this.message.sendBuzz(to);
 	}
 
 	@Override
 	public void sendTypingNotification(YahooContact contact, boolean isTyping) {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		this.message.sendTypingNotification(contact, isTyping);
 	}
 
 	@Override
 	public void setStatus(YahooStatus status) throws IllegalArgumentException {
-		this.session.setStatus(status);
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
+		this.context.setStatus(status);
 	}
 
 	@Override
 	public void setCustomStatus(String message, boolean showBusyIcon) throws IllegalArgumentException {
-		this.session.setCustomStatus(message, showBusyIcon);
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
+		this.context.setCustomStatus(message, showBusyIcon);
 	}
 
 	@Override
 	public YahooConference createConference(String conferenceId, Set<YahooContact> contacts, String message) {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		return this.conference.createConference(conferenceId, contacts, message);
 	}
 
 	@Override
-	public void sendConferenceMessage(YahooConference conference, String message) throws IllegalArgumentException {
+	public void sendConferenceMessage(YahooConference conference, String message) throws IllegalArgumentException,
+			IllegalStateException {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		this.conference.sendConferenceMessage(conference, message);
 	}
 
 	@Override
-	public void leaveConference(YahooConference conference) throws IllegalArgumentException {
+	public void leaveConference(YahooConference conference) throws IllegalArgumentException, IllegalStateException {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		this.conference.leaveConference(conference);
 	}
 
 	@Override
-	public void acceptConferenceInvite(YahooConference conference) throws IllegalArgumentException {
+	public void acceptConferenceInvite(YahooConference conference) throws IllegalArgumentException,
+			IllegalStateException {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		this.conference.acceptConferenceInvite(conference);
 	}
 
 	@Override
-	public void declineConferenceInvite(YahooConference conference, String message) throws IllegalArgumentException {
+	public void declineConferenceInvite(YahooConference conference, String message) throws IllegalArgumentException,
+			IllegalStateException {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		this.conference.declineConferenceInvite(conference, message);
 	}
 
 	@Override
-	public void extendConference(YahooConference conference, YahooContact contact, String message)
-			throws IllegalArgumentException {
-		this.conference.extendConference(conference, contact, message);
+	public void extendConference(YahooConference conference, Set<YahooContact> contacts, String message)
+			throws IllegalArgumentException, IllegalStateException {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
+		this.conference.extendConference(conference, contacts, message);
 	}
 
 	@Override
-	public YahooConference getConference(String conferenceId) {
+	public YahooConference getConference(String conferenceId) throws IllegalStateException {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		return this.conference.getConference(conferenceId);
 	}
 
-	@Override
-	public YahooConferenceStatus getConferenceStatus(String conferenceId) {
-		return this.conference.getConferenceStatus(conferenceId);
-	}
+	// @Override
+	// public YahooConferenceStatus getConferenceStatus(String conferenceId) {
+	// if (!state.isAvailable()) {
+	// throw new IllegalStateException("Session in wrong state: " + state);
+	// }
+	// return this.conference.getConferenceStatus(conferenceId);
+	// }
 
 	@Override
 	public void acceptFriendAuthorization(YahooContact contact) throws IllegalStateException {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		this.contact.acceptFriendAuthorization(contact);
 	}
 
 	@Override
 	public void rejectFriendAuthorization(YahooContact contact, String message) throws IllegalStateException {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		this.contact.rejectFriendAuthorization(contact, message);
 	}
 
 	@Override
 	public void removeFromGroup(YahooContact contact, YahooContactGroup group) {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		this.contact.removeFromGroup(contact, group);
 	}
 
 	@Override
-	public void addContact(YahooContact contact, YahooContactGroup group) throws IllegalArgumentException {
-		this.contact.addContact(contact, group);
+	public void addContact(YahooContact contact, YahooContactGroup group, String message)
+			throws IllegalArgumentException {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
+		this.contact.addContact(contact, group, message);
 	}
 
 	@Override
 	public Set<YahooContact> getContacts() {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		return this.contact.getContacts();
 	}
 
 	@Override
 	public Set<YahooContactGroup> getContactGroups() {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		return this.contact.getContactGroups();
 	}
 
@@ -176,38 +240,68 @@ public class SessionImpl implements YahooSession {
 		return this.connection.getConnectionInfo();
 	}
 
-	@Override
-	public void addListener(SessionConnectionCallback listener) {
-		this.connection.addListener(listener);
-	}
-
-	@Override
-	public boolean removeListener(SessionConnectionCallback listener) {
-		return this.connection.removeListener(listener);
-	}
-
 	// @Override
-	// public void addListener(SessionAuthenticationCallback listener) {
-	// this.authorize.addListener(listener);
+	// public void addListener(SessionConnectionCallback listener) {
+	// this.connection.addListener(listener);
 	// }
 	//
 	// @Override
-	// public boolean removeListener(SessionAuthenticationCallback listener) {
-	// return this.authorize.removeListener(listener);
+	// public boolean removeListener(SessionConnectionCallback listener) {
+	// return this.connection.removeListener(listener);
 	// }
 
 	@Override
 	public void addGroup(String groupName) {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		this.contact.addGroup(groupName);
 	}
 
 	@Override
 	public YahooContactStatus getStatus(YahooContact contact) {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		return this.contact.getStatus(contact);
 	}
 
 	@Override
 	public Set<YahooConference> getConferences() {
+		if (!state.isAvailable()) {
+			throw new IllegalStateException("Session in wrong state: " + state);
+		}
 		return this.conference.getConferences();
 	}
+
+	@Override
+	public AuthenticationFailure getFailureState() {
+		return context.getFailureState();
+	}
+
+	public void connectionSuccessful() {
+		this.state = YahooSessionState.CONNECTED;
+	}
+
+	public void connectionFailed() {
+		this.state = YahooSessionState.FAILURE;
+	}
+
+	public void connectionPrematurelyEnded() {
+		this.state = YahooSessionState.FAILURE;
+	}
+
+	public void loggedOfNormally() {
+		this.state = YahooSessionState.LOGGED_OUT;
+	}
+
+	public void loggedOffForced() {
+		this.state = YahooSessionState.FAILURE;
+	}
+
+	public void failedAuthentication() {
+		this.state = YahooSessionState.FAILURE;
+		this.connection.closeConnection();
+	}
+
 }

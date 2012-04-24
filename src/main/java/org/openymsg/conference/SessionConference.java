@@ -3,7 +3,6 @@ package org.openymsg.conference;
 import java.util.Set;
 
 import org.openymsg.YahooConference;
-import org.openymsg.YahooConferenceStatus;
 import org.openymsg.YahooContact;
 
 /**
@@ -20,7 +19,8 @@ public interface SessionConference {
 	 * @param message invite message. Sometimes this shows as the conference name. Can be null.
 	 * @return new Conference
 	 */
-	YahooConference createConference(String conferenceId, Set<YahooContact> contacts, String message);
+	YahooConference createConference(String conferenceId, Set<YahooContact> contacts, String message)
+			throws IllegalArgumentException;
 
 	/**
 	 * Send a message to the conference.
@@ -59,21 +59,22 @@ public interface SessionConference {
 	 * @param message invite message. May be null
 	 * @throws IllegalArgumentException if conference doesn't exist
 	 */
-	void extendConference(YahooConference conference, YahooContact contact, String message) throws IllegalArgumentException;
+	void extendConference(YahooConference conference, Set<YahooContact> contacts, String message)
+			throws IllegalArgumentException;
 
 	/**
 	 * Get the Conference with the matching id. Null if id is not matched.
 	 * @param conferenceId conference id to find
 	 * @return matching Conference, null if not found.
 	 */
-	YahooConference getConference(String conferenceId);
+	YahooConference getConference(String conferenceId) throws IllegalArgumentException;
 
-	/**
-	 * get the ConferenceStatus with the matching id. Null if id is not matched.
-	 * @param conferenceId conference id to find
-	 * @return matching ConferenceStatus, null if not found.
-	 */
-	YahooConferenceStatus getConferenceStatus(String conferenceId);
+	// /**
+	// * get the ConferenceStatus with the matching id. Null if id is not matched.
+	// * @param conferenceId conference id to find
+	// * @return matching ConferenceStatus, null if not found.
+	// */
+	// YahooConferenceStatus getConferenceStatus(String conferenceId);
 
 	Set<YahooConference> getConferences();
 }

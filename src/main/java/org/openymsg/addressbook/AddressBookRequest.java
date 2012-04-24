@@ -16,7 +16,6 @@ import org.openymsg.execute.dispatch.Request;
 import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.url.URLStream;
 import org.openymsg.network.url.URLStreamBuilder;
-import org.openymsg.network.url.URLStreamBuilderImpl;
 import org.openymsg.network.url.URLStreamStatus;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -38,7 +37,7 @@ public class AddressBookRequest implements Request {
 	@Override
 	public void execute() {
 		String cookie = String.format(NetworkConstants.ADDRESSBOOK_COOKIE_FORMAT, this.cookieY, this.cookieT);
-		URLStreamBuilder builder = new URLStreamBuilderImpl().url(NetworkConstants.ADDRESSBOOK_URL)
+		URLStreamBuilder builder = config.getURLStreamBuilder().url(NetworkConstants.ADDRESSBOOK_URL)
 				.timeout(config.getConnectionTimeout()).cookie(cookie);
 		URLStream stream = builder.build();
 		URLStreamStatus status = builder.getStatus();
@@ -96,8 +95,7 @@ public class AddressBookRequest implements Request {
 				contacts.add(user);
 				// contacts.add(e);
 			}
-		}
-		else {
+		} else {
 			log.debug("No node list found for ct. AddressBook empty?");
 		}
 	}

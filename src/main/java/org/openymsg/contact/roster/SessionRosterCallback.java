@@ -13,11 +13,11 @@ public interface SessionRosterCallback {
 
 	// void contactAddSuccess(Contact contact);
 
-	void contactAddFailure(YahooContact contact, ContactAddFailure failure, String additionalInformation);
+	void receivedContactAddFailure(YahooContact contact, ContactAddFailure failure, String additionalInformation);
 
-	void contactAddAccepted(YahooContact contact);
+	void receivedContactAddAccepted(YahooContact contact);
 
-	void contactAddDeclined(YahooContact contact, String message);
+	void receivedContactAddDeclined(YahooContact contact, String message);
 
-	void contactAddRequest(YahooContact contact, Name name, String message);
+	void receivedContactAddRequest(YahooContact contact, Name name, String message);
 }

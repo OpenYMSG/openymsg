@@ -2,6 +2,7 @@ package org.openymsg.config;
 
 import org.openymsg.network.ConnectionBuilder;
 import org.openymsg.network.TestingConnectionBuilder;
+import org.openymsg.network.url.URLStreamBuilder;
 
 public class TestingSessionConfig implements SessionConfig {
 	private boolean connect;
@@ -21,7 +22,7 @@ public class TestingSessionConfig implements SessionConfig {
 	}
 
 	@Override
-	public ConnectionBuilder getBuilder() {
+	public ConnectionBuilder getConnectionBuilder() {
 		return new TestingConnectionBuilder(this.connect);
 	}
 
@@ -57,6 +58,12 @@ public class TestingSessionConfig implements SessionConfig {
 
 	@Override
 	public String[] getScsHosts() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public URLStreamBuilder getURLStreamBuilder() {
 		// TODO Auto-generated method stub
 		return null;
 	}
