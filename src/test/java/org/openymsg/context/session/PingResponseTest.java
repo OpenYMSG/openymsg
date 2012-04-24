@@ -1,4 +1,4 @@
-package org.openymsg.session;
+package org.openymsg.context.session;
 
 import org.openymsg.network.YMSG9Packet;
 import org.openymsg.testing.PacketReader;
