@@ -13,6 +13,8 @@ public class DispatcherExecutorService extends ScheduledThreadPoolExecutor {
 		super(1, new NamedThreadFactory(name), new RejectionWrapper(callback));
 		this.callback = callback;
 		this.setKeepAliveTime(5, TimeUnit.SECONDS);
+		this.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+		this.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
 	}
 
 	public DispatcherExecutorService(String name) {

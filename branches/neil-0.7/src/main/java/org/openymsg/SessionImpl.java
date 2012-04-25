@@ -33,6 +33,7 @@ public class SessionImpl implements YahooSession {
 	@SuppressWarnings("unused")
 	private SessionMail mail;
 	private YahooSessionState state;
+	private ExecutorImpl executor;
 
 	public SessionImpl(SessionConfig config, YahooSessionCallback callback) {
 		this.config = config;
@@ -54,7 +55,7 @@ public class SessionImpl implements YahooSession {
 	}
 
 	private void initialize(String username) {
-		ExecutorImpl executor = new ExecutorImpl(username);
+		this.executor = new ExecutorImpl(username);
 		this.connection = new SessionConnectionImpl(executor, callback);
 		this.connection.initialize(config);
 		this.context = new SessionContextImpl(config, executor, username, callback);
@@ -302,6 +303,16 @@ public class SessionImpl implements YahooSession {
 	public void failedAuthentication() {
 		this.state = YahooSessionState.FAILURE;
 		this.connection.closeConnection();
+	}
+
+	@Override
+	public boolean isShutdown() {
+		return this.executor.isTerminated();
+	}
+
+	@Override
+	public boolean isDisconnected() {
+		return this.executor.isDisconnected();
 	}
 
 }

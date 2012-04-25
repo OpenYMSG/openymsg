@@ -1,5 +1,6 @@
 package org.openymsg.execute.dispatch;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
@@ -36,6 +37,15 @@ public class DispatcherImpl implements Dispatcher {
 	public void shutdown() {
 		log.info("Shutdown dispatcher");
 		this.shutdown = true;
-		this.executor.shutdown();
+		List<Runnable> jobs = this.executor.shutdownNow();
+		for (Runnable job : jobs) {
+			log.info("Shutdown with the pending job: " + job);
+		}
+	}
+
+	// TODO must check
+	@Override
+	public boolean isTerminated() {
+		return this.executor.isTerminated();
 	}
 }

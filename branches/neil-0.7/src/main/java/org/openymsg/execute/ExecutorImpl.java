@@ -18,6 +18,7 @@ public class ExecutorImpl implements Executor {
 	private PacketWriterImpl writer;
 	private PacketReaderImpl reader;
 	private Dispatcher dispatcher;
+	private ConnectionHandler connection;
 
 	public ExecutorImpl(String username) {
 		DispatcherExecutorService executor = new DispatcherExecutorService(username);
@@ -50,6 +51,7 @@ public class ExecutorImpl implements Executor {
 		if (connectionSet) {
 			throw new IllegalStateException("Connection was already set");
 		}
+		this.connection = connection;
 		this.connectionSet = true;
 		this.reader.initializeConnection(connection);
 		this.writer.initializeConnection(connection);
@@ -70,6 +72,7 @@ public class ExecutorImpl implements Executor {
 		if (connectionSet) {
 			this.reader.shutdown();
 			this.writer.shutdown();
+			this.connection.shutdown();
 		}
 		this.dispatcher.shutdown();
 	}
@@ -77,5 +80,14 @@ public class ExecutorImpl implements Executor {
 	@Override
 	public void schedule(Request request, long repeatInterval) {
 		this.dispatcher.schedule(request, repeatInterval);
+	}
+
+	@Override
+	public boolean isTerminated() {
+		return this.dispatcher.isTerminated();
+	}
+
+	public boolean isDisconnected() {
+		return this.connection.isDisconnected();
 	}
 }

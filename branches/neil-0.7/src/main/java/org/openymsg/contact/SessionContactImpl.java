@@ -53,12 +53,16 @@ public class SessionContactImpl implements SessionContact {
 
 	@Override
 	public void removeFromGroup(YahooContact contact, YahooContactGroup group) {
+		// if (!this.sessionGroup.getContactGroups().contains(group)) {
+		// throw new IllegalArgumentException("Not an existing group");
+		// }
 		this.sessionRoster.removeFromGroup(contact, group);
 	}
 
 	@Override
 	public void addContact(YahooContact contact, YahooContactGroup group, String message)
 			throws IllegalArgumentException {
+		// TODO validate group
 		this.sessionRoster.addContact(contact, group, message);
 	}
 
