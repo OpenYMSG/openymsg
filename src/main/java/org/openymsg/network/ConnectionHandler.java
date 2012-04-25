@@ -1,69 +1,42 @@
-/*
- * OpenYMSG, an implementation of the Yahoo Instant Messaging and Chat protocol.
- * Copyright (C) 2007 G. der Kinderen, Nimbuzz.com 
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
- */
 package org.openymsg.network;
 
-import java.io.IOException;
-
 /**
- * 
- * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
- * @author S.E. Morris
+ * The connection to communicate to Yahoo Subclasses of this will need to maintain the sessionId. Subclasses of this may
+ * not be thread-safe.
+ * @author neilhart
  */
-public abstract class ConnectionHandler {
-    abstract void install(Session session);
+public interface ConnectionHandler {
 
-    abstract void open(boolean searchForAddress) throws IOException;
+	/**
+	 * Send a message to Yahoo containing the following information. This may not be thread-safe.
+	 * @param body body of the message
+	 * @param service type of service of the message
+	 * @param status type of status of the message
+	 */
+	void sendPacket(PacketBodyBuffer body, ServiceType service, MessageStatus status);
 
-    abstract void close() throws IOException;
+	/**
+	 * Return a Yahoo message or null. Does not wait. This may not be thread-safe
+	 */
+	YMSG9Packet receivePacket();
 
-    abstract void sendPacket(PacketBodyBuffer body, ServiceType service, long status, long sessionID)
-            throws IOException;
+	/**
+	 * Shutdown the connection
+	 */
+	// TODO Must call
+	void shutdown();
 
-    abstract YMSG9Packet receivePacket() throws IOException;
+	/**
+	 * Add a listener
+	 * @param listener
+	 */
+	void addListener(ConnectionHandlerCallback listener);
 
-    /**
-     * Creates an string array from cookies in packet.
-     * 
-     * @param pkt
-     *            Packet to extract the cookies from.
-     * @return Array of cookies.
-     */
-    protected static String[] extractCookies(YMSG9Packet pkt) {
-        String[] cookies = new String[3];
-        for (int i = 0; i < cookies.length; i++) {
-            String s = pkt.getNthValue("59", i);
-            if (s == null) break;
-            if (s.indexOf(";") >= 0) s = s.substring(0, s.indexOf(";"));
-            switch (s.charAt(0)) {
-            case 'Y':
-                cookies[NetworkConstants.COOKIE_Y] = "Y=" + s.substring(2);
-                break;
-            case 'T':
-                cookies[NetworkConstants.COOKIE_T] = "T=" + s.substring(2);
-                break;
-            case 'C':
-                cookies[NetworkConstants.COOKIE_C] = "C=" + s.substring(2);
-                break;
-            default:
-                throw new IllegalStateException("Unknown cookie: " + s);
-            }
-        }
-        return cookies;
-    }
+	/**
+	 * Remove a listener
+	 * @param listener
+	 */
+	void removeListener(ConnectionHandlerCallback listener);
+
+	boolean isDisconnected();
 }
