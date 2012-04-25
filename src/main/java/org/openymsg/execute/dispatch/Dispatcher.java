@@ -8,4 +8,6 @@ public interface Dispatcher {
 
 	void shutdown();
 
+	boolean isTerminated();
+
 }

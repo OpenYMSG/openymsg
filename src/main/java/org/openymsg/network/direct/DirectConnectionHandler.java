@@ -142,4 +142,9 @@ public class DirectConnectionHandler implements ConnectionHandler {
 	public void removeListener(ConnectionHandlerCallback listener) {
 		this.listeners.remove(listener);
 	}
+
+	@Override
+	public boolean isDisconnected() {
+		return socket == null;
+	}
 }

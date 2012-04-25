@@ -33,4 +33,10 @@ public class LoggingConnectionHandler implements ConnectionHandler {
 		log.info("no op remove listener");
 	}
 
+	@Override
+	public boolean isDisconnected() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

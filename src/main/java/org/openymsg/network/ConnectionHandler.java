@@ -23,6 +23,7 @@ public interface ConnectionHandler {
 	/**
 	 * Shutdown the connection
 	 */
+	// TODO Must call
 	void shutdown();
 
 	/**
@@ -36,4 +37,6 @@ public interface ConnectionHandler {
 	 * @param listener
 	 */
 	void removeListener(ConnectionHandlerCallback listener);
+
+	boolean isDisconnected();
 }

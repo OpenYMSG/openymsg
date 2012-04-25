@@ -29,4 +29,8 @@ public interface YahooSession extends SessionConnection, SessionContext, Session
 	@Override
 	Set<YahooContactGroup> getContactGroups() throws IllegalStateException;
 
+	boolean isShutdown();
+
+	boolean isDisconnected();
+
 }

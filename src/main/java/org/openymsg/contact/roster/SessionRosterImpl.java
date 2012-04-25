@@ -39,9 +39,6 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	public void addContact(YahooContact contact, YahooContactGroup group, String message)
 			throws IllegalArgumentException {
 		// log.trace("Adding new user: " + userId + ", group: " + groupId + ", protocol: " + yahooProtocol);
-		// TODO: perhaps we should check the roster to make sure that this
-		// friend does not already exist.
-		// TODO validate group
 		if (contact == null) {
 			throw new IllegalArgumentException("Argument 'contact' cannot be null");
 		}
@@ -58,14 +55,11 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	@Override
 	public void removeFromGroup(YahooContact contact, YahooContactGroup group) {
 		if (contact == null) {
-			throw new IllegalArgumentException("Argument 'group' cannot be null.");
+			throw new IllegalArgumentException("Argument 'contact' cannot be null.");
 		}
 		if (group == null) {
 			throw new IllegalArgumentException("Argument 'group' cannot be null.");
 		}
-		// if (!this.sessionGroup.getContactGroups().contains(group)) {
-		// throw new IllegalArgumentException("Not an existing group");
-		// }
 		if (!group.getContacts().contains(contact)) {
 			throw new IllegalArgumentException("Contact not in group");
 		}
