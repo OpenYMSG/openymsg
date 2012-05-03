@@ -7,6 +7,7 @@ import org.openymsg.execute.Executor;
 import org.openymsg.network.ConnectionHandlerCallback;
 
 public class SessionConnectionImpl implements SessionConnection, ConnectionHandlerCallback {
+	/** logger */
 	private static final Log log = LogFactory.getLog(SessionConnectionImpl.class);
 	private Executor executor;
 	private ConnectionState state;

@@ -22,6 +22,10 @@ public class PagerLogoffResponse implements SinglePacketResponse {
 		this.session = session;
 	}
 
+	/**
+	 * handle the incoming packet.
+	 * @param packet incoming packet
+	 */
 	@Override
 	public void execute(YMSG9Packet packet) {
 		log.trace("Received Pager Logoff packet.");

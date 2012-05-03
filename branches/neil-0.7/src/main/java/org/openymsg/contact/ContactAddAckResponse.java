@@ -30,6 +30,10 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 		this.sessionStatus = sessionStatus;
 	}
 
+	/**
+	 * handle the incoming packet.
+	 * @param packet incoming packet
+	 */
 	@Override
 	public void execute(YMSG9Packet packet) {
 		String me = packet.getValue("1");

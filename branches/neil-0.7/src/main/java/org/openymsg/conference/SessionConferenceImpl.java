@@ -13,6 +13,7 @@ import org.openymsg.network.ServiceType;
 import org.openymsg.util.CollectionUtils;
 
 public class SessionConferenceImpl implements SessionConference {
+	/** logger */
 	private static final Log log = LogFactory.getLog(SessionConferenceImpl.class);
 	private String username;
 	private Executor executor;

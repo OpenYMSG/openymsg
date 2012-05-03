@@ -43,11 +43,9 @@ public class SessionAuthorizeImplTest {
 	@Test
 	public void testSeed() {
 		SessionAuthenticationImpl session = new SessionAuthenticationImpl(sessionConfig, executor, callback);
-		String seed = "seed";
 		session.login(username, password);
 		AuthenticationToken token = new AuthenticationToken();
 		token.setUsernameAndPassword(username, password);
-		// token.setSeed(seed);
 		session.receivedLoginInit();
 		Mockito.verify(executor).execute(argThat(new PasswordTokenRequest(session, sessionConfig, token)));
 	}
@@ -58,8 +56,10 @@ public class SessionAuthorizeImplTest {
 		String cookieT = "cookieT";
 		String crumb = "crumb";
 		String cookieB = "cookieB";
+		session.receivedPasswordTokenLogin();
 		AuthenticationToken token = new AuthenticationToken();
 		token.setCookiesAndCrumb(cookieY, cookieT, crumb, cookieB);
+		Mockito.verify(executor).execute(argThat(new PasswordTokenLoginRequest(session, sessionConfig, token)));
 	}
 
 	// TODO copied

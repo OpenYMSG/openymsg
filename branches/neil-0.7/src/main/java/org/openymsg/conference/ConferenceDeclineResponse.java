@@ -18,6 +18,7 @@ public class ConferenceDeclineResponse extends AbstractConferenceResponse {
 	public void execute(YMSG9Packet packet) {
 		// YahooConference yc = getOrCreateConference(pkt);
 		YahooConference conference = this.getConference(packet);
+		@SuppressWarnings("unused")
 		String to = packet.getValue("1");
 		String from = packet.getValue("54");
 		YahooContact contact = new YahooContact(from); // TODO protocol

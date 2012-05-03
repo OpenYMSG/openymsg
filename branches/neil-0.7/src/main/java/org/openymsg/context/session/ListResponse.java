@@ -10,6 +10,10 @@ import org.openymsg.network.YMSG9Packet;
 public class ListResponse implements SinglePacketResponse {
 	private static final Log log = LogFactory.getLog(ListResponse.class);
 
+	/**
+	 * handle the incoming packet.
+	 * @param packet incoming packet
+	 */
 	@Override
 	public void execute(YMSG9Packet packet) {
 		checkLegacy(packet);
@@ -40,7 +44,7 @@ public class ListResponse implements SinglePacketResponse {
 					log.info("Getting more than one identity: " + id);
 				}
 				foundOne = true;
-//				identities.put(id, new YahooIdentity(id));
+				// identities.put(id, new YahooIdentity(id));
 			}
 		}
 	}

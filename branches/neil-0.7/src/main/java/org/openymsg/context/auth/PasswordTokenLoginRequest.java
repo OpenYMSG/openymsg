@@ -17,6 +17,7 @@ import org.openymsg.network.url.URLStreamStatus;
  * @author neilhart
  */
 public class PasswordTokenLoginRequest implements Request {
+	/** logger */
 	private static final Log log = LogFactory.getLog(PasswordTokenLoginRequest.class);
 	private final SessionAuthenticationImpl sessionAuthorize;
 	private SessionConfig config;

@@ -76,4 +76,9 @@ public class SessionContactImpl implements SessionContact {
 		return this.sessionStatus.getStatus(contact);
 	}
 
+	@Override
+	public void renameGroup(YahooContactGroup group, String newName) throws IllegalArgumentException {
+		this.sessionGroup.renameGroup(group, newName);
+	}
+
 }

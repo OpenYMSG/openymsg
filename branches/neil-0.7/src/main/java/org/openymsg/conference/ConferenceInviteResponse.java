@@ -17,6 +17,7 @@ import org.openymsg.network.YMSG9Packet;
  * @param pkt
  */
 public class ConferenceInviteResponse extends AbstractConferenceResponse {
+	/** logger */
 	private static final Log log = LogFactory.getLog(ConferenceInviteResponse.class);
 
 	public ConferenceInviteResponse(SessionConferenceImpl sessionConference) {
@@ -26,13 +27,17 @@ public class ConferenceInviteResponse extends AbstractConferenceResponse {
 	@Override
 	public void execute(YMSG9Packet packet) {
 		String to = packet.getValue("1");
+		@SuppressWarnings("unused")
 		String value13 = packet.getValue("13");
 		String from = packet.getValue("50");
 		final String[] invitedContactIds = packet.getValues("52");
 		String conferenceId = packet.getValue("57");
 		String message = packet.getValue("58");
+		@SuppressWarnings("unused")
 		String unicode = packet.getValue("97"); // 1
+		@SuppressWarnings("unused")
 		String value233 = packet.getValue("233"); // unknown
+		@SuppressWarnings("unused")
 		String value234 = packet.getValue("234"); // duplicate of conferenceId?
 
 		YahooContact inviter = new YahooContact(from, YahooProtocol.YAHOO);

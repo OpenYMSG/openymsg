@@ -20,11 +20,12 @@ import org.openymsg.network.NetworkConstants;
  * @author neilhart
  */
 public class CapacityServers {
+	/** logger */
+	private static final Log log = LogFactory.getLog(CapacityServers.class);
 	/** prefix for line with some colo information */
 	private static final String COLO_CAPACITY = "COLO_CAPACITY_";
 	/** prefix for line with ip address */
 	private static final String CS_IP_ADDRESS = "CS_IP_ADDRESS=";
-	private static final Log log = LogFactory.getLog(CapacityServers.class);
 	/** config to use for accessing the capacity servers */
 	private SessionConfig config;
 
@@ -76,12 +77,10 @@ public class CapacityServers {
 					in.close();
 
 					return readIpAddress(host, url, out);
-				}
-				else {
+				} else {
 					log.error("Failed opening url: " + url + " return code: " + responseCode);
 				}
-			}
-			else {
+			} else {
 				Class<? extends URLConnection> ucType = null;
 				if (uc != null) {
 					ucType = uc.getClass();
@@ -113,8 +112,7 @@ public class CapacityServers {
 		Integer coloCapacity = null;
 		if (coloCapacityString == null || coloCapacityString.isEmpty()) {
 			log.error("No colo capacity found for: " + host);
-		}
-		else {
+		} else {
 			coloCapacity = new Integer(coloCapacityString);
 			if (coloCapacity > 1) {
 				log.info("Colo Capacity is greater than 1");
@@ -125,8 +123,7 @@ public class CapacityServers {
 		if (ipAddress == null || ipAddress.isEmpty()) {
 			log.error("No ipAddress found for: " + host);
 			return null;
-		}
-		else {
+		} else {
 			log.debug("Colo Capacity is: " + coloCapacity + ", ipAddress is: " + ipAddress + " for: " + host);
 			return ipAddress;
 		}
@@ -145,8 +142,7 @@ public class CapacityServers {
 			String string = token.substring(prefix.length());
 			log.trace(prefix + " string: " + string + ".");
 			return string;
-		}
-		else {
+		} else {
 			log.error("No more tokens for: " + prefix);
 		}
 		return null;

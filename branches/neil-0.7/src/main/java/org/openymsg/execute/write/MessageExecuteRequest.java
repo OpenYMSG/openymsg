@@ -11,6 +11,7 @@ import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
 public class MessageExecuteRequest implements Request {
+	/** logger */
 	private static final Log log = LogFactory.getLog(MessageExecuteRequest.class);
 	private Message message;
 	private ConnectionHandler connection;

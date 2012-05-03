@@ -1,5 +1,6 @@
 package org.openymsg.contact.roster;
 
+import org.junit.Assert;
 import org.mockito.Mockito;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.openymsg.Name;
@@ -64,7 +65,9 @@ public class SessionRosterImplTest {
 		ContactGroupImpl group = new ContactGroupImpl("group");
 		group.add(contact);
 		session.removeFromGroup(contact, group);
+		// TODO remove from status
 		Mockito.verify(executor).execute(argThat(new ContactRemoveMessage(this.username, contact, group)));
+		Assert.assertFalse(session.getContacts().contains(contact));
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Argument 'contact' cannot be null.")
@@ -98,7 +101,10 @@ public class SessionRosterImplTest {
 	public void testReceivedAddAccept() {
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		session.receivedContactAddAccepted(contact);
+
 		// TODO no longer pending, status comes separately
+		// TODO in group?
+		Assert.assertTrue(session.getContacts().contains(contact));
 		Mockito.verify(callback).receivedContactAddAccepted(contact);
 	}
 
@@ -107,7 +113,10 @@ public class SessionRosterImplTest {
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		String message = "message";
 		// TODO remove contact, remove pending status
+		// TODO remove from group?
 		session.receivedContactAddDeclined(contact, message);
+
+		Assert.assertFalse(session.getContacts().contains(contact));
 		Mockito.verify(callback).receivedContactAddDeclined(contact, message);
 	}
 

@@ -9,6 +9,7 @@ import org.openymsg.execute.dispatch.Request;
 import org.openymsg.network.ConnectionHandler;
 
 public class ConnectionWriter implements Request {
+	/** logger */
 	private static final Log log = LogFactory.getLog(ConnectionWriter.class);
 	private ConnectionHandler connection;
 	private ConcurrentLinkedQueue<Message> queue;

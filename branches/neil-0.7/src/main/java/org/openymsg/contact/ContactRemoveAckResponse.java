@@ -1,5 +1,7 @@
 package org.openymsg.contact;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.contact.group.ContactGroupImpl;
@@ -9,6 +11,7 @@ import org.openymsg.execute.read.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
 
 public class ContactRemoveAckResponse implements SinglePacketResponse {
+	private static final Log log = LogFactory.getLog(ContactRemoveAckResponse.class);
 	private SessionRosterImpl sessionRoster;
 	private SessionGroupImpl sessionGroup;
 
@@ -17,8 +20,13 @@ public class ContactRemoveAckResponse implements SinglePacketResponse {
 		this.sessionGroup = sessionGroup;
 	}
 
+	/**
+	 * handle the incoming packet.
+	 * @param packet incoming packet
+	 */
 	@Override
 	public void execute(YMSG9Packet packet) {
+		@SuppressWarnings("unused")
 		String me = packet.getValue("1");
 		String contactUsername = packet.getValue("7");
 		String groupName = packet.getValue("65");
@@ -40,7 +48,7 @@ public class ContactRemoveAckResponse implements SinglePacketResponse {
 
 		boolean contactWasRemoved = sessionRoster.possibleRemoveContact(contact);
 		boolean groupWasRemoved = sessionGroup.possibleRemoveGroup(group);
-		// log.info("Contact was added: " + contactWasAdded + " along with the group: " + groupWasAdded);
+		log.info("Contact was remove: " + contactWasRemoved + " along with the group: " + groupWasRemoved);
 
 	}
 

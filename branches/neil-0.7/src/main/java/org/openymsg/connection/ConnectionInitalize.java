@@ -9,6 +9,7 @@ import org.openymsg.network.ConnectionBuilder;
 import org.openymsg.network.ConnectionHandler;
 
 public class ConnectionInitalize implements Request {
+	/** logger */
 	private static final Log log = LogFactory.getLog(ConnectionInitalize.class);
 	private SessionConfig config;
 	private SessionConnectionImpl session;

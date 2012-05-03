@@ -15,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class URLStreamBuilderImpl implements URLStreamBuilder {
+	/** logger */
 	private static final Log log = LogFactory.getLog(URLStreamBuilderImpl.class);
 	private String url;
 	private int timeout;

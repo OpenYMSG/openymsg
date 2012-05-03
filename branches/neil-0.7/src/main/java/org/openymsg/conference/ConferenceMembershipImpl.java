@@ -18,6 +18,7 @@ import org.openymsg.util.CollectionUtils;
  * @author neilhart
  */
 public class ConferenceMembershipImpl implements ConferenceMembership {
+	/** logger */
 	private static final Log log = LogFactory.getLog(ConferenceMembershipImpl.class);
 	/** set of Contacts that are currently members */
 	private Set<YahooContact> memberContacts = new HashSet<YahooContact>();

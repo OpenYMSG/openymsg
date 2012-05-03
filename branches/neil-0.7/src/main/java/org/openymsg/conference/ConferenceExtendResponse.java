@@ -18,6 +18,7 @@ import org.openymsg.network.YMSG9Packet;
  * @param pkt
  */
 public class ConferenceExtendResponse extends AbstractConferenceResponse {
+	/** logger */
 	private static final Log log = LogFactory.getLog(ConferenceExtendResponse.class);
 
 	public ConferenceExtendResponse(SessionConferenceImpl sessionConference) {
@@ -26,6 +27,7 @@ public class ConferenceExtendResponse extends AbstractConferenceResponse {
 
 	@Override
 	public void execute(YMSG9Packet packet) {
+		@SuppressWarnings("unused")
 		String to = packet.getValue("1");
 		// String value13 = packet.getValue("13");
 		String from = packet.getValue("50");

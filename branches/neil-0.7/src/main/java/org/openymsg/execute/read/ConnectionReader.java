@@ -7,6 +7,7 @@ import org.openymsg.network.ConnectionHandler;
 import org.openymsg.network.YMSG9Packet;
 
 public class ConnectionReader implements Request {
+	/** logger */
 	private static final Log log = LogFactory.getLog(ConnectionReader.class);
 	private ConnectionHandler connection;
 	private ReaderRegistryImpl registry;

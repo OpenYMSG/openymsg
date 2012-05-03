@@ -9,6 +9,10 @@ public class Unknown002Response implements SinglePacketResponse {
 	public void execute(YMSG9Packet packet) {
 	}
 
+	/**
+	 * handle the incoming packet.
+	 * @param packet incoming packet
+	 */
 	@Override
 	public boolean equals(Object arg0) {
 		return arg0 instanceof Unknown002Response;

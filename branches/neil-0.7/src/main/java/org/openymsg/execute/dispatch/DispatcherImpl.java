@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class DispatcherImpl implements Dispatcher {
+	/** logger */
 	private static final Log log = LogFactory.getLog(DispatcherImpl.class);
 	private DispatcherExecutorService executor = null;
 	private boolean shutdown;

@@ -44,8 +44,9 @@ import org.openymsg.network.YMSG9Packet;
  * @author S.E. Morris
  */
 public class YMSG9InputStream extends BufferedInputStream {
-	private static final int HEADER_SIZE = 20;
+	/** logger */
 	private static final Log log = LogFactory.getLog(YMSG9InputStream.class);
+	private static final int HEADER_SIZE = 20;
 
 	public YMSG9InputStream(InputStream in) {
 		super(in);

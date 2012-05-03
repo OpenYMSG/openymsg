@@ -7,6 +7,7 @@ import org.openymsg.execute.Executor;
 import org.openymsg.network.ServiceType;
 
 public class SessionAuthenticationImpl implements SessionAuthentication {
+	/** logger */
 	private static final Log log = LogFactory.getLog(SessionAuthenticationImpl.class);
 	private Executor executor;
 	// private String username;

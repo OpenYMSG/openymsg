@@ -40,7 +40,7 @@ public class SessionIT {
 
 	@Parameters({ "badPasswordUsername", "badPassword" })
 	@Test()
-	public void testBadPassword(String badPasswordUsername, String badPassword) {
+	public void testLocked(String badPasswordUsername, String badPassword) {
 		SessionConfig config = new SessionConfigImpl();
 		TestingSessionCallback callback = new TestingSessionCallback();
 		YahooSession session = new SessionImpl(config, callback);
@@ -54,7 +54,7 @@ public class SessionIT {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Assert.assertEquals(AuthenticationFailure.BAD, callback.getFailure());
+		Assert.assertEquals(AuthenticationFailure.LOCKED, callback.getFailure());
 		Assert.assertTrue(session.isShutdown());
 		Assert.assertTrue(session.isDisconnected());
 
@@ -80,6 +80,20 @@ public class SessionIT {
 		session1.login(username1, password1);
 		session2.login(username2, password2);
 		session3.login(username3, password3);
+
+		try {
+			Thread.sleep(5 * 1000);
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			Thread.sleep(10 * 1000);
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 	}
 

@@ -18,6 +18,7 @@ import org.openymsg.network.ServiceType;
 import org.openymsg.network.YMSG9Packet;
 
 public class DirectConnectionHandler implements ConnectionHandler {
+	/** logger */
 	private static final Log log = LogFactory.getLog(DirectConnectionHandler.class);
 	private Socket socket;
 	private YMSG9InputStream ips;
@@ -27,6 +28,7 @@ public class DirectConnectionHandler implements ConnectionHandler {
 
 	public DirectConnectionHandler(Socket socket) {
 		this.socket = socket;
+		// TODO monitor socket?
 		try {
 			ips = new YMSG9InputStream(socket.getInputStream());
 			ops = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));

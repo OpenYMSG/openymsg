@@ -20,6 +20,10 @@ public class MessageResponse implements SinglePacketResponse {
 		this.offlineResponse = new MessageOfflineResponse(session);
 	}
 
+	/**
+	 * handle the incoming packet.
+	 * @param packet incoming packet
+	 */
 	@Override
 	public void execute(YMSG9Packet packet) {
 		// packet.status <= 1 || packet.status == MessageStatus.OFFLINE.getValue()

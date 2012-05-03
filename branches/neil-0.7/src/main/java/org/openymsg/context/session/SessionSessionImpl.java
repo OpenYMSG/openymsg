@@ -8,6 +8,7 @@ import org.openymsg.execute.write.ScheduledMessageSender;
 import org.openymsg.network.ServiceType;
 
 public class SessionSessionImpl implements SessionSession {
+	/** logger */
 	private static final Log log = LogFactory.getLog(SessionSessionImpl.class);
 	private String username;
 	private Executor executor;
