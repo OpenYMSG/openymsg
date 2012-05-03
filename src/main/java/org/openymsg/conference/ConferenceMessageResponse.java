@@ -18,8 +18,11 @@ public class ConferenceMessageResponse extends AbstractConferenceResponse {
 	public void execute(YMSG9Packet packet) {
 		YahooConference conference = this.getConference(packet);
 		// If we have not received an invite yet, buffer packets
+		@SuppressWarnings("unused")
 		String id = packet.getValue("57");
+		@SuppressWarnings("unused")
 		String name = packet.getValue("58");
+		@SuppressWarnings("unused")
 		String to = packet.getValue("1");
 		String from = packet.getValue("3"); // TODO - protocol
 		YahooContact contact = new YahooContact(from);

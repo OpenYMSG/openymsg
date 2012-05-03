@@ -13,12 +13,16 @@ import org.openymsg.network.YMSG9Packet;
  */
 public class ContactAddResponse implements SinglePacketResponse {
 	private static final Log log = LogFactory.getLog(ContactAddResponse.class);
-	private SessionRosterCallback sessionContact;
+	private SessionRosterImpl sessionRoster;
 
-	public ContactAddResponse(SessionRosterCallback sessionContact) {
-		this.sessionContact = sessionContact;
+	public ContactAddResponse(SessionRosterImpl sessionRoster) {
+		this.sessionRoster = sessionRoster;
 	}
 
+	/**
+	 * handle the incoming packet.
+	 * @param packet incoming packet
+	 */
 	@Override
 	public void execute(YMSG9Packet packet) {
 		// TODO - check this with all
@@ -30,6 +34,7 @@ public class ContactAddResponse implements SinglePacketResponse {
 		String who = packet.getValue("4");
 		String message = packet.getValue("14");
 		// TODO - UTF8
+		@SuppressWarnings("unused")
 		String me = packet.getValue("5");
 		String protocolString = packet.getValue("241");
 		if (protocolString == null) {
@@ -42,10 +47,10 @@ public class ContactAddResponse implements SinglePacketResponse {
 			String authStatus = packet.getValue("13");
 			if (authStatus.equals("1")) {
 				log.trace("A friend accepted our authorization request: " + contact);
-				sessionContact.receivedContactAddAccepted(contact);
+				sessionRoster.receivedContactAddAccepted(contact);
 			} else if (authStatus.equals("2")) {
 				log.trace("A friend refused our subscription request: " + contact);
-				sessionContact.receivedContactAddDeclined(contact, message);
+				sessionRoster.receivedContactAddDeclined(contact, message);
 			} else {
 				log.error("Unexpected authorization packet. Do not know how to handle: " + packet);
 			}
@@ -57,7 +62,7 @@ public class ContactAddResponse implements SinglePacketResponse {
 				contactName = new Name(fname, lname);
 			}
 			log.trace("Someone is sending us a subscription request: " + contact);
-			sessionContact.receivedContactAddRequest(contact, contactName, message);
+			sessionRoster.receivedContactAddRequest(contact, contactName, message);
 		} else {
 			log.error("Unexpected authorization packet. Do not know how to handle: " + packet);
 		}

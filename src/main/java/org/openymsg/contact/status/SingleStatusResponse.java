@@ -24,12 +24,8 @@ public class SingleStatusResponse implements SinglePacketResponse {
 	}
 
 	/**
-	 * [300] [315] [7] [buddy] [10] [0] [13] [1] [97] [1] [192] [2140265804] [198] [0] [213] [0] [244] [33554367] [302]
-	 * [316] [300] [316] [135] [2.0.42] [258] [16762d37-0eb1-40d0-5863-5fa5ade02675] [310] [en-us] [301] [316] [300]
-	 * [316] [135] [2.0.4] [258] [4eb73995-f313-4f4a-49a5-1bc4d7c3ee68] [310] [en-us] [301] [316] [300] [316] [135]
-	 * [0.2.11] [258] [af6d7f82-d94d-4ce0-7707-a527d5a01f3d] [310] [en-us] [301] [316] [303] [316] [300] [444] [440] [0]
-	 * [301] [444] [550] [OK3X2E2PORYZ3DKCIUGF6S5CUI] [301] [315]
-	 * @param pkt
+	 * handle the incoming packet.
+	 * @param packet incoming packet
 	 */
 	@Override
 	public void execute(YMSG9Packet packet) {
@@ -103,6 +99,7 @@ public class SingleStatusResponse implements SinglePacketResponse {
 				break;
 			case 97:
 				// TODO - unicodeStatus
+				@SuppressWarnings("unused")
 				boolean unicodeStatusMessage = value.equals("1");
 				break;
 			case 138:

@@ -15,6 +15,7 @@ import org.openymsg.network.ServiceType;
 import org.openymsg.util.CollectionUtils;
 
 public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
+	/** logger */
 	private static final Log log = LogFactory.getLog(SessionRosterImpl.class);
 	private Executor executor;
 	private String username;
@@ -123,6 +124,7 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 
 	@Override
 	public void receivedContactAddAccepted(YahooContact contact) {
+		this.contacts.add(contact);
 		this.callback.receivedContactAddAccepted(contact);
 	}
 

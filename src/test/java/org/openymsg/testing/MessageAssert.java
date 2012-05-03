@@ -97,8 +97,8 @@ public class MessageAssert {
 		String[] comparisonStrings = stripValue.split(",");
 		String[] bodyStrings = bodyValue.split(",");
 		if (comparisonStrings.length == bodyStrings.length && comparisonStrings.length > 1) {
-			Set comparisonSet = new HashSet(Arrays.asList(comparisonStrings));
-			Set bodySet = new HashSet(Arrays.asList(bodyStrings));
+			Set<String> comparisonSet = new HashSet<String>(Arrays.asList(comparisonStrings));
+			Set<String> bodySet = new HashSet<String>(Arrays.asList(bodyStrings));
 			Assert.assertEquals(comparisonSet, bodySet);
 			return true;
 		}

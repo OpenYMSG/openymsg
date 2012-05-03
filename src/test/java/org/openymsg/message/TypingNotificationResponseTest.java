@@ -21,7 +21,7 @@ public class TypingNotificationResponseTest {
 	}
 
 	@Test
-	public void testTyping() {
+	public void testYahooTyping() {
 		String test = "Magic:YMSG Version:16 Length:56 Service:NOTIFY Status:SERVER_ACK SessionId:0x45130f  [4] [testuser] [5] [testbuddy] [13] [1] [14] [ ] [49] [TYPING]";
 		YMSG9Packet packet = PacketReader.readString(test);
 		response.execute(packet);
@@ -29,15 +29,15 @@ public class TypingNotificationResponseTest {
 	}
 
 	@Test
-	public void testDone() {
+	public void testYahooDone() {
 		String test = "Magic:YMSG Version:16 Length:56 Service:NOTIFY Status:SERVER_ACK SessionId:0x45130f  [4] [testuser] [5] [testbuddy] [13] [0] [14] [ ] [49] [TYPING]";
 		YMSG9Packet packet = PacketReader.readString(test);
 		response.execute(packet);
 		Mockito.verify(session).receivedTypingNotification(contact, false);
 	}
 
-	@Test(enabled = false)
-	public void testProtocol() {
+	@Test
+	public void testMsnTyping() {
 		Assert.fail("not implemented");
 	}
 }

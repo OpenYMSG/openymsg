@@ -16,6 +16,7 @@ import org.openymsg.network.url.URLStreamBuilderImpl;
  * @author neilhart
  */
 public class SessionConfigImpl implements SessionConfig {
+	/** logger */
 	private static final Log log = LogFactory.getLog(SessionConfigImpl.class);
 
 	@Override

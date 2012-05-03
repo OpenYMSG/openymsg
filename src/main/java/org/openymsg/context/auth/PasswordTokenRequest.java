@@ -16,6 +16,7 @@ import org.openymsg.network.url.URLStreamStatus;
  * @author neilhart
  */
 public class PasswordTokenRequest implements Request {
+	/** logger */
 	private static final Log log = LogFactory.getLog(PasswordTokenRequest.class);
 	private final SessionAuthenticationImpl sessionAuthorize;
 	private SessionConfig config;
@@ -74,7 +75,7 @@ public class PasswordTokenRequest implements Request {
 		if (responseNo != 0 || !toks.hasMoreTokens()) {
 			switch (responseNo) {
 			case 1235:
-				log.info("Login Failed, Invalid username" + AuthenticationFailure.BADUSERNAME);
+				log.info("Login Failed, Invalid username: " + AuthenticationFailure.BADUSERNAME);
 				sessionAuthorize.setFailureState(AuthenticationFailure.BADUSERNAME);
 				break;
 			case 1212:
@@ -82,7 +83,7 @@ public class PasswordTokenRequest implements Request {
 				sessionAuthorize.setFailureState(AuthenticationFailure.BAD);
 				break;
 			case 1213:
-				log.info("Login locked: Too many failed login attempts" + AuthenticationFailure.LOCKED);
+				log.info("Login locked: Too many failed login attempts: " + AuthenticationFailure.LOCKED);
 				sessionAuthorize.setFailureState(AuthenticationFailure.LOCKED);
 				break;
 			case 1236:

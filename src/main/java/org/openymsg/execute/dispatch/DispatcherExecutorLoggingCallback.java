@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class DispatcherExecutorLoggingCallback implements DispatcherExecutorCallback {
+	/** logger */
 	private static final Log log = LogFactory.getLog(DispatcherExecutorLoggingCallback.class);
 
 	@Override

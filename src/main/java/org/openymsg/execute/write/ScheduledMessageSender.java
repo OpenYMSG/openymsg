@@ -11,6 +11,7 @@ import org.openymsg.execute.dispatch.Request;
  * @author neilhart
  */
 public class ScheduledMessageSender implements Request {
+	/** logger */
 	private static final Log log = LogFactory.getLog(ScheduledMessageSender.class);
 	private Executor executor;
 	private Message message;

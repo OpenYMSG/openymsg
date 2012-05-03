@@ -12,8 +12,9 @@ public enum YahooProtocol {
 	MSN("2"),
 	LOTUS("9");
 
+	/** logger */
 	private static final Log log = LogFactory.getLog(YahooProtocol.class);
-	// Unique long representation of this Status.
+	/** Unique long representation of this Status */
 	private String value;
 
 	/**

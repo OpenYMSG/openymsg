@@ -11,6 +11,7 @@ import org.openymsg.network.ServiceType;
 import org.openymsg.network.YMSG9Packet;
 
 public class ReaderRegistryImpl implements ReaderRegistry {
+	/** logger */
 	private static final Log log = LogFactory.getLog(ReaderRegistryImpl.class);
 	private Map<ServiceType, Set<SinglePacketResponse>> registry = new HashMap<ServiceType, Set<SinglePacketResponse>>();
 

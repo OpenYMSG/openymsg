@@ -5,14 +5,24 @@ import org.openymsg.execute.Executor;
 import org.openymsg.execute.read.NoOpResponse;
 import org.openymsg.network.ServiceType;
 
+/**
+ * //TODO add top javadoc * Incoming messages and typing notifications will be forwarded onto the callback. This service
+ * also handles creating the message number sent to yahoo and ack'ing incoming messages back to yahoo.
+ * @author neilhart
+ */
 public class SessionMessageImpl implements SessionMessage {
-	// Buzz string
+	/** buzz messsage */
 	public final static String BUZZ = "<ding>";
+	/** blank message number format */
 	private static final String blankMessageNumber = "0000000000000000";
+	/** executor for the messages */
 	private Executor executor;
+	/** user name */
 	private String username;
 	// TODO - random messageNumber start
+	/** initial message number */
 	private long messageNumber = System.currentTimeMillis();
+	/** callback for incoming messages and notifications */
 	private SessionMessageCallback callback;
 
 	/**
@@ -42,35 +52,21 @@ public class SessionMessageImpl implements SessionMessage {
 		this.executor.register(ServiceType.NOTIFY, new TypingNotificationResponse(this));
 	}
 
-	/**
-	 * Send a buzz message
-	 * @param to Recipient of the buzz.
-	 * @throws IllegalArgumentException if contact is null
-	 */
 	public void sendBuzz(YahooContact to) throws IllegalArgumentException {
 		sendMessage(to, BUZZ);
 	}
 
-	/**
-	 * Send a chat message.
-	 * @param to Yahoo ID of the user to transmit the message.
-	 * @param message The message to transmit.
-	 * @throws IllegalArgumentException if contact or message is null
-	 */
 	// TODO - handle message ask
 	// TODO - current contact?
 	public void sendMessage(YahooContact contact, String message) throws IllegalArgumentException {
-
 		if (contact == null) {
 			throw new IllegalArgumentException("Contact cannot be null");
 		}
-
 		if (message == null) {
 			throw new IllegalArgumentException("Message cannot be null");
 		}
 
 		String messageId = buildMessageNumber();
-
 		this.executor.execute(new SendMessage(username, contact, message, messageId));
 	}
 
@@ -83,18 +79,12 @@ public class SessionMessageImpl implements SessionMessage {
 		this.executor.execute(new TypingNotificationMessage(username, contact, isTyping));
 	}
 
-	protected String buildMessageNumber() {
-		String messageNumber = "" + this.messageNumber++;
-		messageNumber = blankMessageNumber.substring(0, blankMessageNumber.length() - messageNumber.length())
-				+ messageNumber;
-		return messageNumber;
-	}
-
 	// TODO - send ack if ignored?
 	public void receivedMessage(YahooContact contact, String message, String messageId) {
 		if (messageId != null) {
 			this.executor.execute(new MessageAckMessage(username, contact, messageId));
 		}
+
 		this.callback.receivedMessage(contact, message);
 	}
 
@@ -113,6 +103,13 @@ public class SessionMessageImpl implements SessionMessage {
 
 	public void receivedTypingNotification(YahooContact contact, boolean isTyping) {
 		this.callback.receivedTypingNotification(contact, isTyping);
+	}
+
+	protected String buildMessageNumber() {
+		String messageNumber = "" + this.messageNumber++;
+		messageNumber = blankMessageNumber.substring(0, blankMessageNumber.length() - messageNumber.length())
+				+ messageNumber;
+		return messageNumber;
 	}
 
 }

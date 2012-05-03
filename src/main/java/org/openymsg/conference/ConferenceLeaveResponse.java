@@ -19,8 +19,10 @@ public class ConferenceLeaveResponse extends AbstractConferenceResponse {
 	public void execute(YMSG9Packet packet) {
 		@SuppressWarnings("unused")
 		String to = packet.getValue("1");
+		@SuppressWarnings("unused")
 		String value302 = packet.getValue("302"); // 3
 		// multiple 3 for each in conference room
+		@SuppressWarnings("unused")
 		String value303 = packet.getValue("302"); // 3
 		String from = packet.getValue("56");
 		YahooConference conference = this.getConference(packet);

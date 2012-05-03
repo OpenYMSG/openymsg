@@ -12,6 +12,7 @@ import org.openymsg.network.YMSG9Packet;
  * YahooUser details and fire event. status == 0 is a single status
  */
 public class ListOfStatusesResponse implements MultiplePacketResponse {
+	/** logger */
 	private static final Log log = LogFactory.getLog(ListOfStatusesResponse.class);
 	private SingleStatusResponse singleStatusResponse;
 

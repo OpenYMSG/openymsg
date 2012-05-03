@@ -315,4 +315,9 @@ public class SessionImpl implements YahooSession {
 		return this.executor.isDisconnected();
 	}
 
+	@Override
+	public void renameGroup(YahooContactGroup group, String newName) throws IllegalArgumentException {
+		this.contact.renameGroup(group, newName);
+	}
+
 }

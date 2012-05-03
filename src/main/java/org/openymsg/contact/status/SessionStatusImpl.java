@@ -17,6 +17,7 @@ import org.openymsg.network.ServiceType;
  * @author neilhart
  */
 public class SessionStatusImpl implements SessionStatus, SessionStatusCallback {
+	/** logger */
 	private static final Log log = LogFactory.getLog(SessionStatusImpl.class);
 	private Executor executor;
 	private SessionStatusCallback callback;

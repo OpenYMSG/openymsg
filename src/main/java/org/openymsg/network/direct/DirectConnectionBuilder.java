@@ -20,6 +20,7 @@ import org.openymsg.network.NetworkConstants;
  * @author neilhart
  */
 public class DirectConnectionBuilder implements ConnectionBuilder {
+	/** logger */
 	private static final Log log = LogFactory.getLog(DirectConnectionBuilder.class);
 	private boolean capacityBuilding;
 	private boolean scsBuilding;

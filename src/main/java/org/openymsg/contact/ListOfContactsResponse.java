@@ -20,6 +20,7 @@ import org.openymsg.execute.read.MultiplePacketResponse;
 import org.openymsg.network.YMSG9Packet;
 
 public class ListOfContactsResponse implements MultiplePacketResponse {
+	/** logger */
 	private static final Log log = LogFactory.getLog(ListOfContactsResponse.class);
 	private SessionRosterImpl sessionContact;
 	private SessionGroupImpl sessionGroup;

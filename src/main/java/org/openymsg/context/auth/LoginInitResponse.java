@@ -23,6 +23,10 @@ public class LoginInitResponse implements SinglePacketResponse {
 		this.token = token;
 	}
 
+	/**
+	 * handle the incoming packet.
+	 * @param packet incoming packet
+	 */
 	@Override
 	public void execute(YMSG9Packet packet) {
 		// TODO - get the message out of sync

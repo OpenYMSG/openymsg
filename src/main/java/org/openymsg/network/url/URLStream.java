@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class URLStream {
+	/** logger */
 	private static final Log log = LogFactory.getLog(URLStream.class);
 	private InputStream inputStream;
 	private Map<String, List<String>> headers;

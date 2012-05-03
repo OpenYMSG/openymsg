@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class LoggingConnectionHandler implements ConnectionHandler {
+	/** logger */
 	private static final Log log = LogFactory.getLog(LoggingConnectionHandler.class);
 	private int sessionId = 0;
 

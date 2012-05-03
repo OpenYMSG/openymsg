@@ -10,6 +10,10 @@ public class LogoffStatusResponse implements SinglePacketResponse {
 		this.singleStatusResponse = singleStatusResponse;
 	}
 
+	/**
+	 * handle the incoming packet.
+	 * @param packet incoming packet
+	 */
 	@Override
 	public void execute(YMSG9Packet packet) {
 		if (packet.exists("7")) {

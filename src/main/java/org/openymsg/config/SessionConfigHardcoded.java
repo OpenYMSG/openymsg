@@ -12,6 +12,7 @@ import org.openymsg.network.url.URLStreamBuilder;
 import org.openymsg.network.url.URLStreamBuilderImpl;
 
 public class SessionConfigHardcoded implements SessionConfig {
+	/** logger */
 	private static final Log log = LogFactory.getLog(SessionConfigImpl.class);
 
 	@Override

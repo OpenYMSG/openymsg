@@ -6,9 +6,10 @@ import org.openymsg.execute.Executor;
 import org.openymsg.execute.dispatch.Request;
 
 public class ShutdownRequest implements Request {
+	/** logger */
 	private static final Log log = LogFactory.getLog(ShutdownRequest.class);
- 	Executor dispatcher;
-	
+	Executor dispatcher;
+
 	public ShutdownRequest(Executor dispatcher) {
 		this.dispatcher = dispatcher;
 	}

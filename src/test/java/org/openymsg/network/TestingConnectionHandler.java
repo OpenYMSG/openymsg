@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class TestingConnectionHandler implements ConnectionHandler {
+	/** logger */
 	private static final Log log = LogFactory.getLog(TestingConnectionHandler.class);
 	private LinkedBlockingQueue<YMSG9Packet> incomingPackets = new LinkedBlockingQueue<YMSG9Packet>();
 	private LinkedBlockingQueue<OutgoingPacket> outgoingPackets = new LinkedBlockingQueue<OutgoingPacket>();
