@@ -1,11 +1,10 @@
-package org.openymsg.execute.write;
+package org.openymsg.connection.read;
 
 import org.openymsg.network.ConnectionHandler;
 
-public interface PacketWriter {
-	void execute(Message message);
-
+public interface PacketReader extends ReaderRegistry {
 	void initializeConnection(ConnectionHandler connection);
 
 	void shutdown();
+
 }

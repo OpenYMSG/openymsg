@@ -9,21 +9,21 @@ import org.apache.commons.logging.LogFactory;
 import org.openymsg.Name;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
+import org.openymsg.connection.YahooConnection;
 import org.openymsg.contact.group.ContactGroupRenameMessage;
-import org.openymsg.execute.Executor;
 import org.openymsg.network.ServiceType;
 import org.openymsg.util.CollectionUtils;
 
 public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	/** logger */
 	private static final Log log = LogFactory.getLog(SessionRosterImpl.class);
-	private Executor executor;
+	private YahooConnection executor;
 	private String username;
 	private Set<YahooContact> contacts = new HashSet<YahooContact>();
 	private SessionRosterCallback callback;
 	private boolean rosterLoaded = false;
 
-	public SessionRosterImpl(Executor executor, String username, SessionRosterCallback callback) {
+	public SessionRosterImpl(YahooConnection executor, String username, SessionRosterCallback callback) {
 		this.executor = executor;
 		this.username = username;
 		this.callback = callback;

@@ -3,21 +3,33 @@ package org.openymsg.connection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.config.SessionConfig;
+import org.openymsg.connection.read.MultiplePacketResponse;
+import org.openymsg.connection.read.PacketReaderImpl;
+import org.openymsg.connection.read.SinglePacketResponse;
+import org.openymsg.connection.write.Message;
+import org.openymsg.connection.write.PacketWriterImpl;
 import org.openymsg.execute.Executor;
+import org.openymsg.network.ConnectionHandler;
 import org.openymsg.network.ConnectionHandlerCallback;
+import org.openymsg.network.ServiceType;
 
-public class SessionConnectionImpl implements SessionConnection, ConnectionHandlerCallback {
+public class SessionConnectionImpl implements YahooConnection, ConnectionHandlerCallback {
 	/** logger */
 	private static final Log log = LogFactory.getLog(SessionConnectionImpl.class);
 	private Executor executor;
 	private ConnectionState state;
 	private ConnectionInfo status;
 	private SessionConnectionCallback callback;
+	private PacketWriterImpl writer;
+	private PacketReaderImpl reader;
+	private ConnectionHandler connection;
 
 	public SessionConnectionImpl(Executor executor, SessionConnectionCallback callback) {
 		this.executor = executor;
 		this.callback = callback;
 		this.state = ConnectionState.UNSTARTED;
+		this.writer = new PacketWriterImpl(this.executor);
+		this.reader = new PacketReaderImpl(this.executor);
 	}
 
 	/**
@@ -32,7 +44,7 @@ public class SessionConnectionImpl implements SessionConnection, ConnectionHandl
 		// ConnectionState state = this.getConnectionState();
 		// if (state.isStartable()) {
 		this.setState(ConnectionState.CONNECTING);
-		this.executor.execute(new ConnectionInitalize(sessionConfig, executor, this));
+		this.executor.execute(new ConnectionInitalize(sessionConfig, this));
 	}
 
 	@Override
@@ -70,8 +82,47 @@ public class SessionConnectionImpl implements SessionConnection, ConnectionHandl
 		}
 	}
 
-	public void closeConnection() {
+	@Override
+	public void shutdown() {
 		this.state = ConnectionState.DISCONNECTING;
-		this.executor.shutdown();
+		this.reader.shutdown();
+		this.writer.shutdown();
+		this.connection.shutdown();
 	}
+
+	@Override
+	public void register(ServiceType type, SinglePacketResponse response) {
+		this.reader.register(type, response);
+	}
+
+	@Override
+	public boolean deregister(ServiceType type, SinglePacketResponse response) {
+		return this.reader.deregister(type, response);
+	}
+
+	@Override
+	public void register(ServiceType type, MultiplePacketResponse response) {
+		this.reader.register(type, response);
+	}
+
+	@Override
+	public boolean deregister(ServiceType type, MultiplePacketResponse response) {
+		return this.reader.deregister(type, response);
+	}
+
+	public void initializeConnection(ConnectionHandler connection) throws IllegalStateException {
+		if (!this.state.isStartable()) {
+			// TODO this isn't quite right
+			throw new IllegalStateException("Connection was already set");
+		}
+		this.connection = connection;
+		this.reader.initializeConnection(connection);
+		this.writer.initializeConnection(connection);
+	}
+
+	@Override
+	public void execute(Message message) {
+		this.writer.execute(message);
+	}
+
 }

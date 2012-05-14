@@ -2,7 +2,7 @@ package org.openymsg.context.session;
 
 import java.io.IOException;
 
-import org.openymsg.execute.write.Message;
+import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
@@ -21,7 +21,7 @@ public class LogoutMessage implements Message {
 	public PacketBodyBuffer getBody() throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("0", username);
-		// TODO  Is this only in for HTTP?
+		// TODO Is this only in for HTTP?
 		return body;
 	}
 

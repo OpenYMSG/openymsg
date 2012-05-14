@@ -76,7 +76,6 @@ public class SessionIT {
 		YahooSession session2 = new SessionImpl(config, callback2);
 		YahooSessionCallback callback3 = new TestingSessionCallback();
 		YahooSession session3 = new SessionImpl(config, callback3);
-		// callback.setSession(session);
 		session1.login(username1, password1);
 		session2.login(username2, password2);
 		session3.login(username3, password3);

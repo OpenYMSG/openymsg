@@ -5,7 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openymsg.Name;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
-import org.openymsg.execute.read.SinglePacketResponse;
+import org.openymsg.connection.read.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
 
 /**

@@ -4,12 +4,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
+import org.openymsg.connection.read.SinglePacketResponse;
 import org.openymsg.contact.group.ContactGroupImpl;
 import org.openymsg.contact.group.SessionGroupImpl;
 import org.openymsg.contact.roster.ContactAddFailure;
 import org.openymsg.contact.roster.SessionRosterImpl;
 import org.openymsg.contact.status.SessionStatusImpl;
-import org.openymsg.execute.read.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
 
 /**

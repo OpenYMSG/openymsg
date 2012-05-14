@@ -8,7 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactStatus;
-import org.openymsg.execute.Executor;
+import org.openymsg.connection.YahooConnection;
 import org.openymsg.network.ServiceType;
 
 /**
@@ -19,11 +19,11 @@ import org.openymsg.network.ServiceType;
 public class SessionStatusImpl implements SessionStatus, SessionStatusCallback {
 	/** logger */
 	private static final Log log = LogFactory.getLog(SessionStatusImpl.class);
-	private Executor executor;
+	private YahooConnection executor;
 	private SessionStatusCallback callback;
 	private Map<YahooContact, YahooContactStatus> statuses = new HashMap<YahooContact, YahooContactStatus>();
 
-	public SessionStatusImpl(Executor executor, SessionStatusCallback callback) {
+	public SessionStatusImpl(YahooConnection executor, SessionStatusCallback callback) {
 		this.executor = executor;
 		this.callback = callback;
 		SingleStatusResponse singleStatusResponse = new SingleStatusResponse(this);

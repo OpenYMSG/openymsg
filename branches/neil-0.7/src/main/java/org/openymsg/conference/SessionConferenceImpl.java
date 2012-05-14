@@ -8,7 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
-import org.openymsg.execute.Executor;
+import org.openymsg.connection.YahooConnection;
 import org.openymsg.network.ServiceType;
 import org.openymsg.util.CollectionUtils;
 
@@ -16,14 +16,14 @@ public class SessionConferenceImpl implements SessionConference {
 	/** logger */
 	private static final Log log = LogFactory.getLog(SessionConferenceImpl.class);
 	private String username;
-	private Executor executor;
+	private YahooConnection executor;
 	private SessionConferenceCallback callback;
 	private Map<String, YahooConference> conferences = new ConcurrentHashMap<String, YahooConference>();
 	// private Map<String, YahooConferenceStatus> conferenceStatuses = new ConcurrentHashMap<String,
 	// YahooConferenceStatus>();
 	private Map<String, ConferenceMembershipImpl> conferenceMemberships = new ConcurrentHashMap<String, ConferenceMembershipImpl>();
 
-	public SessionConferenceImpl(String username, Executor executor, SessionConferenceCallback callback)
+	public SessionConferenceImpl(String username, YahooConnection executor, SessionConferenceCallback callback)
 			throws IllegalArgumentException {
 		if (username == null) {
 			throw new IllegalArgumentException("Username cannot be null");

@@ -2,6 +2,7 @@ package org.openymsg.context;
 
 import org.openymsg.YahooStatus;
 import org.openymsg.config.SessionConfig;
+import org.openymsg.connection.YahooConnection;
 import org.openymsg.context.auth.AuthenticationFailure;
 import org.openymsg.context.auth.SessionAuthenticationImpl;
 import org.openymsg.context.session.LogoutReason;
@@ -13,11 +14,11 @@ public class SessionContextImpl implements SessionContext, SessionContextCallbac
 	private SessionSessionImpl session;
 	private SessionContextCallback callback;
 
-	public SessionContextImpl(SessionConfig sessionConfig, Executor executor, String username,
-			SessionContextCallback callback) {
+	public SessionContextImpl(SessionConfig sessionConfig, Executor executor, YahooConnection connection,
+			String username, SessionContextCallback callback) {
 		this.callback = callback;
-		authentication = new SessionAuthenticationImpl(sessionConfig, executor, this);
-		session = new SessionSessionImpl(username, executor, this);
+		authentication = new SessionAuthenticationImpl(sessionConfig, connection, executor, this);
+		session = new SessionSessionImpl(username, executor, connection, this);
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package org.openymsg.execute.write;
+package org.openymsg.connection.write;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -18,7 +18,6 @@ public class PacketWriterImpl implements PacketWriter {
 		this.executor.schedule(this.reader, 200);
 	}
 
-	@Override
 	public void initializeConnection(ConnectionHandler connection) {
 		this.reader.setConnection(connection);
 	}

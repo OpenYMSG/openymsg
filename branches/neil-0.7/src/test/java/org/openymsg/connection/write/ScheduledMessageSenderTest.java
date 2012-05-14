@@ -1,18 +1,18 @@
-package org.openymsg.execute.write;
+package org.openymsg.connection.write;
 
 import org.mockito.Mockito;
-import org.openymsg.execute.Executor;
+import org.openymsg.connection.YahooConnection;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class ScheduledMessageSenderTest {
-	private Executor executor;
+	private YahooConnection executor;
 	private Message message;
 
 	@BeforeMethod
 	public void beforeMethod() {
-		executor = Mockito.mock(Executor.class);
+		executor = Mockito.mock(YahooConnection.class);
 		message = Mockito.mock(Message.class);
 	}
 

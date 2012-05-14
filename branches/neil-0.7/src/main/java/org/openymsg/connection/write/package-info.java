@@ -8,5 +8,5 @@
  * the Message.  A MessageExecuteRequest is what wraps the Messages.
  *  <img src="doc-files/write.jpg" alt="Overview of Write Framework"/> 
  */
-package org.openymsg.execute.write;
+package org.openymsg.connection.write;
 

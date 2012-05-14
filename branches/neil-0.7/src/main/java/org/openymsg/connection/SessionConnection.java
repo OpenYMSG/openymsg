@@ -1,5 +1,6 @@
 package org.openymsg.connection;
 
+
 /** SessionConnection for managing connecting to Yahoo */
 public interface SessionConnection {
 	/**

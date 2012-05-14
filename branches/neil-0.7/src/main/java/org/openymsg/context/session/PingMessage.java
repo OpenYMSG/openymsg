@@ -1,6 +1,6 @@
 package org.openymsg.context.session;
 
-import org.openymsg.execute.write.Message;
+import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;

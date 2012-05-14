@@ -3,7 +3,7 @@ package org.openymsg.message;
 import org.mockito.Mockito;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
-import org.openymsg.execute.Executor;
+import org.openymsg.connection.YahooConnection;
 import org.openymsg.network.YMSG9Packet;
 import org.openymsg.testing.PacketReader;
 import org.testng.annotations.BeforeMethod;
@@ -12,12 +12,12 @@ import org.testng.annotations.Test;
 public class MessageResponseTest {
 	private String username = "testuser";
 	private SessionMessageCallback callback;
-	private Executor executor;
+	private YahooConnection executor;
 
 	@BeforeMethod
 	public void beforeMethod() {
 		callback = Mockito.mock(SessionMessageCallback.class);
-		executor = Mockito.mock(Executor.class);
+		executor = Mockito.mock(YahooConnection.class);
 	}
 
 	@Test

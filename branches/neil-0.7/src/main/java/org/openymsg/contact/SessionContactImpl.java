@@ -5,10 +5,10 @@ import java.util.Set;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 import org.openymsg.YahooContactStatus;
+import org.openymsg.connection.YahooConnection;
 import org.openymsg.contact.group.SessionGroupImpl;
 import org.openymsg.contact.roster.SessionRosterImpl;
 import org.openymsg.contact.status.SessionStatusImpl;
-import org.openymsg.execute.Executor;
 import org.openymsg.network.ServiceType;
 
 //TODO verify, no status without a contact
@@ -16,9 +16,9 @@ public class SessionContactImpl implements SessionContact {
 	private SessionRosterImpl sessionRoster;
 	private SessionGroupImpl sessionGroup;
 	private SessionStatusImpl sessionStatus;
-	private Executor executor;
+	private YahooConnection executor;
 
-	public SessionContactImpl(Executor executor, String username, SessionContactCallback callback) {
+	public SessionContactImpl(YahooConnection executor, String username, SessionContactCallback callback) {
 		this.executor = executor;
 		sessionRoster = new SessionRosterImpl(executor, username, callback);
 		sessionGroup = new SessionGroupImpl(executor, username);

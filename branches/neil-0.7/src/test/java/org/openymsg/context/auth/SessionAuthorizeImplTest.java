@@ -3,9 +3,10 @@ package org.openymsg.context.auth;
 import org.mockito.Mockito;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.openymsg.config.SessionConfig;
+import org.openymsg.connection.YahooConnection;
+import org.openymsg.connection.write.Message;
 import org.openymsg.execute.Executor;
 import org.openymsg.execute.dispatch.Request;
-import org.openymsg.execute.write.Message;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -13,7 +14,9 @@ import org.testng.annotations.Test;
 public class SessionAuthorizeImplTest {
 	private SessionConfig sessionConfig;
 	private Executor executor;
+	private YahooConnection connection;
 	private SessionAuthenticationCallback callback;
+	private SessionAuthenticationImpl session;
 	private String username = "testuser";
 	private String password = "testpassword";
 
@@ -22,18 +25,18 @@ public class SessionAuthorizeImplTest {
 		sessionConfig = Mockito.mock(SessionConfig.class);
 		executor = Mockito.mock(Executor.class);
 		callback = Mockito.mock(SessionAuthenticationCallback.class);
+		connection = Mockito.mock(YahooConnection.class);
+		session = new SessionAuthenticationImpl(sessionConfig, connection, executor, callback);
 	}
 
 	@Test
 	public void testLogin() {
-		SessionAuthenticationImpl session = new SessionAuthenticationImpl(sessionConfig, executor, callback);
 		session.login(username, password);
-		Mockito.verify(executor).execute(argThat(new LoginInitMessage(username)));
+		Mockito.verify(connection).execute(argThat(new LoginInitMessage(username)));
 	}
 
 	@Test
 	public void testFailure() {
-		SessionAuthenticationImpl session = new SessionAuthenticationImpl(sessionConfig, executor, callback);
 		AuthenticationFailure failureState = AuthenticationFailure.BADUSERNAME;
 		session.setFailureState(failureState);
 		Assert.assertEquals(session.getFailureState(), failureState);
@@ -42,7 +45,6 @@ public class SessionAuthorizeImplTest {
 
 	@Test
 	public void testSeed() {
-		SessionAuthenticationImpl session = new SessionAuthenticationImpl(sessionConfig, executor, callback);
 		session.login(username, password);
 		AuthenticationToken token = new AuthenticationToken();
 		token.setUsernameAndPassword(username, password);
@@ -51,7 +53,6 @@ public class SessionAuthorizeImplTest {
 	}
 
 	public void test() {
-		SessionAuthenticationImpl session = new SessionAuthenticationImpl(sessionConfig, executor, callback);
 		String cookieY = "cookieY";
 		String cookieT = "cookieT";
 		String crumb = "crumb";

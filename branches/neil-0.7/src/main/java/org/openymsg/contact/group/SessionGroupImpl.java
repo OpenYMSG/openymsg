@@ -5,15 +5,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.openymsg.YahooContactGroup;
-import org.openymsg.execute.Executor;
+import org.openymsg.connection.YahooConnection;
 import org.openymsg.util.CollectionUtils;
 
 public class SessionGroupImpl implements SessionGroup, SessionGroupCallback {
-	private Executor executor;
+	private YahooConnection executor;
 	private String username;
 	private Set<YahooContactGroup> contactGroups = Collections.synchronizedSet(new HashSet<YahooContactGroup>());
 
-	public SessionGroupImpl(Executor executor, String username) {
+	public SessionGroupImpl(YahooConnection executor, String username) {
 		if (executor == null) {
 			throw new IllegalArgumentException("Executor may not be null");
 		}
