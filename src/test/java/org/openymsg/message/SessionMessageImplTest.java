@@ -4,9 +4,9 @@ import org.mockito.Mockito;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
-import org.openymsg.execute.Executor;
-import org.openymsg.execute.read.SinglePacketResponse;
-import org.openymsg.execute.write.Message;
+import org.openymsg.connection.YahooConnection;
+import org.openymsg.connection.read.SinglePacketResponse;
+import org.openymsg.connection.write.Message;
 import org.openymsg.network.ServiceType;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -15,13 +15,13 @@ import org.testng.annotations.Test;
 public class SessionMessageImplTest {
 	private String username = "testuser";
 	private YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
-	private Executor executor;
+	private YahooConnection executor;
 	private SessionMessageCallback callback;
 	private SessionMessageImpl session;
 
 	@BeforeMethod
 	public void beforeMethod() {
-		executor = Mockito.mock(Executor.class);
+		executor = Mockito.mock(YahooConnection.class);
 		callback = Mockito.mock(SessionMessageCallback.class);
 		session = new SessionMessageImpl(executor, username, callback);
 	}

@@ -1,15 +1,14 @@
 package org.openymsg.mail;
 
-import org.openymsg.execute.Executor;
+import org.openymsg.connection.YahooConnection;
 import org.openymsg.network.ServiceType;
 
 public class SessionMailImpl implements SessionMail {
-	private Executor executor;
+	private YahooConnection executor;
 
-	public SessionMailImpl(Executor executor) {
+	public SessionMailImpl(YahooConnection executor) {
 		this.executor = executor;
 		this.executor.register(ServiceType.NEWMAIL, new NewMailResponse());
 	}
-
 
 }

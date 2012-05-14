@@ -3,8 +3,9 @@ package org.openymsg.context.session;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooStatus;
+import org.openymsg.connection.YahooConnection;
+import org.openymsg.connection.write.ScheduledMessageSender;
 import org.openymsg.execute.Executor;
-import org.openymsg.execute.write.ScheduledMessageSender;
 import org.openymsg.network.ServiceType;
 
 public class SessionSessionImpl implements SessionSession {
@@ -12,10 +13,12 @@ public class SessionSessionImpl implements SessionSession {
 	private static final Log log = LogFactory.getLog(SessionSessionImpl.class);
 	private String username;
 	private Executor executor;
+	private YahooConnection connection;
 	private SessionSessionCallback callback;
 	private LoginState state;
 
-	public SessionSessionImpl(String username, Executor executor, SessionSessionCallback callback) {
+	public SessionSessionImpl(String username, Executor executor, YahooConnection connection,
+			SessionSessionCallback callback) {
 		if (executor == null) {
 			throw new IllegalArgumentException("Executor cannot be null");
 		}
@@ -27,11 +30,12 @@ public class SessionSessionImpl implements SessionSession {
 		}
 		this.username = username;
 		this.executor = executor;
+		this.connection = connection;
 		this.callback = callback;
 		state = LoginState.LOGGING_IN;
-		executor.register(ServiceType.LIST, new ListResponse());
-		executor.register(ServiceType.LOGOFF, new PagerLogoffResponse(username, this));
-		executor.register(ServiceType.PING, new PingResponse());
+		connection.register(ServiceType.LIST, new ListResponse());
+		connection.register(ServiceType.LOGOFF, new PagerLogoffResponse(username, this));
+		connection.register(ServiceType.PING, new PingResponse());
 	}
 
 	// TODO - looks cool
@@ -52,8 +56,8 @@ public class SessionSessionImpl implements SessionSession {
 			throw new IllegalStateException("State is not logging in: " + state);
 		}
 		state = LoginState.LOGGED_IN;
-		executor.schedule(new ScheduledMessageSender(executor, new PingMessage()), (60 * 60 * 1000));
-		executor.schedule(new ScheduledMessageSender(executor, new KeepAliveMessage(username)), (60 * 1000));
+		executor.schedule(new ScheduledMessageSender(connection, new PingMessage()), (60 * 60 * 1000));
+		executor.schedule(new ScheduledMessageSender(connection, new KeepAliveMessage(username)), (60 * 1000));
 	}
 
 	/**
@@ -67,7 +71,7 @@ public class SessionSessionImpl implements SessionSession {
 		}
 		state = LoginState.LOGGING_OUT;
 
-		executor.execute(new LogoutMessage(username));
+		connection.execute(new LogoutMessage(username));
 
 		// TODO schedule this incase no response from yahoo, not here
 		executor.execute(new ShutdownRequest(executor));
@@ -85,7 +89,7 @@ public class SessionSessionImpl implements SessionSession {
 		if (status == YahooStatus.CUSTOM) {
 			throw new IllegalArgumentException("Cannot set custom state without message");
 		}
-		executor.execute(new StatusChangeRequest(status));
+		connection.execute(new StatusChangeRequest(status));
 		// TODO set internal status
 		// status = status;
 		// customStatusMessage = null;
@@ -114,7 +118,7 @@ public class SessionSessionImpl implements SessionSession {
 		// customStatusBusy = showBusyIcon;
 
 		// TODO - handle showBusy
-		executor.execute(new StatusChangeRequest(YahooStatus.CUSTOM, message));
+		connection.execute(new StatusChangeRequest(YahooStatus.CUSTOM, message));
 	}
 
 	public void receivedLogout(LogoutReason reason) {

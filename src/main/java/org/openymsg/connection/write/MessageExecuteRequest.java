@@ -1,4 +1,4 @@
-package org.openymsg.execute.write;
+package org.openymsg.connection.write;
 
 import java.io.IOException;
 

@@ -3,7 +3,7 @@ package org.openymsg.context.session;
 import java.io.IOException;
 
 import org.openymsg.YahooStatus;
-import org.openymsg.execute.write.Message;
+import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
@@ -31,8 +31,7 @@ public class StatusChangeRequest implements Message {
 		body.addElement("10", String.valueOf(status.getValue()));
 		if (this.customStatusMessage == null) {
 			body.addElement("19", "");
-		}
-		else {
+		} else {
 			body.addElement("19", customStatusMessage);
 			// TODO this is unicode I think
 			body.addElement("97", "1");

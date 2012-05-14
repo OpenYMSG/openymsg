@@ -1,8 +1,8 @@
-package org.openymsg.execute.write;
+package org.openymsg.connection.write;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.execute.Executor;
+import org.openymsg.connection.YahooConnection;
 import org.openymsg.execute.dispatch.Request;
 
 /**
@@ -13,10 +13,10 @@ import org.openymsg.execute.dispatch.Request;
 public class ScheduledMessageSender implements Request {
 	/** logger */
 	private static final Log log = LogFactory.getLog(ScheduledMessageSender.class);
-	private Executor executor;
+	private YahooConnection executor;
 	private Message message;
 
-	public ScheduledMessageSender(Executor executor, Message message) {
+	public ScheduledMessageSender(YahooConnection executor, Message message) {
 		if (executor == null) {
 			throw new IllegalArgumentException("Executor cannot be null");
 		}

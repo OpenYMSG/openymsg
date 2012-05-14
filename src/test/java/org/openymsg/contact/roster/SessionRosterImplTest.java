@@ -7,21 +7,21 @@ import org.openymsg.Name;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 import org.openymsg.YahooProtocol;
+import org.openymsg.connection.YahooConnection;
+import org.openymsg.connection.write.Message;
 import org.openymsg.contact.group.ContactGroupImpl;
-import org.openymsg.execute.Executor;
-import org.openymsg.execute.write.Message;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class SessionRosterImplTest {
 	private String username = "testuser";
-	private Executor executor;
+	private YahooConnection executor;
 	private SessionRosterCallback callback;
 	private SessionRosterImpl session;
 
 	@BeforeMethod
 	public void beforeMethod() {
-		executor = Mockito.mock(Executor.class);
+		executor = Mockito.mock(YahooConnection.class);
 		callback = Mockito.mock(SessionRosterCallback.class);
 		session = new SessionRosterImpl(executor, username, callback);
 	}

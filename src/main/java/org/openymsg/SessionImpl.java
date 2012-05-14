@@ -58,12 +58,12 @@ public class SessionImpl implements YahooSession {
 		this.executor = new ExecutorImpl(username);
 		this.connection = new SessionConnectionImpl(executor, callback);
 		this.connection.initialize(config);
-		this.context = new SessionContextImpl(config, executor, username, callback);
-		this.contact = new SessionContactImpl(executor, username, callback);
-		this.message = new SessionMessageImpl(executor, username, callback);
-		this.conference = new SessionConferenceImpl(username, executor, callback);
-		this.mail = new SessionMailImpl(executor);
-		this.unknown = new SessionUnknown(executor);
+		this.context = new SessionContextImpl(config, executor, connection, username, callback);
+		this.contact = new SessionContactImpl(connection, username, callback);
+		this.message = new SessionMessageImpl(connection, username, callback);
+		this.conference = new SessionConferenceImpl(username, connection, callback);
+		this.mail = new SessionMailImpl(connection);
+		this.unknown = new SessionUnknown(connection);
 	}
 
 	@Override
@@ -302,7 +302,7 @@ public class SessionImpl implements YahooSession {
 
 	public void failedAuthentication() {
 		this.state = YahooSessionState.FAILURE;
-		this.connection.closeConnection();
+		this.connection.shutdown();
 	}
 
 	@Override
@@ -312,7 +312,7 @@ public class SessionImpl implements YahooSession {
 
 	@Override
 	public boolean isDisconnected() {
-		return this.executor.isDisconnected();
+		return !this.connection.getConnectionState().isConnected();
 	}
 
 	@Override

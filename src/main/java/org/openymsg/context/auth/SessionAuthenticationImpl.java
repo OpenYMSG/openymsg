@@ -3,6 +3,7 @@ package org.openymsg.context.auth;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.config.SessionConfig;
+import org.openymsg.connection.YahooConnection;
 import org.openymsg.execute.Executor;
 import org.openymsg.network.ServiceType;
 
@@ -10,6 +11,7 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 	/** logger */
 	private static final Log log = LogFactory.getLog(SessionAuthenticationImpl.class);
 	private Executor executor;
+	private YahooConnection connection;
 	// private String username;
 	// private String password;
 	// private String seed;
@@ -18,14 +20,15 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 	private SessionConfig sessionConfig;
 	private AuthenticationFailure failureState;
 
-	public SessionAuthenticationImpl(SessionConfig sessionConfig, Executor executor,
+	public SessionAuthenticationImpl(SessionConfig sessionConfig, YahooConnection connection, Executor executor,
 			SessionAuthenticationCallback callback) {
 		this.sessionConfig = sessionConfig;
 		this.executor = executor;
 		this.callback = callback;
+		this.connection = connection;
 		this.token = new AuthenticationToken();
-		this.executor.register(ServiceType.AUTH, new LoginInitResponse(this, token));
-		this.executor.register(ServiceType.AUTHRESP, new LoginFailureResponse(this));
+		this.connection.register(ServiceType.AUTH, new LoginInitResponse(this, token));
+		this.connection.register(ServiceType.AUTHRESP, new LoginFailureResponse(this));
 	}
 
 	@Override
@@ -43,7 +46,7 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 		// TODO move status check to Session
 		// ConnectionState executionState = this.executor.getState();
 		// if (executionState.isLoginable()) {
-		executor.execute(new LoginInitMessage(username));
+		connection.execute(new LoginInitMessage(username));
 		// }
 		// else {
 		// throw new IllegalStateException("Don't call login when status is: " + executionState);
@@ -65,7 +68,7 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 	}
 
 	protected void receivedPasswordTokenLogin() {
-		this.executor.execute(new LoginCompleteMessage(token));
+		this.connection.execute(new LoginCompleteMessage(token));
 		this.callback.authenticationSuccess();
 	}
 

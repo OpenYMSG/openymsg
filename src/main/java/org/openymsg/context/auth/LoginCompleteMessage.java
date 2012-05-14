@@ -2,7 +2,7 @@ package org.openymsg.context.auth;
 
 import java.io.IOException;
 
-import org.openymsg.execute.write.Message;
+import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.PacketBodyBuffer;

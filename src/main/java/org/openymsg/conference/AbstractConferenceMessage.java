@@ -5,7 +5,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
-import org.openymsg.execute.write.Message;
+import org.openymsg.connection.write.Message;
 import org.openymsg.network.PacketBodyBuffer;
 
 public abstract class AbstractConferenceMessage implements Message {
