@@ -1,32 +1,25 @@
 package org.openymsg;
 
 public enum YahooSessionState {
-	NOT_STARTED(true, false, false),
-	STARTED(false, false, true),
-	CONNECTED(false, false, true),
-	LOGGED_IN(false, true, true),
-	LOGGED_OUT(false, false, false),
-	FAILURE(false, false, false);
+	NOT_STARTED(),
+	STARTED(),
+	CONNECTED(),
+	LOGGED_IN(),
+	LOGGED_OUT(),
+	FAILURE();
 
-	private final boolean readyToStart;
-	private final boolean loggedIn;
-	private final boolean available;
-
-	private YahooSessionState(boolean readyToStart, boolean loggedIn, boolean available) {
-		this.readyToStart = readyToStart;
-		this.loggedIn = loggedIn;
-		this.available = available;
+	private YahooSessionState() {
 	}
 
 	public boolean isReadyToStart() {
-		return readyToStart;
+		return this == NOT_STARTED;
 	}
 
 	public boolean isLoggedIn() {
-		return loggedIn;
+		return this == LOGGED_IN;
 	}
 
 	public boolean isAvailable() {
-		return available;
+		return this == STARTED || this == CONNECTED || this == LOGGED_IN || this == LOGGED_OUT;
 	}
 }

@@ -99,7 +99,7 @@ public class CapacityServers {
 	 * @param host hostname
 	 * @param url url
 	 * @param out stream containing connection ip address information
-	 * @return
+	 * @return ip address for connecting to yahoo
 	 */
 	protected String readIpAddress(String host, String url, ByteArrayOutputStream out) {
 		StringTokenizer toks = new StringTokenizer(out.toString(), "\r\n");

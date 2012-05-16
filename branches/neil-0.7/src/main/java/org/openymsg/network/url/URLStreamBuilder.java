@@ -29,7 +29,7 @@ public interface URLStreamBuilder {
 
 	/**
 	 * Build the URL
-	 * @return
+	 * @return completed stream
 	 */
 	URLStream build();
 

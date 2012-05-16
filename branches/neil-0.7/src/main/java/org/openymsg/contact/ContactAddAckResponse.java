@@ -103,7 +103,9 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 		} else {
 			log.warn("added contact with pending: " + pending);
 		}
-		boolean contactWasAdded = sessionRoster.possibleAddContact(contact);
+		// TODO do I need this
+		boolean contactWasAdded = true;
+		sessionRoster.receivedContactAddAck(contact);
 		boolean groupWasAdded = sessionGroup.possibleAddGroup(group);
 		sessionStatus.publishPending(contact);
 		log.info("Contact was added: " + contactWasAdded + " along with the group: " + groupWasAdded);

@@ -20,6 +20,41 @@ public class DispatcherExecutorServiceTest {
 	}
 
 	@Test
+	public void testCancelScheduled() {
+		String name = "name";
+		TestingDispatcherExecutorCallback callback = new TestingDispatcherExecutorCallback();
+		DispatcherExecutorService executor = new DispatcherExecutorService(name, callback);
+		QuiteRunnable runnable = new QuiteRunnable();
+		executor.scheduleAtFixedRate(runnable, 0, 1, TimeUnit.SECONDS);
+		System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
+		try {
+			Thread.sleep(2000);
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
+		Assert.assertTrue(runnable.checkAndResetHasRun());
+		try {
+			Thread.sleep(2000);
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		Assert.assertTrue(runnable.checkAndResetHasRun());
+		System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
+		runnable.setException(new ScheduleTaskCompletionException());
+		try {
+			Thread.sleep(2000);
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
+		Assert.assertFalse(runnable.hasRun());
+	}
+
+	@Test
 	public void testShutdown() {
 		String name = "name";
 		TestingDispatcherExecutorCallback callback = new TestingDispatcherExecutorCallback();
@@ -32,23 +67,41 @@ public class DispatcherExecutorServiceTest {
 		executor.shutdownNow();
 		runnable = new QuiteRunnable();
 		executor.execute(runnable);
+		Assert.assertFalse(((QuiteRunnable) runnable).hasRun());
 		Assert.assertNotNull(callback.getRunnable(), "Should have an unrun runnable");
 	}
 
 	private final class QuiteRunnable implements Runnable {
 		boolean ran = false;
+		RuntimeException exception = null;
 
 		@Override
 		public void run() {
+			if (exception != null) {
+				throw exception;
+			}
 			this.ran = true;
 		}
 
 		public boolean hasRun() {
 			return this.ran;
 		}
+
+		public boolean checkAndResetHasRun() {
+			boolean answer = this.ran;
+			this.ran = false;
+			return answer;
+		}
+
+		/**
+		 * @param exception the exception to set
+		 */
+		public void setException(RuntimeException exception) {
+			this.exception = exception;
+		}
 	}
 
-	private final class SlowRunnable implements Runnable {
+	private class SlowRunnable implements Runnable {
 		boolean ran = false;
 
 		@Override

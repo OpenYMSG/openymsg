@@ -122,7 +122,7 @@ public enum ServiceType {
 	Y7_FILETRANSFERACCEPT(0xde),
 	Y7_FILETRANSFERINFO(0xdd),
 
-	UNKNOWN_SOMETHING_WITH_DUPLICATELOGIN_LOGOUT(0x7D1);
+	NEW_LOGOFF(0x7D1);
 
 	// // Home made service numbers, used in event dispatch only
 	// Y7_MINGLE(0xe1),

@@ -205,8 +205,7 @@ public class SingleStatusResponse implements SinglePacketResponse {
 
 	/**
 	 * Updates the YahooUser with the new values.
-	 * @param newStatus replacement for current Status
-	 * @param newVisibility replacement for current onChat and onPager values
+	 * @param visibility encoded visibility string
 	 */
 	public ContactPresence getPresenceByVisibility(String visibility) {
 		// This is the new version, where 13=combined pager/chat

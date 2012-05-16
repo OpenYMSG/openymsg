@@ -13,11 +13,6 @@ import org.openymsg.network.ServiceType;
 /**
  * Transmit a ADD_BUDDY packet. If all goes well we'll get a ADD_BUDDY packet back with the details of the friend to
  * confirm the transaction (usually preceded by a CONTACTNEW packet with well detailed info).
- * @param userId Yahoo id of friend to add group
- * @param groupId Group to add the new friend in
- * @throws IllegalArgumentException if one of the arguments is null or an empty String.
- * @throws IllegalStateException if this session is not logged onto the Yahoo network correctly.
- * @throws IOException on any problem while trying to create or send the packet.
  */
 public class ContactAddMessage implements Message {
 

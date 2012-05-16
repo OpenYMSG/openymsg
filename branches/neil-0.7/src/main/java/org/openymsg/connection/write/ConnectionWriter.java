@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.execute.dispatch.Dispatcher;
 import org.openymsg.execute.dispatch.Request;
+import org.openymsg.execute.dispatch.ScheduleTaskCompletionException;
 import org.openymsg.network.ConnectionHandler;
 
 public class ConnectionWriter implements Request {
@@ -14,6 +15,7 @@ public class ConnectionWriter implements Request {
 	private ConnectionHandler connection;
 	private ConcurrentLinkedQueue<Message> queue;
 	private Dispatcher executor;
+	private boolean isFinished = false;
 
 	public ConnectionWriter(ConcurrentLinkedQueue<Message> queue, Dispatcher executor) {
 		this.queue = queue;
@@ -26,6 +28,9 @@ public class ConnectionWriter implements Request {
 			log.info("connection not set");
 			return;
 		}
+		if (this.isFinished) {
+			throw new ScheduleTaskCompletionException();
+		}
 		Message message = this.queue.poll();
 		if (message != null) {
 			MessageExecuteRequest request = new MessageExecuteRequest(message, connection);
@@ -37,6 +42,10 @@ public class ConnectionWriter implements Request {
 
 	public void setConnection(ConnectionHandler connection) {
 		this.connection = connection;
+	}
+
+	public void finished() {
+		this.isFinished = true;
 	}
 
 	@Override

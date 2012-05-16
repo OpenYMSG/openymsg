@@ -24,7 +24,7 @@ public class ContactAddAckResponseTest {
 		ContactAddAckResponse response = new ContactAddAckResponse(roster, group, status);
 		response.execute(packet);
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
-		Mockito.verify(roster).possibleAddContact(contact);
+		Mockito.verify(roster).receivedContactAddAck(contact);
 		ContactGroupImpl contactGroup = new ContactGroupImpl("groupName");
 		contactGroup.add(contact);
 		Mockito.verify(group).possibleAddGroup(contactGroup);

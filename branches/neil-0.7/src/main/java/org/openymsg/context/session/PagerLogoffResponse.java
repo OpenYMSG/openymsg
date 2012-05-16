@@ -30,7 +30,7 @@ public class PagerLogoffResponse implements SinglePacketResponse {
 	public void execute(YMSG9Packet packet) {
 		log.trace("Received Pager Logoff packet.");
 		String packetUser = packet.getValue("7");
-		if (username.equalsIgnoreCase(packetUser)) {
+		if (username.equalsIgnoreCase(packetUser) || packetUser == null) {
 			handleMyLogoff(packet);
 		} else {
 			log.warn("Got a logoff for another user: " + packet);

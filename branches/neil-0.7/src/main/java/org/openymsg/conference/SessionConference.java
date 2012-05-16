@@ -55,7 +55,7 @@ public interface SessionConference {
 	/**
 	 * Invite another yahoo id to the conference with a messages. contact does not need to be current contact.
 	 * @param conference conference in the invite
-	 * @param contact yahoo id to invite
+	 * @param contacts yahoo ids to invite
 	 * @param message invite message. May be null
 	 * @throws IllegalArgumentException if conference doesn't exist
 	 */

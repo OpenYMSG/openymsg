@@ -9,17 +9,17 @@ public class PacketWriterImpl implements PacketWriter {
 	private Dispatcher executor = null;
 	// TODO don't let this get to big
 	private ConcurrentLinkedQueue<Message> queue = new ConcurrentLinkedQueue<Message>();
-	private ConnectionWriter reader;
+	private ConnectionWriter writer;
 
 	// TODO only schedule when queue is active
 	public PacketWriterImpl(Dispatcher executor) {
 		this.executor = executor;
-		this.reader = new ConnectionWriter(queue, this.executor);
-		this.executor.schedule(this.reader, 200);
+		this.writer = new ConnectionWriter(queue, this.executor);
+		this.executor.schedule(this.writer, 200);
 	}
 
 	public void initializeConnection(ConnectionHandler connection) {
-		this.reader.setConnection(connection);
+		this.writer.setConnection(connection);
 	}
 
 	@Override
@@ -29,7 +29,8 @@ public class PacketWriterImpl implements PacketWriter {
 
 	@Override
 	public void shutdown() {
-		// TODO
+		this.writer.finished();
+		this.queue.clear();
 	}
 
 }

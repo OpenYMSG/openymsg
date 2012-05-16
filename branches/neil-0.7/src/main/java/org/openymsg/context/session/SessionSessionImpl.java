@@ -74,7 +74,7 @@ public class SessionSessionImpl implements SessionSession {
 		connection.execute(new LogoutMessage(username));
 
 		// TODO schedule this incase no response from yahoo, not here
-		executor.execute(new ShutdownRequest(executor));
+		executor.execute(new ShutdownRequest(connection));
 	}
 
 	/**

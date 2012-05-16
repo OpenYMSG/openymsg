@@ -57,7 +57,7 @@ public class DirectConnectionHandler implements ConnectionHandler {
 	@Override
 	public synchronized void sendPacket(PacketBodyBuffer body, ServiceType service, MessageStatus status) {
 		log.debug("Sent packet: Magic:YMSG Version:16 Length:" + body.getBuffer().length + " Service:" + service
-				+ " Status:" + status + " SessionId:" + (sessionId & 0xFFFFFFFF) + " " + body);
+				+ " Status:" + status + " SessionId:" + Long.toHexString(sessionId) + " " + body);
 		byte[] b = body.getBuffer();
 		// Because the buffer is held at class member level, this method
 		// is not automatically thread safe. Besides, we should be only
@@ -96,6 +96,10 @@ public class DirectConnectionHandler implements ConnectionHandler {
 	@Override
 	public YMSG9Packet receivePacket() {
 		try {
+			if (ips == null) {
+				log.warn("trying to pull when input stream is null");
+				return null;
+			}
 			if (ips.isHoldingMessage()) {
 				YMSG9Packet packet = ips.readPacket();
 				if (this.sessionId == 0) {

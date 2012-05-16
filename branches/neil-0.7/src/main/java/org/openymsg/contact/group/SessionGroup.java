@@ -7,7 +7,6 @@ import org.openymsg.YahooContactGroup;
 public interface SessionGroup {
 	/**
 	 * get the groups
-	 * @category Group
 	 * @return all contact groups
 	 */
 	Set<YahooContactGroup> getContactGroups();

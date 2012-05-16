@@ -1,7 +1,5 @@
 package org.openymsg.contact.roster;
 
-import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -10,16 +8,14 @@ import org.openymsg.Name;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 import org.openymsg.connection.YahooConnection;
-import org.openymsg.contact.group.ContactGroupRenameMessage;
 import org.openymsg.network.ServiceType;
-import org.openymsg.util.CollectionUtils;
 
 public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	/** logger */
 	private static final Log log = LogFactory.getLog(SessionRosterImpl.class);
 	private YahooConnection executor;
 	private String username;
-	private Set<YahooContact> contacts = new HashSet<YahooContact>();
+	private ContactRoster contacts = new ContactRoster();
 	private SessionRosterCallback callback;
 	private boolean rosterLoaded = false;
 
@@ -28,12 +24,6 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 		this.username = username;
 		this.callback = callback;
 		this.executor.register(ServiceType.ADD_BUDDY, new ContactAddResponse(this));
-	}
-
-	public void renameGroup(YahooContactGroup group, String newName) throws IllegalStateException, IOException {
-		// checkStatus();
-		this.executor.execute(new ContactGroupRenameMessage(username, group, newName));
-		// transmitGroupRename(group, newName);
 	}
 
 	@Override
@@ -88,33 +78,19 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 		if (this.rosterLoaded) {
 			log.warn("Loading contact after roster is loaded: " + contact);
 		}
-		this.contacts.add(contact);
+		this.contacts.loadedContact(contact);
 		this.callback.addedContact(contact);
-	}
-
-	@Override
-	public void addedContact(YahooContact contact) {
-		log.trace("addedContact: " + contact);
-		if (!this.rosterLoaded) {
-			log.warn("Loading contact before roster is loaded: " + contact);
-		}
-		this.contacts.add(contact);
-		this.callback.addedContact(contact);
-		// for (Contact contact : usersOnFriendsList) {
-		// System.err.println("add: " + contactImpl.getId() + "/" + contactImpl.getProtocol() + "/" +
-		// contactImpl.getGroupIds());
-		// }
 	}
 
 	@Override
 	public Set<YahooContact> getContacts() {
-		return CollectionUtils.protectedSet(this.contacts);
+		return contacts.getContacts();
 	}
 
 	// TODO is this only for ack? should check with timeout
-	public boolean possibleAddContact(YahooContact contact) {
-		// TODO Auto-generated method stub
-		return false;
+	public void receivedContactAddAck(YahooContact contact) {
+		contacts.addRequestAcked(contact);
+		callback.addedContact(contact);
 	}
 
 	@Override
@@ -124,12 +100,13 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 
 	@Override
 	public void receivedContactAddAccepted(YahooContact contact) {
-		this.contacts.add(contact);
+		this.contacts.addRequestAccepted(contact);
 		this.callback.receivedContactAddAccepted(contact);
 	}
 
 	@Override
 	public void receivedContactAddDeclined(YahooContact contact, String message) {
+		this.contacts.addRequestDeclined(contact);
 		this.callback.receivedContactAddDeclined(contact, message);
 	}
 
@@ -139,6 +116,7 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	}
 
 	@Override
+	// TODO is why is there here
 	public void removedContact(YahooContact contact) {
 		this.callback.removedContact(contact);
 	}
@@ -158,6 +136,20 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	public boolean possibleRemoveContact(YahooContact contact) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	// NOT sure I need this
+	public void addedContact(YahooContact contact) {
+		log.trace("addedContact: " + contact);
+		if (!this.rosterLoaded) {
+			log.warn("Loading contact before roster is loaded: " + contact);
+		}
+		this.callback.addedContact(contact);
+		// for (Contact contact : usersOnFriendsList) {
+		// System.err.println("add: " + contactImpl.getId() + "/" + contactImpl.getProtocol() + "/" +
+		// contactImpl.getGroupIds());
+		// }
 	}
 
 }

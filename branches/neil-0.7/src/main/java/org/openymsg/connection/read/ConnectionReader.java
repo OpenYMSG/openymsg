@@ -3,6 +3,7 @@ package org.openymsg.connection.read;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.execute.dispatch.Request;
+import org.openymsg.execute.dispatch.ScheduleTaskCompletionException;
 import org.openymsg.network.ConnectionHandler;
 import org.openymsg.network.YMSG9Packet;
 
@@ -29,8 +30,7 @@ public class ConnectionReader implements Request {
 		// TODO - how long runs, starvation
 		log.trace("Running");
 		if (this.isFinished) {
-			log.warn("Running when finished");
-			return;
+			throw new ScheduleTaskCompletionException();
 		}
 		YMSG9Packet packet = connection.receivePacket();
 		while (packet != null) {

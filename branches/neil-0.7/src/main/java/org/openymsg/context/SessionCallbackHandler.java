@@ -63,6 +63,7 @@ public class SessionCallbackHandler implements YahooSessionCallback {
 
 	@Override
 	public void authenticationSuccess() {
+		session.authenticationSuccess();
 		callback.authenticationSuccess();
 	}
 

@@ -12,7 +12,6 @@ import org.openymsg.network.ServiceType;
  * official Yahoo client once every 60 seconds, and seems to replace the older PING service type (although this service
  * type is still received by the client just after authentication). The keep-alive does not appear to be sent to a Yahoo
  * Chatrooms.
- * @throws IOException
  */
 public class KeepAliveMessage implements Message {
 	private String username;

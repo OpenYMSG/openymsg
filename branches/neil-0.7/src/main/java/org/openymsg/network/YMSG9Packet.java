@@ -206,13 +206,11 @@ public class YMSG9Packet {
 					// packet - one will overwrite the other? (Can this happen?)
 					appendBuffer.add(k);
 					appendBuffer.add(pkt.body[i + 1]);
-				}
-				else {
+				} else {
 					// Yes! Merge!
 					body[idx + 1] = body[idx + 1] + v;
 				}
-			}
-			else {
+			} else {
 				// Append new body field to current body field
 				appendBuffer.add(k);
 				appendBuffer.add(pkt.body[i + 1]);
@@ -236,7 +234,7 @@ public class YMSG9Packet {
 		sb.append(" Service:").append(service);
 		MessageStatus messageStatus = MessageStatus.getStatus(status);
 		sb.append(" Status:").append(messageStatus != null ? messageStatus : status);
-		sb.append(" SessionId:0x").append(Long.toHexString(sessionId));
+		sb.append(" SessionId:").append(Long.toHexString(sessionId));
 		sb.append(" ");
 		for (int i = 0; i < body.length; i++)
 			sb.append(" [" + body[i] + "]");

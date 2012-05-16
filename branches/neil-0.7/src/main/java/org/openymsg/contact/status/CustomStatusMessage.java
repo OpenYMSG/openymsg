@@ -3,12 +3,8 @@ package org.openymsg.contact.status;
 import org.openymsg.YahooStatus;
 
 /**
- * Returns the custom status, or <tt>null</tt> if no such status has been set.
- * @return The custom status or <tt>null</tt>.
- */
-/**
- * Returns the custom status message, or <tt>null</tt> if no such message has been set.
- * @return The custom status message or <tt>null</tt>.
+ * Returns the custom status, or <tt>null</tt> if no such status has been set. Returns the custom status message, or
+ * <tt>null</tt> if no such message has been set.
  */
 
 public class CustomStatusMessage implements StatusMessage {
