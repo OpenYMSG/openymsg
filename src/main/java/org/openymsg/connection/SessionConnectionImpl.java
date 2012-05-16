@@ -84,10 +84,12 @@ public class SessionConnectionImpl implements YahooConnection, ConnectionHandler
 
 	@Override
 	public void shutdown() {
+		log.info("Shutting down everything");
 		this.state = ConnectionState.DISCONNECTING;
 		this.reader.shutdown();
 		this.writer.shutdown();
 		this.connection.shutdown();
+		this.executor.shutdown();
 	}
 
 	@Override
@@ -113,8 +115,10 @@ public class SessionConnectionImpl implements YahooConnection, ConnectionHandler
 	public void initializeConnection(ConnectionHandler connection) throws IllegalStateException {
 		if (!this.state.isStartable()) {
 			// TODO this isn't quite right
-			throw new IllegalStateException("Connection was already set");
+			throw new IllegalStateException("Connection was already set state: " + state + ", connection: "
+					+ connection);
 		}
+		this.state = ConnectionState.CONNECTED;
 		this.connection = connection;
 		this.reader.initializeConnection(connection);
 		this.writer.initializeConnection(connection);

@@ -36,14 +36,14 @@ public interface SessionConfig {
 	/**
 	 * Socket size. Null or 0 values prevent a change to the system settings. This does not always work on different
 	 * platforms. Only used by DirectConnect
-	 * @return
+	 * @return socket size
 	 */
 	Integer getSocketSize();
 
 	/**
 	 * Timeout for the socket connection in milliseconds. 0 is wait until the system default time Only used by
 	 * DirectConnect
-	 * @return
+	 * @return timeout for attempted socket exception
 	 */
 	int getConnectionTimeout();
 

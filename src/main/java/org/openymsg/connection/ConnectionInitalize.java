@@ -39,6 +39,7 @@ public class ConnectionInitalize implements Request {
 	public void failure(Exception ex) {
 		log.warn("Failure, setting ConnectionState to: " + ConnectionState.FAILED_CONNECTING, ex);
 		this.session.setState(ConnectionState.FAILED_CONNECTING);
+		// TODO shutdown
 	}
 
 }

@@ -294,10 +294,12 @@ public class SessionImpl implements YahooSession {
 
 	public void loggedOfNormally() {
 		this.state = YahooSessionState.LOGGED_OUT;
+		this.connection.shutdown();
 	}
 
 	public void loggedOffForced() {
 		this.state = YahooSessionState.FAILURE;
+		this.connection.shutdown();
 	}
 
 	public void failedAuthentication() {
@@ -318,6 +320,10 @@ public class SessionImpl implements YahooSession {
 	@Override
 	public void renameGroup(YahooContactGroup group, String newName) throws IllegalArgumentException {
 		this.contact.renameGroup(group, newName);
+	}
+
+	public void authenticationSuccess() {
+		this.state = YahooSessionState.LOGGED_IN;
 	}
 
 }

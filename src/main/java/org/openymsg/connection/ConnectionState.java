@@ -8,7 +8,7 @@ public enum ConnectionState {
 	/**
 	 * Started to logon
 	 */
-	CONNECTING(false, false),
+	CONNECTING(false, true),
 	/**
 	 * Connected to yahoo
 	 */

@@ -9,7 +9,12 @@ public class DispatcherExecutorLoggingCallback implements DispatcherExecutorCall
 
 	@Override
 	public void afterExecute(Runnable runnable, Throwable throwable) {
-		log.error("got Exception running: " + runnable, throwable);
+		if (throwable instanceof ScheduleTaskCompletionException) {
+			// TODO get runnable name. this is a ScheduleFutureTask
+			log.debug("scheduled runnable is done: " + runnable);
+		} else {
+			log.error("got Exception running: " + runnable, throwable);
+		}
 	}
 
 	@Override

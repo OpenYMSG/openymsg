@@ -11,7 +11,7 @@ import org.openymsg.YahooContact;
 public interface SessionMessage {
 	/**
 	 * Send a chat message.
-	 * @param to Yahoo ID of the user to transmit the message.
+	 * @param contact Yahoo ID of the user to transmit the message.
 	 * @param message The message to transmit.
 	 * @throws IllegalArgumentException if contact or message is null
 	 */
@@ -20,7 +20,7 @@ public interface SessionMessage {
 
 	/**
 	 * Send a buzz message
-	 * @param to Recipient of the buzz.
+	 * @param contact Recipient of the buzz.
 	 * @throws IllegalArgumentException if contact is null
 	 */
 	// TODO handle offline

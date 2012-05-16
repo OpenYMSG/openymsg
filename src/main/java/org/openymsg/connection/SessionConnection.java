@@ -1,6 +1,5 @@
 package org.openymsg.connection;
 
-
 /** SessionConnection for managing connecting to Yahoo */
 public interface SessionConnection {
 	/**
@@ -11,7 +10,7 @@ public interface SessionConnection {
 
 	/**
 	 * Get the ConnectionInfo. This will not change once set.
-	 * @return
+	 * @return information of the connection
 	 */
 	ConnectionInfo getConnectionInfo();
 

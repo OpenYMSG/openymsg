@@ -27,7 +27,7 @@ public class SessionMessageImpl implements SessionMessage {
 
 	/**
 	 * Creates the manager for sending and receiving messages and typing notification
-	 * @param executor executor
+	 * @param connection connection to yahoo
 	 * @param username user name
 	 * @param callback callback for notification of message and typing
 	 * @throws IllegalArgumentException if executor, user name, or callback is null

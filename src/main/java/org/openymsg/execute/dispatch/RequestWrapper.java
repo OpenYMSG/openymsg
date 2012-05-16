@@ -14,8 +14,11 @@ public class RequestWrapper implements Runnable {
 		}
 		// TODO - Throwable
 		catch (Exception e) {
-			// TODO log
-			this.request.failure(e);
+			if (e instanceof ScheduleTaskCompletionException) {
+				throw (ScheduleTaskCompletionException) e;
+			} else {
+				this.request.failure(e);
+			}
 		}
 	}
 

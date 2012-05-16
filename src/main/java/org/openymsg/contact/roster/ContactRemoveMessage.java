@@ -13,11 +13,6 @@ import org.openymsg.network.ServiceType;
  * Transmit a REMOVE_BUDDY packet. We should get a REMOVE_BUDDY packet back (usually preceded by a CONTACTNEW packet).
  * <p>
  * Note that removing a user from all groups that it is in, equals removing the user from the contact list completely.
- * @param friendId Yahoo IDof the contact to remove from a group.
- * @param groupId Group to remove the contact from.
- * @throws IllegalArgumentException if one of the arguments is null or an empty String.
- * @throws IllegalStateException if this session is not logged onto the Yahoo network correctly.
- * @throws IOException on any problem while trying to create or send the packet.
  */
 public class ContactRemoveMessage implements Message {
 
