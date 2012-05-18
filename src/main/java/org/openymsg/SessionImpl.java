@@ -10,21 +10,22 @@ import org.openymsg.connection.ConnectionState;
 import org.openymsg.connection.SessionConnectionImpl;
 import org.openymsg.contact.SessionContactImpl;
 import org.openymsg.context.SessionCallbackHandler;
-import org.openymsg.context.SessionContext;
 import org.openymsg.context.SessionContextImpl;
 import org.openymsg.context.auth.AuthenticationFailure;
+import org.openymsg.context.session.PagerLogoffResponse;
 import org.openymsg.execute.ExecutorImpl;
 import org.openymsg.mail.SessionMail;
 import org.openymsg.mail.SessionMailImpl;
 import org.openymsg.message.SessionMessage;
 import org.openymsg.message.SessionMessageImpl;
+import org.openymsg.network.ServiceType;
 import org.openymsg.unknown.SessionUnknown;
 
 public class SessionImpl implements YahooSession {
 	private SessionConfig config;
 	private SessionConnectionImpl connection;
 	private YahooSessionCallback callback;
-	private SessionContext context;
+	private SessionContextImpl context;
 	private SessionMessage message;
 	private SessionContactImpl contact;
 	private SessionConference conference;
@@ -58,12 +59,13 @@ public class SessionImpl implements YahooSession {
 		this.executor = new ExecutorImpl(username);
 		this.connection = new SessionConnectionImpl(executor, callback);
 		this.connection.initialize(config);
-		this.context = new SessionContextImpl(config, executor, connection, username, callback);
 		this.contact = new SessionContactImpl(connection, username, callback);
+		this.context = new SessionContextImpl(config, executor, connection, username, callback);
 		this.message = new SessionMessageImpl(connection, username, callback);
 		this.conference = new SessionConferenceImpl(username, connection, callback);
 		this.mail = new SessionMailImpl(connection);
 		this.unknown = new SessionUnknown(connection);
+		connection.register(ServiceType.LOGOFF, new PagerLogoffResponse(username, context, contact));
 	}
 
 	@Override

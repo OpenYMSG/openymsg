@@ -67,7 +67,12 @@ public class ConnectionReaderTest {
 
 		ConnectionReader reader = new ConnectionReader(connection, registry);
 		reader.finished();
-		reader.execute();
+		try {
+			reader.execute();
+		}
+		catch (Exception e) {
+			// fine throwing exception
+		}
 
 		Mockito.verifyZeroInteractions(connection);
 		Mockito.verifyZeroInteractions(registry);

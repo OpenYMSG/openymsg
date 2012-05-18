@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.connection.read.MultiplePacketResponse;
+import org.openymsg.network.MessageStatus;
 import org.openymsg.network.YMSG9Packet;
 
 /**
@@ -34,8 +35,8 @@ public class ListOfStatusesResponse implements MultiplePacketResponse {
 	}
 
 	@Override
-	public int getProceedStatus() {
-		return 0;
+	public boolean isFinished(long status) {
+		return status == MessageStatus.SERVER_ACK.getValue() || status == MessageStatus.DEFAULT.getValue();
 	}
 
 }

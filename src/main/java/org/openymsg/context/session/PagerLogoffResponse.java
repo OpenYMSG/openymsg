@@ -2,7 +2,11 @@ package org.openymsg.context.session;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooProtocol;
 import org.openymsg.connection.read.SinglePacketResponse;
+import org.openymsg.contact.SessionContactImpl;
+import org.openymsg.context.SessionContextImpl;
 import org.openymsg.network.YMSG9Packet;
 
 //TODO - connection isn't closed yet
@@ -15,11 +19,13 @@ import org.openymsg.network.YMSG9Packet;
 public class PagerLogoffResponse implements SinglePacketResponse {
 	private static final Log log = LogFactory.getLog(PagerLogoffResponse.class);
 	private final String username;
-	private final SessionSessionImpl session;
+	private final SessionContextImpl sessionContext;
+	private final SessionContactImpl sessionContact;
 
-	public PagerLogoffResponse(String username, SessionSessionImpl session) {
+	public PagerLogoffResponse(String username, SessionContextImpl sessionContext, SessionContactImpl sessionContact) {
 		this.username = username;
-		this.session = session;
+		this.sessionContext = sessionContext;
+		this.sessionContact = sessionContact;
 	}
 
 	/**
@@ -30,10 +36,13 @@ public class PagerLogoffResponse implements SinglePacketResponse {
 	public void execute(YMSG9Packet packet) {
 		log.trace("Received Pager Logoff packet.");
 		String packetUser = packet.getValue("7");
+		// TODO handle protocol
 		if (username.equalsIgnoreCase(packetUser) || packetUser == null) {
 			handleMyLogoff(packet);
 		} else {
 			log.warn("Got a logoff for another user: " + packet);
+			YahooContact contact = new YahooContact(packetUser, YahooProtocol.YAHOO);
+			sessionContact.receivedContactLogoff(contact);
 		}
 
 	}
@@ -51,7 +60,7 @@ public class PagerLogoffResponse implements SinglePacketResponse {
 		} else {
 			log.info("AUTHRESP says: logged off without a reason" + LogoutReason.NO_REASON);
 		}
-		session.receivedLogout(state);
+		sessionContext.receivedLogout(state);
 	}
 
 }

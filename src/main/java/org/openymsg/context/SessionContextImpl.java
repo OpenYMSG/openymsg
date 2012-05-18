@@ -68,4 +68,8 @@ public class SessionContextImpl implements SessionContext, SessionContextCallbac
 		return authentication.getFailureState();
 	}
 
+	public void receivedLogout(LogoutReason state) {
+		this.session.receivedLogout(state);
+	}
+
 }

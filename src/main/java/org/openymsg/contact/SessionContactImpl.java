@@ -5,9 +5,11 @@ import java.util.Set;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 import org.openymsg.YahooContactStatus;
+import org.openymsg.YahooStatus;
 import org.openymsg.connection.YahooConnection;
 import org.openymsg.contact.group.SessionGroupImpl;
 import org.openymsg.contact.roster.SessionRosterImpl;
+import org.openymsg.contact.status.ContactStatusImpl;
 import org.openymsg.contact.status.SessionStatusImpl;
 import org.openymsg.network.ServiceType;
 
@@ -79,6 +81,10 @@ public class SessionContactImpl implements SessionContact {
 	@Override
 	public void renameGroup(YahooContactGroup group, String newName) throws IllegalArgumentException {
 		this.sessionGroup.renameGroup(group, newName);
+	}
+
+	public void receivedContactLogoff(YahooContact contact) {
+		sessionStatus.statusUpdate(contact, new ContactStatusImpl(YahooStatus.OFFLINE, false, false));
 	}
 
 }

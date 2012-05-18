@@ -3,9 +3,12 @@ package org.openymsg.connection.read;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.YMSG9Packet;
 
 public class CollectPacketResponse implements SinglePacketResponse {
+	private static final Log log = LogFactory.getLog(CollectPacketResponse.class);
 	private final MultiplePacketResponse response;
 	protected List<YMSG9Packet> packets = new ArrayList<YMSG9Packet>();
 
@@ -17,11 +20,10 @@ public class CollectPacketResponse implements SinglePacketResponse {
 	public void execute(YMSG9Packet packet) {
 		boolean finished = false;
 		this.packets.add(packet);
-		if (packet.status == response.getProceedStatus()) {
+		if (response.isFinished(packet.status)) {
 			finished = true;
 		} else {
-			// TODO log
-			// System.err.println("status is: " + packet.status);
+			log.debug("still collection: " + packet.status);
 		}
 		if (finished) {
 			this.response.execute(packets);
