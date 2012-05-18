@@ -34,7 +34,6 @@ public class SessionSessionImpl implements SessionSession {
 		this.callback = callback;
 		state = LoginState.LOGGING_IN;
 		connection.register(ServiceType.LIST, new ListResponse());
-		connection.register(ServiceType.LOGOFF, new PagerLogoffResponse(username, this));
 		connection.register(ServiceType.PING, new PingResponse());
 	}
 

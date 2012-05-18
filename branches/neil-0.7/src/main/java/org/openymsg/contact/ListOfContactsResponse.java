@@ -17,6 +17,7 @@ import org.openymsg.contact.group.ContactGroupImpl;
 import org.openymsg.contact.group.SessionGroupImpl;
 import org.openymsg.contact.roster.SessionRosterImpl;
 import org.openymsg.contact.status.SessionStatusImpl;
+import org.openymsg.network.MessageStatus;
 import org.openymsg.network.YMSG9Packet;
 
 public class ListOfContactsResponse implements MultiplePacketResponse {
@@ -191,8 +192,8 @@ public class ListOfContactsResponse implements MultiplePacketResponse {
 	}
 
 	@Override
-	public int getProceedStatus() {
-		return 0;
+	public boolean isFinished(long status) {
+		return status == MessageStatus.DEFAULT.getValue();
 	}
 
 }

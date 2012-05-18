@@ -9,4 +9,13 @@ public class Unknown002Response implements SinglePacketResponse {
 	public void execute(YMSG9Packet packet) {
 	}
 
+	@Override
+	public int hashCode() {
+		return 1;
+	}
+
+	@Override
+	public boolean equals(Object arg0) {
+		return arg0 instanceof Unknown002Response;
+	}
 }

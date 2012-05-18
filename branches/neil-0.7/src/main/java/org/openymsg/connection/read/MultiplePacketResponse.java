@@ -6,5 +6,6 @@ import org.openymsg.network.YMSG9Packet;
 
 public interface MultiplePacketResponse {
 	void execute(List<YMSG9Packet> packets);
-	int getProceedStatus();
+
+	boolean isFinished(long status);
 }
