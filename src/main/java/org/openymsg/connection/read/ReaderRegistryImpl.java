@@ -62,18 +62,18 @@ public class ReaderRegistryImpl implements ReaderRegistry {
 		ServiceType type = packet.service;
 		Set<SinglePacketResponse> responses = this.registry.get(type);
 		if (responses == null || responses.isEmpty()) {
-			log.info("Not handling serviceType: + " + type);
+			log.warn("Not handling serviceType: + " + type);
 			return;
 		}
 		if (responses.size() > 1) {
-			log.info("multiple responses for serviceType: + " + type);
+			log.warn("multiple responses for serviceType: + " + type);
 		}
 		for (SinglePacketResponse response : responses) {
 			try {
 				response.execute(packet);
 			}
 			catch (Exception e) {
-				log.warn("Failed calling: " + packet, e);
+				log.error("Failed calling: " + packet, e);
 			}
 		}
 
