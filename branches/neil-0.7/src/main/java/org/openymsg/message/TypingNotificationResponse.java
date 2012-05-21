@@ -38,8 +38,8 @@ public class TypingNotificationResponse implements SinglePacketResponse {
 		// FIX: documentation says this should be Status.TYPING (0x16)
 		// if (packet.status == 0x01) {
 		@SuppressWarnings("unused")
-		String to = packet.getValue("4");
-		String from = packet.getValue("5");
+		String to = packet.getValue("5");
+		String from = packet.getValue("4");
 		// TODO protocol
 		String message = packet.getValue("14"); // message (game)
 		String type = packet.getValue("49"); // type (typing/game)
