@@ -13,6 +13,6 @@ public abstract class AbstractConferenceResponse implements SinglePacketResponse
 
 	protected YahooConference getConference(YMSG9Packet packet) {
 		String id = packet.getValue("57");
-		return new ConferenceImpl(id);
+		return new YahooConference(id);
 	}
 }

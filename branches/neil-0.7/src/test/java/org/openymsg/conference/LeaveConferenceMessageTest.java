@@ -20,7 +20,7 @@ public class LeaveConferenceMessageTest {
 		YahooContact invited2 = new YahooContact("testbuddy4", YahooProtocol.YAHOO);
 		YahooContact invited3 = new YahooContact("testbuddy5", YahooProtocol.YAHOO);
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		ConferenceMembershipImpl membership = new ConferenceMembershipImpl();
 		membership.addMember(member1);
 		membership.addMember(member2);

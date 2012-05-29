@@ -34,7 +34,7 @@ public class ConferenceExtendResponseTest {
 		ConferenceExtendResponse response = new ConferenceExtendResponse(session);
 		response.execute(packet);
 		String id = "testbuddy-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		YahooContact inviter = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		YahooContact invited = new YahooContact("testbuddy2", YahooProtocol.YAHOO);
 		Set<YahooContact> invitedContacts = new HashSet<YahooContact>();
@@ -57,7 +57,7 @@ public class ConferenceExtendResponseTest {
 		ConferenceExtendResponse response = new ConferenceExtendResponse(session);
 		response.execute(packet);
 		String id = "testbuddy-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		YahooContact inviter = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		YahooContact invited1 = new YahooContact("testbuddy3", YahooProtocol.YAHOO);
 		YahooContact invited2 = new YahooContact("testbuddy4", YahooProtocol.YAHOO);

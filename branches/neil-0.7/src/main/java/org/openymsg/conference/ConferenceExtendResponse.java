@@ -43,7 +43,7 @@ public class ConferenceExtendResponse extends AbstractConferenceResponse {
 		// Set<YahooContact> memberContacts = getContacts(memberContactId);
 		// invitedUsers.addAll(otherInvitedUsers);
 
-		YahooConference conference = new ConferenceImpl(conferenceId);
+		YahooConference conference = new YahooConference(conferenceId);
 		if (invitedContactIdsCommaSeparated.isEmpty()) {
 			log.debug("Correctly not handling empty invite: " + packet);
 			return;

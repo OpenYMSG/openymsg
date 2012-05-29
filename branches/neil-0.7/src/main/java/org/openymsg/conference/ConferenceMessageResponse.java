@@ -2,6 +2,7 @@ package org.openymsg.conference;
 
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
+import org.openymsg.YahooProtocol;
 import org.openymsg.network.YMSG9Packet;
 
 /**
@@ -25,7 +26,7 @@ public class ConferenceMessageResponse extends AbstractConferenceResponse {
 		@SuppressWarnings("unused")
 		String to = packet.getValue("1");
 		String from = packet.getValue("3"); // TODO - protocol
-		YahooContact contact = new YahooContact(from);
+		YahooContact contact = new YahooContact(from, YahooProtocol.YAHOO);
 		String message = packet.getValue("14"); // unicode
 		sessionConference.receivedConferenceMessage(conference, contact, message);
 		// TODO add invite packet?

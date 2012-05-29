@@ -2,6 +2,7 @@ package org.openymsg.conference;
 
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
+import org.openymsg.YahooProtocol;
 import org.openymsg.network.YMSG9Packet;
 
 /**
@@ -21,7 +22,7 @@ public class ConferenceDeclineResponse extends AbstractConferenceResponse {
 		@SuppressWarnings("unused")
 		String to = packet.getValue("1");
 		String from = packet.getValue("54");
-		YahooContact contact = new YahooContact(from); // TODO protocol
+		YahooContact contact = new YahooContact(from, YahooProtocol.YAHOO); // TODO protocol
 		String message = packet.getValue("14");
 		sessionConference.receivedConferenceDecline(conference, contact, message);
 		// Create event

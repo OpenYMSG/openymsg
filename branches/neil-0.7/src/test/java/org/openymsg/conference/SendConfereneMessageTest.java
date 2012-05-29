@@ -16,7 +16,7 @@ public class SendConfereneMessageTest {
 		String username = "testuser";
 		YahooContact member1 = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		ConferenceMembershipImpl membership = new ConferenceMembershipImpl();
 		membership.addMember(member1);
 		String message = "myMessage";

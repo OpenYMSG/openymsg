@@ -27,7 +27,7 @@ public class ConferenceLeaveResponseTest {
 		ConferenceLeaveResponse response = new ConferenceLeaveResponse(session);
 		response.execute(packet);
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		YahooContact leaver = new YahooContact("testbuddy2", YahooProtocol.YAHOO);
 
 		// Verify
@@ -41,7 +41,7 @@ public class ConferenceLeaveResponseTest {
 		ConferenceLeaveResponse response = new ConferenceLeaveResponse(session);
 		response.execute(packet);
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		YahooContact leaver = new YahooContact("testbuddy5", YahooProtocol.YAHOO);
 
 		// Verify

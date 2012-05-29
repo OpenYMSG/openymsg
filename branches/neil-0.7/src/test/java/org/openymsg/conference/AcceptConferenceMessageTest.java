@@ -20,7 +20,7 @@ public class AcceptConferenceMessageTest {
 		Set<YahooContact> contacts = new HashSet<YahooContact>();
 		contacts.add(contact);
 		String id = "testbuddy-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		ConferenceMembershipImpl membership = new ConferenceMembershipImpl();
 		membership.addMember(contact);
 		AcceptConferenceMessage outgoing = new AcceptConferenceMessage(username, conference, membership);
