@@ -10,13 +10,13 @@ public class YahooConferenceTest {
 
 	@Test
 	public void equalsContract() {
-		EqualsVerifier.forClass(ConferenceImpl.class).verify();
+		EqualsVerifier.forClass(YahooConference.class).verify();
 	}
 
 	@Test
 	public void testSimple() {
 		String id = "id";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		Assert.assertEquals(id, conference.getId());
 	}
 

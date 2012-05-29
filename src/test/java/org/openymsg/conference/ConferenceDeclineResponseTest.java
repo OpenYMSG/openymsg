@@ -27,7 +27,7 @@ public class ConferenceDeclineResponseTest {
 		ConferenceDeclineResponse response = new ConferenceDeclineResponse(session);
 		response.execute(packet);
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		YahooContact decliner = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		String message = "Nothankyou.";
 

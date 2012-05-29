@@ -30,7 +30,7 @@ public class ConferenceAcceptResponseTest {
 		response.execute(packet);
 
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		YahooContact accepter = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		Set<YahooContact> members = new HashSet<YahooContact>();
 		members.add(accepter);

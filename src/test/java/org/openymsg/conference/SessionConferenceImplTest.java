@@ -31,7 +31,7 @@ public class SessionConferenceImplTest {
 	@Test
 	public void testSendMessage() {
 		String conferenceId = "id";
-		YahooConference conference = new ConferenceImpl(conferenceId);
+		YahooConference conference = new YahooConference(conferenceId);
 		Set<YahooContact> contacts = new HashSet<YahooContact>();
 		String message = "message";
 
@@ -46,7 +46,7 @@ public class SessionConferenceImplTest {
 	@Test
 	public void testConferenceDecline() {
 		String conferenceId = "id";
-		YahooConference conference = new ConferenceImpl(conferenceId);
+		YahooConference conference = new YahooConference(conferenceId);
 		YahooContact inviter = null;
 		YahooContact me = new YahooContact(username, YahooProtocol.YAHOO);
 		Set<YahooContact> invited = new HashSet<YahooContact>();
@@ -69,7 +69,7 @@ public class SessionConferenceImplTest {
 	@Test
 	public void testConferenceAccept() {
 		String conferenceId = "id";
-		YahooConference conference = new ConferenceImpl(conferenceId);
+		YahooConference conference = new YahooConference(conferenceId);
 		YahooContact inviter = null;
 		YahooContact me = new YahooContact(username, YahooProtocol.YAHOO);
 		Set<YahooContact> invited = new HashSet<YahooContact>();
@@ -92,7 +92,7 @@ public class SessionConferenceImplTest {
 	@Test
 	public void testReceivedConferenceAccept() throws IOException {
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		YahooContact accepter = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		Set<YahooContact> members = new HashSet<YahooContact>();
 		members.add(accepter);
@@ -107,7 +107,7 @@ public class SessionConferenceImplTest {
 	@Test
 	public void testReceivedConferneceDeclie() throws IOException {
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		YahooContact decliner = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		String message = "Nothankyou.";
 
@@ -126,7 +126,7 @@ public class SessionConferenceImplTest {
 	@Test
 	public void testReceiveConferenceExtendSingleExistingSingleInvite() throws IOException {
 		String id = "testbuddy-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		YahooContact inviter = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		YahooContact invited = new YahooContact("testbuddy2", YahooProtocol.YAHOO);
 		Set<YahooContact> invitedContacts = new HashSet<YahooContact>();
@@ -148,7 +148,7 @@ public class SessionConferenceImplTest {
 	@Test
 	public void testReceiveConferenceExtendMultiInvite() throws IOException {
 		String id = "testbuddy-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		YahooContact inviter = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		YahooContact invited1 = new YahooContact("testbuddy3", YahooProtocol.YAHOO);
 		YahooContact invited2 = new YahooContact("testbuddy4", YahooProtocol.YAHOO);
@@ -175,7 +175,7 @@ public class SessionConferenceImplTest {
 	@Test
 	public void testReceiveSingleInviteYahoo() throws IOException {
 		String id = "testbuddy-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		YahooContact inviter = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		String message = "Invitingtestuser";
 		Set<YahooContact> invited = new HashSet<YahooContact>();
@@ -195,7 +195,7 @@ public class SessionConferenceImplTest {
 	@Test
 	public void testReceiveSingleInviteAckYahoo() throws IOException {
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		Set<YahooContact> invited = new HashSet<YahooContact>();
 		YahooContact buddy = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		invited.add(buddy);
@@ -214,7 +214,7 @@ public class SessionConferenceImplTest {
 	@Test
 	public void testReceiveLogoffMultipleMembersYahoo() throws IOException {
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		YahooContact leaver = new YahooContact("testbuddy2", YahooProtocol.YAHOO);
 
 		session.receivedConferenceLeft(conference, leaver);
@@ -227,7 +227,7 @@ public class SessionConferenceImplTest {
 	@Test
 	public void testReceiveMessage() throws IOException {
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		YahooContact sender = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		String message = "myMessage";
 

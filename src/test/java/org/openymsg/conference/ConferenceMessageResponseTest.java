@@ -27,7 +27,7 @@ public class ConferenceMessageResponseTest {
 		ConferenceMessageResponse response = new ConferenceMessageResponse(session);
 		response.execute(packet);
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		YahooContact sender = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		String message = "myMessage";
 

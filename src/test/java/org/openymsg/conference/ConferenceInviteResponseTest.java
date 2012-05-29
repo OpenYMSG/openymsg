@@ -29,7 +29,7 @@ public class ConferenceInviteResponseTest {
 		ConferenceInviteResponse response = new ConferenceInviteResponse(session);
 		response.execute(packet);
 		String id = "testbuddy-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		YahooContact inviter = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		String message = "Invitingtestuser";
 		Set<YahooContact> invited = new HashSet<YahooContact>();
@@ -49,7 +49,7 @@ public class ConferenceInviteResponseTest {
 		ConferenceInviteResponse response = new ConferenceInviteResponse(session);
 		response.execute(packet);
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		Set<YahooContact> invited = new HashSet<YahooContact>();
 		YahooContact buddy = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		invited.add(buddy);

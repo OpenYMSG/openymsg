@@ -22,7 +22,7 @@ public class ExtendConferenceMessageTest {
 		invitedContacts.add(invited);
 		String message = "joinconference";
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		ConferenceMembershipImpl membership = new ConferenceMembershipImpl();
 		membership.addMember(member);
 		ExtendConferenceMessage outgoing = new ExtendConferenceMessage(username, conference, membership,
@@ -45,7 +45,7 @@ public class ExtendConferenceMessageTest {
 		invitedContacts.add(invited3);
 		String message = "joinconference";
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		ConferenceMembershipImpl membership = new ConferenceMembershipImpl();
 		membership.addMember(member1);
 		membership.addMember(member2);
@@ -67,7 +67,7 @@ public class ExtendConferenceMessageTest {
 		invitedContacts.add(invited);
 		String message = "joinconference";
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		ConferenceMembershipImpl membership = new ConferenceMembershipImpl();
 		membership.addMember(member);
 		membership.addInvited(outstandingInvited1);

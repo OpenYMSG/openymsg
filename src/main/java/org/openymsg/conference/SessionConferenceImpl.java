@@ -93,7 +93,7 @@ public class SessionConferenceImpl implements SessionConference {
 			throw new IllegalArgumentException("Contact cannot be null, but can be empty");
 		}
 		// TODO - how to add invited ids to conference
-		YahooConference conference = new ConferenceImpl(conferenceId);
+		YahooConference conference = new YahooConference(conferenceId);
 		// TODO - cannot reused id
 		this.conferenceMemberships.put(conferenceId, new ConferenceMembershipImpl());
 		this.executor.execute(new CreateConferenceMessage(username, conference, contacts, message));

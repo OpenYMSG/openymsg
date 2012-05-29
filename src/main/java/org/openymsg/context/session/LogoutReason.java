@@ -1,21 +1,19 @@
 package org.openymsg.context.session;
 
 public enum LogoutReason {
-	NO_REASON(-1, false), // don't know, this is when no reason is sent, usually when normal logout
-	DUPLICATE_LOGIN1(42, true), // 42 - Account has signed in from another location
-	DUPLICATE_LOGIN2(99, true),
-	UNKNOWN_52(52, false); // don't know
+	NO_REASON(-1), // don't know, this is when no reason is sent, usually when normal logout
+	DUPLICATE_LOGIN1(42), // 42 - Account has signed in from another location
+	DUPLICATE_LOGIN2(99),
+	UNKNOWN_52(52); // don't know
 
 	private long value;
-	private boolean duplicateLogin;
 
 	/**
 	 * Creates a new state, based on a unique long value identifier.
 	 * @param value Unique long value for the state to be created.
 	 */
-	private LogoutReason(long value, boolean isDuplicateLogin) {
+	private LogoutReason(long value) {
 		this.value = value;
-		duplicateLogin = isDuplicateLogin;
 	}
 
 	/**
@@ -44,7 +42,7 @@ public enum LogoutReason {
 	}
 
 	public boolean isDuplicateLogin() {
-		return duplicateLogin;
+		return this == DUPLICATE_LOGIN1 || this == DUPLICATE_LOGIN2;
 	}
 
 }

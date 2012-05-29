@@ -22,7 +22,7 @@ public class CreateConferenceMessageTest {
 		contacts.add(contact);
 		String message = "Invitingtestbuddy";
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
-		YahooConference conference = new ConferenceImpl(id);
+		YahooConference conference = new YahooConference(id);
 		CreateConferenceMessage outgoing = new CreateConferenceMessage(username, conference, contacts, message);
 		MessageAssert.assertEquals(outgoing, test);
 	}
