@@ -204,7 +204,7 @@ public class SessionConferenceImplTest {
 		members.add(me);
 		String message = "Invitingtestuser";
 
-		session.receivedConferenceInviteAck(conference, me, invited, members, message);
+		session.receivedConferenceInviteAck(conference, invited, members, message);
 
 		ConferenceMembership membership = session.getConferenceMembership(conference);
 		Assert.assertEquals(members, membership.getMembers());

@@ -154,20 +154,23 @@ public class SessionCallbackHandler implements YahooSessionCallback {
 
 	@Override
 	public void receivedConferenceAccept(YahooConference conference, YahooContact contact) {
-		// TODO Auto-generated method stub
-
+		callback.receivedConferenceAccept(conference, contact);
 	}
 
 	@Override
 	public void receivedConferenceExtend(YahooConference conference, YahooContact inviter, Set<YahooContact> invited) {
-		// TODO Auto-generated method stub
-
+		callback.receivedConferenceExtend(conference, inviter, invited);
 	}
 
 	@Override
 	public void receivedConferenceLeft(YahooConference conference, YahooContact contact) {
-		// TODO Auto-generated method stub
+		callback.receivedConferenceLeft(conference, contact);
+	}
 
+	@Override
+	public void receivedConferenceInviteAck(YahooConference conference, Set<YahooContact> invited,
+			Set<YahooContact> members, String message) {
+		callback.receivedConferenceInviteAck(conference, invited, members, message);
 	}
 
 }

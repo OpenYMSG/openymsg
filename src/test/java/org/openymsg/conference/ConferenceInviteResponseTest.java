@@ -59,7 +59,7 @@ public class ConferenceInviteResponseTest {
 		String message = "Invitingtestbuddy";
 
 		// Verify
-		Mockito.verify(session).receivedConferenceInviteAck(conference, me, invited, members, message);
+		Mockito.verify(session).receivedConferenceInviteAck(conference, invited, members, message);
 	}
 
 }

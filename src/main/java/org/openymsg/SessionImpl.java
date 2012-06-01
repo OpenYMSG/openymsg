@@ -23,10 +23,10 @@ import org.openymsg.unknown.SessionUnknown;
 
 public class SessionImpl implements YahooSession {
 	private SessionConfig config;
-	private SessionConnectionImpl connection;
-	private YahooSessionCallback callback;
+	protected SessionConnectionImpl connection;
+	protected YahooSessionCallback callback;
 	private SessionContextImpl context;
-	private SessionMessage message;
+	protected SessionMessage message;
 	private SessionContactImpl contact;
 	private SessionConference conference;
 	@SuppressWarnings("unused")
@@ -61,7 +61,7 @@ public class SessionImpl implements YahooSession {
 		this.connection.initialize(config);
 		this.contact = new SessionContactImpl(connection, username, callback);
 		this.context = new SessionContextImpl(config, executor, connection, username, callback);
-		this.message = new SessionMessageImpl(connection, username, callback);
+		initializeSessionMessage(username);
 		this.conference = new SessionConferenceImpl(username, connection, callback);
 		this.mail = new SessionMailImpl(connection);
 		this.unknown = new SessionUnknown(connection);
@@ -326,6 +326,10 @@ public class SessionImpl implements YahooSession {
 
 	public void authenticationSuccess() {
 		this.state = YahooSessionState.LOGGED_IN;
+	}
+
+	protected void initializeSessionMessage(String username) {
+		this.message = new SessionMessageImpl(connection, username, callback);
 	}
 
 }
