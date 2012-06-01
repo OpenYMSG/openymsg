@@ -59,8 +59,7 @@ public class ConferenceInviteResponse extends AbstractConferenceResponse {
 		memberContacts.add(inviter);
 
 		if (to.equals(from)) {
-			sessionConference
-					.receivedConferenceInviteAck(conference, inviter, invitedContacts, memberContacts, message);
+			sessionConference.receivedConferenceInviteAck(conference, invitedContacts, memberContacts, message);
 		} else {
 			sessionConference.receivedConferenceInvite(conference, inviter, invitedContacts, memberContacts, message);
 		}

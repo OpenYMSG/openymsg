@@ -186,4 +186,11 @@ public class TestingSessionCallback implements YahooSessionCallback {
 		return failure;
 	}
 
+	@Override
+	public void receivedConferenceInviteAck(YahooConference conference, Set<YahooContact> invited,
+			Set<YahooContact> members, String message) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

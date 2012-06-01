@@ -35,4 +35,7 @@ public interface SessionConferenceCallback {
 	void receivedConferenceAccept(YahooConference conference, YahooContact contact);
 
 	void receivedConferenceLeft(YahooConference conference, YahooContact contact);
+
+	void receivedConferenceInviteAck(YahooConference conference, Set<YahooContact> invited, Set<YahooContact> members,
+			String message);
 }

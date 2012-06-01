@@ -41,6 +41,7 @@ public class SessionConferenceImpl implements SessionConference {
 		this.executor.register(ServiceType.CONFINVITE, new ConferenceInviteResponse(this));
 		this.executor.register(ServiceType.CONFDECLINE, new ConferenceDeclineResponse(this));
 		this.executor.register(ServiceType.CONFLOGON, new ConferenceAcceptResponse(this));
+		this.executor.register(ServiceType.CONFLOGOFF, new ConferenceLeaveResponse(this));
 	}
 
 	@Override
@@ -194,8 +195,8 @@ public class SessionConferenceImpl implements SessionConference {
 		this.callback.receivedConferenceInvite(conference, inviter, invited, members, message);
 	}
 
-	public void receivedConferenceInviteAck(YahooConference conference, YahooContact inviter,
-			Set<YahooContact> invited, Set<YahooContact> members, String message) {
+	public void receivedConferenceInviteAck(YahooConference conference, Set<YahooContact> invited,
+			Set<YahooContact> members, String message) {
 		ConferenceMembershipImpl membership = this.conferenceMemberships.get(conference.getId());
 		if (membership == null) {
 			membership = new ConferenceMembershipImpl();
@@ -206,6 +207,7 @@ public class SessionConferenceImpl implements SessionConference {
 		}
 		membership.addMember(members);
 		membership.addInvited(invited);
+		callback.receivedConferenceInviteAck(conference, invited, members, message);
 	}
 
 	public void receivedConferenceAccept(YahooConference conference, YahooContact contact) {
