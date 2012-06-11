@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.openymsg.config.SessionConfig;
-import org.openymsg.config.SessionConfigImpl;
+import org.openymsg.config.SessionConfigSimple;
 import org.testng.annotations.Test;
 
 public class CapacityServersTest {
@@ -12,7 +12,7 @@ public class CapacityServersTest {
 	@Test
 	// TODO needs internet
 	public void getIpAddress() {
-		SessionConfig config = new SessionConfigImpl();
+		SessionConfig config = new SessionConfigSimple();
 		CapacityServers servers = new CapacityServers(config);
 		for (String ipAddress : servers.getIpAddresses()) {
 			System.out.println("ipAddress: " + ipAddress);
@@ -22,7 +22,7 @@ public class CapacityServersTest {
 
 	@Test
 	public void readIpAddress() throws IOException {
-		SessionConfig config = new SessionConfigImpl();
+		SessionConfig config = new SessionConfigSimple();
 		CapacityServers servers = new CapacityServers(config);
 		String host = "host";
 		String url = "url";
@@ -36,7 +36,7 @@ public class CapacityServersTest {
 
 	@Test
 	public void read2IpAddress() throws IOException {
-		SessionConfig config = new SessionConfigImpl();
+		SessionConfig config = new SessionConfigSimple();
 		CapacityServers servers = new CapacityServers(config);
 		String host = "host";
 		String url = "url";

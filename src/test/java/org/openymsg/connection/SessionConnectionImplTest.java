@@ -2,9 +2,9 @@ package org.openymsg.connection;
 
 import org.mockito.Mockito;
 import org.openymsg.config.SessionConfig;
-import org.openymsg.config.TestingSessionConfig;
 import org.openymsg.execute.Executor;
 import org.openymsg.execute.ExecutorImpl;
+import org.openymsg.network.TestingConnectionBuilder;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -40,7 +40,8 @@ public class SessionConnectionImplTest {
 
 	@Test
 	public void testConnection() {
-		SessionConfig sessionConfig = new TestingSessionConfig();
+		SessionConfig sessionConfig = Mockito.mock(SessionConfig.class);
+		Mockito.when(sessionConfig.getConnectionBuilder()).thenReturn(new TestingConnectionBuilder(true));
 		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, listener);
 		sessionConnection.initialize(sessionConfig);
 		Mockito.verify(listener, Mockito.timeout(100)).connectionSuccessful();
@@ -49,7 +50,8 @@ public class SessionConnectionImplTest {
 
 	@Test
 	public void testFailed() {
-		SessionConfig sessionConfig = new TestingSessionConfig(false);
+		SessionConfig sessionConfig = Mockito.mock(SessionConfig.class);
+		Mockito.when(sessionConfig.getConnectionBuilder()).thenReturn(new TestingConnectionBuilder(false));
 		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, listener);
 		sessionConnection.initialize(sessionConfig);
 		Mockito.verify(listener).connectionFailure();
@@ -57,7 +59,8 @@ public class SessionConnectionImplTest {
 
 	@Test
 	public void testFailLater() {
-		SessionConfig sessionConfig = new TestingSessionConfig();
+		SessionConfig sessionConfig = Mockito.mock(SessionConfig.class);
+		Mockito.when(sessionConfig.getConnectionBuilder()).thenReturn(new TestingConnectionBuilder(true));
 		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, listener);
 		sessionConnection.initialize(sessionConfig);
 		sessionConnection.connectionEnded();

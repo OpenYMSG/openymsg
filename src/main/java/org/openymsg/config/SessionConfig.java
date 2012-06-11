@@ -48,4 +48,10 @@ public interface SessionConfig {
 	int getConnectionTimeout();
 
 	String[] getScsHosts();
+
+	/**
+	 * Get timeout in seconds for session without calling keepalive. Null is never timeout.
+	 * @return timeout in seconds, null is forever
+	 */
+	Integer getSessionTimeout();
 }

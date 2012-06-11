@@ -8,7 +8,7 @@ public class SessionConfigImplTest {
 
 	@Test
 	public void getLoginUrl() throws UnsupportedEncodingException {
-		SessionConfig config = new SessionConfigImpl();
+		SessionConfig config = new SessionConfigSimple();
 		String seed = "sfdfsdfdsf";
 		String password = "password";
 		String username = "username";

@@ -1,7 +1,7 @@
 package org.openymsg.network.direct;
 
 import org.openymsg.config.SessionConfig;
-import org.openymsg.config.SessionConfigImpl;
+import org.openymsg.config.SessionConfigSimple;
 import org.openymsg.connection.ConnectionInfo;
 import org.openymsg.network.ConnectionBuilder;
 import org.testng.annotations.BeforeMethod;
@@ -13,7 +13,7 @@ public class DirectConnectionBuilderTest {
 
 	@BeforeMethod
 	public void setup() {
-		config = new SessionConfigImpl();
+		config = new SessionConfigSimple();
 		builder = new DirectConnectionBuilder();
 	}
 

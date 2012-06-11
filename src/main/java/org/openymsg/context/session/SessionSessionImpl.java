@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooStatus;
 import org.openymsg.connection.YahooConnection;
 import org.openymsg.connection.write.ScheduledMessageSender;
+import org.openymsg.context.session.timeout.TimeoutChecker;
 import org.openymsg.execute.Executor;
 import org.openymsg.network.ServiceType;
 
@@ -16,8 +17,9 @@ public class SessionSessionImpl implements SessionSession {
 	private YahooConnection connection;
 	private SessionSessionCallback callback;
 	private LoginState state;
+	private TimeoutChecker timeoutChecker;
 
-	public SessionSessionImpl(String username, Executor executor, YahooConnection connection,
+	public SessionSessionImpl(String username, Executor executor, YahooConnection connection, Integer timeout,
 			SessionSessionCallback callback) {
 		if (executor == null) {
 			throw new IllegalArgumentException("Executor cannot be null");
@@ -35,6 +37,12 @@ public class SessionSessionImpl implements SessionSession {
 		state = LoginState.LOGGING_IN;
 		connection.register(ServiceType.LIST, new ListResponse());
 		connection.register(ServiceType.PING, new PingResponse());
+		initializeTimeout(timeout);
+	}
+
+	private void initializeTimeout(Integer timeout) {
+		timeoutChecker = new TimeoutChecker(timeout, executor, connection);
+		executor.schedule(timeoutChecker, 60 * 1000);
 	}
 
 	// TODO - looks cool
@@ -145,6 +153,11 @@ public class SessionSessionImpl implements SessionSession {
 		// session.setState(state);
 		// }
 
+	}
+
+	@Override
+	public void keepAlive() {
+		timeoutChecker.keepAlive();
 	}
 
 }
