@@ -11,9 +11,13 @@ import org.openymsg.network.direct.DirectConnectionBuilder;
 import org.openymsg.network.url.URLStreamBuilder;
 import org.openymsg.network.url.URLStreamBuilderImpl;
 
-public class SessionConfigHardcoded implements SessionConfig {
+/**
+ * Default SessionConfig
+ * @author neilhart
+ */
+public class SessionConfigSimple implements SessionConfig {
 	/** logger */
-	private static final Log log = LogFactory.getLog(SessionConfigImpl.class);
+	private static final Log log = LogFactory.getLog(SessionConfigSimple.class);
 
 	@Override
 	public String getLoginHost() {
@@ -50,7 +54,7 @@ public class SessionConfigHardcoded implements SessionConfig {
 
 	@Override
 	public String[] getCapacityHosts() {
-		return new String[0];
+		return NetworkConstants.CAPACITY_HOSTS;
 	}
 
 	@Override
@@ -65,8 +69,7 @@ public class SessionConfigHardcoded implements SessionConfig {
 
 	@Override
 	public String[] getScsHosts() {
-		String[] ips = { "67.195.187.252", "67.195.187.197" };
-		return ips;
+		return NetworkConstants.SCS_HOSTS;
 	}
 
 	@Override
@@ -78,4 +81,14 @@ public class SessionConfigHardcoded implements SessionConfig {
 	public URLStreamBuilder getURLStreamBuilder() {
 		return new URLStreamBuilderImpl();
 	}
+
+	/**
+	 * Timeout is null, forever
+	 * @return null
+	 */
+	@Override
+	public Integer getSessionTimeout() {
+		return null;
+	}
+
 }
