@@ -3,7 +3,16 @@ package org.openymsg.context.session;
 import org.openymsg.YahooStatus;
 
 public interface SessionSession {
+
+	/**
+	 * Logout of session
+	 */
 	void logout();
+
+	/**
+	 * Keep alive called to prevent connection shutting down.
+	 */
+	void keepAlive();
 
 	/**
 	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc. If you want to login as invisible, set

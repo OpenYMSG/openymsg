@@ -18,7 +18,7 @@ public class SessionContextImpl implements SessionContext, SessionContextCallbac
 			String username, SessionContextCallback callback) {
 		this.callback = callback;
 		authentication = new SessionAuthenticationImpl(sessionConfig, connection, executor, this);
-		session = new SessionSessionImpl(username, executor, connection, this);
+		session = new SessionSessionImpl(username, executor, connection, sessionConfig.getSessionTimeout(), this);
 	}
 
 	@Override
@@ -44,23 +44,23 @@ public class SessionContextImpl implements SessionContext, SessionContextCallbac
 
 	@Override
 	public void authenticationSuccess() {
-		this.session.loginComplete();
-		this.callback.authenticationSuccess();
+		session.loginComplete();
+		callback.authenticationSuccess();
 	}
 
 	@Override
 	public void authenticationFailure(AuthenticationFailure failure) {
-		this.callback.authenticationFailure(failure);
+		callback.authenticationFailure(failure);
 	}
 
 	@Override
 	public void logoffNormalComplete() {
-		this.callback.logoffNormalComplete();
+		callback.logoffNormalComplete();
 	}
 
 	@Override
 	public void logoffForced(LogoutReason state) {
-		this.callback.logoffForced(state);
+		callback.logoffForced(state);
 	}
 
 	@Override
@@ -69,7 +69,12 @@ public class SessionContextImpl implements SessionContext, SessionContextCallbac
 	}
 
 	public void receivedLogout(LogoutReason state) {
-		this.session.receivedLogout(state);
+		session.receivedLogout(state);
+	}
+
+	@Override
+	public void keepAlive() {
+		session.keepAlive();
 	}
 
 }

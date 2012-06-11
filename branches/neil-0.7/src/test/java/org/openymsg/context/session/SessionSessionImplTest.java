@@ -15,13 +15,14 @@ public class SessionSessionImplTest {
 	private Executor executor;
 	private SessionSessionCallback callback;
 	private SessionSessionImpl session;
+	private Integer timeout = 60 * 1000;
 
 	@BeforeMethod
 	public void beforeMethod() {
 		connection = Mockito.mock(YahooConnection.class);
 		executor = Mockito.mock(Executor.class);
 		callback = Mockito.mock(SessionSessionCallback.class);
-		session = new SessionSessionImpl(username, executor, connection, callback);
+		session = new SessionSessionImpl(username, executor, connection, timeout, callback);
 	}
 
 	@Test

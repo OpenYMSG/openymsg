@@ -4,7 +4,7 @@ import junit.framework.Assert;
 
 import org.mockito.Mockito;
 import org.openymsg.config.SessionConfig;
-import org.openymsg.config.SessionConfigImpl;
+import org.openymsg.config.SessionConfigSimple;
 import org.openymsg.context.auth.AuthenticationFailure;
 import org.openymsg.context.session.LogoutReason;
 import org.openymsg.testing.TestingSessionCallback;
@@ -21,7 +21,7 @@ public class SessionIT {
 	@Parameters({ "badUsername", "badUsernamePassword" })
 	@Test()
 	public void testBadUsername(String badUsername, String badUsernamePassword) {
-		SessionConfig config = new SessionConfigImpl();
+		SessionConfig config = new SessionConfigSimple();
 		YahooSessionCallback callback = Mockito.mock(YahooSessionCallback.class);
 		YahooSession session = new SessionImpl(config, callback);
 		// callback.setSession(session);
@@ -43,7 +43,7 @@ public class SessionIT {
 	@Parameters({ "badPasswordUsername", "badPassword" })
 	@Test()
 	public void testLocked(String badPasswordUsername, String badPassword) {
-		SessionConfig config = new SessionConfigImpl();
+		SessionConfig config = new SessionConfigSimple();
 		TestingSessionCallback callback = new TestingSessionCallback();
 		YahooSession session = new SessionImpl(config, callback);
 		// callback.setSession(session);
@@ -71,7 +71,7 @@ public class SessionIT {
 	@Test()
 	public void testTwo(String username1, String password1, String username2, String password2, String username3,
 			String password3) {
-		SessionConfig config = new SessionConfigImpl();
+		SessionConfig config = new SessionConfigSimple();
 		YahooSessionCallback callback1a = Mockito.mock(YahooSessionCallback.class);
 		YahooSession session1a = new SessionImpl(config, callback1a);
 		session1a.login(username1, password1);

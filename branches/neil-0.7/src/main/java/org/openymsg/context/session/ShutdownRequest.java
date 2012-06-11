@@ -24,4 +24,24 @@ public class ShutdownRequest implements Request {
 		log.error("failed shutting down", ex);
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((connection == null) ? 0 : connection.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (!(obj instanceof ShutdownRequest)) return false;
+		ShutdownRequest other = (ShutdownRequest) obj;
+		if (connection == null) {
+			if (other.connection != null) return false;
+		} else if (!connection.equals(other.connection)) return false;
+		return true;
+	}
+
 }
