@@ -1,5 +1,7 @@
 package org.openymsg.contact.roster;
 
+import static org.testng.Assert.fail;
+
 import java.io.IOException;
 
 import org.openymsg.Name;
@@ -8,7 +10,6 @@ import org.openymsg.YahooContactGroup;
 import org.openymsg.YahooProtocol;
 import org.openymsg.contact.group.ContactGroupImpl;
 import org.openymsg.testing.MessageAssert;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class ContactAddMessageTest {
@@ -32,12 +33,12 @@ public class ContactAddMessageTest {
 
 	@Test
 	public void testMSN() {
-		Assert.fail("not implemented");
+		fail("not implemented");
 	}
 
 	@Test
 	public void testNoName() {
-		Assert.fail("not implemented");
+		fail("not implemented");
 	}
 
 	@Test

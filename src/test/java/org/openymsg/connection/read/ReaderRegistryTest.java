@@ -1,6 +1,6 @@
 package org.openymsg.connection.read;
 
-import junit.framework.Assert;
+import static org.testng.Assert.assertEquals;
 
 import org.openymsg.contact.status.ListOfStatusesResponse;
 import org.openymsg.network.ServiceType;
@@ -35,7 +35,7 @@ public class ReaderRegistryTest {
 		SinglePacketResponse response = new NoOpResponse();
 		registry.register(type, response);
 		boolean answer = registry.deregister(type, response);
-		Assert.assertEquals(true, answer);
+		assertEquals(true, answer);
 	}
 
 	@Test
@@ -44,7 +44,7 @@ public class ReaderRegistryTest {
 		SinglePacketResponse response = new NoOpResponse();
 		registry.register(type, response);
 		boolean answer = registry.deregister(type, new NoOpResponse());
-		Assert.assertEquals(false, answer);
+		assertEquals(false, answer);
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "response may not be null")
@@ -67,7 +67,7 @@ public class ReaderRegistryTest {
 		MultiplePacketResponse response = new ListOfStatusesResponse(null);
 		registry.register(type, response);
 		boolean answer = registry.deregister(type, response);
-		Assert.assertEquals(true, answer);
+		assertEquals(true, answer);
 	}
 
 	@Test
@@ -76,7 +76,7 @@ public class ReaderRegistryTest {
 		MultiplePacketResponse response = new ListOfStatusesResponse(null);
 		registry.register(type, response);
 		boolean answer = registry.deregister(type, new NoOpResponse());
-		Assert.assertEquals(false, answer);
+		assertEquals(false, answer);
 	}
 
 }

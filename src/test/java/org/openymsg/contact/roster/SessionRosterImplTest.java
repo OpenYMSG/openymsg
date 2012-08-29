@@ -1,14 +1,16 @@
 package org.openymsg.contact.roster;
 
-import org.junit.Assert;
-import org.mockito.Mockito;
-import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.openymsg.testing.MessageAssert.argThatMessage;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import org.openymsg.Name;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 import org.openymsg.YahooProtocol;
 import org.openymsg.connection.YahooConnection;
-import org.openymsg.connection.write.Message;
 import org.openymsg.contact.group.ContactGroupImpl;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -21,8 +23,8 @@ public class SessionRosterImplTest {
 
 	@BeforeMethod
 	public void beforeMethod() {
-		executor = Mockito.mock(YahooConnection.class);
-		callback = Mockito.mock(SessionRosterCallback.class);
+		executor = mock(YahooConnection.class);
+		callback = mock(SessionRosterCallback.class);
 		session = new SessionRosterImpl(executor, username, callback);
 	}
 
@@ -32,8 +34,8 @@ public class SessionRosterImplTest {
 		YahooContactGroup group = new ContactGroupImpl("group");
 		String message = "message";
 		session.addContact(contact, group, message);
-		Mockito.verify(executor).execute(
-				argThat(new ContactAddMessage(this.username, contact, group, message, new Name(null, null))));
+		verify(executor).execute(
+				argThatMessage(new ContactAddMessage(this.username, contact, group, message, new Name(null, null))));
 	}
 
 	@Test
@@ -41,8 +43,8 @@ public class SessionRosterImplTest {
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		YahooContactGroup group = new ContactGroupImpl("group");
 		session.addContact(contact, group, null);
-		Mockito.verify(executor).execute(
-				argThat(new ContactAddMessage(this.username, contact, group, null, new Name(null, null))));
+		verify(executor).execute(
+				argThatMessage(new ContactAddMessage(this.username, contact, group, null, new Name(null, null))));
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Argument 'group' cannot be null")
@@ -66,8 +68,8 @@ public class SessionRosterImplTest {
 		group.add(contact);
 		session.removeFromGroup(contact, group);
 		// TODO remove from status
-		Mockito.verify(executor).execute(argThat(new ContactRemoveMessage(this.username, contact, group)));
-		Assert.assertFalse(session.getContacts().contains(contact));
+		verify(executor).execute(argThatMessage(new ContactRemoveMessage(this.username, contact, group)));
+		assertFalse(session.getContacts().contains(contact));
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Argument 'contact' cannot be null.")
@@ -86,7 +88,7 @@ public class SessionRosterImplTest {
 	public void testAcceptContact() {
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		session.acceptFriendAuthorization(contact);
-		Mockito.verify(executor).execute(argThat(new ContactAddAcceptMessage(this.username, contact)));
+		verify(executor).execute(argThatMessage(new ContactAddAcceptMessage(this.username, contact)));
 	}
 
 	@Test
@@ -94,7 +96,7 @@ public class SessionRosterImplTest {
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		String message = "message";
 		session.rejectFriendAuthorization(contact, message);
-		Mockito.verify(executor).execute(argThat(new ContactAddDeclineMessage(this.username, contact, message)));
+		verify(executor).execute(argThatMessage(new ContactAddDeclineMessage(this.username, contact, message)));
 	}
 
 	@Test
@@ -104,8 +106,8 @@ public class SessionRosterImplTest {
 
 		// TODO no longer pending, status comes separately
 		// TODO in group?
-		Assert.assertTrue(session.getContacts().contains(contact));
-		Mockito.verify(callback).receivedContactAddAccepted(contact);
+		assertTrue(session.getContacts().contains(contact));
+		verify(callback).receivedContactAddAccepted(contact);
 	}
 
 	@Test
@@ -116,12 +118,8 @@ public class SessionRosterImplTest {
 		// TODO remove from group?
 		session.receivedContactAddDeclined(contact, message);
 
-		Assert.assertFalse(session.getContacts().contains(contact));
-		Mockito.verify(callback).receivedContactAddDeclined(contact, message);
-	}
-
-	private Message argThat(Message message, String... excludeFields) {
-		return (Message) Mockito.argThat(new ReflectionEquals(message, excludeFields));
+		assertFalse(session.getContacts().contains(contact));
+		verify(callback).receivedContactAddDeclined(contact, message);
 	}
 
 }

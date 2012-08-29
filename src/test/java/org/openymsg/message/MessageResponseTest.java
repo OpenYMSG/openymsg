@@ -1,6 +1,8 @@
 package org.openymsg.message;
 
-import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.connection.YahooConnection;
@@ -16,8 +18,8 @@ public class MessageResponseTest {
 
 	@BeforeMethod
 	public void beforeMethod() {
-		callback = Mockito.mock(SessionMessageCallback.class);
-		executor = Mockito.mock(YahooConnection.class);
+		callback = mock(SessionMessageCallback.class);
+		executor = mock(YahooConnection.class);
 	}
 
 	@Test
@@ -29,7 +31,7 @@ public class MessageResponseTest {
 		response.execute(packet);
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		String message = "sending message";
-		Mockito.verify(callback).receivedMessage(contact, message);
+		verify(callback).receivedMessage(contact, message);
 	}
 
 	@Test
@@ -41,7 +43,7 @@ public class MessageResponseTest {
 		response.execute(packet);
 		YahooContact contact = new YahooContact("testbuddy@live.com", YahooProtocol.MSN);
 		String message = "hello back";
-		Mockito.verify(callback).receivedMessage(contact, message);
+		verify(callback).receivedMessage(contact, message);
 	}
 
 	@Test
@@ -53,11 +55,11 @@ public class MessageResponseTest {
 		response.execute(packet);
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		String message = "sending number one";
-		Mockito.verify(callback).receivedOfflineMessage(contact, message, 1334803157L * 1000);
+		verify(callback).receivedOfflineMessage(contact, message, 1334803157L * 1000);
 		message = "sending number two";
-		Mockito.verify(callback).receivedOfflineMessage(contact, message, 1334803164L * 1000);
+		verify(callback).receivedOfflineMessage(contact, message, 1334803164L * 1000);
 		message = "and number three";
-		Mockito.verify(callback).receivedOfflineMessage(contact, message, 1334803171L * 1000);
+		verify(callback).receivedOfflineMessage(contact, message, 1334803171L * 1000);
 	}
 
 }

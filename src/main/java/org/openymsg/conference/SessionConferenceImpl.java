@@ -37,11 +37,15 @@ public class SessionConferenceImpl implements SessionConference {
 		this.username = username;
 		this.executor = executor;
 		this.callback = callback;
-		this.executor.register(ServiceType.CONFMSG, new ConferenceMessageResponse(this));
-		this.executor.register(ServiceType.CONFINVITE, new ConferenceInviteResponse(this));
-		this.executor.register(ServiceType.CONFDECLINE, new ConferenceDeclineResponse(this));
-		this.executor.register(ServiceType.CONFLOGON, new ConferenceAcceptResponse(this));
-		this.executor.register(ServiceType.CONFLOGOFF, new ConferenceLeaveResponse(this));
+		initializeRegistry();
+	}
+
+	protected void initializeRegistry() {
+		executor.register(ServiceType.CONFMSG, new ConferenceMessageResponse(this));
+		executor.register(ServiceType.CONFINVITE, new ConferenceInviteResponse(this));
+		executor.register(ServiceType.CONFDECLINE, new ConferenceDeclineResponse(this));
+		executor.register(ServiceType.CONFLOGON, new ConferenceAcceptResponse(this));
+		executor.register(ServiceType.CONFLOGOFF, new ConferenceLeaveResponse(this));
 	}
 
 	@Override
@@ -56,7 +60,7 @@ public class SessionConferenceImpl implements SessionConference {
 		if (membership == null) {
 			throw new IllegalArgumentException("Unknown conference: " + conference);
 		}
-		this.executor.execute(new SendConfereneMessage(username, conference, membership, message));
+		executor.execute(new SendConfereneMessage(username, conference, membership, message));
 	}
 
 	@Override
@@ -68,7 +72,7 @@ public class SessionConferenceImpl implements SessionConference {
 		if (membership == null) {
 			throw new IllegalArgumentException("Unknown conference: " + conference);
 		}
-		this.executor.execute(new LeaveConferenceMessage(username, conference, membership));
+		executor.execute(new LeaveConferenceMessage(username, conference, membership));
 	}
 
 	@Override
@@ -80,7 +84,7 @@ public class SessionConferenceImpl implements SessionConference {
 		if (membership == null) {
 			throw new IllegalArgumentException("Unknown conference: " + conference);
 		}
-		this.executor.execute(new AcceptConferenceMessage(username, conference, membership));
+		executor.execute(new AcceptConferenceMessage(username, conference, membership));
 	}
 
 	// TODO generate conferenceId
@@ -96,8 +100,8 @@ public class SessionConferenceImpl implements SessionConference {
 		// TODO - how to add invited ids to conference
 		YahooConference conference = new YahooConference(conferenceId);
 		// TODO - cannot reused id
-		this.conferenceMemberships.put(conferenceId, new ConferenceMembershipImpl());
-		this.executor.execute(new CreateConferenceMessage(username, conference, contacts, message));
+		conferenceMemberships.put(conferenceId, new ConferenceMembershipImpl());
+		executor.execute(new CreateConferenceMessage(username, conference, contacts, message));
 		return conference;
 	}
 
@@ -110,7 +114,7 @@ public class SessionConferenceImpl implements SessionConference {
 		if (membership == null) {
 			throw new IllegalArgumentException("Unknown conference: " + conference);
 		}
-		this.executor.execute(new DeclineConferenceMessage(username, conference, membership, message));
+		executor.execute(new DeclineConferenceMessage(username, conference, membership, message));
 	}
 
 	@Override
@@ -127,11 +131,11 @@ public class SessionConferenceImpl implements SessionConference {
 		// if (primaryID.getId().equals(id) || loginID.getId().equals(id) || identities.containsKey(id)) {
 		// throw new IllegalIdentityException(id + " is an identity of this session and cannot be used here");
 		// }
-		ConferenceMembership membership = this.conferenceMemberships.get(conference.getId());
+		ConferenceMembership membership = conferenceMemberships.get(conference.getId());
 		if (membership == null) {
 			throw new IllegalArgumentException("Unknown conference: " + conference);
 		}
-		this.executor.execute(new ExtendConferenceMessage(username, conference, membership, contacts, message));
+		executor.execute(new ExtendConferenceMessage(username, conference, membership, contacts, message));
 	}
 
 	@Override
@@ -139,7 +143,10 @@ public class SessionConferenceImpl implements SessionConference {
 		if (conferenceId == null) {
 			throw new IllegalArgumentException("ConferenceId cannot be null");
 		}
-		return this.conferences.get(conferenceId);
+		if (!conferences.containsKey(conferenceId)) {
+			log.warn("Conference not found for: " + conferenceId);
+		}
+		return conferences.get(conferenceId);
 	}
 
 	// @Override
@@ -153,18 +160,18 @@ public class SessionConferenceImpl implements SessionConference {
 	// }
 	//
 	public void receivedConferenceMessage(YahooConference conference, YahooContact contact, String message) {
-		this.callback.receivedConferenceMessage(conference, contact, message);
+		callback.receivedConferenceMessage(conference, contact, message);
 	}
 
 	public void receivedConferenceDecline(YahooConference conference, YahooContact contact, String message) {
-		ConferenceMembershipImpl membership = this.conferenceMemberships.get(conference.getId());
+		ConferenceMembershipImpl membership = conferenceMemberships.get(conference.getId());
 		if (membership == null) {
 			log.warn("no membership for decline: " + conference);
 			membership = new ConferenceMembershipImpl();
-			this.conferenceMemberships.put(conference.getId(), membership);
+			conferenceMemberships.put(conference.getId(), membership);
 		}
 		membership.addDecline(contact);
-		this.callback.receivedConferenceDecline(conference, contact, message);
+		callback.receivedConferenceDecline(conference, contact, message);
 	}
 
 	@Override
@@ -176,15 +183,15 @@ public class SessionConferenceImpl implements SessionConference {
 		if (conference == null) {
 			throw new IllegalArgumentException("Conference cannot be null");
 		}
-		return this.conferenceMemberships.get(conference.getId());
+		return conferenceMemberships.get(conference.getId());
 	}
 
 	public void receivedConferenceInvite(YahooConference conference, YahooContact inviter, Set<YahooContact> invited,
 			Set<YahooContact> members, String message) {
-		ConferenceMembershipImpl membership = this.conferenceMemberships.get(conference.getId());
+		ConferenceMembershipImpl membership = conferenceMemberships.get(conference.getId());
 		if (membership == null) {
 			membership = new ConferenceMembershipImpl();
-			this.conferenceMemberships.put(conference.getId(), membership);
+			conferenceMemberships.put(conference.getId(), membership);
 		} else {
 			log.debug("invited to previously added conference: " + conference);
 			// TODO reset membership?
@@ -197,13 +204,13 @@ public class SessionConferenceImpl implements SessionConference {
 
 	public void receivedConferenceInviteAck(YahooConference conference, Set<YahooContact> invited,
 			Set<YahooContact> members, String message) {
-		ConferenceMembershipImpl membership = this.conferenceMemberships.get(conference.getId());
+		ConferenceMembershipImpl membership = conferenceMemberships.get(conference.getId());
 		if (membership == null) {
+			log.warn("getting ack for a conference we don't have");
 			membership = new ConferenceMembershipImpl();
-			this.conferenceMemberships.put(conference.getId(), membership);
+			conferenceMemberships.put(conference.getId(), membership);
 		} else {
-			log.debug("invited to previously added conference: " + conference);
-			// TODO reset membership?
+			log.debug("Got ack for conference: " + conference);
 		}
 		membership.addMember(members);
 		membership.addInvited(invited);
@@ -211,7 +218,7 @@ public class SessionConferenceImpl implements SessionConference {
 	}
 
 	public void receivedConferenceAccept(YahooConference conference, YahooContact contact) {
-		ConferenceMembershipImpl membership = this.conferenceMemberships.get(conference.getId());
+		ConferenceMembershipImpl membership = conferenceMemberships.get(conference.getId());
 		if (membership == null) {
 			log.warn("no membership for accept: " + conference);
 			membership = new ConferenceMembershipImpl();
@@ -222,24 +229,25 @@ public class SessionConferenceImpl implements SessionConference {
 	}
 
 	public void receivedConferenceExtend(YahooConference conference, YahooContact inviter, Set<YahooContact> invited) {
-		ConferenceMembershipImpl membership = this.conferenceMemberships.get(conference.getId());
+		ConferenceMembershipImpl membership = conferenceMemberships.get(conference.getId());
 		if (membership == null) {
 			log.warn("no membership for accept: " + conference);
 			membership = new ConferenceMembershipImpl();
-			this.conferenceMemberships.put(conference.getId(), membership);
+			conferenceMemberships.put(conference.getId(), membership);
 		}
 		membership.addInvited(invited);
 		callback.receivedConferenceExtend(conference, inviter, invited);
 	}
 
 	public void receivedConferenceLeft(YahooConference conference, YahooContact contact) {
-		ConferenceMembershipImpl membership = this.conferenceMemberships.get(conference.getId());
+		ConferenceMembershipImpl membership = conferenceMemberships.get(conference.getId());
 		if (membership == null) {
 			log.warn("no membership for accept: " + conference);
 			membership = new ConferenceMembershipImpl();
-			this.conferenceMemberships.put(conference.getId(), membership);
+			conferenceMemberships.put(conference.getId(), membership);
 		}
 		membership.addLeft(contact);
 		callback.receivedConferenceLeft(conference, contact);
 	}
+
 }

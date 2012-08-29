@@ -1,12 +1,17 @@
 package org.openymsg.message;
 
-import org.mockito.Mockito;
-import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.openymsg.testing.MessageAssert.argThatMessage;
+
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.connection.YahooConnection;
 import org.openymsg.connection.read.SinglePacketResponse;
-import org.openymsg.connection.write.Message;
 import org.openymsg.network.ServiceType;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -21,25 +26,25 @@ public class SessionMessageImplTest {
 
 	@BeforeMethod
 	public void beforeMethod() {
-		executor = Mockito.mock(YahooConnection.class);
-		callback = Mockito.mock(SessionMessageCallback.class);
+		executor = mock(YahooConnection.class);
+		callback = mock(SessionMessageCallback.class);
 		session = new SessionMessageImpl(executor, username, callback);
 	}
 
 	@AfterMethod
 	public void afterMethod() {
-		Mockito.verifyNoMoreInteractions(callback);
-		Mockito.verify(executor).register(Mockito.eq(ServiceType.MESSAGE_ACK), (SinglePacketResponse) Mockito.any());
-		Mockito.verify(executor).register(Mockito.eq(ServiceType.MESSAGE), (SinglePacketResponse) Mockito.any());
-		Mockito.verify(executor).register(Mockito.eq(ServiceType.NOTIFY), (SinglePacketResponse) Mockito.any());
-		Mockito.verifyNoMoreInteractions(executor);
+		verifyNoMoreInteractions(callback);
+		verify(executor).register(eq(ServiceType.MESSAGE_ACK), (SinglePacketResponse) any());
+		verify(executor).register(eq(ServiceType.MESSAGE), (SinglePacketResponse) any());
+		verify(executor).register(eq(ServiceType.NOTIFY), (SinglePacketResponse) any());
+		verifyNoMoreInteractions(executor);
 	}
 
 	@Test
 	public void testSendMessage() {
 		String message = "dfgfdgdfgdfgfdg";
 		session.sendMessage(contact, message);
-		Mockito.verify(executor).execute(argThat(new SendMessage(username, contact, message, "0"), "messageId"));
+		verify(executor).execute(argThatMessage(new SendMessage(username, contact, message, "0"), "messageId"));
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Contact cannot be null")
@@ -56,27 +61,27 @@ public class SessionMessageImplTest {
 	@Test
 	public void testSendBuzz() {
 		session.sendBuzz(contact);
-		Mockito.verify(executor).execute(
-				argThat(new SendMessage(username, contact, SessionMessageImpl.BUZZ, "0"), "messageId"));
+		verify(executor).execute(
+				argThatMessage(new SendMessage(username, contact, SessionMessageImpl.BUZZ, "0"), "messageId"));
 	}
 
 	@Test
 	public void testTypingStarted() {
 		session.sendTypingNotification(contact, true);
-		Mockito.verify(executor).execute(argThat((new TypingNotificationMessage(username, contact, true))));
+		verify(executor).execute(argThatMessage((new TypingNotificationMessage(username, contact, true))));
 	}
 
 	@Test
 	public void testTypingDone() {
 		session.sendTypingNotification(contact, false);
-		Mockito.verify(executor).execute(argThat(new TypingNotificationMessage(username, contact, false)));
+		verify(executor).execute(argThatMessage(new TypingNotificationMessage(username, contact, false)));
 	}
 
 	@Test
 	public void testMessageReceiveNoMessageId() {
 		String message = "hello back";
 		session.receivedMessage(contact, message, null);
-		Mockito.verify(callback).receivedMessage(contact, message);
+		verify(callback).receivedMessage(contact, message);
 	}
 
 	@Test
@@ -84,8 +89,8 @@ public class SessionMessageImplTest {
 		String message = "hello back";
 		String messageId = "id";
 		session.receivedMessage(contact, message, messageId);
-		Mockito.verify(callback).receivedMessage(contact, message);
-		Mockito.verify(executor).execute(argThat(new MessageAckMessage(username, contact, messageId)));
+		verify(callback).receivedMessage(contact, message);
+		verify(executor).execute(argThatMessage(new MessageAckMessage(username, contact, messageId)));
 	}
 
 	@Test
@@ -93,33 +98,29 @@ public class SessionMessageImplTest {
 		String message = "hello back";
 		long timestampInMillis = System.currentTimeMillis();
 		session.receivedOfflineMessage(contact, message, timestampInMillis);
-		Mockito.verify(callback).receivedOfflineMessage(contact, message, timestampInMillis);
+		verify(callback).receivedOfflineMessage(contact, message, timestampInMillis);
 	}
 
 	@Test
 	public void testMessageReceiveOfflineNoTime() {
 		String message = "hello back";
 		session.receivedOfflineMessage(contact, message, 0);
-		Mockito.verify(callback).receivedMessage(contact, message);
+		verify(callback).receivedMessage(contact, message);
 	}
 
 	@Test
 	public void testMessageReceiveTypingBoth() {
 		session.receivedTypingNotification(contact, true);
 		session.receivedTypingNotification(contact, false);
-		Mockito.verify(callback).receivedTypingNotification(contact, true);
-		Mockito.verify(callback).receivedTypingNotification(contact, false);
+		verify(callback).receivedTypingNotification(contact, true);
+		verify(callback).receivedTypingNotification(contact, false);
 	}
 
 	@Test
 	public void testMessageReceiveBuzz() {
 		session.receivedBuzz(contact, null);
 		session.receivedBuzz(contact, "id");
-		Mockito.verify(callback, Mockito.times(2)).receivedBuzz(contact);
-	}
-
-	private Message argThat(Message message, String... excludeFields) {
-		return (Message) Mockito.argThat(new ReflectionEquals(message, excludeFields));
+		verify(callback, times(2)).receivedBuzz(contact);
 	}
 
 }

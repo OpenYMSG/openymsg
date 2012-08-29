@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.mockito.Mockito;
+import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.openymsg.connection.write.Message;
+import org.openymsg.execute.dispatch.Request;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
@@ -24,6 +27,14 @@ public class MessageAssert {
 		check(comparisonString, serviceType);
 		check(comparisonString, messageStatus);
 		check(comparisonString, body, excludeFields);
+	}
+
+	public static Message argThatMessage(Message message, String... excludeFields) {
+		return (Message) Mockito.argThat(new ReflectionEquals(message, excludeFields));
+	}
+
+	public static Request argThatRequest(Request request, String... excludeFields) {
+		return (Request) Mockito.argThat(new ReflectionEquals(request, excludeFields));
 	}
 
 	private static void check(String comparisonString, ServiceType serviceType) {
@@ -47,7 +58,8 @@ public class MessageAssert {
 	}
 
 	private static void check(String comparisonString, PacketBodyBuffer body, String... excludeFields) {
-		List excludedFieldList = excludeFields != null ? Arrays.asList(excludeFields) : Collections.EMPTY_LIST;
+		@SuppressWarnings("unchecked")
+		List<String> excludedFieldList = excludeFields != null ? Arrays.asList(excludeFields) : Collections.EMPTY_LIST;
 		StringTokenizer tokenizer = new StringTokenizer(comparisonString, " ");
 		String token = tokenizer.nextToken();
 		while (!token.startsWith("SessionId:"))

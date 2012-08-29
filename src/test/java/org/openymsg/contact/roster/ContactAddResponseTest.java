@@ -1,6 +1,8 @@
 package org.openymsg.contact.roster;
 
-import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import org.openymsg.Name;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
@@ -15,7 +17,7 @@ public class ContactAddResponseTest {
 
 	@BeforeMethod
 	public void beforeMethod() {
-		session = Mockito.mock(SessionRosterImpl.class);
+		session = mock(SessionRosterImpl.class);
 	}
 
 	@Test
@@ -25,7 +27,7 @@ public class ContactAddResponseTest {
 		ContactAddResponse response = new ContactAddResponse(session);
 		response.execute(packet);
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
-		Mockito.verify(session).receivedContactAddAccepted(contact);
+		verify(session).receivedContactAddAccepted(contact);
 	}
 
 	@Test
@@ -36,7 +38,7 @@ public class ContactAddResponseTest {
 		response.execute(packet);
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		Name name = new Name("First", "Last");
-		Mockito.verify(session).receivedContactAddRequest(contact, name, null);
+		verify(session).receivedContactAddRequest(contact, name, null);
 	}
 
 	@Test
@@ -47,7 +49,7 @@ public class ContactAddResponseTest {
 		response.execute(packet);
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		String message = "declinedYou";
-		Mockito.verify(session).receivedContactAddDeclined(contact, message);
+		verify(session).receivedContactAddDeclined(contact, message);
 	}
 
 	@Test

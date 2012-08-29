@@ -12,7 +12,7 @@ public enum YahooSessionState {
 	}
 
 	public boolean isReadyToStart() {
-		return this == NOT_STARTED;
+		return this != STARTED && this != CONNECTED && this != LOGGED_IN;
 	}
 
 	public boolean isLoggedIn() {
