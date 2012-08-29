@@ -1,6 +1,12 @@
 package org.openymsg.connection.read;
 
-import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+
 import org.openymsg.network.ConnectionHandler;
 import org.openymsg.network.YMSG9Packet;
 import org.testng.annotations.AfterMethod;
@@ -13,14 +19,14 @@ public class ConnectionReaderTest {
 
 	@BeforeMethod
 	public void beforeMethod() {
-		connection = Mockito.mock(ConnectionHandler.class);
-		registry = Mockito.mock(ReaderRegistryImpl.class);
+		connection = mock(ConnectionHandler.class);
+		registry = mock(ReaderRegistryImpl.class);
 	}
 
 	@AfterMethod
 	public void afterMethod() {
-		Mockito.verifyNoMoreInteractions(connection);
-		Mockito.verifyNoMoreInteractions(registry);
+		verifyNoMoreInteractions(connection);
+		verifyNoMoreInteractions(registry);
 	}
 
 	@Test
@@ -28,20 +34,20 @@ public class ConnectionReaderTest {
 		ConnectionReader reader = new ConnectionReader(connection, registry);
 		reader.execute();
 
-		Mockito.verify(connection).receivePacket();
-		Mockito.verifyZeroInteractions(registry);
+		verify(connection).receivePacket();
+		verifyZeroInteractions(registry);
 	}
 
 	@Test(timeOut = 500)
 	public void testSinglePacket() {
 		YMSG9Packet packet = new YMSG9Packet();
-		Mockito.when(connection.receivePacket()).thenReturn(packet).thenReturn(null);
+		when(connection.receivePacket()).thenReturn(packet).thenReturn(null);
 
 		ConnectionReader reader = new ConnectionReader(connection, registry);
 		reader.execute();
 
-		Mockito.verify(connection, Mockito.times(2)).receivePacket();
-		Mockito.verify(registry).received(packet);
+		verify(connection, times(2)).receivePacket();
+		verify(registry).received(packet);
 	}
 
 	@Test(timeOut = 500)
@@ -49,21 +55,21 @@ public class ConnectionReaderTest {
 		YMSG9Packet packet1 = new YMSG9Packet();
 		YMSG9Packet packet2 = new YMSG9Packet();
 		YMSG9Packet packet3 = new YMSG9Packet();
-		Mockito.when(connection.receivePacket()).thenReturn(packet1, packet2, packet3).thenReturn(null);
+		when(connection.receivePacket()).thenReturn(packet1, packet2, packet3).thenReturn(null);
 
 		ConnectionReader reader = new ConnectionReader(connection, registry);
 		reader.execute();
 
-		Mockito.verify(connection, Mockito.times(4)).receivePacket();
-		Mockito.verify(registry).received(packet1);
-		Mockito.verify(registry).received(packet2);
-		Mockito.verify(registry).received(packet3);
+		verify(connection, times(4)).receivePacket();
+		verify(registry).received(packet1);
+		verify(registry).received(packet2);
+		verify(registry).received(packet3);
 	}
 
 	@Test
 	public void testFinished() {
 		YMSG9Packet packet = new YMSG9Packet();
-		Mockito.when(connection.receivePacket()).thenReturn(packet).thenReturn(null);
+		when(connection.receivePacket()).thenReturn(packet).thenReturn(null);
 
 		ConnectionReader reader = new ConnectionReader(connection, registry);
 		reader.finished();
@@ -74,8 +80,8 @@ public class ConnectionReaderTest {
 			// fine throwing exception
 		}
 
-		Mockito.verifyZeroInteractions(connection);
-		Mockito.verifyZeroInteractions(registry);
+		verifyZeroInteractions(connection);
+		verifyZeroInteractions(registry);
 	}
 
 	@Test

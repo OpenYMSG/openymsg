@@ -1,6 +1,10 @@
 package org.openymsg.connection;
 
-import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.openymsg.config.SessionConfig;
 import org.openymsg.execute.Executor;
 import org.openymsg.execute.ExecutorImpl;
@@ -23,7 +27,7 @@ public class SessionConnectionImplTest {
 	@BeforeMethod
 	public void setUpMethod() {
 		executor = new ExecutorImpl(username);
-		listener = Mockito.mock(SessionConnectionCallback.class);
+		listener = mock(SessionConnectionCallback.class);
 	}
 
 	@AfterMethod
@@ -40,31 +44,31 @@ public class SessionConnectionImplTest {
 
 	@Test
 	public void testConnection() {
-		SessionConfig sessionConfig = Mockito.mock(SessionConfig.class);
-		Mockito.when(sessionConfig.getConnectionBuilder()).thenReturn(new TestingConnectionBuilder(true));
+		SessionConfig sessionConfig = mock(SessionConfig.class);
+		when(sessionConfig.getConnectionBuilder()).thenReturn(new TestingConnectionBuilder(true));
 		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, listener);
 		sessionConnection.initialize(sessionConfig);
-		Mockito.verify(listener, Mockito.timeout(100)).connectionSuccessful();
+		verify(listener, timeout(100)).connectionSuccessful();
 		sessionConnection.getConnectionState();
 	}
 
 	@Test
 	public void testFailed() {
-		SessionConfig sessionConfig = Mockito.mock(SessionConfig.class);
-		Mockito.when(sessionConfig.getConnectionBuilder()).thenReturn(new TestingConnectionBuilder(false));
+		SessionConfig sessionConfig = mock(SessionConfig.class);
+		when(sessionConfig.getConnectionBuilder()).thenReturn(new TestingConnectionBuilder(false));
 		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, listener);
 		sessionConnection.initialize(sessionConfig);
-		Mockito.verify(listener).connectionFailure();
+		verify(listener).connectionFailure();
 	}
 
 	@Test
 	public void testFailLater() {
-		SessionConfig sessionConfig = Mockito.mock(SessionConfig.class);
-		Mockito.when(sessionConfig.getConnectionBuilder()).thenReturn(new TestingConnectionBuilder(true));
+		SessionConfig sessionConfig = mock(SessionConfig.class);
+		when(sessionConfig.getConnectionBuilder()).thenReturn(new TestingConnectionBuilder(true));
 		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, listener);
 		sessionConnection.initialize(sessionConfig);
 		sessionConnection.connectionEnded();
-		Mockito.verify(listener).connectionPrematurelyEnded();
+		verify(listener).connectionPrematurelyEnded();
 	}
 
 }

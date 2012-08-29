@@ -1,11 +1,12 @@
 package org.openymsg.message;
 
+import static org.testng.Assert.fail;
+
 import java.io.IOException;
 
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.testing.MessageAssert;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class SendMessageTest {
@@ -35,7 +36,7 @@ public class SendMessageTest {
 
 	@Test(enabled = false)
 	public void testOfflineProtocol() throws IOException {
-		Assert.fail("Not completed");
+		fail("Not completed");
 	}
 
 }

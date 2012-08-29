@@ -1,9 +1,13 @@
 package org.openymsg.execute.dispatch;
 
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class DispatcherExecutorServiceTest {
@@ -16,7 +20,7 @@ public class DispatcherExecutorServiceTest {
 		Runnable runnable = new ExceptionRunnable();
 		executor.execute(runnable);
 		Throwable t = callback.getException();
-		Assert.assertNotNull(t, "Should have an exception");
+		assertNotNull(t, "Should have an exception");
 	}
 
 	@Test
@@ -26,23 +30,23 @@ public class DispatcherExecutorServiceTest {
 		DispatcherExecutorService executor = new DispatcherExecutorService(name, callback);
 		QuiteRunnable runnable = new QuiteRunnable();
 		executor.scheduleAtFixedRate(runnable, 0, 1, TimeUnit.SECONDS);
-		System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
+		// System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
 		try {
 			Thread.sleep(2000);
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
-		Assert.assertTrue(runnable.checkAndResetHasRun());
+		// System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
+		assertTrue(runnable.checkAndResetHasRun());
 		try {
 			Thread.sleep(2000);
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		Assert.assertTrue(runnable.checkAndResetHasRun());
-		System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
+		assertTrue(runnable.checkAndResetHasRun());
+		// System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
 		runnable.setException(new ScheduleTaskCompletionException());
 		try {
 			Thread.sleep(2000);
@@ -50,8 +54,8 @@ public class DispatcherExecutorServiceTest {
 		catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
-		Assert.assertFalse(runnable.hasRun());
+		// System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
+		assertFalse(runnable.hasRun());
 	}
 
 	@Test
@@ -63,12 +67,12 @@ public class DispatcherExecutorServiceTest {
 		executor.execute(runnable);
 		executor.execute(new SlowRunnable());
 		executor.execute(new SlowRunnable());
-		Assert.assertNull(callback.getException(), "Should not have an exception");
+		assertNull(callback.getException(), "Should not have an exception");
 		executor.shutdownNow();
 		runnable = new QuiteRunnable();
 		executor.execute(runnable);
-		Assert.assertFalse(((QuiteRunnable) runnable).hasRun());
-		Assert.assertNotNull(callback.getRunnable(), "Should have an unrun runnable");
+		assertFalse(((QuiteRunnable) runnable).hasRun());
+		assertNotNull(callback.getRunnable(), "Should have an unrun runnable");
 	}
 
 	private final class QuiteRunnable implements Runnable {

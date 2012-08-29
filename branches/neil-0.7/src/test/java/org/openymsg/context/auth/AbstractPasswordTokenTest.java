@@ -1,5 +1,10 @@
 package org.openymsg.context.auth;
 
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.mockito.Mockito;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.network.url.URLStream;
 import org.openymsg.network.url.URLStreamBuilder;
@@ -29,19 +33,19 @@ public class AbstractPasswordTokenTest {
 
 	@BeforeMethod
 	public void beforeMethod() {
-		sessionAuthorize = Mockito.mock(SessionAuthenticationImpl.class);
-		config = Mockito.mock(SessionConfig.class);
-		token = Mockito.mock(AuthenticationToken.class);
-		builder = Mockito.mock(URLStreamBuilder.class);
-		stream = Mockito.mock(URLStream.class);
-		status = Mockito.mock(URLStreamStatus.class);
+		sessionAuthorize = mock(SessionAuthenticationImpl.class);
+		config = mock(SessionConfig.class);
+		token = mock(AuthenticationToken.class);
+		builder = mock(URLStreamBuilder.class);
+		stream = mock(URLStream.class);
+		status = mock(URLStreamStatus.class);
 
-		Mockito.when(config.getURLStreamBuilder()).thenReturn(builder);
-		Mockito.when(builder.build()).thenReturn(stream);
-		Mockito.when(builder.getStatus()).thenReturn(status);
+		when(config.getURLStreamBuilder()).thenReturn(builder);
+		when(builder.build()).thenReturn(stream);
+		when(builder.getStatus()).thenReturn(status);
 
-		Mockito.when(builder.timeout(Mockito.anyInt())).thenReturn(builder);
-		Mockito.when(builder.url(Mockito.anyString())).thenReturn(builder);
+		when(builder.timeout(anyInt())).thenReturn(builder);
+		when(builder.url(anyString())).thenReturn(builder);
 	}
 
 	protected ByteArrayOutputStream buildResponse(String urlAnswer) throws IOException {

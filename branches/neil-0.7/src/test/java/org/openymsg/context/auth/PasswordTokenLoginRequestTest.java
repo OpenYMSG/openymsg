@@ -1,8 +1,10 @@
 package org.openymsg.context.auth;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 
-import org.mockito.Mockito;
 import org.testng.annotations.Test;
 
 public class PasswordTokenLoginRequestTest extends AbstractPasswordTokenTest {
@@ -17,9 +19,9 @@ public class PasswordTokenLoginRequestTest extends AbstractPasswordTokenTest {
 				+ EOL
 				+ "T=z=vRflPBvX0lPBOnsMRSeYXMKNjU2NwY0NzROTjVOMDIyNjcwNj&a=QAE&sk=DAAsrS5s2Iw6kX&ks=EAA9UDCK2ZPU4PFeEKjlWjH.g--~E&d=c2wBTVRJeE1BRXpNRE01T1RJNU56VTFNVEEzTVRFNE1RLS0BYQFRQUUBZwEzUVVZT0hDQk9SRzZIWlpCUlpRWERMTkUzWQF6egF2UmZsUEJnV0EBdGlwAVl3U3pyQQ--; path=/; domain=.yahoo.com"
 				+ EOL + "cookievalidfor=86400" + EOL;
-		Mockito.when(stream.getHeaders()).thenReturn(buildHeader());
-		Mockito.when(stream.getOutputStream()).thenReturn(buildResponse(responseString));
-		Mockito.when(status.isCorrect()).thenReturn(true);
+		when(stream.getHeaders()).thenReturn(buildHeader());
+		when(stream.getOutputStream()).thenReturn(buildResponse(responseString));
+		when(status.isCorrect()).thenReturn(true);
 		PasswordTokenLoginRequest request = new PasswordTokenLoginRequest(sessionAuthorize, config, token);
 		request.execute();
 
@@ -28,27 +30,27 @@ public class PasswordTokenLoginRequestTest extends AbstractPasswordTokenTest {
 		String crumb = "yxpjXOHjeV.";
 		String cookieB = null;
 
-		Mockito.verify(token).setCookiesAndCrumb(cookieY, cookieT, crumb, cookieB);
-		Mockito.verify(sessionAuthorize).receivedPasswordTokenLogin();
+		verify(token).setCookiesAndCrumb(cookieY, cookieT, crumb, cookieB);
+		verify(sessionAuthorize).receivedPasswordTokenLogin();
 	}
 
 	@Test
 	public void testBadStatus() throws IOException {
-		Mockito.when(status.isCorrect()).thenReturn(false);
+		when(status.isCorrect()).thenReturn(false);
 		PasswordTokenLoginRequest request = new PasswordTokenLoginRequest(sessionAuthorize, config, token);
 		request.execute();
-		Mockito.verify(sessionAuthorize).setFailureState(AuthenticationFailure.STAGE2);
+		verify(sessionAuthorize).setFailureState(AuthenticationFailure.STAGE2);
 	}
 
 	@Test
 	public void testBadResponse() throws IOException {
-		Mockito.when(status.isCorrect()).thenReturn(true);
-		Mockito.when(stream.getHeaders()).thenReturn(buildHeader());
-		Mockito.when(stream.getOutputStream()).thenReturn(buildResponse("1"));
+		when(status.isCorrect()).thenReturn(true);
+		when(stream.getHeaders()).thenReturn(buildHeader());
+		when(stream.getOutputStream()).thenReturn(buildResponse("1"));
 
 		PasswordTokenLoginRequest request = new PasswordTokenLoginRequest(sessionAuthorize, config, token);
 		request.execute();
-		Mockito.verify(sessionAuthorize).setFailureState(AuthenticationFailure.STAGE2);
+		verify(sessionAuthorize).setFailureState(AuthenticationFailure.STAGE2);
 	}
 
 }

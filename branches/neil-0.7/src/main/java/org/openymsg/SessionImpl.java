@@ -34,7 +34,7 @@ public class SessionImpl implements YahooSession {
 	@SuppressWarnings("unused")
 	private SessionMail mail;
 	private YahooSessionState state;
-	private ExecutorImpl executor;
+	protected ExecutorImpl executor;
 
 	public SessionImpl(SessionConfig config, YahooSessionCallback callback) {
 		this.config = config;

@@ -1,10 +1,11 @@
 package org.openymsg.context.session;
 
-import org.mockito.Mockito;
-import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.openymsg.testing.MessageAssert.argThatMessage;
+
 import org.openymsg.YahooStatus;
 import org.openymsg.connection.YahooConnection;
-import org.openymsg.connection.write.Message;
 import org.openymsg.execute.Executor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -19,9 +20,9 @@ public class SessionSessionImplTest {
 
 	@BeforeMethod
 	public void beforeMethod() {
-		connection = Mockito.mock(YahooConnection.class);
-		executor = Mockito.mock(Executor.class);
-		callback = Mockito.mock(SessionSessionCallback.class);
+		connection = mock(YahooConnection.class);
+		executor = mock(Executor.class);
+		callback = mock(SessionSessionCallback.class);
 		session = new SessionSessionImpl(username, executor, connection, timeout, callback);
 	}
 
@@ -29,14 +30,14 @@ public class SessionSessionImplTest {
 	public void testSetStatus() {
 		YahooStatus status = YahooStatus.AVAILABLE;
 		session.setStatus(status);
-		Mockito.verify(connection).execute(argThat(new StatusChangeRequest(status)));
+		verify(connection).execute(argThatMessage(new StatusChangeRequest(status)));
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Cannot set custom state without message")
 	public void testSetStatusCustomFail() {
 		YahooStatus status = YahooStatus.CUSTOM;
 		session.setStatus(status);
-		Mockito.verify(connection).execute(argThat(new StatusChangeRequest(status)));
+		verify(connection).execute(argThatMessage(new StatusChangeRequest(status)));
 	}
 
 	@Test
@@ -45,14 +46,14 @@ public class SessionSessionImplTest {
 		String message = "myMessage";
 		boolean showBusyIcon = false;
 		session.setCustomStatus(message, showBusyIcon);
-		Mockito.verify(connection).execute(argThat(new StatusChangeRequest(YahooStatus.CUSTOM, message)));
+		verify(connection).execute(argThatMessage(new StatusChangeRequest(YahooStatus.CUSTOM, message)));
 	}
 
 	@Test
 	public void testLogout() {
 		session.loginComplete();
 		session.logout();
-		Mockito.verify(connection).execute(argThat(new LogoutMessage(username)));
+		verify(connection).execute(argThatMessage(new LogoutMessage(username)));
 	}
 
 	@Test(expectedExceptions = IllegalStateException.class, expectedExceptionsMessageRegExp = "State is not logging in: LOGGING_IN")
@@ -64,12 +65,7 @@ public class SessionSessionImplTest {
 	public void testLogoutForced() {
 		LogoutReason reason = LogoutReason.DUPLICATE_LOGIN1;
 		session.receivedLogout(reason);
-		Mockito.verify(callback).logoffForced(reason);
-	}
-
-	// TODO copied
-	private Message argThat(Message message, String... excludeFields) {
-		return (Message) Mockito.argThat(new ReflectionEquals(message, excludeFields));
+		verify(callback).logoffForced(reason);
 	}
 
 }

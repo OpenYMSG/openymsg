@@ -1,6 +1,9 @@
 package org.openymsg.connection.write;
 
-import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+
 import org.openymsg.connection.YahooConnection;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -12,14 +15,14 @@ public class ScheduledMessageSenderTest {
 
 	@BeforeMethod
 	public void beforeMethod() {
-		executor = Mockito.mock(YahooConnection.class);
-		message = Mockito.mock(Message.class);
+		executor = mock(YahooConnection.class);
+		message = mock(Message.class);
 	}
 
 	@AfterMethod
 	public void afterMethod() {
-		Mockito.verifyNoMoreInteractions(executor);
-		Mockito.verifyNoMoreInteractions(message);
+		verifyNoMoreInteractions(executor);
+		verifyNoMoreInteractions(message);
 	}
 
 	@Test
@@ -27,7 +30,7 @@ public class ScheduledMessageSenderTest {
 		ScheduledMessageSender sender = new ScheduledMessageSender(executor, message);
 		sender.execute();
 
-		Mockito.verify(executor).execute(message);
+		verify(executor).execute(message);
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Executor cannot be null")

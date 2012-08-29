@@ -1,6 +1,7 @@
 package org.openymsg.context;
 
-import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
+
 import org.openymsg.config.SessionConfig;
 import org.openymsg.connection.YahooConnection;
 import org.openymsg.execute.Executor;
@@ -16,9 +17,9 @@ public class SessionContextImplTest {
 
 	@BeforeMethod
 	public void beforeMethod() {
-		executor = Mockito.mock(Executor.class);
-		callback = Mockito.mock(SessionContextCallback.class);
-		connection = Mockito.mock(YahooConnection.class);
+		executor = mock(Executor.class);
+		callback = mock(SessionContextCallback.class);
+		connection = mock(YahooConnection.class);
 	}
 
 	@Test
