@@ -806,10 +806,10 @@ public class Session implements StatusConstants, FriendManager {
 		transmitRejectBuddy(friend, ev.getTo(), msg);
 	}
 
-	public void acceptFriendAuthorization(String friend, YahooProtocol procotol) throws IllegalStateException,
-			IOException {
+	public void acceptFriendAuthorization(String id, String friend, YahooProtocol procotol)
+			throws IllegalStateException, IOException {
 		checkStatus();
-		transmitAcceptBuddy(friend, procotol.getStringValue());
+		transmitAcceptBuddy(id, friend, procotol.getStringValue());
 	}
 
 	/**
@@ -1358,9 +1358,9 @@ public class Session implements StatusConstants, FriendManager {
 		sendPacket(body, ServiceType.Y7_AUTHORIZATION, Status.AVAILABLE); // 0xd6
 	}
 
-	protected void transmitAcceptBuddy(String friend, String type) throws IOException {
+	protected void transmitAcceptBuddy(String id, String friend, String type) throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
-		body.addElement("1", primaryID.getId());
+		body.addElement("1", id);
 		body.addElement("5", friend);
 		body.addElement("241", type);
 		body.addElement("13", "1");// Accept Authorization

@@ -41,8 +41,10 @@ public class ContactAddMessage implements Message {
 		}
 		body.addElement("65", this.group.getName());
 		body.addElement("97", "1"); // TODO - UNICODE?
-		body.addElement("216", this.name.getFirstName()); // TODO first name
-		body.addElement("254", this.name.getLastName()); // TODO last name
+		if (this.name != null) {
+			body.addElement("216", this.name.getFirstName());
+			body.addElement("254", this.name.getLastName());
+		}
 		body.addElement("1", username);
 		body.addElement("302", "319");
 		body.addElement("300", "319");

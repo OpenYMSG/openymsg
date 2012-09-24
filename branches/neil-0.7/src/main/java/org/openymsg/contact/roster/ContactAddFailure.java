@@ -2,6 +2,7 @@ package org.openymsg.contact.roster;
 
 public enum ContactAddFailure {
 	UNKNOWN(-1),
+	GENERAL_FAILURE(1),
 	ALREADY_IN_GROUP(2), // TODO - may be the big list or the group
 	NOT_YAHOO_USER(3),
 	SOMETHING(33),

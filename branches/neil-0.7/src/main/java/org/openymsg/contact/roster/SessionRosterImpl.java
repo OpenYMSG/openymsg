@@ -23,7 +23,7 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 		this.executor = executor;
 		this.username = username;
 		this.callback = callback;
-		this.executor.register(ServiceType.ADD_BUDDY, new ContactAddResponse(this));
+		this.executor.register(ServiceType.Y7_BUDDY_AUTHORIZATION, new ContactAddAuthorizationResponse(this));
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 			throw new IllegalArgumentException("Contact already exists");
 		}
 		// TODO handle name
-		this.executor.execute(new ContactAddMessage(this.username, contact, group, message, new Name(null, null)));
+		this.executor.execute(new ContactAddMessage(this.username, contact, group, message, null));
 	}
 
 	@Override
@@ -58,8 +58,8 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	}
 
 	@Override
-	public void acceptFriendAuthorization(YahooContact contact) throws IllegalStateException {
-		this.executor.execute(new ContactAddAcceptMessage(this.username, contact));
+	public void acceptFriendAuthorization(String id, YahooContact contact) throws IllegalStateException {
+		this.executor.execute(new ContactAddAcceptMessage(id, contact));
 	}
 
 	@Override
@@ -111,8 +111,8 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	}
 
 	@Override
-	public void receivedContactAddRequest(YahooContact contact, Name name, String message) {
-		this.callback.receivedContactAddRequest(contact, name, message);
+	public void receivedContactAddRequest(String id, YahooContact contact, Name name, String message) {
+		this.callback.receivedContactAddRequest(id, contact, name, message);
 	}
 
 	@Override

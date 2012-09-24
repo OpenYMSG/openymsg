@@ -1,7 +1,7 @@
 package org.openymsg.contact.roster;
 
-import org.openymsg.YahooContact;
 import org.openymsg.Name;
+import org.openymsg.YahooContact;
 
 public interface SessionRosterCallback {
 
@@ -19,5 +19,5 @@ public interface SessionRosterCallback {
 
 	void receivedContactAddDeclined(YahooContact contact, String message);
 
-	void receivedContactAddRequest(YahooContact contact, Name name, String message);
+	void receivedContactAddRequest(String id, YahooContact contact, Name name, String message);
 }

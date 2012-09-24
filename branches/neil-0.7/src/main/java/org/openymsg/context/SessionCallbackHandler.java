@@ -117,8 +117,8 @@ public class SessionCallbackHandler implements YahooSessionCallback {
 	}
 
 	@Override
-	public void receivedContactAddRequest(YahooContact contact, Name name, String message) {
-		callback.receivedContactAddRequest(contact, name, message);
+	public void receivedContactAddRequest(String id, YahooContact contact, Name name, String message) {
+		callback.receivedContactAddRequest(id, contact, name, message);
 	}
 
 	@Override

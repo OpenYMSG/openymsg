@@ -35,7 +35,7 @@ public class SessionRosterImplTest {
 		String message = "message";
 		session.addContact(contact, group, message);
 		verify(executor).execute(
-				argThatMessage(new ContactAddMessage(this.username, contact, group, message, new Name(null, null))));
+				argThatMessage(new ContactAddMessage(username, contact, group, message, new Name(null, null))));
 	}
 
 	@Test
@@ -44,7 +44,7 @@ public class SessionRosterImplTest {
 		YahooContactGroup group = new ContactGroupImpl("group");
 		session.addContact(contact, group, null);
 		verify(executor).execute(
-				argThatMessage(new ContactAddMessage(this.username, contact, group, null, new Name(null, null))));
+				argThatMessage(new ContactAddMessage(username, contact, group, null, new Name(null, null))));
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Argument 'group' cannot be null")
@@ -87,8 +87,8 @@ public class SessionRosterImplTest {
 	@Test
 	public void testAcceptContact() {
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
-		session.acceptFriendAuthorization(contact);
-		verify(executor).execute(argThatMessage(new ContactAddAcceptMessage(this.username, contact)));
+		session.acceptFriendAuthorization(username, contact);
+		verify(executor).execute(argThatMessage(new ContactAddAcceptMessage(username, contact)));
 	}
 
 	@Test
@@ -96,7 +96,7 @@ public class SessionRosterImplTest {
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		String message = "message";
 		session.rejectFriendAuthorization(contact, message);
-		verify(executor).execute(argThatMessage(new ContactAddDeclineMessage(this.username, contact, message)));
+		verify(executor).execute(argThatMessage(new ContactAddDeclineMessage(username, contact, message)));
 	}
 
 	@Test
