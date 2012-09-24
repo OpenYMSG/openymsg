@@ -11,11 +11,11 @@ import org.openymsg.network.YMSG9Packet;
 /**
  * packet.status: 1 - Authorization Accepted 2 - Authorization Denied 3 - Authorization Request
  */
-public class ContactAddResponse implements SinglePacketResponse {
-	private static final Log log = LogFactory.getLog(ContactAddResponse.class);
+public class ContactAddAuthorizationResponse implements SinglePacketResponse {
+	private static final Log log = LogFactory.getLog(ContactAddAuthorizationResponse.class);
 	private SessionRosterImpl sessionRoster;
 
-	public ContactAddResponse(SessionRosterImpl sessionRoster) {
+	public ContactAddAuthorizationResponse(SessionRosterImpl sessionRoster) {
 		this.sessionRoster = sessionRoster;
 	}
 
@@ -30,20 +30,20 @@ public class ContactAddResponse implements SinglePacketResponse {
 			return;
 		}
 
-		YahooProtocol protocol;
-		String who = packet.getValue("4");
-		String message = packet.getValue("14");
 		// TODO - UTF8
-		@SuppressWarnings("unused")
-		String me = packet.getValue("5");
-		String protocolString = packet.getValue("241");
-		if (protocolString == null) {
-			protocol = YahooProtocol.YAHOO;
-		} else {
-			protocol = YahooProtocol.getProtocolOrDefault(protocolString, who);
-		}
-		YahooContact contact = new YahooContact(who, protocol);
 		if (packet.status == 1) {
+			String who = packet.getValue("4");
+			String me = packet.getValue("5");
+			// TODO - is this right
+			String protocolString = packet.getValue("241");
+			String message = packet.getValue("14");
+			YahooProtocol protocol;
+			if (protocolString == null) {
+				protocol = YahooProtocol.YAHOO;
+			} else {
+				protocol = YahooProtocol.getProtocolOrDefault(protocolString, who);
+			}
+			YahooContact contact = new YahooContact(who, protocol);
 			String authStatus = packet.getValue("13");
 			if (authStatus.equals("1")) {
 				log.trace("A friend accepted our authorization request: " + contact);
@@ -55,6 +55,19 @@ public class ContactAddResponse implements SinglePacketResponse {
 				log.error("Unexpected authorization packet. Do not know how to handle: " + packet);
 			}
 		} else if (packet.status == 3) {
+			String who = packet.getValue("4");
+			String me = packet.getValue("5");
+			// TODO - is this right
+			String protocolString = packet.getValue("241");
+			String message = packet.getValue("14");
+
+			YahooProtocol protocol;
+			if (protocolString == null) {
+				protocol = YahooProtocol.YAHOO;
+			} else {
+				protocol = YahooProtocol.getProtocolOrDefault(protocolString, who);
+			}
+			YahooContact contact = new YahooContact(who, protocol);
 			Name contactName = null;
 			String fname = packet.getValue("216");
 			String lname = packet.getValue("254");
@@ -62,7 +75,7 @@ public class ContactAddResponse implements SinglePacketResponse {
 				contactName = new Name(fname, lname);
 			}
 			log.trace("Someone is sending us a subscription request: " + contact);
-			sessionRoster.receivedContactAddRequest(contact, contactName, message);
+			sessionRoster.receivedContactAddRequest(me, contact, contactName, message);
 		} else {
 			log.error("Unexpected authorization packet. Do not know how to handle: " + packet);
 		}

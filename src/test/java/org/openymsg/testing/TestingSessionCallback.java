@@ -119,7 +119,7 @@ public class TestingSessionCallback implements YahooSessionCallback {
 	}
 
 	@Override
-	public void receivedContactAddRequest(YahooContact contact, Name name, String message) {
+	public void receivedContactAddRequest(String id, YahooContact contact, Name name, String message) {
 		// TODO Auto-generated method stub
 
 	}

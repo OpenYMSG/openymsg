@@ -44,8 +44,8 @@ public class SessionContactImpl implements SessionContact {
 	}
 
 	@Override
-	public void acceptFriendAuthorization(YahooContact contact) throws IllegalStateException {
-		this.sessionRoster.acceptFriendAuthorization(contact);
+	public void acceptFriendAuthorization(String id, YahooContact contact) throws IllegalStateException {
+		this.sessionRoster.acceptFriendAuthorization(id, contact);
 	}
 
 	@Override

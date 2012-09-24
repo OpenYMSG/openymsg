@@ -177,11 +177,11 @@ public class SessionImpl implements YahooSession {
 	}
 
 	@Override
-	public void acceptFriendAuthorization(YahooContact contact) throws IllegalStateException {
+	public void acceptFriendAuthorization(String id, YahooContact contact) throws IllegalStateException {
 		if (!state.isAvailable()) {
 			throw new IllegalStateException("Session in wrong state: " + state);
 		}
-		this.contact.acceptFriendAuthorization(contact);
+		this.contact.acceptFriendAuthorization(id, contact);
 	}
 
 	@Override

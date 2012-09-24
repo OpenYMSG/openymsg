@@ -36,25 +36,29 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 	 */
 	@Override
 	public void execute(YMSG9Packet packet) {
+		// TODO should we always check for this?
+		if (packet.status != 1) {
+			log.warn("got ContactAddAckResponse with status: " + packet.status);
+			return;
+		}
+
 		String me = packet.getValue("1");
 		String contactUsername = packet.getValue("7");
+		String protocolString = packet.getValue("241");
+		YahooProtocol protocol;
+		if (protocolString == null) {
+			protocol = YahooProtocol.YAHOO;
+		} else {
+			protocol = YahooProtocol.getProtocolOrDefault(protocolString, contactUsername);
+		}
 		String groupName = packet.getValue("65");
 		String friendAddStatus = packet.getValue("66"); // TODO what is this: 40 - failed MSN, 0 success yahoo,
 		String pending = packet.getValue("223"); // 1
-		String protocol = packet.getValue("241");
-
-		// TODO should we always check for this?
-		if (packet.status != 1) {
-			log.warn("Ack is not an ack: " + packet.status);
-			// log.warn("Me: " + myName + " Add buddy attempt: " + primaryID + ", " + userId + " problem: "
-			// + friendAddStatus + " not an ack: " + pkt.status);
+		if (!pending.equals("1")) {
+			log.warn("pending is not 1: " + pending);
 		}
 
-		YahooProtocol yahooProtocol = YahooProtocol.YAHOO;
-		if (protocol != null) {
-			yahooProtocol = YahooProtocol.getProtocolOrDefault(protocol, contactUsername);
-		}
-		YahooContact contact = new YahooContact(contactUsername, yahooProtocol);
+		YahooContact contact = new YahooContact(contactUsername, protocol);
 
 		if ("0".equals(friendAddStatus)) {
 			// log.info("Me: " + myName + " friend added: " + userId + ", pending: " + pending + ", protocol: "
@@ -83,6 +87,7 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 					sessionRoster.contactAddFailure(contact, failure);
 				}
 				break;
+			case GENERAL_FAILURE:
 			case NOT_REMOTE_USER:
 			case NOT_YAHOO_USER:
 			case SOMETHING:
@@ -90,7 +95,7 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 				sessionRoster.contactAddFailure(contact, failure);
 				break;
 			default:
-				failure = ContactAddFailure.UNKNOWN;
+				// failure = ContactAddFailure.UNKNOWN;
 				sessionRoster.receivedContactAddFailure(contact, failure, friendAddStatus);
 			}
 		}

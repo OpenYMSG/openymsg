@@ -9,7 +9,7 @@ public interface SessionRoster {
 
 	Set<YahooContact> getContacts();
 
-	void acceptFriendAuthorization(YahooContact contact) throws IllegalStateException;
+	void acceptFriendAuthorization(String id, YahooContact contact) throws IllegalStateException;
 
 	void rejectFriendAuthorization(YahooContact contact, String message) throws IllegalStateException;
 
