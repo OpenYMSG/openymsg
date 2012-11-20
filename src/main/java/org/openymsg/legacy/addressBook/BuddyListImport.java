@@ -29,19 +29,21 @@ public class BuddyListImport {
 		if (sessionCookies != null) {
 			cookieLine = /* FIXME "Cookie: "+ */
 			"Y=" + sessionCookies[NetworkConstants.COOKIE_Y] + "; " + "T=" + sessionCookies[NetworkConstants.COOKIE_T];
-		}
-		else {
+		} else {
 			cookieLine = null;
 		}
 		this.roster = roster;
 	}
 
 	public void process(String userId, String password) throws IOException {
-		String addressBookLink = "http://address.yahoo.com/yab/us?v=XM";
+		String addressBookLink = "http://address.yahoo.com/yab/us?v=XM"
+				+ "&prog=ymsgr&useutf8=1&diffs=1&t=0&rt=0&prog-ver=7,0,0,426";
 
 		URL u = new URL(addressBookLink);
 		URLConnection uc = u.openConnection();
 		Util.initURLConnection(uc);
+		uc.setRequestProperty("User-Agent",
+				"Yahoo!%20Messenger/235554 CFNetwork/520.5.1 Darwin/11.4.2 (x86_64) (MacBookPro10%2C1)");
 
 		if (cookieLine != null) {
 			uc.setRequestProperty("Cookie", cookieLine);
@@ -89,16 +91,14 @@ public class BuddyListImport {
 							this.roster.addOrUpdateAddressBook(user);
 							// contacts.add(e);
 						}
-					}
-					else {
+					} else {
 						log.debug("user: " + username + " No node list found for ct. AddressBook empty?");
 					}
 				}
 				catch (Exception pce) {
 					log.error("user: " + username + " Failed reading xml addressbook", pce);
 				}
-			}
-			else {
+			} else {
 				log.warn("user: " + username + " responseCode from http is: " + responseCode);
 			}
 		}
