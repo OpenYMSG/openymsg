@@ -6,6 +6,8 @@ public interface Dispatcher {
 
 	void schedule(Request request, long repeatInterval) throws IllegalStateException;
 
+	void scheduleOnce(Request request, long delay) throws IllegalStateException;
+
 	void shutdown();
 
 	boolean isTerminated();

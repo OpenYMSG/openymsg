@@ -35,6 +35,15 @@ public class DispatcherImpl implements Dispatcher {
 	}
 
 	@Override
+	public void scheduleOnce(Request request, long delay) throws IllegalStateException {
+		if (this.shutdown) {
+			throw new IllegalStateException("Not executing because shutdown");
+		} else {
+			this.executor.schedule(new RequestWrapper(request), delay, TimeUnit.MILLISECONDS);
+		}
+	}
+
+	@Override
 	public void shutdown() {
 		log.info("Shutdown dispatcher");
 		this.shutdown = true;

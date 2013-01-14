@@ -96,6 +96,7 @@ public class DirectConnectionHandler extends ConnectionHandler {
 			if (searchForAddress) {
 				GetConnectionServer getConnection = new GetConnectionServer();
 				String otherHost = getConnection.getIpAddress();
+				log.debug("Connecting to: " + otherHost);
 				if (otherHost != null) {
 					log.info("Swapping host: " + otherHost);
 					host = otherHost;

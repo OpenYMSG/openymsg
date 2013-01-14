@@ -74,6 +74,9 @@ public class SessionImpl implements YahooSession {
 			throw new IllegalStateException("Session in wrong state: " + state);
 		}
 		context.logout();
+
+		// no event from yahoo anymore
+		state = YahooSessionState.LOGGED_OUT;
 	}
 
 	@Override
