@@ -29,6 +29,11 @@ public class ExecutorImpl implements Executor {
 	}
 
 	@Override
+	public void scheduleOnce(Request request, long delay) {
+		dispatcher.scheduleOnce(request, delay);
+	}
+
+	@Override
 	public boolean isTerminated() {
 		return dispatcher.isTerminated();
 	}

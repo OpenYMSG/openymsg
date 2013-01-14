@@ -112,7 +112,7 @@ public class Session implements StatusConstants, FriendManager {
 	/** Yahoo user password. */
 	private String password;
 
-	private String cookieY, cookieT, cookieC;
+	private String cookieY, cookieT, cookieB, cookieC;
 
 	/** IMvironment (decor, etc.) */
 	private String imvironment;
@@ -1049,7 +1049,7 @@ public class Session implements StatusConstants, FriendManager {
 	 * and 1 use loginID . Note: message also contains our initial status. plp - plain response (not MD5Crypt'd) crp -
 	 * crypted response (MD5Crypt'd)
 	 */
-	protected void transmitAuthResp(String plp, String crp, String base64) throws IOException {
+	protected void transmitAuthResp(String plp, String crp, String base64, String cookieB) throws IOException {
 		if (sessionStatus != SessionState.CONNECTED) {
 			throw new IllegalStateException(
 					"Cannot transmit an AUTHRESP packet if you're not completely connected to the Yahoo Network. Current state: "
@@ -1072,6 +1072,9 @@ public class Session implements StatusConstants, FriendManager {
 			if (pictureHandler != null && pictureHandler.getPictureChecksum() != null) {
 				body.addElement("192", pictureHandler.getPictureChecksum());
 			}
+			if (cookieB != null) {
+				body.addElement("59", cookieB);
+			}
 
 			sendPacket(body, ServiceType.AUTHRESP, status); // 0x54
 		} else {
@@ -1088,6 +1091,9 @@ public class Session implements StatusConstants, FriendManager {
 
 			if (pictureHandler != null && pictureHandler.getPictureChecksum() != null) {
 				body.addElement("192", pictureHandler.getPictureChecksum());
+			}
+			if (cookieB != null) {
+				body.addElement("59", cookieB);
 			}
 
 			sendPacket(body, ServiceType.AUTHRESP, status); // 0x54
@@ -1811,10 +1817,14 @@ public class Session implements StatusConstants, FriendManager {
 		sessionStatus = SessionState.CONNECTED;
 		log.trace("Going to transmit Auth response, " + "containing the challenge...");
 		if (s.length > 2) {
-			transmitAuthResp(s[0], s[1], s[2]);
+			transmitAuthResp(s[0], s[1], s[2], s[3]);
 		} else {
-			transmitAuthResp(s[0], s[1], null);
+			transmitAuthResp(s[0], s[1], null, null);
 		}
+		System.out.println("Cookie 0: " + s[0]);
+		System.out.println("Cookie 1: " + s[1]);
+		System.out.println("Cookie 2: " + s[2]);
+		System.out.println("Cookie 3: " + s[3]);
 		loadAddressBook(s);
 	}
 
@@ -1972,6 +1982,9 @@ public class Session implements StatusConstants, FriendManager {
 				String crumb = null;
 				String cookieY = null;
 				String cookieT = null;
+				String cookieB = null;
+
+				log.debug("Cookies: " + out.toString());
 
 				StringTokenizer toks = new StringTokenizer(out.toString(), "\r\n");
 				if (toks.countTokens() <= 0) {
@@ -2000,8 +2013,14 @@ public class Session implements StatusConstants, FriendManager {
 						cookieY = t.replaceAll("Y=", "");
 					} else if (t.startsWith("T=")) {
 						cookieT = t.replaceAll("T=", "");
+					} else if (t.startsWith("B=")) {
+						cookieT = t.replaceAll("B=", "");
 					}
 				}
+
+				log.debug("Cookie T: " + cookieT);
+				log.debug("Cookie Y: " + cookieY);
+				log.debug("Cookie B: " + cookieB);
 
 				if (crumb == null || cookieT == null || cookieY == null) {
 					throw new LoginRefusedException("Login Failed, Unkown error", AuthenticationState.BAD);
@@ -2016,15 +2035,17 @@ public class Session implements StatusConstants, FriendManager {
 				// }
 				this.cookieY = cookieY;
 				this.cookieT = cookieT;
-				return yahooAuth16Stage3(crumb + seed, cookieY, cookieT);
+				this.cookieB = cookieB;
+				return yahooAuth16Stage3(crumb + seed, cookieY, cookieT, cookieB);
 			}
 		}
 
 		throw new LoginRefusedException("Login Failed, unable to retrieve stage 2 url");
 	}
 
-	private String[] yahooAuth16Stage3(String crypt, String cookieY, String cookieT) throws NoSuchAlgorithmException {
-		return ChallengeResponseV16.getStrings(cookieY, cookieT, crypt);
+	private String[] yahooAuth16Stage3(String crypt, String cookieY, String cookieT, String cookieB)
+			throws NoSuchAlgorithmException {
+		return ChallengeResponseV16.getStrings(cookieY, cookieT, crypt, cookieB);
 	}
 
 	/**

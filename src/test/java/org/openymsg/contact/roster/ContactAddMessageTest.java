@@ -1,7 +1,5 @@
 package org.openymsg.contact.roster;
 
-import static org.testng.Assert.fail;
-
 import java.io.IOException;
 
 import org.openymsg.Name;
@@ -44,8 +42,16 @@ public class ContactAddMessageTest {
 	}
 
 	@Test
-	public void testNoName() {
-		fail("not implemented");
+	// TODO fails because first and last name is null
+	public void testNoName() throws IOException {
+		String test = "Magic:YMSG Version:16 Length:134 Service:ADD_BUDDY Status:DEFAULT SessionId:0x59e41a  [14] [Hereisamessage] [65] [groupName] [97] [1] [216] [] [254] [] [1] [testuser] [302] [319] [300] [319] [7] [testbuddy] [301] [319] [303] [319]";
+		String username = "testuser";
+		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
+		YahooContactGroup group = new ContactGroupImpl("groupName");
+		String addMessage = "Hereisamessage";
+		Name name = new Name("", "");
+		ContactAddMessage message = new ContactAddMessage(username, contact, group, addMessage, name);
+		MessageAssert.assertEquals(message, test);
 	}
 
 	@Test

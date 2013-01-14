@@ -29,6 +29,10 @@ public class BuddyListImport {
 		if (sessionCookies != null) {
 			cookieLine = /* FIXME "Cookie: "+ */
 			"Y=" + sessionCookies[NetworkConstants.COOKIE_Y] + "; " + "T=" + sessionCookies[NetworkConstants.COOKIE_T];
+			String cookieB = sessionCookies[NetworkConstants.COOKIE_B];
+			if (cookieB != null) {
+				cookieLine = cookieLine + "; " + "B=" + cookieB;
+			}
 		} else {
 			cookieLine = null;
 		}
@@ -48,6 +52,8 @@ public class BuddyListImport {
 		if (cookieLine != null) {
 			uc.setRequestProperty("Cookie", cookieLine);
 		}
+
+		System.out.println("cookieLine: " + cookieLine);
 
 		// log.trace("Cookie: " + uc.getRequestProperty("Cookie"));
 		if (uc instanceof HttpURLConnection) {
