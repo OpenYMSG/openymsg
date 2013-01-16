@@ -70,8 +70,8 @@ public class SessionImpl implements YahooSession {
 
 	@Override
 	public void logout() throws IllegalStateException {
-		if (!state.isLoggedIn()) {
-			throw new IllegalStateException("Session in wrong state: " + state);
+		if (!state.isLoggedIn() || !state.isFailure()) {
+			// TODO - nah - log this or send exception("Session in wrong state: " + state);
 		}
 		context.logout();
 

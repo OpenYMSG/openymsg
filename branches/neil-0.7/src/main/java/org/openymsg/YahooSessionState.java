@@ -19,6 +19,10 @@ public enum YahooSessionState {
 		return this == LOGGED_IN;
 	}
 
+	public boolean isFailure() {
+		return this == FAILURE;
+	}
+
 	public boolean isAvailable() {
 		return this == STARTED || this == CONNECTED || this == LOGGED_IN || this == LOGGED_OUT;
 	}
