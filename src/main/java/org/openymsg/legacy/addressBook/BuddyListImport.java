@@ -2,9 +2,14 @@ package org.openymsg.legacy.addressBook;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.CookieManager;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -49,23 +54,51 @@ public class BuddyListImport {
 		uc.setRequestProperty("User-Agent",
 				"Yahoo!%20Messenger/235554 CFNetwork/520.5.1 Darwin/11.4.2 (x86_64) (MacBookPro10%2C1)");
 
+		// System.out.println("getRequestProperty before" + uc.getRequestProperty("Cookie"));
+
 		if (cookieLine != null) {
 			uc.setRequestProperty("Cookie", cookieLine);
 		}
 
-		System.out.println("cookieLine: " + cookieLine);
+		// System.out.println("getRequestProperty after" + uc.getRequestProperty("Cookie"));
+
+		CookieManager cm = (CookieManager) CookieManager.getDefault();
+
+		// System.out.println("cookieManager: " + cm);
+
+		if (cm != null) {
+			try {
+				// System.out.println("cookieStore: " + cm.getCookieStore().get(u.toURI()));
+
+				Map<String, List<String>> blankHeaders = new HashMap<String, List<String>>();
+				System.out.println("cookieMap.get: " + cm.get(u.toURI(), blankHeaders));
+			}
+			catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+		// System.out.println("cookieLine: " + cookieLine);
 
 		// log.trace("Cookie: " + uc.getRequestProperty("Cookie"));
 		if (uc instanceof HttpURLConnection) {
 			int responseCode = ((HttpURLConnection) uc).getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
 				InputStream responseStream = uc.getInputStream();
-				// byte[] buff = new byte[256];
-				// int read = -1;
-				// while ((read = responseStream.read(buff)) != -1) {
-				// String buffLine = new String(buff);
-				// log.trace(buffLine);
-				// }
+				byte[] buff = new byte[256];
+				int read = -1;
+				log.error("================");
+				log.error("================");
+				log.error("================");
+				while ((read = responseStream.read(buff)) != -1) {
+					String buffLine = new String(buff);
+					log.error(buffLine);
+				}
+				log.error("================");
+				log.error("================");
+				log.error("================");
 
 				DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 

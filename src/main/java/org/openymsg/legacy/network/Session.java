@@ -179,6 +179,8 @@ public class Session implements StatusConstants, FriendManager {
 
 	private LinkedList<String> previousIds = new LinkedList<String>();
 
+	private boolean shouldLoadAddressBook;
+
 	// used to simulate failures
 	// static private int triesBeforeFailure = 0;
 
@@ -212,6 +214,7 @@ public class Session implements StatusConstants, FriendManager {
 
 	public Session(ConnectionHandler connectionHandler, String yahooLoginHost) throws NumberFormatException {
 		this.yahooLoginHost = yahooLoginHost;
+		this.shouldLoadAddressBook = true;
 		if (connectionHandler != null) {
 			network = connectionHandler;
 		} else {
@@ -1821,14 +1824,18 @@ public class Session implements StatusConstants, FriendManager {
 		} else {
 			transmitAuthResp(s[0], s[1], null, null);
 		}
-		System.out.println("Cookie 0: " + s[0]);
-		System.out.println("Cookie 1: " + s[1]);
-		System.out.println("Cookie 2: " + s[2]);
-		System.out.println("Cookie 3: " + s[3]);
-		loadAddressBook(s);
+		// System.out.println("Cookie 0: " + s[0]);
+		// System.out.println("Cookie 1: " + s[1]);
+		// System.out.println("Cookie 2: " + s[2]);
+		// System.out.println("Cookie 3: " + s[3]);
+		this.sessionCookies = s;
+
+		if (shouldLoadAddressBook) {
+			loadAddressBook();
+		}
 	}
 
-	private void loadAddressBook(String[] sessionCookies) {
+	private void loadAddressBook() {
 		log.trace("loadAddressBook");
 		BuddyListImport buddyListImport = new BuddyListImport(this.loginID.getId(), roster, sessionCookies);
 		try {
@@ -1837,7 +1844,6 @@ public class Session implements StatusConstants, FriendManager {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.sessionCookies = sessionCookies;
 	}
 
 	private String[] yahooAuth16Stage1(String seed) throws LoginRefusedException, IOException, NoSuchAlgorithmException {
@@ -3985,6 +3991,10 @@ public class Session implements StatusConstants, FriendManager {
 
 	public Collection<YahooConference> getConferences() {
 		return Collections.unmodifiableCollection(conferences.values());
+	}
+
+	public void setShouldLoadAddressBook(boolean shouldLoadAddressBook) {
+		this.shouldLoadAddressBook = shouldLoadAddressBook;
 	}
 
 }
