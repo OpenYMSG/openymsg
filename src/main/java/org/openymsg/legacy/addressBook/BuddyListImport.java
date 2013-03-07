@@ -4,12 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.CookieManager;
 import java.net.HttpURLConnection;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -66,19 +62,19 @@ public class BuddyListImport {
 
 		// System.out.println("cookieManager: " + cm);
 
-		if (cm != null) {
-			try {
-				// System.out.println("cookieStore: " + cm.getCookieStore().get(u.toURI()));
-
-				Map<String, List<String>> blankHeaders = new HashMap<String, List<String>>();
-				System.out.println("cookieMap.get: " + cm.get(u.toURI(), blankHeaders));
-			}
-			catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
+		// if (cm != null) {
+		// try {
+		// // System.out.println("cookieStore: " + cm.getCookieStore().get(u.toURI()));
+		//
+		// Map<String, List<String>> blankHeaders = new HashMap<String, List<String>>();
+		// // System.out.println("cookieMap.get: " + cm.get(u.toURI(), blankHeaders));
+		// }
+		// catch (URISyntaxException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		//
+		// }
 
 		// System.out.println("cookieLine: " + cookieLine);
 
@@ -87,18 +83,13 @@ public class BuddyListImport {
 			int responseCode = ((HttpURLConnection) uc).getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
 				InputStream responseStream = uc.getInputStream();
-				byte[] buff = new byte[256];
-				int read = -1;
-				log.error("================");
-				log.error("================");
-				log.error("================");
-				while ((read = responseStream.read(buff)) != -1) {
-					String buffLine = new String(buff);
-					log.error(buffLine);
-				}
-				log.error("================");
-				log.error("================");
-				log.error("================");
+				// byte[] buff = new byte[256];
+				// int read = -1;
+				// while ((read = responseStream.read(buff)) != -1) {
+				// String buffLine = new String(buff);
+				// log.debug(buffLine);
+				// }
+				// responseStream.reset();
 
 				DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 

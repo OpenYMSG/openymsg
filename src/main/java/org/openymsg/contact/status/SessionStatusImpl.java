@@ -54,7 +54,7 @@ public class SessionStatusImpl implements SessionStatus, SessionStatusCallback {
 
 	public void addedIgnored(Set<YahooContact> usersOnIgnoreList) {
 		for (YahooContact contact : usersOnIgnoreList) {
-			System.err.println("ignored: " + contact);
+			log.error("ignored: " + contact);
 		}
 	}
 
