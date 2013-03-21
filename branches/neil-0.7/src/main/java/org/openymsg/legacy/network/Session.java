@@ -429,7 +429,7 @@ public class Session implements StatusConstants, FriendManager {
 			long now = System.currentTimeMillis();
 			if (now - pingTimestamp > NetworkConstants.PING_TIMEOUT_IN_SECS * 1000) {
 				this.transmitPings();
-				pingTimestamp = now;
+				pingTimestamp = pingTimestamp + (NetworkConstants.PING_TIMEOUT_ADDITION_IN_SEC * 1000);
 				pingSent = true;
 			}
 			this.transmitKeepAlive();

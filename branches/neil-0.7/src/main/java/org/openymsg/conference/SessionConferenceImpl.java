@@ -70,7 +70,13 @@ public class SessionConferenceImpl implements SessionConference {
 		}
 		ConferenceMembership membership = this.conferenceMemberships.get(conference.getId());
 		if (membership == null) {
-			throw new IllegalArgumentException("Unknown conference: " + conference);
+			if (this.conferences.containsKey(conference.getId())) {
+				log.error("Trying to leave with a conference in conferences, but not in membership: "
+						+ conference.getId());
+				return;
+			} else {
+				throw new IllegalArgumentException("Unknown conference: " + conference);
+			}
 		}
 		executor.execute(new LeaveConferenceMessage(username, conference, membership));
 	}
