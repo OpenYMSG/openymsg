@@ -4,7 +4,7 @@
 	<groupId>net.sf.openymsg</groupId>
 	<artifactId>openymsg</artifactId>
 	<name>OpenYMSG library</name>
-	<version>1.0-beta-12</version>
+	<version>1.0-beta-13</version>
 	<description>OpenYMSG is an Java library that implements the Yahoo Instant
 	 	Messenger protocol.</description>
 	<url>http://sourceforge.net/projects/openymsg/</url>
