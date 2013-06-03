@@ -138,4 +138,46 @@ public class SingleStatusResponseTest {
 		verify(sessionStatus).statusUpdate(new YahooContact("testuser", YahooProtocol.YAHOO), status);
 	}
 
+	@Test
+	public void testCustomAvailableProtocol() {
+		String test = "Magic:YMSG Version:16 Length:63 Service:Y6_STATUS_UPDATE Status:SERVER_ACK SessionId:fffffffffe5a618f  [7] [testuser] [10] [99] [19] [Custom Message] [47] [0] [97] [1] [187] [0] [317] [1]";
+		YMSG9Packet packet = PacketReader.readString(test);
+		SessionStatusImpl sessionStatus = mock(SessionStatusImpl.class);
+		SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
+		response.execute(packet);
+		StatusMessage internalStatus = new CustomStatusMessage(YahooStatus.AVAILABLE, "Custom Message");
+		ContactPresence presence = null;
+		Long idleTime = -1L;
+		ContactStatusImpl status = new ContactStatusImpl(internalStatus, presence, idleTime);
+		verify(sessionStatus).statusUpdate(new YahooContact("testuser", YahooProtocol.YAHOO), status);
+	}
+
+	@Test
+	public void testCustomBusyProtocol() {
+		String test = "Magic:YMSG Version:16 Length:63 Service:Y6_STATUS_UPDATE Status:SERVER_ACK SessionId:fffffffffe5a618f  [7] [testuser] [10] [99] [19] [Custom Message] [47] [1] [97] [1] [187] [0] [317] [1]";
+		YMSG9Packet packet = PacketReader.readString(test);
+		SessionStatusImpl sessionStatus = mock(SessionStatusImpl.class);
+		SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
+		response.execute(packet);
+		StatusMessage internalStatus = new CustomStatusMessage(YahooStatus.BUSY, "Custom Message");
+		ContactPresence presence = null;
+		Long idleTime = -1L;
+		ContactStatusImpl status = new ContactStatusImpl(internalStatus, presence, idleTime);
+		verify(sessionStatus).statusUpdate(new YahooContact("testuser", YahooProtocol.YAHOO), status);
+	}
+
+	@Test
+	public void testCustomIdleProtocol() {
+		String test = "Magic:YMSG Version:16 Length:63 Service:Y6_STATUS_UPDATE Status:SERVER_ACK SessionId:fffffffffe5a618f  [7] [testuser] [10] [99] [19] [Custom Message] [47] [2] [97] [1] [187] [0] [317] [1]";
+		YMSG9Packet packet = PacketReader.readString(test);
+		SessionStatusImpl sessionStatus = mock(SessionStatusImpl.class);
+		SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
+		response.execute(packet);
+		StatusMessage internalStatus = new CustomStatusMessage(YahooStatus.IDLE, "Custom Message");
+		ContactPresence presence = null;
+		Long idleTime = -1L;
+		ContactStatusImpl status = new ContactStatusImpl(internalStatus, presence, idleTime);
+		verify(sessionStatus).statusUpdate(new YahooContact("testuser", YahooProtocol.YAHOO), status);
+	}
+
 }

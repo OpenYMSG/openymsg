@@ -140,23 +140,6 @@ public class SessionSessionImpl implements SessionSession {
 		} else {
 			callback.logoffForced(reason);
 		}
-
-		// switch (state) {
-		// case UNKNOWN_52:
-		// log.info("AUTHRESP says: Logged off with " + state);
-		// session.setState(state);
-		// break;
-		//
-		// case DUPLICATE_LOGIN1:
-		// case DUPLICATE_LOGIN2:
-		// log.info("AUTHRESP says: Logged off with Duplicate Login: " + state);
-		// session.setState(state);
-		// break;
-		// default:
-		// log.warn("AUTHRESP says: logged off with an unchecked reason: " + state);
-		// session.setState(state);
-		// }
-
 	}
 
 	@Override

@@ -20,11 +20,6 @@ public class NormalStatusMessage implements StatusMessage {
 	}
 
 	@Override
-	public String getStatusText() {
-		return status.toString();
-	}
-
-	@Override
 	public String getStatusMessage() {
 		return null;
 	}

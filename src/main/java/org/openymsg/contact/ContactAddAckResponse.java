@@ -70,34 +70,21 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 			ContactAddFailure failure = ContactAddFailure.get(friendAddStatus);
 			log.warn("Me: " + me + " Friend add status is not 0: " + friendAddStatus);
 
-			if (failure == null) {
-				failure = ContactAddFailure.UNKNOWN;
-				sessionRoster.receivedContactAddFailure(contact, failure, friendAddStatus);
-				return;
-			}
-
-			switch (failure) {
-			case ALREADY_IN_GROUP:
+			if (failure == ContactAddFailure.ALREADY_IN_GROUP) {
 				if (!sessionRoster.getContacts().contains(contact)) {
 					log.warn("Getting already in group, but can't find it.  It will be added");
 					ContactGroupImpl group = new ContactGroupImpl(groupName);
 					group.add(contact);
 					addContact(pending, contact, group);
-				} else {
-					sessionRoster.contactAddFailure(contact, failure);
+					return;
 				}
-				break;
-			case GENERAL_FAILURE:
-			case NOT_REMOTE_USER:
-			case NOT_YAHOO_USER:
-			case SOMETHING:
-			case SOMETHING_ELSE:
-				sessionRoster.contactAddFailure(contact, failure);
-				break;
-			default:
-				// failure = ContactAddFailure.UNKNOWN;
-				sessionRoster.receivedContactAddFailure(contact, failure, friendAddStatus);
 			}
+
+			if (failure == null) {
+				failure = ContactAddFailure.UNKNOWN;
+			}
+
+			sessionRoster.receivedContactAddFailure(contact, failure, friendAddStatus);
 		}
 
 	}

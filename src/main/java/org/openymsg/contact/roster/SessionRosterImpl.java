@@ -128,11 +128,6 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 		this.callback.rosterLoaded();
 	}
 
-	public void contactAddFailure(YahooContact contact, ContactAddFailure failure) {
-		// TODO Auto-generated method stub
-
-	}
-
 	public boolean possibleRemoveContact(YahooContact contact) {
 		// TODO Auto-generated method stub
 		return false;
