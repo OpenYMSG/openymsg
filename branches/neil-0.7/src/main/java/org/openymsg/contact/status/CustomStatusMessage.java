@@ -10,12 +10,11 @@ import org.openymsg.YahooStatus;
 public class CustomStatusMessage implements StatusMessage {
 	/** An free form status message. */
 	protected final String statusMessage;
-	/** A custom status. As yet I'm unsure if these are String identifiers, or numeric or even boolean values. */
-	// TODO: Find out what values this can have (boolean, numeric, string?)
-	protected final String statusText;
+	/** Either busy or available */
+	protected final YahooStatus status;
 
-	public CustomStatusMessage(String statusText, String statusMessage) {
-		this.statusText = statusText;
+	public CustomStatusMessage(YahooStatus status, String statusMessage) {
+		this.status = status;
 		this.statusMessage = statusMessage;
 	}
 
@@ -26,12 +25,7 @@ public class CustomStatusMessage implements StatusMessage {
 
 	@Override
 	public YahooStatus getStatus() {
-		return YahooStatus.CUSTOM;
-	}
-
-	@Override
-	public String getStatusText() {
-		return this.statusText;
+		return status;
 	}
 
 	@Override
@@ -44,7 +38,7 @@ public class CustomStatusMessage implements StatusMessage {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((statusMessage == null) ? 0 : statusMessage.hashCode());
-		result = prime * result + ((statusText == null) ? 0 : statusText.hashCode());
+		result = prime * result + ((status == null) ? 0 : status.hashCode());
 		return result;
 	}
 
@@ -57,9 +51,9 @@ public class CustomStatusMessage implements StatusMessage {
 		if (statusMessage == null) {
 			if (other.statusMessage != null) return false;
 		} else if (!statusMessage.equals(other.statusMessage)) return false;
-		if (statusText == null) {
-			if (other.statusText != null) return false;
-		} else if (!statusText.equals(other.statusText)) return false;
+		if (status == null) {
+			if (other.status != null) return false;
+		} else if (!status.equals(other.status)) return false;
 		return true;
 	}
 
@@ -67,4 +61,10 @@ public class CustomStatusMessage implements StatusMessage {
 	public boolean is(YahooStatus status) {
 		return this.getStatus().equals(status);
 	}
+
+	@Override
+	public String toString() {
+		return "CustomStatusMessage [statusMessage=" + statusMessage + ", status=" + status + "]";
+	}
+
 }

@@ -8,7 +8,7 @@ public class ContactStatusImpl implements YahooContactStatus {
 	/** The status message a user (away, available, etc). */
 	private final StatusMessage status;
 
-	/** The presene of a user */
+	/** The presence of a user */
 	private final ContactPresence presence;
 
 	/** The amount of seconds that the user has been idle (or -1 if the idle time is unknown). */

@@ -7,8 +7,6 @@ public interface StatusMessage {
 
 	YahooStatus getStatus();
 
-	String getStatusText();
-
 	String getStatusMessage();
 
 	boolean is(YahooStatus status);

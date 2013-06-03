@@ -169,7 +169,7 @@ public class Session implements StatusConstants, FriendManager {
 	/** Message number to be included in sending a message */
 	private int messageNumber = new Random().nextInt(1000000);
 
-	private long pingTimestamp;
+	private long pingTimestamp = 0L;
 
 	private ArrayList<YMSG9Packet> queueOfList15 = new ArrayList<YMSG9Packet>();
 
@@ -260,7 +260,7 @@ public class Session implements StatusConstants, FriendManager {
 			throw new IllegalArgumentException("Argument 'sessionListener' cannot be null.");
 		}
 		if (!sessionListeners.remove(sessionListener)) {
-			log.warn("SessionListener not found to be removed.", new Throwable());
+			log.warn("SessionListener not found to be removed.");
 		}
 	}
 
@@ -427,9 +427,14 @@ public class Session implements StatusConstants, FriendManager {
 		boolean pingSent = false;
 		try {
 			long now = System.currentTimeMillis();
-			if (now - pingTimestamp > NetworkConstants.PING_TIMEOUT_IN_SECS * 1000) {
+			if (pingTimestamp == 0) {
+				pingTimestamp = now;
 				this.transmitPings();
+				pingSent = true;
+			}
+			if (now - pingTimestamp > NetworkConstants.PING_TIMEOUT_IN_SECS * 1000) {
 				pingTimestamp = pingTimestamp + (NetworkConstants.PING_TIMEOUT_ADDITION_IN_SEC * 1000);
+				this.transmitPings();
 				pingSent = true;
 			}
 			this.transmitKeepAlive();
@@ -1224,8 +1229,8 @@ public class Session implements StatusConstants, FriendManager {
 		// Send new invite packet to Yahoo
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", yid);
-		body.addElement("51", username);
 		body.addElement("57", room);
+		body.addElement("51", username);
 
 		final Set<YahooUser> users = getConference(room).getUsers();
 		for (YahooUser u : users) {
@@ -1233,7 +1238,9 @@ public class Session implements StatusConstants, FriendManager {
 		}
 
 		body.addElement("58", msg);
+		body.addElement("97", "1");
 		body.addElement("13", "0"); // FIX : what's this for?
+		body.addElement("234", room);
 		sendPacket(body, ServiceType.CONFADDINVITE); // 0x1c
 	}
 
@@ -2896,7 +2903,7 @@ public class Session implements StatusConstants, FriendManager {
 				Thread.sleep(1000 * 3);
 			}
 			catch (InterruptedException e) {
-				e.printStackTrace();
+				log.warn("Failed sleeping during receivedStatus15");
 			}
 			if (cachePacket == null)
 				updateFriendsStatus(pkt);

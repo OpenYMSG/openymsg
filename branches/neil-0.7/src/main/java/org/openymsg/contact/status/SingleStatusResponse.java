@@ -188,7 +188,20 @@ public class SingleStatusResponse implements SinglePacketResponse {
 			// status.update(newStatus);
 		}
 		if (customMessage != null) {
-			status = new CustomStatusMessage(customStatus, customMessage);
+			if (customStatus == null) {
+				log.error("customStatus is null");
+			} else {
+				if (customStatus.equals("0")) {
+					newStatus = YahooStatus.AVAILABLE;
+				} else if (customStatus.equals("1")) {
+					newStatus = YahooStatus.BUSY;
+				} else if (customStatus.equals("2")) {
+					newStatus = YahooStatus.IDLE;
+				} else {
+					log.error("customStatus is not found: " + customStatus);
+				}
+			}
+			status = new CustomStatusMessage(newStatus, customMessage);
 
 			// log.info("update custom: " + customMessage + "/" + customStatus);
 			// status.setCustom(customMessage, customStatus);
@@ -196,7 +209,7 @@ public class SingleStatusResponse implements SinglePacketResponse {
 
 		Long statusIdleTime = getIdleTime(clearIdleTime, idleTime);
 		// Hack for MSN users
-		if (contact.getProtocol().isMsn() && status.getStatus() == YahooStatus.STEPPEDOUT) {
+		if (contact.getProtocol().isMsn() && status.is(YahooStatus.STEPPEDOUT)) {
 			status = new NormalStatusMessage(YahooStatus.AWAY);
 		}
 		ContactStatusImpl contactStatus = new ContactStatusImpl(status, presence, statusIdleTime);
