@@ -18,8 +18,7 @@ interface PropertyConstants
 	// -----------------------------------------------------------------
 	// Property defaults
 	// -----------------------------------------------------------------
-    public final static String DIRECT_HOST_DEFAULT = "vcs2.msg.yahoo.com";
-    public final static String DIRECT_HOST_FALLBACK = "vcs1.msg.yahoo.com";
+    public final static String DIRECT_HOST_DEFAULT = "scsa.msg.yahoo.com";
 
 	public final static int[] DIRECT_PORTS_DEFAULT = { 5050,23,25,80 };
 	public final static String HTTP_HOST_DEFAULT = "http.pager.yahoo.com";

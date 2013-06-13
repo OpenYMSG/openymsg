@@ -50,39 +50,24 @@ implements NetworkConstants
 	{	//session=ss;
 	}
 
-    private void updateHost(String fromServer, boolean fallback)
+    private void updateHost(String fromServer)
     {
         try
         {
-            URL url1 = new URL("http", PropertyConstants.DIRECT_HOST_DEFAULT, "/capacity");
-            URL url2 = new URL("http", PropertyConstants.DIRECT_HOST_FALLBACK, "/capacity");
+            URL url1 = new URL("http", fromServer, "/capacity");
 
             InputStream in1 = url1.openStream();
-            InputStream in2 = url2.openStream();
 
             Properties props = new Properties();
             props.load(in1);
             host = props.getProperty("CS_IP_ADDRESS", host);
             in1.close();
-            in2.close();
-//            Properties props = new Properties();
-//            URL url = new URL("http", fromServer, "/capacity");
-//            InputStream in = url.openStream();
-//            props.load(in);
-//            host = props.getProperty("CS_IP_ADDRESS", host);
-//            in.close();
-//
-//            if(fallback)
-//                updateHost(PropertyConstants.DIRECT_HOST_FALLBACK, false);
         }
         catch (Exception e) 
         {
             Logger.getLogger(
                 DirectConnectionHandler.class.getName()).log(Level.SEVERE,
                 "cannot connect to capacity server", e);
-
-//            if(fallback)
-//                updateHost(PropertyConstants.DIRECT_HOST_FALLBACK, false);
         }
     }
 
@@ -93,7 +78,7 @@ implements NetworkConstants
 	// -----------------------------------------------------------------
 	void open() throws SocketException,IOException
 	{
-        updateHost(PropertyConstants.DIRECT_HOST_DEFAULT, true);
+        updateHost(PropertyConstants.DIRECT_HOST_DEFAULT);
 
         if(dontUseFallbacks)
 		{	socket = new Socket(host,port);
