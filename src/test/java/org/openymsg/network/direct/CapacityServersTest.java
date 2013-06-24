@@ -28,7 +28,7 @@ public class CapacityServersTest {
 		String url = "url";
 		ByteArrayOutputStream out = new ByteArrayOutputStream(100);
 		String response = "COLO_CAPACITY=1\r\n" + "CS_IP_ADDRESS=10.10.10.10\r\n";
-		System.out.println(response);
+		// System.out.println(response);
 		out.write(response.getBytes());
 		String ipAddress = servers.readIpAddress(host, url, out);
 		assert ipAddress.equals("10.10.10.10");
@@ -42,7 +42,7 @@ public class CapacityServersTest {
 		String url = "url";
 		ByteArrayOutputStream out = new ByteArrayOutputStream(100);
 		String response = "COLO_CAPACITY=2\r\n" + "CS_IP_ADDRESS=10.10.10.10\r\n" + "CS_IP_ADDRESS=10.10.10.11\r\n";
-		System.out.println(response);
+		// System.out.println(response);
 		out.write(response.getBytes());
 		String ipAddress = servers.readIpAddress(host, url, out);
 		assert ipAddress.equals("10.10.10.10");

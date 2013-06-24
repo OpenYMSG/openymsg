@@ -7,14 +7,12 @@ import org.openymsg.YahooStatus;
  * <tt>null</tt> if no such message has been set.
  */
 
-public class CustomStatusMessage implements StatusMessage {
+public class CustomStatusMessage extends AbstractStatusMessage {
 	/** An free form status message. */
 	protected final String statusMessage;
-	/** Either busy or available */
-	protected final YahooStatus status;
 
 	public CustomStatusMessage(YahooStatus status, String statusMessage) {
-		this.status = status;
+		super(status);
 		this.statusMessage = statusMessage;
 	}
 
@@ -24,47 +22,33 @@ public class CustomStatusMessage implements StatusMessage {
 	}
 
 	@Override
-	public YahooStatus getStatus() {
-		return status;
-	}
-
-	@Override
 	public String getStatusMessage() {
 		return this.statusMessage;
 	}
 
 	@Override
-	public final int hashCode() {
+	public String toString() {
+		return "CustomStatusMessage [statusMessage=" + statusMessage + ", status=" + this.getStatus() + "]";
+	}
+
+	@Override
+	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
+		int result = super.hashCode();
 		result = prime * result + ((statusMessage == null) ? 0 : statusMessage.hashCode());
-		result = prime * result + ((status == null) ? 0 : status.hashCode());
 		return result;
 	}
 
 	@Override
-	public final boolean equals(Object obj) {
+	public boolean equals(Object obj) {
 		if (this == obj) return true;
-		if (obj == null) return false;
-		if (!(obj instanceof CustomStatusMessage)) return false;
+		if (!super.equals(obj)) return false;
+		if (getClass() != obj.getClass()) return false;
 		CustomStatusMessage other = (CustomStatusMessage) obj;
 		if (statusMessage == null) {
 			if (other.statusMessage != null) return false;
 		} else if (!statusMessage.equals(other.statusMessage)) return false;
-		if (status == null) {
-			if (other.status != null) return false;
-		} else if (!status.equals(other.status)) return false;
 		return true;
-	}
-
-	@Override
-	public boolean is(YahooStatus status) {
-		return this.getStatus().equals(status);
-	}
-
-	@Override
-	public String toString() {
-		return "CustomStatusMessage [statusMessage=" + statusMessage + ", status=" + status + "]";
 	}
 
 }

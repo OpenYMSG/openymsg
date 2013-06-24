@@ -5,6 +5,8 @@ import org.openymsg.YahooStatus;
 
 //TODO handle stealthBlocked and stealth mode
 public class ContactStatusImpl implements YahooContactStatus {
+	public static final YahooContactStatus PENDING = new ContactStatusImpl(new PendingStatusMessage(),
+			ContactPresence.EMPTY, 0L);
 	/** The status message a user (away, available, etc). */
 	private final StatusMessage status;
 
