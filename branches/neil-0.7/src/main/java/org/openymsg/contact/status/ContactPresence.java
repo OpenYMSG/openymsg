@@ -1,6 +1,8 @@
 package org.openymsg.contact.status;
 
 public class ContactPresence {
+	public static final ContactPresence EMPTY = new ContactPresence(false, false);
+
 	protected final boolean onChat;
 	protected final boolean onPager;
 

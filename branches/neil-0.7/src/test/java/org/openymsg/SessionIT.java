@@ -1,13 +1,13 @@
 package org.openymsg;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import junit.framework.Assert;
 
-import org.mockito.Mockito;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.config.SessionConfigSimple;
 import org.openymsg.context.auth.AuthenticationFailure;
 import org.openymsg.context.session.LogoutReason;
-import org.openymsg.testing.TestingSessionCallback;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
@@ -22,7 +22,7 @@ public class SessionIT {
 	@Test()
 	public void testBadUsername(String badUsername, String badUsernamePassword) {
 		SessionConfig config = new SessionConfigSimple();
-		YahooSessionCallback callback = Mockito.mock(YahooSessionCallback.class);
+		YahooSessionCallback callback = mock(YahooSessionCallback.class);
 		YahooSession session = new SessionImpl(config, callback);
 		// callback.setSession(session);
 		session.login(badUsername, badUsernamePassword);
@@ -34,7 +34,7 @@ public class SessionIT {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Mockito.verify(callback).authenticationFailure(AuthenticationFailure.BADUSERNAME);
+		verify(callback).authenticationFailure(AuthenticationFailure.BADUSERNAME);
 		Assert.assertTrue(session.isShutdown());
 		Assert.assertTrue(session.isDisconnected());
 
@@ -44,7 +44,7 @@ public class SessionIT {
 	@Test()
 	public void testLocked(String badPasswordUsername, String badPassword) {
 		SessionConfig config = new SessionConfigSimple();
-		TestingSessionCallback callback = new TestingSessionCallback();
+		YahooSessionCallback callback = mock(YahooSessionCallback.class);
 		YahooSession session = new SessionImpl(config, callback);
 		// callback.setSession(session);
 		session.login(badPasswordUsername, badPassword);
@@ -72,7 +72,7 @@ public class SessionIT {
 	public void testTwo(String username1, String password1, String username2, String password2, String username3,
 			String password3) {
 		SessionConfig config = new SessionConfigSimple();
-		YahooSessionCallback callback1a = Mockito.mock(YahooSessionCallback.class);
+		YahooSessionCallback callback1a = mock(YahooSessionCallback.class);
 		YahooSession session1a = new SessionImpl(config, callback1a);
 		session1a.login(username1, password1);
 
@@ -83,10 +83,10 @@ public class SessionIT {
 		catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		Mockito.verify(callback1a).authenticationSuccess();
+		verify(callback1a).authenticationSuccess();
 
 		// test duplicate login
-		YahooSessionCallback callback1 = Mockito.mock(YahooSessionCallback.class);
+		YahooSessionCallback callback1 = mock(YahooSessionCallback.class);
 		YahooSession session1 = new SessionImpl(config, callback1);
 		session1.login(username1, password1);
 
@@ -96,8 +96,8 @@ public class SessionIT {
 		catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		Mockito.verify(callback1).authenticationSuccess();
-		Mockito.verify(callback1a).logoffForced(LogoutReason.DUPLICATE_LOGIN1);
+		verify(callback1).authenticationSuccess();
+		verify(callback1a).logoffForced(LogoutReason.DUPLICATE_LOGIN1);
 		Assert.assertTrue(session1a.isShutdown());
 		Assert.assertTrue(session1a.isDisconnected());
 
@@ -120,27 +120,6 @@ public class SessionIT {
 			e.printStackTrace();
 		}
 
-		// YahooSessionCallback callback2 = new TestingSessionCallback();
-		// YahooSession session2 = new SessionImpl(config, callback2);
-		// YahooSessionCallback callback3 = new TestingSessionCallback();
-		// YahooSession session3 = new SessionImpl(config, callback3);
-		// session2.login(username2, password2);
-		// session3.login(username3, password3);
-		//
-		// try {
-		// Thread.sleep(5 * 1000);
-		// }
-		// catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-		//
-		// try {
-		// Thread.sleep(10 * 1000);
-		// }
-		// catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-		//
 	}
 
 }

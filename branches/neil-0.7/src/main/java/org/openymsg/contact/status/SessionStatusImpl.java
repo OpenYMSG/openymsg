@@ -43,13 +43,17 @@ public class SessionStatusImpl implements SessionStatus, SessionStatusCallback {
 	}
 
 	public void addPending(YahooContact contact) {
-		// TODO Auto-generated method stub
-
+		log.trace("addPending: " + contact);
+		YahooContactStatus status = ContactStatusImpl.PENDING;
+		this.statuses.put(contact, status);
+		this.callback.statusUpdate(contact, status);
 	}
 
 	public void publishPending(YahooContact contact) {
-		// TODO Auto-generated method stub
-
+		log.trace("publishPending: " + contact);
+		YahooContactStatus status = ContactStatusImpl.PENDING;
+		this.statuses.put(contact, status);
+		this.callback.statusUpdate(contact, status);
 	}
 
 	public void addedIgnored(Set<YahooContact> usersOnIgnoreList) {
@@ -59,6 +63,13 @@ public class SessionStatusImpl implements SessionStatus, SessionStatusCallback {
 	}
 
 	public void addedPending(Set<YahooContact> usersOnPendingList) {
+		log.trace("publishPending: " + usersOnPendingList);
+		YahooContactStatus status = ContactStatusImpl.PENDING;
+		for (YahooContact contact : usersOnPendingList) {
+			this.statuses.put(contact, status);
+			this.callback.statusUpdate(contact, status);
+
+		}
 		// for (Contact contact : usersOnPendingList) {
 		// System.err.println("pending:" + contactImpl.getId() + "/" + contactImpl.getProtocol());
 		// }

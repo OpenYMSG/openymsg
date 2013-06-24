@@ -2625,6 +2625,16 @@ public class Session implements StatusConstants, FriendManager {
 				if (authStatus.equals("1")) {
 					log.trace("A friend accepted our authorization request: " + who);
 					YahooUser user = roster.getUser(who);
+					if (user == null) {
+						log.debug("Sleeping because user is not added yet");
+						// Sleep for new add buddy logic. user added to roster the event thread
+						try {
+							Thread.sleep(1000L);
+						}
+						catch (Exception e) {
+						}
+					}
+					user = roster.getUser(who);
 					SessionFriendAcceptedEvent ser = new SessionFriendAcceptedEvent(this, user, msg, protocol);
 					int eventStatus = 1;
 					ser.setStatus(eventStatus);

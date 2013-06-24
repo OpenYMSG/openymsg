@@ -25,6 +25,7 @@ package org.openymsg;
  */
 public enum YahooStatus {
 	OFFLINE(-100), // Internal missing value
+	PENDING(-99), // Internal Pending
 	ERROR(-1),
 	AVAILABLE(0),
 	BRB(1),
