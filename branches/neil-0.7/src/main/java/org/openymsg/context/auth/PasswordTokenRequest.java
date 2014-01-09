@@ -42,7 +42,8 @@ public class PasswordTokenRequest implements Request {
 			return;
 		}
 
-		URLStreamBuilder builder = config.getURLStreamBuilder().url(authLink).timeout(config.getConnectionTimeout());
+		URLStreamBuilder builder = config.getURLStreamBuilder().url(authLink).timeout(config.getConnectionTimeout())
+				.disableSSLCheck(config.isSSLCheckDisabled());
 		URLStream stream = builder.build();
 		URLStreamStatus status = builder.getStatus();
 		ByteArrayOutputStream out = stream.getOutputStream();

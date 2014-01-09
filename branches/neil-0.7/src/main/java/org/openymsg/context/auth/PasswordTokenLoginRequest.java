@@ -38,7 +38,8 @@ public class PasswordTokenLoginRequest implements Request {
 	private void yahooAuth16Stage2(String ymsgr) {
 		String loginLink = config.getPasswordTokenLoginUrl(ymsgr);
 
-		URLStreamBuilder builder = config.getURLStreamBuilder().url(loginLink).timeout(config.getConnectionTimeout());
+		URLStreamBuilder builder = config.getURLStreamBuilder().url(loginLink).timeout(config.getConnectionTimeout())
+				.disableSSLCheck(config.isSSLCheckDisabled());
 		URLStream stream = builder.build();
 		URLStreamStatus status = builder.getStatus();
 		ByteArrayOutputStream out = stream.getOutputStream();

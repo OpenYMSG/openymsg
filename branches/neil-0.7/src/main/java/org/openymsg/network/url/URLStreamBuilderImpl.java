@@ -13,6 +13,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openymsg.connection.TrustModifier;
 
 public class URLStreamBuilderImpl implements URLStreamBuilder {
 	/** logger */
@@ -21,6 +22,7 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 	private int timeout;
 	private URLStreamStatus status;
 	private String cookie;
+	private boolean disableSSLCheck;
 
 	public URLStreamBuilderImpl() {
 		this.status = new URLStreamStatus();
@@ -77,42 +79,20 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 		}
 
 		uc.setConnectTimeout(timeout);
+		uc.setReadTimeout(timeout);
 
 		if (uc instanceof HttpsURLConnection) {
 			HttpsURLConnection httpUc = (HttpsURLConnection) uc;
-			// used to simulate failures
-			// if (triesBeforeFailure++ % 3 == 0) {
-			// throw new SocketException("Test failure");
-			// }
-			// TODO - handle hosts sert issues
-			// if (!yahooLoginHost.equalsIgnoreCase(LOGIN_YAHOO_COM)) {
-			// httpUc.setHostnameVerifier(new HostnameVerifier() {
-			//
-			// public boolean verify(String hostname, SSLSession session) {
-			// Principal principal = null;
-			// try {
-			// principal = session.getPeerPrincipal();
-			// }
-			// catch (SSLPeerUnverifiedException e) {
-			// }
-			// String localName = "no set";
-			// if (principal != null) {
-			// localName = principal.getName();
-			// }
-			// log.debug("Hostname verify: " + hostname + "localName: " + localName);
-			// return true;
-			// }
-			// });
-			// }
-			// TODO HANDLE ssl with login
-			// if (!yahooLoginHost.equalsIgnoreCase(LOGIN_YAHOO_COM)) {
-			// httpUc.setHostnameVerifier(new HostnameVerifier() {
-			//
-			// public boolean verify(String hostname, SSLSession session) {
-			// return true;
-			// }
-			// });
-			// }
+
+			if (disableSSLCheck) {
+				try {
+					TrustModifier.relaxHostChecking(httpUc);
+				}
+				catch (Exception e) {
+					log.warn("Failed disabling ssl checking: " + u);
+				}
+			}
+
 			int responseCode = -1;
 			String responseMessage = null;
 			try {
@@ -155,5 +135,11 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 	@Override
 	public URLStreamStatus getStatus() {
 		return this.status;
+	}
+
+	@Override
+	public URLStreamBuilder disableSSLCheck(boolean disableSSLCheck) {
+		this.disableSSLCheck = disableSSLCheck;
+		return this;
 	}
 }
