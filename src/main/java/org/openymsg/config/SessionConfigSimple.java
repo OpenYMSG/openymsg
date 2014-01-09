@@ -91,4 +91,9 @@ public class SessionConfigSimple implements SessionConfig {
 		return null;
 	}
 
+	@Override
+	public boolean isSSLCheckDisabled() {
+		return false;
+	}
+
 }

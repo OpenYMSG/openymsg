@@ -28,6 +28,13 @@ public interface URLStreamBuilder {
 	URLStreamBuilder cookie(String cookie);
 
 	/**
+	 * Disable SSL Check
+	 * @param disableSSLCheck true to disable ssl checking
+	 * @return same instance as this is a builder pattern
+	 */
+	URLStreamBuilder disableSSLCheck(boolean disableSSLCheck);
+
+	/**
 	 * Build the URL
 	 * @return completed stream
 	 */

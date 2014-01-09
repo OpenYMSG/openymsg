@@ -60,6 +60,7 @@ import javax.net.ssl.SSLSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jdom.JDOMException;
+import org.openymsg.connection.TrustModifier;
 import org.openymsg.legacy.addressBook.BuddyListImport;
 import org.openymsg.legacy.network.challenge.ChallengeResponseV10;
 import org.openymsg.legacy.network.challenge.ChallengeResponseV16;
@@ -186,7 +187,9 @@ public class Session implements StatusConstants, FriendManager {
 
 	private static final Log log = LogFactory.getLog(Session.class);
 
-	private static final int LOGIN_HTTP_TIMEOUT = 10000;
+	private static final int LOGIN_HTTP_TIMEOUT = 10 * 1000;
+
+	private boolean checkSSL;
 
 	/**
 	 * Creates a new Session based on a ConnectionHandler as configured in the current System properties.
@@ -209,11 +212,13 @@ public class Session implements StatusConstants, FriendManager {
 	 * @throws NumberFormatException
 	 */
 	public Session(ConnectionHandler connectionHandler) throws NumberFormatException {
-		this(connectionHandler, LOGIN_YAHOO_COM);
+		this(connectionHandler, LOGIN_YAHOO_COM, false);
 	}
 
-	public Session(ConnectionHandler connectionHandler, String yahooLoginHost) throws NumberFormatException {
+	public Session(ConnectionHandler connectionHandler, String yahooLoginHost, boolean checkSSL)
+			throws NumberFormatException {
 		this.yahooLoginHost = yahooLoginHost;
+		this.checkSSL = checkSSL;
 		this.shouldLoadAddressBook = true;
 		if (connectionHandler != null) {
 			network = connectionHandler;
@@ -1860,6 +1865,7 @@ public class Session implements StatusConstants, FriendManager {
 		URL u = new URL(authLink);
 		URLConnection uc = u.openConnection();
 		uc.setConnectTimeout(LOGIN_HTTP_TIMEOUT);
+		uc.setReadTimeout(LOGIN_HTTP_TIMEOUT);
 
 		if (uc instanceof HttpsURLConnection) {
 			HttpsURLConnection httpUc = (HttpsURLConnection) uc;
@@ -1885,6 +1891,15 @@ public class Session implements StatusConstants, FriendManager {
 						return true;
 					}
 				});
+			}
+
+			if (!checkSSL) {
+				try {
+					TrustModifier.relaxHostChecking(httpUc);
+				}
+				catch (Exception e) {
+					log.error("Failed relaxing SSL checking: " + e);
+				}
 			}
 
 			int responseCode = httpUc.getResponseCode();

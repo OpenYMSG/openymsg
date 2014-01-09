@@ -38,7 +38,7 @@ public class AddressBookRequest implements Request {
 	public void execute() {
 		String cookie = String.format(NetworkConstants.ADDRESSBOOK_COOKIE_FORMAT, this.cookieY, this.cookieT);
 		URLStreamBuilder builder = config.getURLStreamBuilder().url(NetworkConstants.ADDRESSBOOK_URL)
-				.timeout(config.getConnectionTimeout()).cookie(cookie);
+				.timeout(config.getConnectionTimeout()).disableSSLCheck(config.isSSLCheckDisabled()).cookie(cookie);
 		URLStream stream = builder.build();
 		URLStreamStatus status = builder.getStatus();
 		InputStream in = stream.getInputStream();

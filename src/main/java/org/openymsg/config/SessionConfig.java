@@ -54,4 +54,6 @@ public interface SessionConfig {
 	 * @return timeout in seconds, null is forever
 	 */
 	Integer getSessionTimeout();
+
+	boolean isSSLCheckDisabled();
 }
