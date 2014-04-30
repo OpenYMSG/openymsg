@@ -67,11 +67,16 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 			connected = connectViaScsServers(config, handlerStatus);
 		}
 		if (connected) {
-			connection = new DirectConnectionHandler(this.socket);
+			connection = createHandler();
 		}
 		this.socket = null;
 		this.config = null;
 		return connection;
+	}
+
+	protected DirectConnectionHandler createHandler() {
+		SocketLockChecker socketLockChecker = new SocketLockCheckerImpl();
+		return new DirectConnectionHandler(this.socket, socketLockChecker);
 	}
 
 	protected boolean connectViaScsServers(SessionConfig config, ConnectionInfo handlerStatus) {
@@ -140,6 +145,10 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 			log.warn("Failed connecting to: " + endpoint + " from: " + socket.getLocalSocketAddress(), e);
 		}
 		return false;
+	}
+
+	protected Socket getSocket() {
+		return socket;
 	}
 
 }

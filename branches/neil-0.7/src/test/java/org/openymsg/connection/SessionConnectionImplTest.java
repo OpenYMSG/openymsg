@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.execute.Executor;
 import org.openymsg.execute.ExecutorImpl;
+import org.openymsg.network.ConnectionEndedReason;
 import org.openymsg.network.TestingConnectionBuilder;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -67,7 +68,7 @@ public class SessionConnectionImplTest {
 		when(sessionConfig.getConnectionBuilder()).thenReturn(new TestingConnectionBuilder(true));
 		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, listener);
 		sessionConnection.initialize(sessionConfig);
-		sessionConnection.connectionEnded();
+		sessionConnection.connectionEnded(ConnectionEndedReason.SocketClosed);
 		verify(listener).connectionPrematurelyEnded();
 	}
 

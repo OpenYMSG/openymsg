@@ -128,8 +128,7 @@ public class SessionSessionImpl implements SessionSession {
 		// customStatusMessage = message;
 		// customStatusBusy = showBusyIcon;
 
-		// TODO - handle showBusy
-		connection.execute(new StatusChangeRequest(YahooStatus.CUSTOM, message));
+		connection.execute(new StatusChangeRequest(YahooStatus.CUSTOM, message, showBusyIcon));
 	}
 
 	public void receivedLogout(LogoutReason reason) {

@@ -21,49 +21,54 @@ package org.openymsg.legacy.network;
 import java.io.IOException;
 
 /**
- * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
 public abstract class ConnectionHandler {
-    abstract void install(Session session);
+	abstract void install(Session session);
 
-    abstract void open(boolean searchForAddress) throws IOException;
+	abstract void open(boolean searchForAddress) throws IOException;
 
-    abstract void close() throws IOException;
+	abstract void close() throws IOException;
 
-    abstract void sendPacket(PacketBodyBuffer body, ServiceType service, long status, long sessionID)
-            throws IOException;
+	abstract void sendPacket(PacketBodyBuffer body, ServiceType service, long status, long sessionID)
+			throws IOException;
 
-    abstract YMSG9Packet receivePacket() throws IOException;
+	abstract YMSG9Packet receivePacket() throws IOException;
 
-    /**
-     * Creates an string array from cookies in packet.
-     * 
-     * @param pkt
-     *            Packet to extract the cookies from.
-     * @return Array of cookies.
-     */
-    protected static String[] extractCookies(YMSG9Packet pkt) {
-        String[] cookies = new String[3];
-        for (int i = 0; i < cookies.length; i++) {
-            String s = pkt.getNthValue("59", i);
-            if (s == null) break;
-            if (s.indexOf(";") >= 0) s = s.substring(0, s.indexOf(";"));
-            switch (s.charAt(0)) {
-            case 'Y':
-                cookies[NetworkConstants.COOKIE_Y] = "Y=" + s.substring(2);
-                break;
-            case 'T':
-                cookies[NetworkConstants.COOKIE_T] = "T=" + s.substring(2);
-                break;
-            case 'C':
-                cookies[NetworkConstants.COOKIE_C] = "C=" + s.substring(2);
-                break;
-            default:
-                throw new IllegalStateException("Unknown cookie: " + s);
-            }
-        }
-        return cookies;
-    }
+	/**
+	 * Creates an string array from cookies in packet.
+	 * @param pkt Packet to extract the cookies from.
+	 * @return Array of cookies.
+	 */
+	protected static String[] extractCookies(YMSG9Packet pkt) {
+		String[] cookies = new String[3];
+		for (int i = 0; i < cookies.length; i++) {
+			String s = pkt.getNthValue("59", i);
+			if (s == null) break;
+			if (s.indexOf(";") >= 0) s = s.substring(0, s.indexOf(";"));
+			switch (s.charAt(0)) {
+			case 'Y':
+				cookies[NetworkConstants.COOKIE_Y] = "Y=" + s.substring(2);
+				break;
+			case 'T':
+				cookies[NetworkConstants.COOKIE_T] = "T=" + s.substring(2);
+				break;
+			case 'C':
+				cookies[NetworkConstants.COOKIE_C] = "C=" + s.substring(2);
+				break;
+			default:
+				throw new IllegalStateException("Unknown cookie: " + s);
+			}
+		}
+		return cookies;
+	}
+
+	/**
+	 * Is the socket locked up
+	 * @param millisDuration
+	 * @return
+	 */
+	abstract boolean isLocked(int millisDuration);
+
 }

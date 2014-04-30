@@ -46,7 +46,7 @@ public class SessionSessionImplTest {
 		String message = "myMessage";
 		boolean showBusyIcon = false;
 		session.setCustomStatus(message, showBusyIcon);
-		verify(connection).execute(argThatMessage(new StatusChangeRequest(YahooStatus.CUSTOM, message)));
+		verify(connection).execute(argThatMessage(new StatusChangeRequest(YahooStatus.CUSTOM, message, false)));
 	}
 
 	@Test

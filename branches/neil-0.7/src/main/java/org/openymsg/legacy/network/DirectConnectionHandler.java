@@ -49,6 +49,8 @@ public class DirectConnectionHandler extends ConnectionHandler {
 
 	private static final Log log = LogFactory.getLog(DirectConnectionHandler.class);
 
+	private long lastWriteTimestamp = 0;
+
 	public DirectConnectionHandler(String h, int p, Integer socketSize) {
 		host = h;
 		port = p;
@@ -76,6 +78,16 @@ public class DirectConnectionHandler extends ConnectionHandler {
 
 	public int getPort() {
 		return port;
+	}
+
+	@Override
+	boolean isLocked(int millisDuration) {
+		long lastWriteTimestampCopy = lastWriteTimestamp;
+		if (lastWriteTimestampCopy == 0) {
+			return false;
+		}
+
+		return System.currentTimeMillis() > lastWriteTimestampCopy + millisDuration;
 	}
 
 	/**
@@ -151,20 +163,26 @@ public class DirectConnectionHandler extends ConnectionHandler {
 		// is not automatically thread safe. Besides, we should be only
 		// sending one message at a time!
 		synchronized (ops) {
-			// 20 byte header
-			ops.write(NetworkConstants.MAGIC, 0, 4); // Magic code 'YMSG'
-			ops.write(NetworkConstants.VERSION, 0, 4); // Version
-			ops.writeShort(b.length & 0xFFFF); // Body length (16 bit unsigned)
-			ops.writeShort(service.getValue() & 0xFFFF); // Service ID (16
-			// bit unsigned
-			ops.writeInt((int) (status & 0xFFFFFFFF)); // Status (32 bit
-			// unsigned)
-			ops.writeInt((int) (sessionId & 0xFFFFFFFF)); // Session id (32
-			// bit unsigned)
-			// Then the body...
-			ops.write(b, 0, b.length);
-			// Now send the buffer
-			ops.flush();
+			try {
+				this.lastWriteTimestamp = System.currentTimeMillis();
+				// 20 byte header
+				ops.write(NetworkConstants.MAGIC, 0, 4); // Magic code 'YMSG'
+				ops.write(NetworkConstants.VERSION, 0, 4); // Version
+				ops.writeShort(b.length & 0xFFFF); // Body length (16 bit unsigned)
+				ops.writeShort(service.getValue() & 0xFFFF); // Service ID (16
+				// bit unsigned
+				ops.writeInt((int) (status & 0xFFFFFFFF)); // Status (32 bit
+				// unsigned)
+				ops.writeInt((int) (sessionId & 0xFFFFFFFF)); // Session id (32
+				// bit unsigned)
+				// Then the body...
+				ops.write(b, 0, b.length);
+				// Now send the buffer
+				ops.flush();
+			}
+			finally {
+				this.lastWriteTimestamp = 0;
+			}
 		}
 	}
 
@@ -194,4 +212,5 @@ public class DirectConnectionHandler extends ConnectionHandler {
 			// silently fail;
 		}
 	}
+
 }

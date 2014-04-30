@@ -15,7 +15,11 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class TrustModifier {
+	private static final Log log = LogFactory.getLog(TrustModifier.class);
 	private static final TrustingHostnameVerifier TRUSTING_HOSTNAME_VERIFIER = new TrustingHostnameVerifier();
 	private static SSLSocketFactory factory;
 
@@ -30,6 +34,8 @@ public class TrustModifier {
 			SSLSocketFactory factory = prepFactory(httpsConnection);
 			httpsConnection.setSSLSocketFactory(factory);
 			httpsConnection.setHostnameVerifier(TRUSTING_HOSTNAME_VERIFIER);
+		} else {
+			log.warn("connection is not https");
 		}
 	}
 

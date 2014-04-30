@@ -15,14 +15,16 @@ import org.openymsg.network.ServiceType;
 public class StatusChangeRequest implements Message {
 	private YahooStatus status;
 	private String customStatusMessage = null;
+	private boolean showBusy = false;
 
 	public StatusChangeRequest(YahooStatus status) {
 		this.status = status;
 	}
 
-	public StatusChangeRequest(YahooStatus status, String customStatusMessage) {
+	public StatusChangeRequest(YahooStatus status, String customStatusMessage, boolean showBusy) {
 		this.status = status;
 		this.customStatusMessage = customStatusMessage;
+		this.showBusy = showBusy;
 	}
 
 	@Override
@@ -35,6 +37,9 @@ public class StatusChangeRequest implements Message {
 			body.addElement("19", customStatusMessage);
 			// TODO this is unicode I think
 			body.addElement("97", "1");
+		}
+		if (showBusy) {
+			body.addElement("47", "1");
 		}
 		return body;
 	}

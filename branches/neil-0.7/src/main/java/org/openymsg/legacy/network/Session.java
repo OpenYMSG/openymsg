@@ -212,13 +212,11 @@ public class Session implements StatusConstants, FriendManager {
 	 * @throws NumberFormatException
 	 */
 	public Session(ConnectionHandler connectionHandler) throws NumberFormatException {
-		this(connectionHandler, LOGIN_YAHOO_COM, false);
+		this(connectionHandler, LOGIN_YAHOO_COM);
 	}
 
-	public Session(ConnectionHandler connectionHandler, String yahooLoginHost, boolean checkSSL)
-			throws NumberFormatException {
+	public Session(ConnectionHandler connectionHandler, String yahooLoginHost) throws NumberFormatException {
 		this.yahooLoginHost = yahooLoginHost;
-		this.checkSSL = checkSSL;
 		this.shouldLoadAddressBook = true;
 		if (connectionHandler != null) {
 			network = connectionHandler;
@@ -284,7 +282,7 @@ public class Session implements StatusConstants, FriendManager {
 	 */
 	public void login(String username, String password) throws IllegalStateException, IOException,
 			AccountLockedException, LoginRefusedException, FailedLoginException {
-		this.login(username, password, true, false);
+		this.login(username, password, true, false, false);
 	}
 
 	/**
@@ -293,9 +291,10 @@ public class Session implements StatusConstants, FriendManager {
 	 * @param password password
 	 * @param createPingerTask Session will do it's own thread for pings and keepAlives
 	 */
-	public void login(String username, String password, boolean createPingerTask, boolean searchForAddress)
-			throws IllegalStateException, IOException, AccountLockedException, LoginRefusedException,
+	public void login(String username, String password, boolean createPingerTask, boolean searchForAddress,
+			boolean checkSSL) throws IllegalStateException, IOException, AccountLockedException, LoginRefusedException,
 			FailedLoginException {
+		this.checkSSL = checkSSL;
 		identities = new HashMap<String, YahooIdentity>();
 		conferences = new Hashtable<String, YahooConference>();
 		chatroomManager = new ChatroomManager(null, null);
@@ -1602,9 +1601,9 @@ public class Session implements StatusConstants, FriendManager {
 		body.addElement("10", "99");
 		body.addElement("19", customStatusMessage);
 		body.addElement("97", "1");
-		// if (customStatusBusy) { pigdin has 47 as some idle thing
-		// body.addElement("47", "1");
-		// }
+		if (customStatusBusy) {
+			body.addElement("47", "1");
+		}
 		// body.addElement("187", "0");
 		sendPacket(body, ServiceType.Y6_STATUS_UPDATE, Status.AVAILABLE);
 	}
@@ -1893,6 +1892,8 @@ public class Session implements StatusConstants, FriendManager {
 				});
 			}
 
+			log.info("CheckSSL: " + checkSSL);
+
 			if (!checkSSL) {
 				try {
 					TrustModifier.relaxHostChecking(httpUc);
@@ -1901,7 +1902,7 @@ public class Session implements StatusConstants, FriendManager {
 					log.error("Failed relaxing SSL checking: " + e);
 				}
 			}
-
+			log.debug("calling: " + authLink);
 			int responseCode = httpUc.getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
 				InputStream in = uc.getInputStream();
@@ -3514,7 +3515,12 @@ public class Session implements StatusConstants, FriendManager {
 	protected void sendPacket(PacketBodyBuffer body, ServiceType service, Status status) throws IOException {
 		log.debug("Sending packet on/to the network. SessionId[0x" + Long.toHexString(sessionId) + "] ServiceType["
 				+ service + "] Status[" + status + "] Body[" + body + "]");
-		network.sendPacket(body, service, status.getValue(), sessionId);
+		if (network.isLocked(2000)) {
+			log.error("Writing Socket is locked.  Closing connection");
+			network.close();
+		} else {
+			network.sendPacket(body, service, status.getValue(), sessionId);
+		}
 	}
 
 	protected void sendPacket(PacketBodyBuffer body, ServiceType service) throws IOException {

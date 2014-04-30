@@ -74,7 +74,11 @@ public class SessionConfigSimple implements SessionConfig {
 
 	@Override
 	public ConnectionBuilder getConnectionBuilder() {
-		return new DirectConnectionBuilder().with(this);
+		return createDirectConnectionBuilder().with(this);
+	}
+
+	protected ConnectionBuilder createDirectConnectionBuilder() {
+		return new DirectConnectionBuilder();
 	}
 
 	@Override

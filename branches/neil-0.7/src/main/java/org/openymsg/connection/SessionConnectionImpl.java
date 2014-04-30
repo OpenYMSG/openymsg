@@ -9,6 +9,7 @@ import org.openymsg.connection.read.SinglePacketResponse;
 import org.openymsg.connection.write.Message;
 import org.openymsg.connection.write.PacketWriterImpl;
 import org.openymsg.execute.Executor;
+import org.openymsg.network.ConnectionEndedReason;
 import org.openymsg.network.ConnectionHandler;
 import org.openymsg.network.ConnectionHandlerCallback;
 import org.openymsg.network.ServiceType;
@@ -74,9 +75,11 @@ public class SessionConnectionImpl implements YahooConnection, ConnectionHandler
 	}
 
 	@Override
-	public void connectionEnded() {
+	public void connectionEnded(ConnectionEndedReason reason) {
+		// TODO No Reason
 		if (this.state != ConnectionState.DISCONNECTING) {
 			this.setState(ConnectionState.FAILED_AFTER_CONNECTED);
+			this.shutdown();
 		} else {
 			log.warn("got connection ended with state: " + this.state);
 		}

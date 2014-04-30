@@ -36,7 +36,11 @@ public class LoggingConnectionHandler implements ConnectionHandler {
 
 	@Override
 	public boolean isDisconnected() {
-		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isLocked(int millisDuration) {
 		return false;
 	}
 

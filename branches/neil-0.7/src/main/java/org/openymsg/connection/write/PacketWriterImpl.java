@@ -24,6 +24,9 @@ public class PacketWriterImpl implements PacketWriter {
 
 	@Override
 	public void execute(Message message) {
+		if (writer.isLocked(2000)) {
+			// nothing here?
+		}
 		this.queue.add(message);
 	}
 

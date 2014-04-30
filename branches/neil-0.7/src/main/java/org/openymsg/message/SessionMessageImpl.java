@@ -88,8 +88,11 @@ public class SessionMessageImpl implements SessionMessage {
 		this.callback.receivedMessage(contact, message);
 	}
 
-	// TODO - ack buzz?
-	public void receivedBuzz(YahooContact contact, String id) {
+	// TODO - send ack if ignored?
+	public void receivedBuzz(YahooContact contact, String messageId) {
+		if (messageId != null) {
+			this.connection.execute(new MessageAckMessage(username, contact, messageId));
+		}
 		this.callback.receivedBuzz(contact);
 	}
 
