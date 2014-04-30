@@ -9,5 +9,5 @@ public interface ConnectionHandlerCallback {
 	/**
 	 * Connection has ended.
 	 */
-	void connectionEnded();
+	void connectionEnded(ConnectionEndedReason reason);
 }

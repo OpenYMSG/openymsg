@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openymsg.network.ConnectionEndedReason;
 import org.openymsg.network.ConnectionHandler;
 import org.openymsg.network.ConnectionHandlerCallback;
 import org.openymsg.network.MessageStatus;
@@ -25,9 +26,11 @@ public class DirectConnectionHandler implements ConnectionHandler {
 	private DataOutputStream ops;
 	private long sessionId;
 	private Set<ConnectionHandlerCallback> listeners = new HashSet<ConnectionHandlerCallback>();
+	private SocketLockChecker socketLockChecker;
 
-	public DirectConnectionHandler(Socket socket) {
+	public DirectConnectionHandler(Socket socket, SocketLockChecker socketLockChecker) {
 		this.socket = socket;
+		this.socketLockChecker = socketLockChecker;
 		// TODO monitor socket?
 		try {
 			ips = new YMSG9InputStream(socket.getInputStream());
@@ -35,15 +38,15 @@ public class DirectConnectionHandler implements ConnectionHandler {
 		}
 		catch (IOException e) {// TODO handle failure
 			log.info("Failed creating streams", e);
-			this.notifyListeners();
+			this.notifyListeners(ConnectionEndedReason.SocketClosed);
 		}
 	}
 
 	// TODO pass failure
-	private void notifyListeners() {
+	private void notifyListeners(ConnectionEndedReason reason) {
 		synchronized (this.listeners) {
 			for (ConnectionHandlerCallback listener : this.listeners) {
-				listener.connectionEnded();
+				listener.connectionEnded(reason);
 			}
 		}
 	}
@@ -65,23 +68,29 @@ public class DirectConnectionHandler implements ConnectionHandler {
 		// synchronized (ops) {
 		// 20 byte header
 		try {
-			ops.write(NetworkConstants.PROTOCOL, 0, 4); // Magic code 'YMSG'
-			ops.write(NetworkConstants.VERSION, 0, 4); // Version
-			ops.writeShort(b.length & 0xFFFF); // Body length (16 bit unsigned)
-			ops.writeShort(service.getValue() & 0xFFFF); // Service ID (16
-			// bit unsigned
-			ops.writeInt((int) (status.getValue() & 0xFFFFFFFF)); // Status (32 bit
-			// unsigned)
-			ops.writeInt((int) (sessionId & 0xFFFFFFFF)); // Session id (32
-			// bit unsigned)
-			// Then the body...
-			ops.write(b, 0, b.length);
-			// Now send the buffer
-			ops.flush();
+			try {
+				this.socketLockChecker.startWriting();
+				ops.write(NetworkConstants.PROTOCOL, 0, 4); // Magic code 'YMSG'
+				ops.write(NetworkConstants.VERSION, 0, 4); // Version
+				ops.writeShort(b.length & 0xFFFF); // Body length (16 bit unsigned)
+				ops.writeShort(service.getValue() & 0xFFFF); // Service ID (16
+				// bit unsigned
+				ops.writeInt((int) (status.getValue() & 0xFFFFFFFF)); // Status (32 bit
+				// unsigned)
+				ops.writeInt((int) (sessionId & 0xFFFFFFFF)); // Session id (32
+				// bit unsigned)
+				// Then the body...
+				ops.write(b, 0, b.length);
+				// Now send the buffer
+				ops.flush();
+			}
+			finally {
+				this.socketLockChecker.finishWriting();
+			}
 		}
 		catch (IOException e) {
 			log.info("sending packet", e);
-			this.notifyListeners();
+			this.notifyListeners(ConnectionEndedReason.SocketClosed);
 		}
 	}
 
@@ -115,7 +124,7 @@ public class DirectConnectionHandler implements ConnectionHandler {
 		}
 		catch (IOException e) {
 			log.info("Failed reading connection", e);
-			this.notifyListeners();
+			this.notifyListeners(ConnectionEndedReason.SocketClosed);
 		}
 		catch (UnknowServiceException e) {
 			log.warn("unknown service: " + e.getPacket());
@@ -153,4 +162,14 @@ public class DirectConnectionHandler implements ConnectionHandler {
 	public boolean isDisconnected() {
 		return socket == null;
 	}
+
+	@Override
+	public boolean isLocked(int millisDuration) {
+		boolean answer = this.socketLockChecker.isLocked(millisDuration);
+		if (answer) {
+			this.notifyListeners(ConnectionEndedReason.LockedSocket);
+		}
+		return answer;
+	}
+
 }

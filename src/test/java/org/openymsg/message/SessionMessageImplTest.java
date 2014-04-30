@@ -118,9 +118,11 @@ public class SessionMessageImplTest {
 
 	@Test
 	public void testMessageReceiveBuzz() {
+		String messageId = "id";
 		session.receivedBuzz(contact, null);
-		session.receivedBuzz(contact, "id");
+		session.receivedBuzz(contact, messageId);
 		verify(callback, times(2)).receivedBuzz(contact);
+		verify(executor).execute(argThatMessage(new MessageAckMessage(username, contact, messageId)));
 	}
 
 }

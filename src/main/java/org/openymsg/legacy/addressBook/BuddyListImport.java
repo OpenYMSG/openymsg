@@ -1,5 +1,7 @@
 package org.openymsg.legacy.addressBook;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.CookieManager;
@@ -10,6 +12,7 @@ import java.net.URLConnection;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.legacy.network.NetworkConstants;
@@ -43,12 +46,13 @@ public class BuddyListImport {
 	public void process(String userId, String password) throws IOException {
 		String addressBookLink = "http://address.yahoo.com/yab/us?v=XM"
 				+ "&prog=ymsgr&useutf8=1&diffs=1&t=0&rt=0&prog-ver=7,0,0,426";
+		// + "&prog=ymsgr&.intl=us&useutf8=1&diffs=1&t=0&rt=0&prog-ver=" + NetworkConstants.CLIENT_VERSION;
 
 		URL u = new URL(addressBookLink);
 		URLConnection uc = u.openConnection();
 		Util.initURLConnection(uc);
 		uc.setRequestProperty("User-Agent",
-				"Yahoo!%20Messenger/235554 CFNetwork/520.5.1 Darwin/11.4.2 (x86_64) (MacBookPro10%2C1)");
+				"Yahoo!%20Messenger/235554 CFNetwork/520.5.1 Darwin/11.4.2 (x86_64) (MacBookPro10%2C1)");// NetworkConstants.USER_AGENT);
 
 		// System.out.println("getRequestProperty before" + uc.getRequestProperty("Cookie"));
 
@@ -64,16 +68,15 @@ public class BuddyListImport {
 
 		// if (cm != null) {
 		// try {
-		// // System.out.println("cookieStore: " + cm.getCookieStore().get(u.toURI()));
+		// System.out.println("cookieStore: " + cm.getCookieStore().get(u.toURI()));
 		//
 		// Map<String, List<String>> blankHeaders = new HashMap<String, List<String>>();
-		// // System.out.println("cookieMap.get: " + cm.get(u.toURI(), blankHeaders));
+		// System.out.println("cookieMap.get: " + cm.get(u.toURI(), blankHeaders));
 		// }
 		// catch (URISyntaxException e) {
 		// // TODO Auto-generated catch block
 		// e.printStackTrace();
 		// }
-		//
 		// }
 
 		// System.out.println("cookieLine: " + cookieLine);
@@ -83,13 +86,20 @@ public class BuddyListImport {
 			int responseCode = ((HttpURLConnection) uc).getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
 				InputStream responseStream = uc.getInputStream();
-				// byte[] buff = new byte[256];
-				// int read = -1;
-				// while ((read = responseStream.read(buff)) != -1) {
-				// String buffLine = new String(buff);
-				// log.debug(buffLine);
-				// }
-				// responseStream.reset();
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				IOUtils.copy(responseStream, baos);
+				byte[] bytes = baos.toByteArray();
+
+				responseStream = new ByteArrayInputStream(bytes);
+				byte[] buff = new byte[256];
+				int read = -1;
+				while ((read = responseStream.read(buff)) != -1) {
+					String buffLine = new String(buff);
+					log.debug(buffLine);
+				}
+				String buffLine = new String(buff);
+				log.debug(buffLine);
+				responseStream = new ByteArrayInputStream(bytes);
 
 				DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 

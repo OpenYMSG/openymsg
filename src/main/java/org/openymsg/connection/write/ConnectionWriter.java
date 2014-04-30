@@ -54,4 +54,8 @@ public class ConnectionWriter implements Request {
 		ex.printStackTrace();
 	}
 
+	public boolean isLocked(int millisDuration) {
+		return (this.connection != null) && this.connection.isLocked(millisDuration);
+	}
+
 }

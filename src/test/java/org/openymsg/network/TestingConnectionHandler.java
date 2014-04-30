@@ -2,6 +2,7 @@ package org.openymsg.network;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -11,11 +12,18 @@ public class TestingConnectionHandler implements ConnectionHandler {
 	private static final Log log = LogFactory.getLog(TestingConnectionHandler.class);
 	private LinkedBlockingQueue<YMSG9Packet> incomingPackets = new LinkedBlockingQueue<YMSG9Packet>();
 	private LinkedBlockingQueue<OutgoingPacket> outgoingPackets = new LinkedBlockingQueue<OutgoingPacket>();
+	private Lock lock;
 
 	@Override
 	public void sendPacket(PacketBodyBuffer body, ServiceType service, MessageStatus status) {
-		OutgoingPacket packet = new OutgoingPacket(body, service, status);
-		this.outgoingPackets.add(packet);
+		lock.lock();
+		try {
+			OutgoingPacket packet = new OutgoingPacket(body, service, status);
+			this.outgoingPackets.add(packet);
+		}
+		finally {
+			lock.unlock();
+		}
 	}
 
 	@Override
@@ -48,8 +56,20 @@ public class TestingConnectionHandler implements ConnectionHandler {
 
 	@Override
 	public boolean isDisconnected() {
-		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public boolean isLocked(int millisDuration) {
+		return !lock.tryLock();
+	}
+
+	public void lock() {
+		lock.lock();
+	}
+
+	public void unLock() {
+		lock.unlock();
 	}
 
 }

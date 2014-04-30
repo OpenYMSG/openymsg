@@ -39,4 +39,6 @@ public interface ConnectionHandler {
 	void removeListener(ConnectionHandlerCallback listener);
 
 	boolean isDisconnected();
+
+	boolean isLocked(int millisDuration);
 }
