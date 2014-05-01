@@ -2031,6 +2031,10 @@ public class Session implements StatusConstants, FriendManager {
 				}
 
 				if (responseNo != 0 || !toks.hasMoreTokens()) {
+					if (responseNo == 100) {
+						throw new LoginRefusedException("Login Failed, Two Factor Authentication",
+								AuthenticationState.TWO_FACTOR_AUTHENTICATION);
+					}
 					throw new LoginRefusedException("Login Failed, Unkown error", AuthenticationState.BAD);
 				}
 
