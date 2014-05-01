@@ -43,6 +43,7 @@ public class SessionConferenceImpl implements SessionConference {
 	protected void initializeRegistry() {
 		executor.register(ServiceType.CONFMSG, new ConferenceMessageResponse(this));
 		executor.register(ServiceType.CONFINVITE, new ConferenceInviteResponse(this));
+		executor.register(ServiceType.CONFADDINVITE, new ConferenceExtendResponse(this));
 		executor.register(ServiceType.CONFDECLINE, new ConferenceDeclineResponse(this));
 		executor.register(ServiceType.CONFLOGON, new ConferenceAcceptResponse(this));
 		executor.register(ServiceType.CONFLOGOFF, new ConferenceLeaveResponse(this));
