@@ -1603,8 +1603,10 @@ public class Session implements StatusConstants, FriendManager {
 		body.addElement("97", "1");
 		if (customStatusBusy) {
 			body.addElement("47", "1");
+		} else {
+			body.addElement("47", "0");
 		}
-		// body.addElement("187", "0");
+		body.addElement("187", "0");
 		sendPacket(body, ServiceType.Y6_STATUS_UPDATE, Status.AVAILABLE);
 	}
 
