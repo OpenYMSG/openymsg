@@ -40,7 +40,10 @@ public class StatusChangeRequest implements Message {
 		}
 		if (showBusy) {
 			body.addElement("47", "1");
+		} else {
+			body.addElement("47", "0");
 		}
+		body.addElement("187", "0");
 		return body;
 	}
 
