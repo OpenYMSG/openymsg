@@ -3330,6 +3330,14 @@ public class Session implements StatusConstants, FriendManager {
 		}
 	}
 
+	private void sleepABit() {
+		try {
+			Thread.sleep(500);
+		}
+		catch (InterruptedException e) {
+		}
+	}
+
 	/**
 	 * Process an incoming LOGON packet. If we get one of these it means the logon process has been successful. If the
 	 * user has friends already online, an extra section of varying length is appended, starting with a count, and then
@@ -3586,6 +3594,7 @@ public class Session implements StatusConstants, FriendManager {
 			network.close();
 		}
 		finally {
+			sleepABit();
 			if (eventDispatchQueue != null) {
 				eventDispatchQueue.kill();
 				eventDispatchQueue.runEventNOW(new FireEvent(null, ServiceType.LOGOFF));

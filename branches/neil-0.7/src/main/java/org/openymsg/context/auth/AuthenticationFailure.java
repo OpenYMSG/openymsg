@@ -39,7 +39,9 @@ public enum AuthenticationFailure {
 	/** Bad login? */
 	BAD2(29),
 	/** Bad username/password ? */
-	INVALID_CREDENTIALS(1013);
+	INVALID_CREDENTIALS(1013),
+	/** two factor authentication activated, local implemenation */
+	TWO_FACTOR_AUTHENTICATION(-101);
 
 	private long value;
 
