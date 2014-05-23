@@ -90,6 +90,11 @@ public class PasswordTokenLoginRequest implements Request {
 		}
 
 		if (responseNo != 0 || !toks.hasMoreTokens()) {
+			if (responseNo == 100) {
+				sessionAuthorize.setFailureState(AuthenticationFailure.TWO_FACTOR_AUTHENTICATION);
+				log.warn("Login Failed, Two Factor Authentication");
+				return;
+			}
 			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE2);
 			log.warn("Login Failed, Unkown error");
 			return;
