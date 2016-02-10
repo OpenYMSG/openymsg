@@ -312,18 +312,18 @@ public class InputThread extends Thread {
 		try {
 			final String[] invitedUserIds = pkt.getValues("52");
 			final String[] currentUserIds = pkt.getValues("53");
-			if (invitedUserIds.length == 0 && currentUserIds.length == 0) {
-				log.debug("Correctly not handling empty invite: " + pkt);
-				return;
-			}
+			final String[] otherInvitedUserIds = pkt.getValues("51");
+			// if (invitedUserIds.length == 0 && currentUserIds.length == 0 && otherInvitedUserIds.length == 0) {
+			// log.debug("Correctly not handling empty invite: " + pkt);
+			// return;
+			// }
 			final YahooConference yc = parentSession.getOrCreateConference(pkt);
-			String otherInvitedUserIdsCommaSeparated = pkt.getValue("51");
 			String to = pkt.getValue("1");
 			String from = pkt.getValue("50");
 			String message = pkt.getValue("58");
 			Set<YahooUser> invitedUsers = getUsers(invitedUserIds);
 			Set<YahooUser> currentUsers = getUsers(currentUserIds);
-			Set<YahooUser> otherInvitedUsers = getUsers(otherInvitedUserIdsCommaSeparated);
+			Set<YahooUser> otherInvitedUsers = getUsers(otherInvitedUserIds);
 			invitedUsers.addAll(otherInvitedUsers);
 
 			// Create event

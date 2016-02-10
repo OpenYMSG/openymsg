@@ -48,7 +48,7 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 
 	@Override
 	public URLStream build() {
-		log.info("URL is: " + url);
+		log.trace("URL is: " + url);
 		URL u;
 		try {
 			u = new URL(url);

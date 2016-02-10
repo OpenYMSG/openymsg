@@ -47,6 +47,7 @@ public class BuddyListImport {
 		String addressBookLink = "http://address.yahoo.com/yab/us?v=XM"
 				+ "&prog=ymsgr&useutf8=1&diffs=1&t=0&rt=0&prog-ver=7,0,0,426";
 		// + "&prog=ymsgr&.intl=us&useutf8=1&diffs=1&t=0&rt=0&prog-ver=" + NetworkConstants.CLIENT_VERSION;
+		//https://us-mg4.mail.yahoo.com/yab-fe/me/ExportContacts?pc=1&action=export_contacts&wssid=.....&export_type=action_export_yahoo%r=0.737351645482704
 
 		URL u = new URL(addressBookLink);
 		URLConnection uc = u.openConnection();

@@ -191,6 +191,8 @@ public class Session implements StatusConstants, FriendManager {
 
 	private boolean checkSSL;
 
+	private boolean isInvisible;
+
 	/**
 	 * Creates a new Session based on a ConnectionHandler as configured in the current System properties.
 	 * @throws IOException
@@ -282,7 +284,7 @@ public class Session implements StatusConstants, FriendManager {
 	 */
 	public void login(String username, String password) throws IllegalStateException, IOException,
 			AccountLockedException, LoginRefusedException, FailedLoginException {
-		this.login(username, password, true, false, false);
+		this.login(username, password, true, false, false, false);
 	}
 
 	/**
@@ -292,9 +294,10 @@ public class Session implements StatusConstants, FriendManager {
 	 * @param createPingerTask Session will do it's own thread for pings and keepAlives
 	 */
 	public void login(String username, String password, boolean createPingerTask, boolean searchForAddress,
-			boolean checkSSL) throws IllegalStateException, IOException, AccountLockedException, LoginRefusedException,
-			FailedLoginException {
+			boolean checkSSL, boolean isInvisible) throws IllegalStateException, IOException, AccountLockedException,
+			LoginRefusedException, FailedLoginException {
 		this.checkSSL = checkSSL;
+		this.isInvisible = isInvisible;
 		identities = new HashMap<String, YahooIdentity>();
 		conferences = new Hashtable<String, YahooConference>();
 		chatroomManager = new ChatroomManager(null, null);
@@ -540,6 +543,9 @@ public class Session implements StatusConstants, FriendManager {
 	 * @throws IOException
 	 */
 	public synchronized void setStatus(Status status) throws IllegalArgumentException, IOException {
+		boolean wasInvisible = isInvisible;
+		isInvisible = Status.INVISIBLE == status;
+
 		log.debug("setting status: " + status);
 		if (status == Status.CUSTOM) {
 			throw new IllegalArgumentException("Cannot set custom state without message");
@@ -549,7 +555,7 @@ public class Session implements StatusConstants, FriendManager {
 		customStatusMessage = null;
 
 		if (sessionStatus != SessionState.UNSTARTED) {
-			transmitNewStatus();
+			transmitNewStatus(wasInvisible);
 		}
 	}
 
@@ -565,6 +571,8 @@ public class Session implements StatusConstants, FriendManager {
 	 */
 	public synchronized void setStatus(String message, boolean showBusyIcon) throws IllegalArgumentException,
 			IOException {
+		boolean wasInvisible = isInvisible;
+		isInvisible = false;
 		if (sessionStatus == SessionState.UNSTARTED) {
 			throw new IllegalArgumentException("Unstarted sessions can be available or invisible only");
 		}
@@ -577,7 +585,7 @@ public class Session implements StatusConstants, FriendManager {
 		customStatusMessage = message;
 		customStatusBusy = showBusyIcon;
 
-		transmitNewCustomStatus();
+		transmitNewCustomStatus(wasInvisible);
 	}
 
 	public String getCustomStatusMessage() {
@@ -1067,6 +1075,10 @@ public class Session implements StatusConstants, FriendManager {
 					"Cannot transmit an AUTHRESP packet if you're not completely connected to the Yahoo Network. Current state: "
 							+ sessionStatus);
 		}
+		Status useStatus = status;
+		if (isInvisible) {
+			useStatus = Status.INVISIBLE;
+		}
 		if (base64 == null) {
 			final PacketBodyBuffer body = new PacketBodyBuffer();
 			body.addElement("0", loginID.getId());
@@ -1088,7 +1100,7 @@ public class Session implements StatusConstants, FriendManager {
 				body.addElement("59", cookieB);
 			}
 
-			sendPacket(body, ServiceType.AUTHRESP, status); // 0x54
+			sendPacket(body, ServiceType.AUTHRESP, useStatus); // 0x54
 		} else {
 			PacketBodyBuffer body = new PacketBodyBuffer();
 			body.addElement("1", loginID.getId());
@@ -1108,7 +1120,7 @@ public class Session implements StatusConstants, FriendManager {
 				body.addElement("59", cookieB);
 			}
 
-			sendPacket(body, ServiceType.AUTHRESP, status); // 0x54
+			sendPacket(body, ServiceType.AUTHRESP, useStatus); // 0x54
 		}
 	}
 
@@ -1585,7 +1597,18 @@ public class Session implements StatusConstants, FriendManager {
 	 * Transmit the current status to the Yahoo network.
 	 * @throws IOException
 	 */
-	protected void transmitNewStatus() throws IOException {
+	protected void transmitNewStatus(boolean wasInvisible) throws IOException {
+		if (wasInvisible && !isInvisible) {
+			final PacketBodyBuffer body = new PacketBodyBuffer();
+			body.addElement("13", "1");
+			sendPacket(body, ServiceType.Y6_VISIBLE_TOGGLE);
+		} else if (!wasInvisible && isInvisible) {
+			final PacketBodyBuffer body = new PacketBodyBuffer();
+			body.addElement("13", "2");
+			sendPacket(body, ServiceType.Y6_VISIBLE_TOGGLE);
+			return;
+		}
+
 		final PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("10", String.valueOf(status.getValue()));
 		body.addElement("19", "");
@@ -1596,7 +1619,18 @@ public class Session implements StatusConstants, FriendManager {
 	 * Transmit the current custom status to the Yahoo network.
 	 * @throws IOException
 	 */
-	protected void transmitNewCustomStatus() throws IOException {
+	protected void transmitNewCustomStatus(boolean wasInvisible) throws IOException {
+		if (wasInvisible && !isInvisible) {
+			final PacketBodyBuffer body = new PacketBodyBuffer();
+			body.addElement("13", "1");
+			sendPacket(body, ServiceType.Y6_VISIBLE_TOGGLE);
+		} else if (!wasInvisible && isInvisible) {
+			final PacketBodyBuffer body = new PacketBodyBuffer();
+			body.addElement("13", "2");
+			sendPacket(body, ServiceType.Y6_VISIBLE_TOGGLE);
+			return;
+		}
+
 		final PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("10", "99");
 		body.addElement("19", customStatusMessage);
@@ -1904,7 +1938,7 @@ public class Session implements StatusConstants, FriendManager {
 					log.error("Failed relaxing SSL checking: " + e);
 				}
 			}
-			log.debug("calling: " + authLink);
+			log.trace("calling: " + authLink);
 			int responseCode = httpUc.getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
 				InputStream in = uc.getInputStream();
@@ -2095,7 +2129,8 @@ public class Session implements StatusConstants, FriendManager {
 		try {
 			if (pkt.exists("66")) {
 				final long l = Long.parseLong(pkt.getValue("66"));
-				switch (AuthenticationState.getStatus(l)) {
+				AuthenticationState authenticationState = AuthenticationState.getStatus(l);
+				switch (authenticationState) {
 				// Account locked out?
 				case LOCKED:
 					URL u;
@@ -2133,11 +2168,12 @@ public class Session implements StatusConstants, FriendManager {
 					sessionEvent = new SessionLogoutEvent(AuthenticationState.INVALID_CREDENTIALS);
 					break;
 				// You have been logged out of the yahoo service, possibly due to a duplicate login.
-				case DUPLICATE_LOGIN:
+				case DUPLICATE_LOGIN1:
+				case DUPLICATE_LOGIN2:
 					loginException = new LoginRefusedException("User " + loginID + " unknown" + loginID,
-							AuthenticationState.DUPLICATE_LOGIN);
+							authenticationState);
 					log.info("AUTHRESP says: authentication failed! " + loginID, loginException);
-					sessionEvent = new SessionLogoutEvent(AuthenticationState.DUPLICATE_LOGIN);
+					sessionEvent = new SessionLogoutEvent(authenticationState);
 					break;
 				case UNKNOWN_52:
 					loginException = new LoginRefusedException("User " + loginID + " was forced off" + loginID,
@@ -2145,6 +2181,10 @@ public class Session implements StatusConstants, FriendManager {
 					log.info("AUTHRESP says: authentication failed with unknown: " + AuthenticationState.UNKNOWN_52
 							+ " " + loginID, loginException);
 					sessionEvent = new SessionLogoutEvent(AuthenticationState.UNKNOWN_52);
+				default:
+					log.warn("AUTHRESP says: authentication is unknown: " + authenticationState
+							+ " " + loginID, loginException);
+					break;
 				}
 			} else {
 				loginException = new LoginRefusedException("User " + loginID + " was forced off" + loginID,
@@ -3284,7 +3324,9 @@ public class Session implements StatusConstants, FriendManager {
 
 		// Set initial presence to 'available'
 		try {
-			setStatus(Status.AVAILABLE);
+			if (!isInvisible) {
+				setStatus(Status.AVAILABLE);
+			}
 		}
 		catch (java.io.IOException e) {
 			log.trace("Failed to set status to available");
@@ -3309,7 +3351,7 @@ public class Session implements StatusConstants, FriendManager {
 				ipThread.stopMe();
 				SessionLogoutEvent logoutEvent = new SessionLogoutEvent(AuthenticationState.YAHOO_LOGOFF);
 				if (pkt.status == -1) {
-					logoutEvent = new SessionLogoutEvent(AuthenticationState.DUPLICATE_LOGIN);
+					logoutEvent = new SessionLogoutEvent(AuthenticationState.DUPLICATE_LOGIN1);
 				}
 				eventDispatchQueue.append(logoutEvent, ServiceType.LOGOFF);
 				closeSession();
@@ -3361,9 +3403,10 @@ public class Session implements StatusConstants, FriendManager {
 		}
 		finally {
 			if (sessionStatus != SessionState.LOGGED_ON) {
-				// set inital presence state.
-				setStatus(status);
-
+				if (!isInvisible) {
+					// set inital presence state.
+					setStatus(status);
+				}
 				sessionStatus = SessionState.LOGGED_ON;
 				eventDispatchQueue.append(ServiceType.LOGON);
 			}
@@ -3577,6 +3620,7 @@ public class Session implements StatusConstants, FriendManager {
 		log.trace("close session");
 		// Close the input thread (unless ipThread itself is calling us)
 		sessionStatus = SessionState.UNSTARTED;
+		sleepABit();
 		if (ipThread != null && Thread.currentThread() != ipThread) {
 			ipThread.stopMe();
 			ipThread.interrupt();
@@ -3594,7 +3638,6 @@ public class Session implements StatusConstants, FriendManager {
 			network.close();
 		}
 		finally {
-			sleepABit();
 			if (eventDispatchQueue != null) {
 				eventDispatchQueue.kill();
 				eventDispatchQueue.runEventNOW(new FireEvent(null, ServiceType.LOGOFF));
