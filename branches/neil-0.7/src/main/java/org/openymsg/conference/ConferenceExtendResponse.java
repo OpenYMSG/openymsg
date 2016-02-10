@@ -1,6 +1,5 @@
 package org.openymsg.conference;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,11 +31,11 @@ public class ConferenceExtendResponse extends AbstractConferenceResponse {
 		// String value13 = packet.getValue("13");
 		String from = packet.getValue("50");
 		// final String[] invitedContactIds = packet.getValues("52");
-		String invitedContactIdsCommaSeparated = packet.getValue("51");
+		final String[] otherInvitedUserIds = packet.getValues("51");
 		String conferenceId = packet.getValue("57");
 
 		YahooContact inviter = new YahooContact(from, YahooProtocol.YAHOO);
-		Set<YahooContact> invitedContacts = getContacts(invitedContactIdsCommaSeparated);
+		Set<YahooContact> invitedContacts = getContacts(otherInvitedUserIds);
 		// Set<YahooContact> invitedContacts = getContacts(invitedContactIds);
 
 		// final String[] memberContactId = packet.getValues("53");
@@ -44,10 +43,6 @@ public class ConferenceExtendResponse extends AbstractConferenceResponse {
 		// invitedUsers.addAll(otherInvitedUsers);
 
 		YahooConference conference = new YahooConference(conferenceId);
-		if (invitedContactIdsCommaSeparated.isEmpty()) {
-			log.debug("Correctly not handling empty invite: " + packet);
-			return;
-		}
 
 		sessionConference.receivedConferenceExtend(conference, inviter, invitedContacts);
 
@@ -72,14 +67,6 @@ public class ConferenceExtendResponse extends AbstractConferenceResponse {
 		// process(packet);
 		// }
 		// }
-	}
-
-	private Set<YahooContact> getContacts(String invitedContactIdsCommaSeparated) {
-		if (invitedContactIdsCommaSeparated == null || invitedContactIdsCommaSeparated.length() == 0) {
-			return Collections.emptySet();
-		}
-		String[] ids = invitedContactIdsCommaSeparated.split(",");
-		return getContacts(ids);
 	}
 
 	private Set<YahooContact> getContacts(final String[] contactIds) {

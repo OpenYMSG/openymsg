@@ -45,15 +45,15 @@ public class ConferenceInviteResponse extends AbstractConferenceResponse {
 
 		final String[] memberContactId = packet.getValues("53");
 		Set<YahooContact> memberContacts = getContacts(memberContactId);
-		String otherInvitedUserIdsCommaSeparated = packet.getValue("51");
-		// Set<YahooUser> otherInvitedUsers = getUsers(otherInvitedUserIdsCommaSeparated);
-		// invitedUsers.addAll(otherInvitedUsers);
+		final String[] otherInvitedUserIds = packet.getValues("51");
+		Set<YahooContact> otherInvitedUsers = getContacts(otherInvitedUserIds);
+		invitedContacts.addAll(otherInvitedUsers);
 
 		YahooConference conference = new YahooConference(conferenceId);
-		if (invitedContactIds.length == 0 && memberContactId.length == 0) {
-			log.debug("Correctly not handling empty invite: " + packet);
-			return;
-		}
+		// if (invitedContacts.isEmpty() && memberContacts.isEmpty()) {
+		// log.debug("Correctly not handling empty invite: " + packet);
+		// return;
+		// }
 
 		// Add inviter to members
 		memberContacts.add(inviter);

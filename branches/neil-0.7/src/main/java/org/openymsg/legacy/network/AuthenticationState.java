@@ -28,7 +28,8 @@ public enum AuthenticationState {
 	BAD(13), // Bad login?
 	BAD2(29), // Bad login?
 	LOCKED(14), // You've been naughty
-	DUPLICATE_LOGIN(99),
+	DUPLICATE_LOGIN1(42),
+	DUPLICATE_LOGIN2(99),
 	BADUSERNAME(3), // Account unknown?
 	YAHOO_LOGOFF(-100), // Yahoo has told us to log off
 	// 42 - Account has signed in from another location
@@ -69,5 +70,12 @@ public enum AuthenticationState {
 		}
 
 		throw new IllegalArgumentException("No AuthenticationState matching long value '" + value + "'.");
+	}
+	
+	public boolean isDuplicateLogin() {
+		System.out.println("this: " + this);
+		System.out.println("DUPLICATE_LOGIN1: " + (this == DUPLICATE_LOGIN1));
+		System.out.println("DUPLICATE_LOGIN2: " + (this == DUPLICATE_LOGIN2));
+		return this == DUPLICATE_LOGIN1 || this == DUPLICATE_LOGIN2;
 	}
 }

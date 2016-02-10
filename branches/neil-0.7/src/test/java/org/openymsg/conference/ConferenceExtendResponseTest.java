@@ -4,20 +4,21 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Mockito;
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.network.YMSG9Packet;
 import org.openymsg.testing.PacketReader;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+
 
 public class ConferenceExtendResponseTest {
 	String username = "testuser";
 	private SessionConferenceImpl session;
 
-	@BeforeMethod
+	@Before
 	public void beforeMethod() {
 		session = Mockito.mock(SessionConferenceImpl.class);
 	}
