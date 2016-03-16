@@ -73,9 +73,6 @@ public enum AuthenticationState {
 	}
 	
 	public boolean isDuplicateLogin() {
-		System.out.println("this: " + this);
-		System.out.println("DUPLICATE_LOGIN1: " + (this == DUPLICATE_LOGIN1));
-		System.out.println("DUPLICATE_LOGIN2: " + (this == DUPLICATE_LOGIN2));
 		return this == DUPLICATE_LOGIN1 || this == DUPLICATE_LOGIN2;
 	}
 }
