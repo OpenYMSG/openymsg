@@ -1,20 +1,19 @@
 package org.openymsg.connection.read;
 
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
+
 import nl.jqno.equalsverifier.EqualsVerifier;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
 public class CollectPacketResponseTest {
-
 	@Test
 	public void equalsContract() {
 		EqualsVerifier.forClass(CollectPacketResponse.class).verify();
 	}
 
-	@Test(enabled = false)
+	@Test()
 	public void testSimple() {
-		Assert.fail("not implemented");
+		fail("not implemented");
 	}
-
 }

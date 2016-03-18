@@ -1,13 +1,15 @@
 package org.openymsg.conference;
 
-import java.util.HashSet;
-import java.util.Set;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
-import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ConferenceMembershipImplTest {
 	private YahooContact contact1 = new YahooContact("1", YahooProtocol.YAHOO);
@@ -19,7 +21,7 @@ public class ConferenceMembershipImplTest {
 	private YahooContact contact7 = new YahooContact("7", YahooProtocol.YAHOO);
 	private ConferenceMembershipImpl membership;
 
-	@BeforeMethod
+	@Before
 	public void beforeMethod() {
 		membership = new ConferenceMembershipImpl();
 	}
@@ -35,37 +37,36 @@ public class ConferenceMembershipImplTest {
 		contacts.add(contact6);
 		contacts.add(contact7);
 		boolean answer = membership.addInvited(contacts);
-		Assert.assertTrue(answer);
+		assertTrue(answer);
 		answer = membership.addMember(contacts);
-		Assert.assertTrue(answer);
+		assertTrue(answer);
 		for (YahooContact yahooContact : contacts) {
 			answer = membership.addLeft(yahooContact);
-			Assert.assertTrue(answer);
+			assertTrue(answer);
 		}
 	}
 
 	@Test
 	public void testDecline() {
 		boolean answer = membership.addInvited(contact1);
-		Assert.assertTrue(answer);
+		assertTrue(answer);
 		answer = membership.addDecline(contact1);
-		Assert.assertTrue(answer);
+		assertTrue(answer);
 	}
 
 	@Test
 	public void testDeclineFail() {
 		boolean answer = membership.addMember(contact1);
-		Assert.assertTrue(answer);
+		assertTrue(answer);
 		answer = membership.addDecline(contact1);
-		Assert.assertFalse(answer);
+		assertFalse(answer);
 	}
 
 	@Test
 	public void testLeftFail() {
 		boolean answer = membership.addInvited(contact1);
-		Assert.assertTrue(answer);
+		assertTrue(answer);
 		answer = membership.addLeft(contact1);
-		Assert.assertFalse(answer);
+		assertFalse(answer);
 	}
-
 }

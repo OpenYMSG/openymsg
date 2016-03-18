@@ -52,19 +52,6 @@ public enum YahooProtocol {
 		throw new IllegalArgumentException("No YahooProtocol matching long value '" + value + "'.");
 	}
 
-	// public static YahooProtocol getProtocol(String protocol) throws IllegalArgumentException {
-	// if (protocol == null || protocol.trim().length() == 0) {
-	// return YahooProtocol.YAHOO;
-	// }
-	// int value;
-	// try {
-	// value = Integer.parseInt(protocol);
-	// }
-	// catch (Exception e) {
-	// throw new IllegalArgumentException("No YahooProtocol matching string value '" + protocol + "'.");
-	// }
-	// return YahooProtocol.getProtocol(value);
-	// }
 	public boolean isYahoo() {
 		return this.equals(YAHOO);
 	}

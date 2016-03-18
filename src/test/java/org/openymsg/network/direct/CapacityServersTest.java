@@ -1,14 +1,13 @@
 package org.openymsg.network.direct;
 
+import org.junit.Test;
+import org.openymsg.config.SessionConfig;
+import org.openymsg.config.SessionConfigSimple;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.openymsg.config.SessionConfig;
-import org.openymsg.config.SessionConfigSimple;
-import org.testng.annotations.Test;
-
 public class CapacityServersTest {
-
 	@Test
 	// TODO needs internet
 	public void getIpAddress() {
@@ -17,7 +16,6 @@ public class CapacityServersTest {
 		for (String ipAddress : servers.getIpAddresses()) {
 			System.out.println("ipAddress: " + ipAddress);
 		}
-		;
 	}
 
 	@Test
@@ -47,5 +45,4 @@ public class CapacityServersTest {
 		String ipAddress = servers.readIpAddress(host, url, out);
 		assert ipAddress.equals("10.10.10.10");
 	}
-
 }

@@ -1,16 +1,16 @@
 package org.openymsg.context.auth;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.openymsg.testing.MessageAssert.argThatMessage;
 import static org.openymsg.testing.MessageAssert.argThatRequest;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.connection.YahooConnection;
 import org.openymsg.execute.Executor;
-import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class SessionAuthorizeImplTest {
 	private SessionConfig sessionConfig;
@@ -21,7 +21,7 @@ public class SessionAuthorizeImplTest {
 	private String username = "testuser";
 	private String password = "testpassword";
 
-	@BeforeMethod
+	@Before
 	public void beforeMethod() {
 		sessionConfig = mock(SessionConfig.class);
 		executor = mock(Executor.class);
@@ -40,7 +40,7 @@ public class SessionAuthorizeImplTest {
 	public void testFailure() {
 		AuthenticationFailure failureState = AuthenticationFailure.BADUSERNAME;
 		session.setFailureState(failureState);
-		Assert.assertEquals(session.getFailureState(), failureState);
+		assertEquals(session.getFailureState(), failureState);
 		verify(callback).authenticationFailure(failureState);
 	}
 
@@ -63,5 +63,4 @@ public class SessionAuthorizeImplTest {
 		token.setCookiesAndCrumb(cookieY, cookieT, crumb, cookieB);
 		verify(executor).execute(argThatRequest(new PasswordTokenLoginRequest(session, sessionConfig, token)));
 	}
-
 }

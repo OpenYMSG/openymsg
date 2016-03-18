@@ -1,18 +1,18 @@
 package org.openymsg.conference;
 
-import java.io.IOException;
-
+import org.junit.Test;
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.testing.MessageAssert;
-import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class LeaveConferenceMessageTest {
-
 	@Test
 	public void test() throws IOException {
-		String test = "Magic:YMSG Version:16 Length:129 Service:CONFLOGOFF Status:DEFAULT SessionId:0x56cf6d  [1] [testuser] [57] [testuser-8iVmHcCkflGJpBXpjBbzCw--] [3] [testbuddy] [3] [testbuddy2] [3] [testbuddy3] [3] [testbuddy4] [3] [testbuddy5]";
+		String test =
+				"Magic:YMSG Version:16 Length:129 Service:CONFLOGOFF Status:DEFAULT SessionId:0x56cf6d  [1] [testuser] [57] [testuser-8iVmHcCkflGJpBXpjBbzCw--] [3] [testbuddy] [3] [testbuddy2] [3] [testbuddy3] [3] [testbuddy4] [3] [testbuddy5]";
 		String username = "testuser";
 		YahooContact member1 = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		YahooContact member2 = new YahooContact("testbuddy2", YahooProtocol.YAHOO);

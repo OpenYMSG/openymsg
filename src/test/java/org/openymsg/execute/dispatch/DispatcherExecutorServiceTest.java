@@ -1,17 +1,16 @@
 package org.openymsg.execute.dispatch;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.testng.annotations.Test;
-
 public class DispatcherExecutorServiceTest {
-
 	@Test
 	public void testException() {
 		String name = "name";
@@ -20,7 +19,7 @@ public class DispatcherExecutorServiceTest {
 		Runnable runnable = new ExceptionRunnable();
 		executor.execute(runnable);
 		Throwable t = callback.getException();
-		assertNotNull(t, "Should have an exception");
+		assertNotNull("Should have an exception", t);
 	}
 
 	@Test
@@ -33,16 +32,14 @@ public class DispatcherExecutorServiceTest {
 		// System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
 		try {
 			Thread.sleep(2000);
-		}
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		// System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
 		assertTrue(runnable.checkAndResetHasRun());
 		try {
 			Thread.sleep(2000);
-		}
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		assertTrue(runnable.checkAndResetHasRun());
@@ -50,8 +47,7 @@ public class DispatcherExecutorServiceTest {
 		runnable.setException(new ScheduleTaskCompletionException());
 		try {
 			Thread.sleep(2000);
-		}
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		// System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
@@ -67,12 +63,12 @@ public class DispatcherExecutorServiceTest {
 		executor.execute(runnable);
 		executor.execute(new SlowRunnable());
 		executor.execute(new SlowRunnable());
-		assertNull(callback.getException(), "Should not have an exception");
+		assertNull("Should not have an exception", callback.getException());
 		executor.shutdownNow();
 		runnable = new QuiteRunnable();
 		executor.execute(runnable);
 		assertFalse(((QuiteRunnable) runnable).hasRun());
-		assertNotNull(callback.getRunnable(), "Should have an unrun runnable");
+		assertNotNull("Should have an unrun runnable", callback.getRunnable());
 	}
 
 	private final class QuiteRunnable implements Runnable {
@@ -104,7 +100,6 @@ public class DispatcherExecutorServiceTest {
 			this.exception = exception;
 		}
 	}
-
 	private class SlowRunnable implements Runnable {
 		boolean ran = false;
 
@@ -113,8 +108,7 @@ public class DispatcherExecutorServiceTest {
 			this.ran = true;
 			try {
 				Thread.sleep(3000);
-			}
-			catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				// e.printStackTrace();
 			}
 		}
@@ -123,14 +117,12 @@ public class DispatcherExecutorServiceTest {
 			return this.ran;
 		}
 	}
-
 	private final class ExceptionRunnable implements Runnable {
 		@Override
 		public void run() {
 			throw new RuntimeException("test failure");
 		}
 	}
-
 	private final class TestingDispatcherExecutorCallback implements DispatcherExecutorCallback {
 		private LinkedBlockingQueue<Throwable> exceptions = new LinkedBlockingQueue<Throwable>();
 		private LinkedBlockingQueue<Runnable> runnables = new LinkedBlockingQueue<Runnable>();
@@ -148,8 +140,7 @@ public class DispatcherExecutorServiceTest {
 		Throwable getException() {
 			try {
 				return this.exceptions.poll(100, TimeUnit.MILLISECONDS);
-			}
-			catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			return null;
@@ -158,12 +149,10 @@ public class DispatcherExecutorServiceTest {
 		Runnable getRunnable() {
 			try {
 				return this.runnables.poll(100, TimeUnit.MILLISECONDS);
-			}
-			catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			return null;
 		}
 	}
-
 }

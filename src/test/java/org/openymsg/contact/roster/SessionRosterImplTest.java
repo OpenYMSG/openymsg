@@ -1,27 +1,31 @@
 package org.openymsg.contact.roster;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.openymsg.testing.MessageAssert.argThatMessage;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openymsg.Name;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 import org.openymsg.YahooProtocol;
 import org.openymsg.connection.YahooConnection;
 import org.openymsg.contact.group.ContactGroupImpl;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class SessionRosterImplTest {
 	private String username = "testuser";
 	private YahooConnection executor;
 	private SessionRosterCallback callback;
 	private SessionRosterImpl session;
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
 
-	@BeforeMethod
+	@Before
 	public void beforeMethod() {
 		executor = mock(YahooConnection.class);
 		callback = mock(SessionRosterCallback.class);
@@ -43,21 +47,25 @@ public class SessionRosterImplTest {
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		YahooContactGroup group = new ContactGroupImpl("group");
 		session.addContact(contact, group, null);
-		verify(executor).execute(
-				argThatMessage(new ContactAddMessage(username, contact, group, null, new Name(null, null))));
+		verify(executor)
+				.execute(argThatMessage(new ContactAddMessage(username, contact, group, null, new Name(null, null))));
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Argument 'group' cannot be null")
+	@Test()
 	public void testAddContactNoGroupFail() {
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		String message = "message";
+		exception.expect(IllegalArgumentException.class);
+		exception.expectMessage("Argument 'group' cannot be null");
 		session.addContact(contact, null, message);
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Argument 'contact' cannot be null")
+	@Test()
 	public void testAddContactNoContactFail() {
 		YahooContactGroup group = new ContactGroupImpl("group");
 		String message = "message";
+		exception.expect(IllegalArgumentException.class);
+		exception.expectMessage("Argument 'contact' cannot be null");
 		session.addContact(null, group, message);
 	}
 
@@ -72,15 +80,19 @@ public class SessionRosterImplTest {
 		assertFalse(session.getContacts().contains(contact));
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Argument 'contact' cannot be null.")
+	@Test()
 	public void testRemoveContactNoContact() {
 		ContactGroupImpl group = new ContactGroupImpl("group");
+		exception.expect(IllegalArgumentException.class);
+		exception.expectMessage("Argument 'contact' cannot be null");
 		session.removeFromGroup(null, group);
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Argument 'group' cannot be null.")
+	@Test()
 	public void testRemoveContactNoGroup() {
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
+		exception.expect(IllegalArgumentException.class);
+		exception.expectMessage("Argument 'group' cannot be null.");
 		session.removeFromGroup(contact, null);
 	}
 
@@ -103,7 +115,6 @@ public class SessionRosterImplTest {
 	public void testReceivedAddAccept() {
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		session.receivedContactAddAccepted(contact);
-
 		// TODO no longer pending, status comes separately
 		// TODO in group?
 		assertTrue(session.getContacts().contains(contact));
@@ -117,9 +128,7 @@ public class SessionRosterImplTest {
 		// TODO remove contact, remove pending status
 		// TODO remove from group?
 		session.receivedContactAddDeclined(contact, message);
-
 		assertFalse(session.getContacts().contains(contact));
 		verify(callback).receivedContactAddDeclined(contact, message);
 	}
-
 }

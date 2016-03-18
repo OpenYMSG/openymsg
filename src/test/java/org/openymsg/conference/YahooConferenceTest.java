@@ -1,13 +1,13 @@
 package org.openymsg.conference;
 
-import junit.framework.Assert;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+import org.openymsg.YahooConference;
+
 import nl.jqno.equalsverifier.EqualsVerifier;
 
-import org.openymsg.YahooConference;
-import org.testng.annotations.Test;
-
 public class YahooConferenceTest {
-
 	@Test
 	public void equalsContract() {
 		EqualsVerifier.forClass(YahooConference.class).verify();
@@ -17,7 +17,6 @@ public class YahooConferenceTest {
 	public void testSimple() {
 		String id = "id";
 		YahooConference conference = new YahooConference(id);
-		Assert.assertEquals(id, conference.getId());
+		assertEquals(id, conference.getId());
 	}
-
 }

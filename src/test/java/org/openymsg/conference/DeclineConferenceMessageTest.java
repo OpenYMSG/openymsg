@@ -1,5 +1,12 @@
 package org.openymsg.conference;
 
-public class DeclineConferenceMessageTest {
+import static org.junit.Assert.fail;
 
+import org.junit.Test;
+
+public class DeclineConferenceMessageTest {
+	@Test
+	public void testYahoo() {
+		fail("not tested");
+	}
 }

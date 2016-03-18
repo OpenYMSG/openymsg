@@ -8,14 +8,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.openymsg.testing.MessageAssert.argThatMessage;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.connection.YahooConnection;
 import org.openymsg.connection.read.SinglePacketResponse;
 import org.openymsg.network.ServiceType;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class SessionMessageImplTest {
 	private String username = "testuser";
@@ -23,15 +25,17 @@ public class SessionMessageImplTest {
 	private YahooConnection executor;
 	private SessionMessageCallback callback;
 	private SessionMessageImpl session;
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
 
-	@BeforeMethod
+	@Before
 	public void beforeMethod() {
 		executor = mock(YahooConnection.class);
 		callback = mock(SessionMessageCallback.class);
 		session = new SessionMessageImpl(executor, username, callback);
 	}
 
-	@AfterMethod
+	@After
 	public void afterMethod() {
 		verifyNoMoreInteractions(callback);
 		verify(executor).register(eq(ServiceType.MESSAGE_ACK), (SinglePacketResponse) any());
@@ -47,22 +51,26 @@ public class SessionMessageImplTest {
 		verify(executor).execute(argThatMessage(new SendMessage(username, contact, message, "0"), "messageId"));
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Contact cannot be null")
+	@Test()
 	public void testSendMessageNoContact() {
+		exception.expect(IllegalArgumentException.class);
+		exception.expectMessage("Contact cannot be null");
 		String message = "dfgfdgdfgdfgfdg";
 		session.sendMessage(null, message);
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Message cannot be null")
+	@Test()
 	public void testSendMessageNoMessage() {
+		exception.expect(IllegalArgumentException.class);
+		exception.expectMessage("Message cannot be null");
 		session.sendMessage(contact, null);
 	}
 
 	@Test
 	public void testSendBuzz() {
 		session.sendBuzz(contact);
-		verify(executor).execute(
-				argThatMessage(new SendMessage(username, contact, SessionMessageImpl.BUZZ, "0"), "messageId"));
+		verify(executor)
+				.execute(argThatMessage(new SendMessage(username, contact, SessionMessageImpl.BUZZ, "0"), "messageId"));
 	}
 
 	@Test
@@ -124,5 +132,4 @@ public class SessionMessageImplTest {
 		verify(callback, times(2)).receivedBuzz(contact);
 		verify(executor).execute(argThatMessage(new MessageAckMessage(username, contact, messageId)));
 	}
-
 }

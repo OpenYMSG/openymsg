@@ -1,11 +1,10 @@
 package org.openymsg.config;
 
+import org.junit.Test;
+
 import java.io.UnsupportedEncodingException;
 
-import org.testng.annotations.Test;
-
 public class SessionConfigImplTest {
-
 	@Test
 	public void getLoginUrl() throws UnsupportedEncodingException {
 		SessionConfig config = new SessionConfigSimple();
@@ -17,5 +16,4 @@ public class SessionConfigImplTest {
 		assert url.contains(password);
 		assert url.contains(seed);
 	}
-
 }

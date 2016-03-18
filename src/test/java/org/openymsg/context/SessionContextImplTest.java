@@ -1,13 +1,13 @@
 package org.openymsg.context;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.connection.YahooConnection;
 import org.openymsg.execute.Executor;
-import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class SessionContextImplTest {
 	private String username = "testuser";
@@ -15,7 +15,7 @@ public class SessionContextImplTest {
 	private SessionContextCallback callback;
 	private YahooConnection connection;
 
-	@BeforeMethod
+	@Before
 	public void beforeMethod() {
 		executor = mock(Executor.class);
 		callback = mock(SessionContextCallback.class);
@@ -26,7 +26,6 @@ public class SessionContextImplTest {
 	public void test() {
 		SessionConfig sessionConfig = null;
 		SessionContextImpl session = new SessionContextImpl(sessionConfig, executor, connection, username, callback);
-		Assert.fail("unimplemented");
+		fail("unimplemented");
 	}
-
 }

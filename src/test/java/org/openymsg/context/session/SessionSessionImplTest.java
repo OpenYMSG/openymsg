@@ -4,11 +4,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.openymsg.testing.MessageAssert.argThatMessage;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openymsg.YahooStatus;
 import org.openymsg.connection.YahooConnection;
 import org.openymsg.execute.Executor;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class SessionSessionImplTest {
 	private String username = "testuser";
@@ -17,8 +19,10 @@ public class SessionSessionImplTest {
 	private SessionSessionCallback callback;
 	private SessionSessionImpl session;
 	private Integer timeout = 60 * 1000;
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
 
-	@BeforeMethod
+	@Before
 	public void beforeMethod() {
 		connection = mock(YahooConnection.class);
 		executor = mock(Executor.class);
@@ -33,8 +37,10 @@ public class SessionSessionImplTest {
 		verify(connection).execute(argThatMessage(new StatusChangeRequest(status)));
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Cannot set custom state without message")
+	@Test()
 	public void testSetStatusCustomFail() {
+		exception.expect(IllegalArgumentException.class);
+		exception.expectMessage("Cannot set custom state without message");
 		YahooStatus status = YahooStatus.CUSTOM;
 		session.setStatus(status);
 		verify(connection).execute(argThatMessage(new StatusChangeRequest(status)));
@@ -56,8 +62,10 @@ public class SessionSessionImplTest {
 		verify(connection).execute(argThatMessage(new LogoutMessage(username)));
 	}
 
-	@Test(expectedExceptions = IllegalStateException.class, expectedExceptionsMessageRegExp = "State is not logging in: LOGGING_IN")
+	@Test()
 	public void testLogoutFailedLogin() {
+		exception.expect(IllegalStateException.class);
+		exception.expectMessage("State is not logging in: LOGGING_IN");
 		session.logout();
 	}
 
@@ -67,5 +75,4 @@ public class SessionSessionImplTest {
 		session.receivedLogout(reason);
 		verify(callback).logoffForced(reason);
 	}
-
 }

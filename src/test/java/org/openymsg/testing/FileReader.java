@@ -1,12 +1,12 @@
 package org.openymsg.testing;
 
+import org.openymsg.network.direct.YMSG9InputStream;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-
-import org.openymsg.network.direct.YMSG9InputStream;
 
 /**
  * Load an export from Wireshark into a stream used by OpenYmsg. To use select the "Yahoo YMSG Messenger Protocol..."
@@ -21,10 +21,10 @@ public class FileReader {
 		FileInputStream stream = new FileInputStream(file);
 		YMSG9InputStream ymsg = new YMSG9InputStream(stream);
 		System.err.println(ymsg.readPacket());
+		ymsg.close();
 	}
 
 	public static final void main(String[] args) throws UnsupportedEncodingException, IOException {
 		new FileReader("AddBuddyDeclineIn");
 	}
-
 }

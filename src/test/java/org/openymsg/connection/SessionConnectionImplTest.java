@@ -5,41 +5,46 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.execute.Executor;
 import org.openymsg.execute.ExecutorImpl;
 import org.openymsg.network.ConnectionEndedReason;
 import org.openymsg.network.TestingConnectionBuilder;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class SessionConnectionImplTest {
 	private String username;
 	private Executor executor;
 	private SessionConnectionCallback listener;
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
 
 	@BeforeClass
 	public void setUp() {
 		username = "testuser";
 	}
 
-	@BeforeMethod
+	@Before
 	public void setUpMethod() {
 		executor = new ExecutorImpl(username);
 		listener = mock(SessionConnectionCallback.class);
 	}
 
-	@AfterMethod
+	@After
 	public void tearDownMethod() {
 		executor.shutdown();
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test()
 	public void testNullConfig() {
 		SessionConfig sessionConfig = null;
 		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, listener);
+		exception.expect(IllegalArgumentException.class);
 		sessionConnection.initialize(sessionConfig);
 	}
 
@@ -71,5 +76,4 @@ public class SessionConnectionImplTest {
 		sessionConnection.connectionEnded(ConnectionEndedReason.SocketClosed);
 		verify(listener).connectionPrematurelyEnded();
 	}
-
 }

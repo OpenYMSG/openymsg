@@ -4,22 +4,26 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openymsg.connection.YahooConnection;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class ScheduledMessageSenderTest {
 	private YahooConnection executor;
 	private Message message;
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
 
-	@BeforeMethod
+	@Before
 	public void beforeMethod() {
 		executor = mock(YahooConnection.class);
 		message = mock(Message.class);
 	}
 
-	@AfterMethod
+	@After
 	public void afterMethod() {
 		verifyNoMoreInteractions(executor);
 		verifyNoMoreInteractions(message);
@@ -29,17 +33,20 @@ public class ScheduledMessageSenderTest {
 	public void testExecute() {
 		ScheduledMessageSender sender = new ScheduledMessageSender(executor, message);
 		sender.execute();
-
 		verify(executor).execute(message);
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Executor cannot be null")
+	@Test()
 	public void testNoExecutor() {
+		exception.expect(IllegalArgumentException.class);
+		exception.expectMessage("Executor cannot be null");
 		new ScheduledMessageSender(null, message);
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Message cannot be null")
+	@Test()
 	public void testNoMessage() {
+		exception.expect(IllegalArgumentException.class);
+		exception.expectMessage("Message cannot be null");
 		new ScheduledMessageSender(executor, null);
 	}
 
@@ -48,5 +55,4 @@ public class ScheduledMessageSenderTest {
 		ScheduledMessageSender sender = new ScheduledMessageSender(executor, message);
 		sender.failure(new Exception("Test failure"));
 	}
-
 }

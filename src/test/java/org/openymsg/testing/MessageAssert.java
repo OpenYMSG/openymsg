@@ -1,5 +1,14 @@
 package org.openymsg.testing;
 
+import org.junit.Assert;
+import org.mockito.Matchers;
+import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
+import org.openymsg.connection.write.Message;
+import org.openymsg.execute.dispatch.Request;
+import org.openymsg.network.MessageStatus;
+import org.openymsg.network.PacketBodyBuffer;
+import org.openymsg.network.ServiceType;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -8,18 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.mockito.Matchers;
-import org.mockito.Mockito;
-import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
-import org.openymsg.connection.write.Message;
-import org.openymsg.execute.dispatch.Request;
-import org.openymsg.network.MessageStatus;
-import org.openymsg.network.PacketBodyBuffer;
-import org.openymsg.network.ServiceType;
-import org.testng.Assert;
-
 public class MessageAssert {
-
 	public static final void assertEquals(Message message, String comparisonString, String... excludeFields)
 			throws IOException {
 		ServiceType serviceType = message.getServiceType();
@@ -81,18 +79,16 @@ public class MessageAssert {
 					bodyValue = bodyTokenizer.nextToken();
 				}
 				try {
-					// System.err.println("comparing:  " + comparisonKey + ":" + comparisonValue + "-" + bodyKey + ":"
+					// System.err.println("comparing: " + comparisonKey + ":" + comparisonValue + "-" + bodyKey + ":"
 					// + bodyValue);
 					check(comparisonKey, comparisonValue, bodyKey, bodyValue);
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					System.err.println("Failed comparing:  " + comparisonKey + ":" + comparisonValue + "-" + bodyKey
 							+ ":" + bodyValue);
 					e.printStackTrace();
 				}
 			}
 		}
-
 	}
 
 	private static void check(String comparisonKey, String comparisonValue, String bodyKey, String bodyValue) {
@@ -116,7 +112,6 @@ public class MessageAssert {
 			return true;
 		}
 		return false;
-
 	}
 
 	private static String strip(String string) {
@@ -134,8 +129,6 @@ public class MessageAssert {
 		if (null != message) {
 			formatted = message + " ";
 		}
-
 		return formatted + "expected:<" + expected + "> but was:<" + actual + ">";
 	}
-
 }

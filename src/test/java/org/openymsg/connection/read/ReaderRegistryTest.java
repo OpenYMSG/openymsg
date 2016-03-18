@@ -1,31 +1,39 @@
 package org.openymsg.connection.read;
 
-import static org.testng.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openymsg.contact.status.ListOfStatusesResponse;
 import org.openymsg.network.ServiceType;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class ReaderRegistryTest {
 	private ReaderRegistry registry;
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
 
-	@BeforeMethod
+	@Before
 	public void beforeMethod() {
 		registry = new ReaderRegistryImpl();
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "response may not be null")
+	@Test()
 	public void testRegisterSingleNoResponse() {
 		ServiceType type = ServiceType.ADDIDENT;
 		SinglePacketResponse response = null;
+		exception.expect(IllegalStateException.class);
+		exception.expectMessage("response may not be null");
 		registry.register(type, response);
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "type may not be null")
+	@Test()
 	public void testRegisterSingleNoServiceType() {
 		ServiceType type = null;
 		SinglePacketResponse response = new NoOpResponse();
+		exception.expect(IllegalStateException.class);
+		exception.expectMessage("type may not be null");
 		registry.register(type, response);
 	}
 
@@ -47,17 +55,21 @@ public class ReaderRegistryTest {
 		assertEquals(false, answer);
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "response may not be null")
+	@Test()
 	public void testRegisterMultiNoResponse() {
 		ServiceType type = ServiceType.ADDIDENT;
 		MultiplePacketResponse response = null;
+		exception.expect(IllegalStateException.class);
+		exception.expectMessage("response may not be null");
 		registry.register(type, response);
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "type may not be null")
+	@Test()
 	public void testRegisterrMultiNoServiceType() {
 		ServiceType type = null;
 		MultiplePacketResponse response = new ListOfStatusesResponse(null);
+		exception.expect(IllegalStateException.class);
+		exception.expectMessage("type may not be null");
 		registry.register(type, response);
 	}
 
@@ -78,5 +90,4 @@ public class ReaderRegistryTest {
 		boolean answer = registry.deregister(type, new NoOpResponse());
 		assertEquals(false, answer);
 	}
-
 }
