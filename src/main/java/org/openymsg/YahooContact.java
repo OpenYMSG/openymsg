@@ -68,15 +68,20 @@ public class YahooContact {
 
 	@Override
 	public final boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (!(obj instanceof YahooContact)) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof YahooContact))
+			return false;
 		YahooContact other = (YahooContact) obj;
 		if (name == null) {
-			if (other.name != null) return false;
-		} else if (!name.equals(other.name)) return false;
-		if (protocol != other.protocol) return false;
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (protocol != other.protocol)
+			return false;
 		return true;
 	}
-
 }

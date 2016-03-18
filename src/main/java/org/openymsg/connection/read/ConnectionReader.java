@@ -48,5 +48,4 @@ public class ConnectionReader implements Request {
 	public void failure(Exception ex) {
 		log.error("Failed reading connection", ex);
 	}
-
 }

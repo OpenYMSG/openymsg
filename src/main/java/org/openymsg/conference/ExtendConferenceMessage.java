@@ -1,13 +1,13 @@
 package org.openymsg.conference;
 
-import java.io.IOException;
-import java.util.Set;
-
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
+
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * Transmit an CONFADDINVITE packet. We send one of these when we wish to invite more users to our conference.
@@ -56,10 +56,8 @@ public class ExtendConferenceMessage extends AbstractConferenceMessage {
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
 	}
-
 	// @Override
 	// public void messageProcessed() {
 	// //TODO - add they are invited?
 	// }
-
 }

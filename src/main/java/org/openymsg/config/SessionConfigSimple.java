@@ -1,8 +1,5 @@
 package org.openymsg.config;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.ConnectionBuilder;
@@ -10,6 +7,9 @@ import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.direct.DirectConnectionBuilder;
 import org.openymsg.network.url.URLStreamBuilder;
 import org.openymsg.network.url.URLStreamBuilderImpl;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * Default SessionConfig
@@ -29,8 +29,7 @@ public class SessionConfigSimple implements SessionConfig {
 		String encodedPassword;
 		try {
 			encodedPassword = URLEncoder.encode(password, "UTF-8");
-		}
-		catch (UnsupportedEncodingException e) {
+		} catch (UnsupportedEncodingException e) {
 			log.error("Encoding password: " + password, e);
 			// TODO handle failure
 			return null;
@@ -38,8 +37,7 @@ public class SessionConfigSimple implements SessionConfig {
 		String encodedSeed;
 		try {
 			encodedSeed = URLEncoder.encode(seed, "UTF-8");
-		}
-		catch (UnsupportedEncodingException e) {
+		} catch (UnsupportedEncodingException e) {
 			log.error("Encoding seed: " + seed, e);
 			// TODO handle failure
 			return null;
@@ -99,5 +97,4 @@ public class SessionConfigSimple implements SessionConfig {
 	public boolean isSSLCheckDisabled() {
 		return false;
 	}
-
 }

@@ -1,75 +1,95 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sf.openymsg</groupId>
 	<artifactId>openymsg</artifactId>
-	<name>OpenYMSG library</name>
 	<version>1.0-beta-22</version>
+	<name>OpenYMSG library</name>
 	<description>OpenYMSG is an Java library that implements the Yahoo Instant
 	 	Messenger protocol.</description>
-	<url>http://sourceforge.net/projects/openymsg/</url>
-	<issueManagement>
-	</issueManagement>
-	<inceptionYear>2007</inceptionYear>
-	<developers>
-		<developer>
-			<id>jadestorm</id>
-			<name>Daniel Henninger</name>
-		</developer>
-		<developer>
-			<id>neilhart</id>
-			<name>Neil Hart</name>
-		</developer>
-		<developer>
-			<id>guusdk</id>
-			<name>Guus der Kinderen</name>
-			<email>guus.der.kinderen@gmail.com</email>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>damencho</id>
-			<name>Damian Minkov</name>
-		</developer>
-	</developers>
-	<licenses>
-		<license>
-			<name>GNU General Public License Version2</name>
-			<url>http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-	<scm>
-		<connection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.7.0</connection>
-		<developerConnection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.7.0</developerConnection>
-		<url>http://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.7.0</url>
-	</scm>
-	<distributionManagement>
-		<repository>
-			<id>${repo-id}</id>
-			<name>${repo-name}</name>
-			<url>${repo-url}</url>
-		</repository>
-		<snapshotRepository>
-			<id>${snapRepo-id}</id>
-			<name>${snapRepo-name}</name>
-			<url>${snapRepo-url}</url>
-		</snapshotRepository>
-	</distributionManagement>
 	<properties>
+		<maven.test.failure.ignore>true</maven.test.failure.ignore>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<repo-id>sonatype-nexus-staging</repo-id>
 		<repo-name>Nexus Staging Repository</repo-name>
 		<repo-url>https://oss.sonatype.org/service/local/staging/deploy/maven2</repo-url>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<!-- <maven.test.skip>true</maven.test.skip> -->
 	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.3</version>
+		</dependency>
+		<!-- Legacy -->
+		<dependency>
+			<groupId>jdom</groupId>
+			<artifactId>jdom</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>nl.jqno.equalsverifier</groupId>
+			<artifactId>equalsverifier</artifactId>
+			<version>1.1.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit-addons</groupId>
+			<artifactId>junit-addons</artifactId>
+			<version>1.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.14</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>1.9.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>6.3.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 	<build>
 		<pluginManagement>
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-site-plugin</artifactId>
-					<version>2.3</version>
+					<artifactId>maven-checkstyle-plugin</artifactId>
+					<version>2.17</version>
+					<configuration>
+						<configLocation>google_checks.xml</configLocation>
+						<suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
+						<suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -77,12 +97,75 @@
 					<version>2.2</version>
 				</plugin>
 				<plugin>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.1</version>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>2.3</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
+			<plugin>
+				<groupId>com.google.code.sortpom</groupId>
+				<artifactId>maven-sortpom-plugin</artifactId>
+				<version>2.1.0</version>
+				<configuration>
+					<nrOfIndentSpace>-1</nrOfIndentSpace>
+					<createBackupFile>false</createBackupFile>
+					<sortProperties>true</sortProperties>
+					<predefinedSortOrder>custom_1</predefinedSortOrder>
+					<sortPlugins>groupId,artifactId</sortPlugins>
+					<sortDependencies>scope,artifactId</sortDependencies>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>sort</goal>
+						</goals>
+						<phase>verify</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.12</version>
+				<configuration>
+					<systemPropertyVariables>
+						<propertyName>badUsername</propertyName>
+						<propertyName>badUsernamePassword</propertyName>
+						<propertyName>badPasswordUsername</propertyName>
+						<propertyName>badPassword</propertyName>
+						<propertyName>username1</propertyName>
+						<propertyName>password1</propertyName>
+						<propertyName>username2</propertyName>
+						<propertyName>password2</propertyName>
+						<propertyName>username3</propertyName>
+						<propertyName>password3</propertyName>
+					</systemPropertyVariables>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -93,21 +176,6 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -148,56 +216,17 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>2.12</version>
-				<configuration>
-					<systemPropertyVariables>
-						<propertyName>badUsername</propertyName>
-						<propertyName>badUsernamePassword</propertyName>
-						<propertyName>badPasswordUsername</propertyName>
-						<propertyName>badPassword</propertyName>
-						<propertyName>username1</propertyName>
-						<propertyName>password1</propertyName>
-						<propertyName>username2</propertyName>
-						<propertyName>password2</propertyName>
-						<propertyName>username3</propertyName>
-						<propertyName>password3</propertyName>
-					</systemPropertyVariables>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>integration-test</goal>
-							<goal>verify</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- <plugin> <groupId>com.atlassian.maven.plugins</groupId> <artifactId>maven-clover2-plugin</artifactId> 
-				<version>3.1.4</version> <configuration> <excludes> <exclude>**/legacy/**/*.java</exclude> 
-				<exclude>**/legacy/*.java</exclude> </excludes> <licenseLocation>/Users/neilhart/clover.license</licenseLocation> 
-				</configuration> <executions> <execution> <id>main</id> <goals> <goal>instrument</goal> 
-				<goal>setup</goal> <goal>aggregate</goal> </goals> </execution> <execution> 
-				<phase>verify</phase> <goals> <goal>instrument-test</goal> <goal>check</goal> 
-				</goals> </execution> <execution> <id>site</id> <phase>pre-site</phase> <goals> 
-				<goal>aggregate</goal> <goal>save-history</goal> <goal>reset</goal> </goals> 
-				</execution> </executions> </plugin> -->
 		</plugins>
 	</build>
 	<reporting>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.12</version>
-				<configuration>
-					<testFailureIgnore>true</testFailureIgnore>
-				</configuration>
+				<artifactId>maven-checkstyle-plugin</artifactId>
 				<reportSets>
 					<reportSet>
 						<reports>
-							<report>report-only</report>
+							<report>checkstyle</report>
 						</reports>
 					</reportSet>
 				</reportSets>
@@ -219,17 +248,22 @@
 					<excludes>
 						<exclude>**/legacy/**/*.java</exclude>
 					</excludes>
-
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>taglist-maven-plugin</artifactId>
-				<version>2.4</version>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>2.12</version>
+				<configuration>
+					<testFailureIgnore>true</testFailureIgnore>
+				</configuration>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>report-only</report>
+						</reports>
+					</reportSet>
+				</reportSets>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -242,6 +276,10 @@
 						</excludes>
 					</instrumentation>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
 			</plugin>
 			<!-- <plugin> <groupId>com.atlassian.maven.plugins</groupId> <artifactId>maven-clover2-plugin</artifactId> 
 				<version>3.1.4</version> <configuration> <licenseLocation>/Users/neilhart/clover.license</licenseLocation> 
@@ -261,68 +299,60 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>jdepend-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>taglist-maven-plugin</artifactId>
+				<version>2.4</version>
+			</plugin>
 		</plugins>
 	</reporting>
-	<dependencies>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.3.3</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-			<version>6.3.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>nl.jqno.equalsverifier</groupId>
-			<artifactId>equalsverifier</artifactId>
-			<version>1.1.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.14</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>1.9.0</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Legacy -->
-		<dependency>
-			<groupId>jdom</groupId>
-			<artifactId>jdom</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit-addons</groupId>
-			<artifactId>junit-addons</artifactId>
-			<version>1.4</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+	<url>http://sourceforge.net/projects/openymsg/</url>
+	<inceptionYear>2007</inceptionYear>
+	<licenses>
+		<license>
+			<name>GNU General Public License Version2</name>
+			<url>http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>jadestorm</id>
+			<name>Daniel Henninger</name>
+		</developer>
+		<developer>
+			<id>neilhart</id>
+			<name>Neil Hart</name>
+		</developer>
+		<developer>
+			<id>guusdk</id>
+			<name>Guus der Kinderen</name>
+			<email>guus.der.kinderen@gmail.com</email>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>damencho</id>
+			<name>Damian Minkov</name>
+		</developer>
+	</developers>
+	<scm>
+		<connection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.7.0</connection>
+		<developerConnection>scm:svn:https://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.7.0</developerConnection>
+		<url>http://openymsg.svn.sourceforge.net/svnroot/openymsg/tags/openymsg-0.7.0</url>
+	</scm>
+	<issueManagement></issueManagement>
+	<distributionManagement>
+		<repository>
+			<id>${repo-id}</id>
+			<name>${repo-name}</name>
+			<url>${repo-url}</url>
+		</repository>
+		<snapshotRepository>
+			<id>${snapRepo-id}</id>
+			<name>${snapRepo-name}</name>
+			<url>${snapRepo-url}</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<profiles>
 		<profile>
 			<id>release-sign-artifacts</id>
@@ -340,10 +370,10 @@
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
-								<phase>verify</phase>
 								<goals>
 									<goal>sign</goal>
 								</goals>
+								<phase>verify</phase>
 							</execution>
 						</executions>
 					</plugin>

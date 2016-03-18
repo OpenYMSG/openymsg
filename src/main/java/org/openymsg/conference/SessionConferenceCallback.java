@@ -1,10 +1,10 @@
 package org.openymsg.conference;
 
-import java.util.Set;
-
 import org.openymsg.YahooConference;
 import org.openymsg.YahooConferenceStatus;
 import org.openymsg.YahooContact;
+
+import java.util.Set;
 
 /**
  * Callback for Conference notifications.

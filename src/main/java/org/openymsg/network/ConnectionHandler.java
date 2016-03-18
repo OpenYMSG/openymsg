@@ -6,7 +6,6 @@ package org.openymsg.network;
  * @author neilhart
  */
 public interface ConnectionHandler {
-
 	/**
 	 * Send a message to Yahoo containing the following information. This may not be thread-safe.
 	 * @param body body of the message

@@ -1,8 +1,8 @@
 package org.openymsg.connection.read;
 
-import java.util.List;
-
 import org.openymsg.network.YMSG9Packet;
+
+import java.util.List;
 
 public interface MultiplePacketResponse {
 	void execute(List<YMSG9Packet> packets);

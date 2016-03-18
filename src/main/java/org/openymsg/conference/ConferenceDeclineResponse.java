@@ -10,7 +10,6 @@ import org.openymsg.network.YMSG9Packet;
  * declines our invite.
  */
 public class ConferenceDeclineResponse extends AbstractConferenceResponse {
-
 	public ConferenceDeclineResponse(SessionConferenceImpl sessionConference) {
 		super(sessionConference);
 	}
@@ -33,6 +32,5 @@ public class ConferenceDeclineResponse extends AbstractConferenceResponse {
 		// Fire invite event
 		// if (!yc.isClosed()) // Should never be closed!
 		// eventDispatchQueue.append(se, ServiceType.CONFDECLINE);
-
 	}
 }

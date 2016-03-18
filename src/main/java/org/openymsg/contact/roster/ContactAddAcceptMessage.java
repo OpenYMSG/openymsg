@@ -1,12 +1,12 @@
 package org.openymsg.contact.roster;
 
-import java.io.IOException;
-
 import org.openymsg.YahooContact;
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
+
+import java.io.IOException;
 
 public class ContactAddAcceptMessage implements Message {
 	private final YahooContact contact;
@@ -38,5 +38,4 @@ public class ContactAddAcceptMessage implements Message {
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
 	}
-
 }

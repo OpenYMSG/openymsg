@@ -1,12 +1,12 @@
 package org.openymsg.conference;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooContact;
 import org.openymsg.util.CollectionUtils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Information on membership of a YahooConference. It contains the contact that were invited, established membership,
@@ -173,5 +173,4 @@ public class ConferenceMembershipImpl implements ConferenceMembership {
 			log.debug("contact removed from invited: " + yahooContact);
 		}
 	}
-
 }

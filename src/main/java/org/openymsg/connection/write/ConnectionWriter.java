@@ -1,13 +1,13 @@
 package org.openymsg.connection.write;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.execute.dispatch.Dispatcher;
 import org.openymsg.execute.dispatch.Request;
 import org.openymsg.execute.dispatch.ScheduleTaskCompletionException;
 import org.openymsg.network.ConnectionHandler;
+
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ConnectionWriter implements Request {
 	/** logger */
@@ -57,5 +57,4 @@ public class ConnectionWriter implements Request {
 	public boolean isLocked(int millisDuration) {
 		return (this.connection != null) && this.connection.isLocked(millisDuration);
 	}
-
 }

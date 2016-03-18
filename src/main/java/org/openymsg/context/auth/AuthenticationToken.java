@@ -1,8 +1,8 @@
 package org.openymsg.context.auth;
 
-import java.security.NoSuchAlgorithmException;
-
 import org.openymsg.context.auth.challenge.ChalllengeRespondBuilder;
+
+import java.security.NoSuchAlgorithmException;
 
 public class AuthenticationToken {
 	private String username;
@@ -40,8 +40,7 @@ public class AuthenticationToken {
 		challenge = null;
 		try {
 			challenge = new ChalllengeRespondBuilder().useV16().challenge(crumb + seed).build();
-		}
-		catch (NoSuchAlgorithmException e) {
+		} catch (NoSuchAlgorithmException e) {
 			// TODO handle
 			e.printStackTrace();
 		}
@@ -104,37 +103,58 @@ public class AuthenticationToken {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (!(obj instanceof AuthenticationToken)) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof AuthenticationToken))
+			return false;
 		AuthenticationToken other = (AuthenticationToken) obj;
 		if (challenge == null) {
-			if (other.challenge != null) return false;
-		} else if (!challenge.equals(other.challenge)) return false;
+			if (other.challenge != null)
+				return false;
+		} else if (!challenge.equals(other.challenge))
+			return false;
 		if (cookieB == null) {
-			if (other.cookieB != null) return false;
-		} else if (!cookieB.equals(other.cookieB)) return false;
+			if (other.cookieB != null)
+				return false;
+		} else if (!cookieB.equals(other.cookieB))
+			return false;
 		if (cookieT == null) {
-			if (other.cookieT != null) return false;
-		} else if (!cookieT.equals(other.cookieT)) return false;
+			if (other.cookieT != null)
+				return false;
+		} else if (!cookieT.equals(other.cookieT))
+			return false;
 		if (cookieY == null) {
-			if (other.cookieY != null) return false;
-		} else if (!cookieY.equals(other.cookieY)) return false;
+			if (other.cookieY != null)
+				return false;
+		} else if (!cookieY.equals(other.cookieY))
+			return false;
 		if (crumb == null) {
-			if (other.crumb != null) return false;
-		} else if (!crumb.equals(other.crumb)) return false;
+			if (other.crumb != null)
+				return false;
+		} else if (!crumb.equals(other.crumb))
+			return false;
 		if (password == null) {
-			if (other.password != null) return false;
-		} else if (!password.equals(other.password)) return false;
+			if (other.password != null)
+				return false;
+		} else if (!password.equals(other.password))
+			return false;
 		if (seed == null) {
-			if (other.seed != null) return false;
-		} else if (!seed.equals(other.seed)) return false;
+			if (other.seed != null)
+				return false;
+		} else if (!seed.equals(other.seed))
+			return false;
 		if (username == null) {
-			if (other.username != null) return false;
-		} else if (!username.equals(other.username)) return false;
+			if (other.username != null)
+				return false;
+		} else if (!username.equals(other.username))
+			return false;
 		if (ymsgr == null) {
-			if (other.ymsgr != null) return false;
-		} else if (!ymsgr.equals(other.ymsgr)) return false;
+			if (other.ymsgr != null)
+				return false;
+		} else if (!ymsgr.equals(other.ymsgr))
+			return false;
 		return true;
 	}
 }

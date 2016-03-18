@@ -30,5 +30,4 @@ public class PingResponse implements SinglePacketResponse {
 			log.warn("144 value for Ping is not 1: " + value143);
 		}
 	}
-
 }

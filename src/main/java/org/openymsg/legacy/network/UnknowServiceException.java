@@ -5,25 +5,23 @@ package org.openymsg.legacy.network;
 
 /**
  * @author Giancarlo Frison - Nimbuzz B.V. <giancarlo@nimbuzz.com>
- * 
  */
 public class UnknowServiceException extends RuntimeException {
-
-    /**
+	/**
 	 * 
 	 */
-    private static final long serialVersionUID = -606709859886555442L;
-    private YMSG9Packet packet;
+	private static final long serialVersionUID = -606709859886555442L;
+	private YMSG9Packet packet;
 
-    /**
-     * @param p
-     */
-    public UnknowServiceException(YMSG9Packet p) {
-        super();
-        packet = p;
-    }
+	/**
+	 * @param p
+	 */
+	public UnknowServiceException(YMSG9Packet p) {
+		super();
+		packet = p;
+	}
 
-    public YMSG9Packet getPacket() {
-        return packet;
-    }
+	public YMSG9Packet getPacket() {
+		return packet;
+	}
 }

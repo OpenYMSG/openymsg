@@ -29,14 +29,11 @@ public class DispatcherExecutorService extends ScheduledThreadPoolExecutor {
 				if (future.isDone()) {
 					future.get();
 				}
-			}
-			catch (CancellationException ce) {
+			} catch (CancellationException ce) {
 				t = ce;
-			}
-			catch (ExecutionException ee) {
+			} catch (ExecutionException ee) {
 				t = ee.getCause();
-			}
-			catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt(); // ignore/reset
 			}
 		}
@@ -44,5 +41,4 @@ public class DispatcherExecutorService extends ScheduledThreadPoolExecutor {
 			this.callback.afterExecute(r, t);
 		}
 	}
-
 }

@@ -51,5 +51,4 @@ public class PacketReaderImpl implements PacketReader {
 		this.reader.finished();
 		this.registry.clear();
 	}
-
 }

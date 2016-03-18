@@ -54,7 +54,6 @@ public class SessionSessionImpl implements SessionSession {
 	// checkStatus();
 	// transmitUserStat();
 	// }
-
 	/**
 	 * Notify session that login is complete
 	 */
@@ -77,15 +76,11 @@ public class SessionSessionImpl implements SessionSession {
 			throw new IllegalStateException("State is not logging in: " + state);
 		}
 		state = LoginState.LOGGING_OUT;
-
 		connection.execute(new LogoutMessage(username));
-
 		// TODO schedule this incase no response from yahoo, not here
 		executor.scheduleOnce(new ShutdownRequest(connection), 1000);
-
 		// no longer getting a response from yahoo
 		state = LoginState.LOGGED_OUT_NORMAL;
-
 	}
 
 	/**
@@ -95,6 +90,7 @@ public class SessionSessionImpl implements SessionSession {
 	 * @param status The new Status to be set for this user.
 	 * @throws IllegalArgumentException
 	 */
+	@Override
 	public void setStatus(YahooStatus status) throws IllegalArgumentException {
 		log.debug("setting status: " + status);
 		if (status == YahooStatus.CUSTOM) {
@@ -119,6 +115,7 @@ public class SessionSessionImpl implements SessionSession {
 	 * @throws IllegalArgumentException
 	 */
 	// TODO showBusyIcon isn't used
+	@Override
 	public synchronized void setCustomStatus(String message, boolean showBusyIcon) throws IllegalArgumentException {
 		if (message == null) {
 			throw new IllegalArgumentException("Cannot set custom state with null message");
@@ -127,7 +124,6 @@ public class SessionSessionImpl implements SessionSession {
 		// status = Status.CUSTOM;
 		// customStatusMessage = message;
 		// customStatusBusy = showBusyIcon;
-
 		connection.execute(new StatusChangeRequest(YahooStatus.CUSTOM, message, showBusyIcon));
 	}
 
@@ -145,5 +141,4 @@ public class SessionSessionImpl implements SessionSession {
 	public void keepAlive() {
 		timeoutChecker.keepAlive();
 	}
-
 }

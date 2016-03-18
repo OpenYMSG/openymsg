@@ -8,7 +8,6 @@ public enum ContactAddFailure {
 	SOMETHING(33),
 	NOT_REMOTE_USER(40), // for other protocols
 	SOMETHING_ELSE(42);
-
 	private int value;
 
 	/**
@@ -40,7 +39,6 @@ public enum ContactAddFailure {
 				return all[i];
 			}
 		}
-
 		throw new IllegalArgumentException("No ContactAddFailure matching long value '" + value + "'.");
 	}
 
@@ -52,8 +50,7 @@ public enum ContactAddFailure {
 		try {
 			longValue = Integer.parseInt(value);
 			return get(longValue);
-		}
-		catch (NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException("No ContactAddFailure matching string value '" + value + "'.");
 		}
 	}

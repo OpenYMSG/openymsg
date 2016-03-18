@@ -1,13 +1,13 @@
 package org.openymsg.network.url;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class URLStream {
 	/** logger */
@@ -31,28 +31,23 @@ public class URLStream {
 	public ByteArrayOutputStream getOutputStream() {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		InputStream in = this.getInputStream();
-
-		if (in == null) return null;
-
+		if (in == null)
+			return null;
 		try {
-
 			int read = -1;
 			byte[] buff = new byte[256];
 			while ((read = in.read(buff)) != -1) {
 				out.write(buff, 0, read);
 			}
 			in.close();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			log.warn("Failed extracting response");
 			// TODO handle failure
-		}
-		finally {
+		} finally {
 			if (in != null) {
 				try {
 					in.close();
-				}
-				catch (IOException e) {
+				} catch (IOException e) {
 					log.warn("Failed closing stream");
 					// TODO handle failure
 				}
@@ -60,5 +55,4 @@ public class URLStream {
 		}
 		return out;
 	}
-
 }

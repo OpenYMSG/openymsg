@@ -1,11 +1,11 @@
 package org.openymsg.connection.read;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.YMSG9Packet;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CollectPacketResponse implements SinglePacketResponse {
 	private static final Log log = LogFactory.getLog(CollectPacketResponse.class);
@@ -41,13 +41,18 @@ public class CollectPacketResponse implements SinglePacketResponse {
 
 	@Override
 	public final boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (!(obj instanceof CollectPacketResponse)) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof CollectPacketResponse))
+			return false;
 		CollectPacketResponse other = (CollectPacketResponse) obj;
 		if (response == null) {
-			if (other.response != null) return false;
-		} else if (!response.equals(other.response)) return false;
+			if (other.response != null)
+				return false;
+		} else if (!response.equals(other.response))
+			return false;
 		return true;
 	}
 }

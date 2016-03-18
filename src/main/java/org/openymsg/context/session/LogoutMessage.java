@@ -1,11 +1,11 @@
 package org.openymsg.context.session;
 
-import java.io.IOException;
-
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
+
+import java.io.IOException;
 
 /**
  * Transmit a LOGOFF packet, which should exit us from Yahoo IM.
@@ -34,5 +34,4 @@ public class LogoutMessage implements Message {
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
 	}
-
 }

@@ -4,7 +4,6 @@ import org.openymsg.Name;
 import org.openymsg.YahooContact;
 
 public interface SessionRosterCallback {
-
 	void rosterLoaded();
 
 	void addedContact(YahooContact contact);
@@ -12,7 +11,6 @@ public interface SessionRosterCallback {
 	void removedContact(YahooContact contact);
 
 	// void contactAddSuccess(Contact contact);
-
 	void receivedContactAddFailure(YahooContact contact, ContactAddFailure failure, String additionalInformation);
 
 	void receivedContactAddAccepted(YahooContact contact);

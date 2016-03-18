@@ -41,5 +41,4 @@ public class ConnectionInitalize implements Request {
 		this.session.setState(ConnectionState.FAILED_CONNECTING);
 		// TODO shutdown
 	}
-
 }

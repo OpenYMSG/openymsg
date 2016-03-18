@@ -33,13 +33,18 @@ public class YahooConference {
 
 	@Override
 	public final boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (!(obj instanceof YahooConference)) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof YahooConference))
+			return false;
 		YahooConference other = (YahooConference) obj;
 		if (id == null) {
-			if (other.id != null) return false;
-		} else if (!id.equals(other.id)) return false;
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
 		return true;
 	}
 
@@ -47,5 +52,4 @@ public class YahooConference {
 	public String toString() {
 		return "YahooConference [id=" + id + "]";
 	}
-
 }

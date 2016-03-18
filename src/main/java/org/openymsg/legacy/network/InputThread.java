@@ -1,22 +1,17 @@
 /*
- * OpenYMSG, an implementation of the Yahoo Instant Messaging and Chat protocol.
- * Copyright (C) 2007 G. der Kinderen, Nimbuzz.com 
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
+ * OpenYMSG, an implementation of the Yahoo Instant Messaging and Chat protocol. Copyright (C) 2007 G. der Kinderen,
+ * Nimbuzz.com This program is free software; you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+ * License for more details. You should have received a copy of the GNU General Public License along with this program;
+ * if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 package org.openymsg.legacy.network;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openymsg.legacy.network.event.SessionConferenceInviteEvent;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -25,10 +20,6 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openymsg.legacy.network.event.SessionConferenceInviteEvent;
-
 /**
  * Thread for handling network input, dispatching incoming packets to appropriate methods based upon service id.
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
@@ -36,9 +27,7 @@ import org.openymsg.legacy.network.event.SessionConferenceInviteEvent;
  */
 public class InputThread extends Thread {
 	private volatile boolean quit = false; // Exit run in J2 compliant way
-
 	protected final Session parentSession;
-
 	private static final Log log = LogFactory.getLog(InputThread.class);
 
 	/**
@@ -66,25 +55,20 @@ public class InputThread extends Thread {
 		while (!quit) {
 			try {
 				process(parentSession.network.receivePacket());
-			}
-			catch (UnknowServiceException e) {
+			} catch (UnknowServiceException e) {
 				log.warn("unknow packet: " + e.getPacket().toString());
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				// ignore SocketExceptions if we're closing the thread.
 				if (quit && e instanceof SocketException) {
 					log.debug("logging out so don't handle exception");
 					return;
 				}
-
 				log.error("error on process packet", e);
 				try {
 					parentSession.sendExceptionEvent(e, "Source: InputThread");
-				}
-				catch (Exception e2) {
+				} catch (Exception e2) {
 					log.error("error on sendException to the session", e2);
 				}
-
 				// IO exceptions? Close the connection!
 				if (e instanceof IOException) {
 					quit = true;
@@ -104,7 +88,6 @@ public class InputThread extends Thread {
 			quit = true;
 			return;
 		}
-
 		// Process header
 		if (pkt.sessionId != 0) {
 			// Some chat packets send zero
@@ -113,14 +96,11 @@ public class InputThread extends Thread {
 			// Update session id in outer class
 			parentSession.sessionId = pkt.sessionId;
 		}
-
 		// Error header?
 		if (pkt.status == -1 && processError(pkt) == true) {
 			return;
 		}
-
 		log.trace("Incoming packet: " + pkt);
-
 		// Process payload
 		processPayload(pkt);
 	}
@@ -128,136 +108,136 @@ public class InputThread extends Thread {
 	protected void processPayload(YMSG9Packet pkt) throws IOException, YahooException {
 		log.trace("processPayload " + pkt.service + "/" + pkt.status);
 		switch (pkt.service) {
-		case ADDIGNORE:
-			parentSession.receiveAddIgnore(pkt);
-			break;
-		case AUTH:
-			parentSession.receiveAuth(pkt);
-			break;
-		case AUTHRESP:
-			parentSession.receiveAuthResp(pkt);
-			break;
-		case CHATCONNECT:
-			parentSession.receiveChatConnect(pkt);
-			break;
-		case CHATDISCONNECT:
-			parentSession.receiveChatDisconnect(pkt);
-			break;
-		case CHATEXIT:
-			parentSession.receiveChatExit(pkt);
-			break;
-		case CHATJOIN:
-			parentSession.receiveChatJoin(pkt);
-			break;
-		case CHATMSG:
-			parentSession.receiveChatMsg(pkt);
-			break;
-		case CHATPM:
-			parentSession.receiveChatPM(pkt);
-			break;
-		case CONFADDINVITE:
-			receiveConfAddInvite(pkt);
-			break;
-		case CONFDECLINE:
-			parentSession.receiveConfDecline(pkt);
-			break;
-		case CONFINVITE:
-			receiveConfInvite(pkt);
-			break;
-		case CONFLOGOFF:
-			parentSession.receiveConfLogoff(pkt);
-			break;
-		case CONFLOGON:
-			parentSession.receiveConfLogon(pkt);
-			break;
-		case CONFMSG:
-			parentSession.receiveConfMsg(pkt);
-			break;
-		case CONTACTIGNORE:
-			parentSession.receiveContactIgnore(pkt);
-			break;
-		case CONTACTNEW:
-			parentSession.receiveContactNew(pkt);
-			break;
-		case FILETRANSFER:
-			parentSession.receiveFileTransfer(pkt);
-			break;
-		case FRIENDADD:
-			parentSession.receiveFriendAdd(pkt);
-			break;
-		case FRIENDREMOVE:
-			parentSession.receiveFriendRemove(pkt);
-			break;
-		case GOTGROUPRENAME:
-			parentSession.receiveGroupRename(pkt);
-			break;
-		case IDACT:
-			parentSession.receiveIdAct(pkt);
-			break;
-		case IDDEACT:
-			parentSession.receiveIdDeact(pkt);
-			break;
-		case ISAWAY:
-			parentSession.receiveIsAway(pkt);
-			break;
-		case ISBACK:
-			parentSession.receiveIsBack(pkt);
-			break;
-		case LIST:
-			parentSession.receiveList(pkt);
-			break;
-		case LIST_15:
-			parentSession.receiveList15(pkt);
-			break;
-		case LOGOFF:
-			parentSession.receiveLogoff(pkt);
-			break;
-		case LOGON:
-			parentSession.receiveLogon(pkt);
-			break;
-		case MESSAGE:
-			parentSession.receiveMessage(pkt);
-			break;
-		case NEWMAIL:
-			parentSession.receiveNewMail(pkt);
-			break;
-		case NOTIFY:
-			parentSession.receiveNotify(pkt);
-			break;
-		case USERSTAT:
-			parentSession.receiveUserStat(pkt);
-			break;
-		case Y6_STATUS_UPDATE:
-			parentSession.receiveStatusUpdate(pkt);
-			break;
-		case STATUS_15:
-			parentSession.receiveStatus15(pkt);
-			break;
-		case GROUPRENAME:
-			parentSession.receiveGroupRename(pkt);
-			break;
-		case CONTACTREJECT:
-			parentSession.receiveContactRejected(pkt);
-			break;
-		case PICTURE:
-			parentSession.receivePicture(pkt);
-			break;
-		case Y7_AUTHORIZATION:
-			parentSession.receiveAuthorization(pkt);
-			break;
-		case PING:
-			// As we're sending pings back, it's probably safe to ignore the
-			// incoming pings from Yahoo.
-			log.debug("Received PING (but ignoring it).");
-			break;
-		case UNKNOWN002:
-			// As we're sending pings back, it's probably safe to ignore the
-			// incoming pings from Yahoo.
-			log.debug("Received 239 (but ignoring it).");
-			break;
-		default:
-			log.info("Don't know how to handle service type '" + pkt.service.getValue()
-					+ "'. The original packet was: " + pkt.toString());
+			case ADDIGNORE:
+				parentSession.receiveAddIgnore(pkt);
+				break;
+			case AUTH:
+				parentSession.receiveAuth(pkt);
+				break;
+			case AUTHRESP:
+				parentSession.receiveAuthResp(pkt);
+				break;
+			case CHATCONNECT:
+				parentSession.receiveChatConnect(pkt);
+				break;
+			case CHATDISCONNECT:
+				parentSession.receiveChatDisconnect(pkt);
+				break;
+			case CHATEXIT:
+				parentSession.receiveChatExit(pkt);
+				break;
+			case CHATJOIN:
+				parentSession.receiveChatJoin(pkt);
+				break;
+			case CHATMSG:
+				parentSession.receiveChatMsg(pkt);
+				break;
+			case CHATPM:
+				parentSession.receiveChatPM(pkt);
+				break;
+			case CONFADDINVITE:
+				receiveConfAddInvite(pkt);
+				break;
+			case CONFDECLINE:
+				parentSession.receiveConfDecline(pkt);
+				break;
+			case CONFINVITE:
+				receiveConfInvite(pkt);
+				break;
+			case CONFLOGOFF:
+				parentSession.receiveConfLogoff(pkt);
+				break;
+			case CONFLOGON:
+				parentSession.receiveConfLogon(pkt);
+				break;
+			case CONFMSG:
+				parentSession.receiveConfMsg(pkt);
+				break;
+			case CONTACTIGNORE:
+				parentSession.receiveContactIgnore(pkt);
+				break;
+			case CONTACTNEW:
+				parentSession.receiveContactNew(pkt);
+				break;
+			case FILETRANSFER:
+				parentSession.receiveFileTransfer(pkt);
+				break;
+			case FRIENDADD:
+				parentSession.receiveFriendAdd(pkt);
+				break;
+			case FRIENDREMOVE:
+				parentSession.receiveFriendRemove(pkt);
+				break;
+			case GOTGROUPRENAME:
+				parentSession.receiveGroupRename(pkt);
+				break;
+			case IDACT:
+				parentSession.receiveIdAct(pkt);
+				break;
+			case IDDEACT:
+				parentSession.receiveIdDeact(pkt);
+				break;
+			case ISAWAY:
+				parentSession.receiveIsAway(pkt);
+				break;
+			case ISBACK:
+				parentSession.receiveIsBack(pkt);
+				break;
+			case LIST:
+				parentSession.receiveList(pkt);
+				break;
+			case LIST_15:
+				parentSession.receiveList15(pkt);
+				break;
+			case LOGOFF:
+				parentSession.receiveLogoff(pkt);
+				break;
+			case LOGON:
+				parentSession.receiveLogon(pkt);
+				break;
+			case MESSAGE:
+				parentSession.receiveMessage(pkt);
+				break;
+			case NEWMAIL:
+				parentSession.receiveNewMail(pkt);
+				break;
+			case NOTIFY:
+				parentSession.receiveNotify(pkt);
+				break;
+			case USERSTAT:
+				parentSession.receiveUserStat(pkt);
+				break;
+			case Y6_STATUS_UPDATE:
+				parentSession.receiveStatusUpdate(pkt);
+				break;
+			case STATUS_15:
+				parentSession.receiveStatus15(pkt);
+				break;
+			case GROUPRENAME:
+				parentSession.receiveGroupRename(pkt);
+				break;
+			case CONTACTREJECT:
+				parentSession.receiveContactRejected(pkt);
+				break;
+			case PICTURE:
+				parentSession.receivePicture(pkt);
+				break;
+			case Y7_AUTHORIZATION:
+				parentSession.receiveAuthorization(pkt);
+				break;
+			case PING:
+				// As we're sending pings back, it's probably safe to ignore the
+				// incoming pings from Yahoo.
+				log.debug("Received PING (but ignoring it).");
+				break;
+			case UNKNOWN002:
+				// As we're sending pings back, it's probably safe to ignore the
+				// incoming pings from Yahoo.
+				log.debug("Received 239 (but ignoring it).");
+				break;
+			default:
+				log.info("Don't know how to handle service type '" + pkt.service.getValue()
+						+ "'. The original packet was: " + pkt.toString());
 		}
 	}
 
@@ -271,18 +251,18 @@ public class InputThread extends Thread {
 	private boolean processError(YMSG9Packet pkt) throws Exception {
 		// Jump to service-specific code
 		switch (pkt.service) {
-		case AUTHRESP:
-			parentSession.receiveAuthResp(pkt);
-			return true;
-		case CHATJOIN:
-			parentSession.receiveChatJoin(pkt);
-			return true;
-		case LOGOFF:
-			parentSession.receiveLogoff(pkt);
-			return true;
-		default:
-			parentSession.errorMessage(pkt, null);
-			return (pkt.body.length <= 2);
+			case AUTHRESP:
+				parentSession.receiveAuthResp(pkt);
+				return true;
+			case CHATJOIN:
+				parentSession.receiveChatJoin(pkt);
+				return true;
+			case LOGOFF:
+				parentSession.receiveLogoff(pkt);
+				return true;
+			default:
+				parentSession.errorMessage(pkt, null);
+				return (pkt.body.length <= 2);
 		}
 	}
 
@@ -325,10 +305,9 @@ public class InputThread extends Thread {
 			Set<YahooUser> currentUsers = getUsers(currentUserIds);
 			Set<YahooUser> otherInvitedUsers = getUsers(otherInvitedUserIds);
 			invitedUsers.addAll(otherInvitedUsers);
-
 			// Create event
-			SessionConferenceInviteEvent se = new SessionConferenceInviteEvent(this, to, from, message, yc,
-					invitedUsers, currentUsers);
+			SessionConferenceInviteEvent se =
+					new SessionConferenceInviteEvent(this, to, from, message, yc, invitedUsers, currentUsers);
 			// Add the users
 			yc.addUsers(invitedUserIds);
 			yc.addUsers(currentUserIds);
@@ -343,8 +322,7 @@ public class InputThread extends Thread {
 					process(packet);
 				}
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			throw new YMSG9BadFormatException("conference invite", pkt, e);
 		}
 	}

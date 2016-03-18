@@ -1,5 +1,10 @@
 package org.openymsg.network.direct;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openymsg.config.SessionConfig;
+import org.openymsg.network.NetworkConstants;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -8,11 +13,6 @@ import java.net.URLConnection;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.StringTokenizer;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openymsg.config.SessionConfig;
-import org.openymsg.network.NetworkConstants;
 
 /**
  * Ask the capacity servers for an ip address to open a socket. Results from the http request look like
@@ -62,12 +62,10 @@ public class CapacityServers {
 		try {
 			URL u = new URL(url);
 			URLConnection uc = u.openConnection();
-
 			if (uc instanceof HttpURLConnection) {
 				int responseCode = ((HttpURLConnection) uc).getResponseCode();
 				if (responseCode == HttpURLConnection.HTTP_OK) {
 					InputStream in = uc.getInputStream();
-
 					ByteArrayOutputStream out = new ByteArrayOutputStream();
 					int read = -1;
 					byte[] buff = new byte[256];
@@ -75,7 +73,6 @@ public class CapacityServers {
 						out.write(buff, 0, read);
 					}
 					in.close();
-
 					return readIpAddress(host, url, out);
 				} else {
 					log.error("Failed opening url: " + url + " return code: " + responseCode);
@@ -87,8 +84,7 @@ public class CapacityServers {
 				}
 				log.error("Failed opening  url: " + url + " returns: " + ucType);
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.error("Failed url: " + url, e);
 		}
 		return null;
@@ -107,7 +103,6 @@ public class CapacityServers {
 			log.warn("Failed getting tokens for: " + url);
 			return null;
 		}
-
 		String coloCapacityString = getTokenValue(COLO_CAPACITY, toks);
 		Integer coloCapacity = null;
 		if (coloCapacityString == null || coloCapacityString.isEmpty()) {
@@ -118,7 +113,6 @@ public class CapacityServers {
 				log.info("Colo Capacity is greater than 1");
 			}
 		}
-
 		String ipAddress = getTokenValue(CS_IP_ADDRESS, toks);
 		if (ipAddress == null || ipAddress.isEmpty()) {
 			log.error("No ipAddress found for: " + host);
@@ -147,5 +141,4 @@ public class CapacityServers {
 		}
 		return null;
 	}
-
 }

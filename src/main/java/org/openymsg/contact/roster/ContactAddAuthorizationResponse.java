@@ -29,7 +29,6 @@ public class ContactAddAuthorizationResponse implements SinglePacketResponse {
 		if (packet.length <= 0) {
 			return;
 		}
-
 		// TODO - UTF8
 		if (packet.status == 1) {
 			String who = packet.getValue("4");
@@ -60,7 +59,6 @@ public class ContactAddAuthorizationResponse implements SinglePacketResponse {
 			// TODO - is this right
 			String protocolString = packet.getValue("241");
 			String message = packet.getValue("14");
-
 			YahooProtocol protocol;
 			if (protocolString == null) {
 				protocol = YahooProtocol.YAHOO;
@@ -79,6 +77,5 @@ public class ContactAddAuthorizationResponse implements SinglePacketResponse {
 		} else {
 			log.error("Unexpected authorization packet. Do not know how to handle: " + packet);
 		}
-
 	}
 }

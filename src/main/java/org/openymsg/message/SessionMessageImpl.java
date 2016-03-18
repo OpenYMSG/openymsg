@@ -43,7 +43,6 @@ public class SessionMessageImpl implements SessionMessage {
 		if (callback == null) {
 			throw new IllegalArgumentException("Callback cannot be null");
 		}
-
 		this.connection = connection;
 		this.username = username;
 		this.callback = callback;
@@ -52,12 +51,14 @@ public class SessionMessageImpl implements SessionMessage {
 		this.connection.register(ServiceType.NOTIFY, new TypingNotificationResponse(this));
 	}
 
+	@Override
 	public void sendBuzz(YahooContact to) throws IllegalArgumentException {
 		sendMessage(to, BUZZ);
 	}
 
 	// TODO - handle message ask
 	// TODO - current contact?
+	@Override
 	public void sendMessage(YahooContact contact, String message) throws IllegalArgumentException {
 		if (contact == null) {
 			throw new IllegalArgumentException("Contact cannot be null");
@@ -65,7 +66,6 @@ public class SessionMessageImpl implements SessionMessage {
 		if (message == null) {
 			throw new IllegalArgumentException("Message cannot be null");
 		}
-
 		String messageId = buildMessageNumber();
 		this.connection.execute(new SendMessage(username, contact, message, messageId));
 	}
@@ -75,7 +75,6 @@ public class SessionMessageImpl implements SessionMessage {
 		if (contact == null) {
 			throw new IllegalArgumentException("Contact cannot be null");
 		}
-
 		this.connection.execute(new TypingNotificationMessage(username, contact, isTyping));
 	}
 
@@ -84,7 +83,6 @@ public class SessionMessageImpl implements SessionMessage {
 		if (messageId != null) {
 			this.connection.execute(new MessageAckMessage(username, contact, messageId));
 		}
-
 		this.callback.receivedMessage(contact, message);
 	}
 
@@ -110,9 +108,8 @@ public class SessionMessageImpl implements SessionMessage {
 
 	protected String buildMessageNumber() {
 		String messageNumber = "" + this.messageNumber++;
-		messageNumber = blankMessageNumber.substring(0, blankMessageNumber.length() - messageNumber.length())
-				+ messageNumber;
+		messageNumber =
+				blankMessageNumber.substring(0, blankMessageNumber.length() - messageNumber.length()) + messageNumber;
 		return messageNumber;
 	}
-
 }

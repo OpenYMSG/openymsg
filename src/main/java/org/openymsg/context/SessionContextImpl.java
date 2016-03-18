@@ -76,5 +76,4 @@ public class SessionContextImpl implements SessionContext, SessionContextCallbac
 	public void keepAlive() {
 		session.keepAlive();
 	}
-
 }

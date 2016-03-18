@@ -1,14 +1,14 @@
 package org.openymsg.conference;
 
-import java.io.IOException;
-import java.util.Set;
-
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
+
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * Transmit an CONFINVITE packet. This is sent when we want to create a new conference, with the specified users and
@@ -53,7 +53,6 @@ public class CreateConferenceMessage implements Message {
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
 	}
-
 	// @Override
 	// public void messageProcessed() {
 	// // TODO - add conference
@@ -61,5 +60,4 @@ public class CreateConferenceMessage implements Message {
 	// // conferences.put(room, new YahooConference(identities.get(yid.toLowerCase()), room, msg, this, false));
 	// // Send request to Yahoo
 	// }
-
 }

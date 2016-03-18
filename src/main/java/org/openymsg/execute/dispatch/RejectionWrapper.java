@@ -4,7 +4,6 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class RejectionWrapper implements RejectedExecutionHandler {
-
 	private DispatcherExecutorCallback callback;
 
 	public RejectionWrapper(DispatcherExecutorCallback callback) {
@@ -14,7 +13,5 @@ public class RejectionWrapper implements RejectedExecutionHandler {
 	@Override
 	public void rejectedExecution(Runnable runnable, ThreadPoolExecutor arg1) {
 		this.callback.rejectedExecution(runnable);
-
 	}
-
 }

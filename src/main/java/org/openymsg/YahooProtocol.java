@@ -11,7 +11,6 @@ public enum YahooProtocol {
 	LCS("1"),
 	MSN("2"),
 	LOTUS("9");
-
 	/** logger */
 	private static final Log log = LogFactory.getLog(YahooProtocol.class);
 	/** Unique long representation of this Status */
@@ -50,7 +49,6 @@ public enum YahooProtocol {
 				return all[i];
 			}
 		}
-
 		throw new IllegalArgumentException("No YahooProtocol matching long value '" + value + "'.");
 	}
 
@@ -67,7 +65,6 @@ public enum YahooProtocol {
 	// }
 	// return YahooProtocol.getProtocol(value);
 	// }
-
 	public boolean isYahoo() {
 		return this.equals(YAHOO);
 	}
@@ -75,8 +72,7 @@ public enum YahooProtocol {
 	public static YahooProtocol getProtocolOrDefault(String protocolString, String who) {
 		try {
 			return YahooProtocol.getProtocol(protocolString);
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			log.error("Failed finding protocol: " + protocolString + " for user: " + who);
 			return YahooProtocol.YAHOO;
 		}
@@ -85,5 +81,4 @@ public enum YahooProtocol {
 	public boolean isMsn() {
 		return this.equals(MSN);
 	}
-
 }

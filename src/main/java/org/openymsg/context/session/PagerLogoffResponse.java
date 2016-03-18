@@ -9,8 +9,8 @@ import org.openymsg.contact.SessionContactImpl;
 import org.openymsg.context.SessionContextImpl;
 import org.openymsg.network.YMSG9Packet;
 
-//TODO - connection isn't closed yet
-//TODO - really a Pager Log off
+// TODO - connection isn't closed yet
+// TODO - really a Pager Log off
 /**
  * Process an incoming AUTHRESP packet. If we get one of these it means the logon process has failed. Set the session
  * state to be failed, and flag the end of login. Note: we don't throw exceptions on the input thread, but instead we
@@ -44,7 +44,6 @@ public class PagerLogoffResponse implements SinglePacketResponse {
 			YahooContact contact = new YahooContact(packetUser, YahooProtocol.YAHOO);
 			sessionContact.receivedContactLogoff(contact);
 		}
-
 	}
 
 	private void handleMyLogoff(YMSG9Packet packet) {
@@ -53,8 +52,7 @@ public class PagerLogoffResponse implements SinglePacketResponse {
 			long l = Long.parseLong(packet.getValue("66"));
 			try {
 				state = LogoutReason.getStatus(l);
-			}
-			catch (Exception e1) {
+			} catch (Exception e1) {
 				log.warn("AUTHRESP says: logged out without an unknown reason: " + l);
 			}
 		} else {
@@ -62,5 +60,4 @@ public class PagerLogoffResponse implements SinglePacketResponse {
 		}
 		sessionContext.receivedLogout(state);
 	}
-
 }

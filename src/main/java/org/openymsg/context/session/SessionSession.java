@@ -3,7 +3,6 @@ package org.openymsg.context.session;
 import org.openymsg.YahooStatus;
 
 public interface SessionSession {
-
 	/**
 	 * Logout of session
 	 */
@@ -33,5 +32,4 @@ public interface SessionSession {
 	 * @throws IllegalArgumentException
 	 */
 	void setCustomStatus(String message, boolean showBusyIcon) throws IllegalArgumentException;
-
 }

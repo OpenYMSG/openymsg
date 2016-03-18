@@ -10,5 +10,4 @@ public class SessionMailImpl implements SessionMail {
 		this.executor = executor;
 		this.executor.register(ServiceType.NEWMAIL, new NewMailResponse());
 	}
-
 }

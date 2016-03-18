@@ -5,7 +5,6 @@ public enum LogoutReason {
 	DUPLICATE_LOGIN1(42), // 42 - Account has signed in from another location
 	DUPLICATE_LOGIN2(99),
 	UNKNOWN_52(52); // don't know
-
 	private long value;
 
 	/**
@@ -37,12 +36,10 @@ public enum LogoutReason {
 				return all[i];
 			}
 		}
-
 		throw new IllegalArgumentException("No LogoutState matching long value '" + value + "'.");
 	}
 
 	public boolean isDuplicateLogin() {
 		return this == DUPLICATE_LOGIN1 || this == DUPLICATE_LOGIN2;
 	}
-
 }

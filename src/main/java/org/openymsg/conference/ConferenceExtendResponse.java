@@ -1,14 +1,14 @@
 package org.openymsg.conference;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.network.YMSG9Packet;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Process an incoming CONFADDINVITE packet. We get one of these when we are being invited to join someone else's
@@ -33,25 +33,19 @@ public class ConferenceExtendResponse extends AbstractConferenceResponse {
 		// final String[] invitedContactIds = packet.getValues("52");
 		final String[] otherInvitedUserIds = packet.getValues("51");
 		String conferenceId = packet.getValue("57");
-
 		YahooContact inviter = new YahooContact(from, YahooProtocol.YAHOO);
 		Set<YahooContact> invitedContacts = getContacts(otherInvitedUserIds);
 		// Set<YahooContact> invitedContacts = getContacts(invitedContactIds);
-
 		// final String[] memberContactId = packet.getValues("53");
 		// Set<YahooContact> memberContacts = getContacts(memberContactId);
 		// invitedUsers.addAll(otherInvitedUsers);
-
 		YahooConference conference = new YahooConference(conferenceId);
-
 		sessionConference.receivedConferenceExtend(conference, inviter, invitedContacts);
-
 		// if (to.equals(from)) {
 		// sessionConference
 		// .receivedConferenceInviteAck(conference, inviter, invitedContacts, memberContacts, message);
 		// } else {
 		// }
-
 		// Add the users
 		// yc.addUsers(invitedUserIds);
 		// yc.addUsers(currentUserIds);
@@ -77,5 +71,4 @@ public class ConferenceExtendResponse extends AbstractConferenceResponse {
 		}
 		return contacts;
 	}
-
 }

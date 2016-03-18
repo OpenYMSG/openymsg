@@ -11,8 +11,9 @@ public interface StatusMessage {
 
 	boolean is(YahooStatus status);
 
+	@Override
 	int hashCode();
 
+	@Override
 	boolean equals(Object obj);
-
 }

@@ -1,12 +1,12 @@
 package org.openymsg.message;
 
-import java.io.IOException;
-
 import org.openymsg.YahooContact;
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
+
+import java.io.IOException;
 
 /**
  * Message for sending a typing notification. In the future, gaming notifications are similar and my be handled.
@@ -61,5 +61,4 @@ public class TypingNotificationMessage implements Message {
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.NOTIFY;
 	}
-
 }

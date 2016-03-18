@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadFactory;
 
-//TODO can I just create one.
+// TODO can I just create one.
 public class NamedThreadFactory implements ThreadFactory {
 	// TODO, remove
 	private static final Map<String, Integer> NAMES = new HashMap<String, Integer>();

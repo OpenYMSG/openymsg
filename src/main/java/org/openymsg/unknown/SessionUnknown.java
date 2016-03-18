@@ -14,5 +14,4 @@ public class SessionUnknown {
 		this.reader = reader;
 		this.reader.register(ServiceType.UNKNOWN002, new Unknown002Response());
 	}
-
 }

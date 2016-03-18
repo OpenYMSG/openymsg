@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.openymsg.YahooConference;
@@ -169,7 +170,7 @@ public class SessionConferenceImplTest {
 
 	// TODO copied
 	private Message argThat(Message message, String... excludeFields) {
-		return (Message) Mockito.argThat(new ReflectionEquals(message, excludeFields));
+		return (Message) Matchers.argThat(new ReflectionEquals(message, excludeFields));
 	}
 
 	@Test

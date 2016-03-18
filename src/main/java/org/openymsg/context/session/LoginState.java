@@ -6,7 +6,6 @@ public enum LoginState {
 	LOGGING_OUT(false, false, true),
 	LOGGED_OUT_NORMAL(false, false, false),
 	LOGGED_OUT_FORCED(false, false, false);
-
 	private final boolean loggingIn;
 	private final boolean loggedIn;
 	private final boolean loggingOff;
@@ -37,5 +36,4 @@ public enum LoginState {
 	public boolean isLoggingOff() {
 		return loggingOff;
 	}
-
 }

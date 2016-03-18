@@ -1,9 +1,9 @@
 package org.openymsg.conference;
 
-import java.util.Set;
-
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
+
+import java.util.Set;
 
 /**
  * Conference Services for Yahoo. Not sure if the conferenceId can contain non-alphanumeric characters. Also unsure of
@@ -75,6 +75,5 @@ public interface SessionConference {
 	// * @return matching ConferenceStatus, null if not found.
 	// */
 	// YahooConferenceStatus getConferenceStatus(String conferenceId);
-
 	Set<YahooConference> getConferences();
 }

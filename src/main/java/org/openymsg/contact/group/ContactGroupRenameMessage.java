@@ -1,12 +1,12 @@
 package org.openymsg.contact.group;
 
-import java.io.IOException;
-
 import org.openymsg.YahooContactGroup;
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
+
+import java.io.IOException;
 
 /**
  * Transmit a GOTGROUPRENAME packet, to change the name of one of our friends groups.
@@ -44,10 +44,8 @@ public class ContactGroupRenameMessage implements Message {
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
 	}
-
 	// @Override
 	// public void messageProcessed() {
 	// //TODO change group name
 	// }
-
 }

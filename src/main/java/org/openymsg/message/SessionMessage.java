@@ -33,5 +33,4 @@ public interface SessionMessage {
 	 * @throws IllegalArgumentException if contact is null
 	 */
 	void sendTypingNotification(YahooContact contact, boolean isTyping) throws IllegalArgumentException;
-
 }

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 
-//TODO - to stream with the info
+// TODO - to stream with the info
 public class URLStreamStatus {
 	private int responseCode = -1;
 	private String responseMessage = null;

@@ -1,7 +1,5 @@
 package org.openymsg.contact.group;
 
-import java.io.IOException;
-
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 import org.openymsg.connection.write.Message;
@@ -9,13 +7,16 @@ import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
+import java.io.IOException;
+
 public class MoveContactToGroupMessage implements Message {
 	private String username;
 	private YahooContact contact;
 	private YahooContactGroup from;
 	private YahooContactGroup to;
 
-	public MoveContactToGroupMessage(String username, YahooContact contact, YahooContactGroup from, YahooContactGroup to) {
+	public MoveContactToGroupMessage(String username, YahooContact contact, YahooContactGroup from,
+			YahooContactGroup to) {
 		this.username = username;
 		this.contact = contact;
 		this.from = from;
@@ -46,5 +47,4 @@ public class MoveContactToGroupMessage implements Message {
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
 	}
-
 }

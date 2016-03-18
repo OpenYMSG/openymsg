@@ -6,5 +6,4 @@ public interface SocketLockChecker {
 	void finishWriting();
 
 	boolean isLocked(int duration);
-
 }

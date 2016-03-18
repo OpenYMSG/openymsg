@@ -5,7 +5,6 @@ package org.openymsg.context.auth;
  * @author neilhart
  */
 public interface SessionAuthentication {
-
 	/**
 	 * Log into Yahoo Messenger. This returns immediately. The response to the Login request will call the
 	 * SessionAuthenticationCallback with either authenticationSuccess() or
@@ -18,5 +17,4 @@ public interface SessionAuthentication {
 	void login(String username, String password) throws IllegalArgumentException;
 
 	AuthenticationFailure getFailureState();
-
 }

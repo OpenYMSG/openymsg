@@ -1,12 +1,12 @@
 package org.openymsg.message;
 
-import java.io.IOException;
-
 import org.openymsg.YahooContact;
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
+
+import java.io.IOException;
 
 /**
  * Send acknowledgement. If we don't do this then the official Yahoo Messenger client for Windows will send us the same
@@ -46,5 +46,4 @@ public class MessageAckMessage implements Message {
 		// TODO - is this correct or use current?
 		return MessageStatus.DEFAULT;
 	}
-
 }

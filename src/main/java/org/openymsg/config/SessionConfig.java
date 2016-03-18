@@ -1,9 +1,9 @@
 package org.openymsg.config;
 
-import java.io.UnsupportedEncodingException;
-
 import org.openymsg.network.ConnectionBuilder;
 import org.openymsg.network.url.URLStreamBuilder;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * Configuration for the communicating to Yahoo. Properties should be static once the Session has the instance. This

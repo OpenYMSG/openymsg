@@ -11,7 +11,6 @@ import org.openymsg.connection.ConnectionInfo;
  * @author neilhart
  */
 public interface ConnectionBuilder {
-
 	/**
 	 * Get the information of what was tried in connecting to Yahoo and what failed.
 	 * @return information about the connection
@@ -42,5 +41,4 @@ public interface ConnectionBuilder {
 	 * @return the connection or null if not successful
 	 */
 	ConnectionHandler build();
-
 }

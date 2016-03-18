@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.openymsg.connection.write.Message;
@@ -30,11 +31,11 @@ public class MessageAssert {
 	}
 
 	public static Message argThatMessage(Message message, String... excludeFields) {
-		return (Message) Mockito.argThat(new ReflectionEquals(message, excludeFields));
+		return (Message) Matchers.argThat(new ReflectionEquals(message, excludeFields));
 	}
 
 	public static Request argThatRequest(Request request, String... excludeFields) {
-		return (Request) Mockito.argThat(new ReflectionEquals(request, excludeFields));
+		return (Request) Matchers.argThat(new ReflectionEquals(request, excludeFields));
 	}
 
 	private static void check(String comparisonString, ServiceType serviceType) {

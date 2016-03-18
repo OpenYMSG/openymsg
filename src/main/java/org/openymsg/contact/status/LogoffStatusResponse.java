@@ -20,5 +20,4 @@ public class LogoffStatusResponse implements SinglePacketResponse {
 			this.singleStatusResponse.execute(packet);
 		}
 	}
-
 }

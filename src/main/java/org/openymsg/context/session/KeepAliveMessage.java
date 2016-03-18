@@ -1,11 +1,11 @@
 package org.openymsg.context.session;
 
-import java.io.IOException;
-
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
+
+import java.io.IOException;
 
 /**
  * Transmits a Keep-Alive packet to the Yahoo network. At the time of implementation, this packet gets sent by the
@@ -36,5 +36,4 @@ public class KeepAliveMessage implements Message {
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
 	}
-
 }

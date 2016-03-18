@@ -1,8 +1,8 @@
 package org.openymsg.contact.group;
 
-import java.util.Set;
-
 import org.openymsg.YahooContactGroup;
+
+import java.util.Set;
 
 public interface SessionGroup {
 	/**
@@ -23,8 +23,7 @@ public interface SessionGroup {
 	 * @param group existing group
 	 * @param newName new name
 	 * @throws IllegalArgumentException if either paramters are null, if group doesn't exist, if name matches an
-	 *             existing group
+	 *         existing group
 	 */
 	void renameGroup(YahooContactGroup group, String newName) throws IllegalArgumentException;
-
 }

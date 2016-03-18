@@ -1,20 +1,11 @@
 /*
- * OpenYMSG, an implementation of the Yahoo Instant Messaging and Chat protocol.
- * Copyright (C) 2007 G. der Kinderen, Nimbuzz.com 
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
+ * OpenYMSG, an implementation of the Yahoo Instant Messaging and Chat protocol. Copyright (C) 2007 G. der Kinderen,
+ * Nimbuzz.com This program is free software; you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+ * License for more details. You should have received a copy of the GNU General Public License along with this program;
+ * if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 package org.openymsg.legacy.network;
 
@@ -45,20 +36,22 @@ public abstract class ConnectionHandler {
 		String[] cookies = new String[3];
 		for (int i = 0; i < cookies.length; i++) {
 			String s = pkt.getNthValue("59", i);
-			if (s == null) break;
-			if (s.indexOf(";") >= 0) s = s.substring(0, s.indexOf(";"));
+			if (s == null)
+				break;
+			if (s.indexOf(";") >= 0)
+				s = s.substring(0, s.indexOf(";"));
 			switch (s.charAt(0)) {
-			case 'Y':
-				cookies[NetworkConstants.COOKIE_Y] = "Y=" + s.substring(2);
-				break;
-			case 'T':
-				cookies[NetworkConstants.COOKIE_T] = "T=" + s.substring(2);
-				break;
-			case 'C':
-				cookies[NetworkConstants.COOKIE_C] = "C=" + s.substring(2);
-				break;
-			default:
-				throw new IllegalStateException("Unknown cookie: " + s);
+				case 'Y':
+					cookies[NetworkConstants.COOKIE_Y] = "Y=" + s.substring(2);
+					break;
+				case 'T':
+					cookies[NetworkConstants.COOKIE_T] = "T=" + s.substring(2);
+					break;
+				case 'C':
+					cookies[NetworkConstants.COOKIE_C] = "C=" + s.substring(2);
+					break;
+				default:
+					throw new IllegalStateException("Unknown cookie: " + s);
 			}
 		}
 		return cookies;
@@ -70,5 +63,4 @@ public abstract class ConnectionHandler {
 	 * @return
 	 */
 	abstract boolean isLocked(int millisDuration);
-
 }

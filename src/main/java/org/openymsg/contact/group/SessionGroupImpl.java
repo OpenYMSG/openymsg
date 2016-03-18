@@ -1,12 +1,12 @@
 package org.openymsg.contact.group;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.openymsg.YahooContactGroup;
 import org.openymsg.connection.YahooConnection;
 import org.openymsg.util.CollectionUtils;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SessionGroupImpl implements SessionGroup, SessionGroupCallback {
 	private YahooConnection executor;
@@ -24,6 +24,7 @@ public class SessionGroupImpl implements SessionGroup, SessionGroupCallback {
 		this.username = username;
 	}
 
+	@Override
 	public void renameGroup(YahooContactGroup group, String newName) throws IllegalArgumentException {
 		if (group == null) {
 			throw new IllegalArgumentException("Group may not be null");
@@ -60,12 +61,10 @@ public class SessionGroupImpl implements SessionGroup, SessionGroupCallback {
 	@Override
 	public void addGroup(String groupName) throws IllegalArgumentException {
 		// TODO Auto-generated method stub
-
 	}
 
 	public boolean possibleRemoveGroup(ContactGroupImpl group) {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 }

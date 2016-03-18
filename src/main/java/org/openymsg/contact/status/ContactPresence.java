@@ -2,7 +2,6 @@ package org.openymsg.contact.status;
 
 public class ContactPresence {
 	public static final ContactPresence EMPTY = new ContactPresence(false, false);
-
 	protected final boolean onChat;
 	protected final boolean onPager;
 
@@ -26,12 +25,17 @@ public class ContactPresence {
 
 	@Override
 	public final boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (!(obj instanceof ContactPresence)) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof ContactPresence))
+			return false;
 		ContactPresence other = (ContactPresence) obj;
-		if (onChat != other.onChat) return false;
-		if (onPager != other.onPager) return false;
+		if (onChat != other.onChat)
+			return false;
+		if (onPager != other.onPager)
+			return false;
 		return true;
 	}
 
@@ -39,5 +43,4 @@ public class ContactPresence {
 	public String toString() {
 		return "ContactPresence [onChat=" + onChat + ", onPager=" + onPager + "]";
 	}
-
 }

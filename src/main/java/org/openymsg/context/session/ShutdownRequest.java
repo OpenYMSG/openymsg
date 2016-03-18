@@ -34,14 +34,18 @@ public class ShutdownRequest implements Request {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (!(obj instanceof ShutdownRequest)) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof ShutdownRequest))
+			return false;
 		ShutdownRequest other = (ShutdownRequest) obj;
 		if (connection == null) {
-			if (other.connection != null) return false;
-		} else if (!connection.equals(other.connection)) return false;
+			if (other.connection != null)
+				return false;
+		} else if (!connection.equals(other.connection))
+			return false;
 		return true;
 	}
-
 }

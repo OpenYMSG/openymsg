@@ -1,7 +1,5 @@
 package org.openymsg.contact;
 
-import java.util.Set;
-
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 import org.openymsg.YahooContactStatus;
@@ -13,7 +11,9 @@ import org.openymsg.contact.status.ContactStatusImpl;
 import org.openymsg.contact.status.SessionStatusImpl;
 import org.openymsg.network.ServiceType;
 
-//TODO verify, no status without a contact
+import java.util.Set;
+
+// TODO verify, no status without a contact
 public class SessionContactImpl implements SessionContact {
 	private SessionRosterImpl sessionRoster;
 	private SessionGroupImpl sessionGroup;
@@ -25,12 +25,11 @@ public class SessionContactImpl implements SessionContact {
 		sessionRoster = new SessionRosterImpl(executor, username, callback);
 		sessionGroup = new SessionGroupImpl(executor, username);
 		sessionStatus = new SessionStatusImpl(executor, callback);
-		this.executor.register(ServiceType.LIST_15, new ListOfContactsResponse(sessionRoster, sessionGroup,
-				sessionStatus));
+		this.executor.register(ServiceType.LIST_15,
+				new ListOfContactsResponse(sessionRoster, sessionGroup, sessionStatus));
 		this.executor.register(ServiceType.REMOVE_BUDDY, new ContactRemoveAckResponse(sessionRoster, sessionGroup));
-		this.executor.register(ServiceType.ADD_BUDDY, new ContactAddAckResponse(sessionRoster, sessionGroup,
-				sessionStatus));
-
+		this.executor.register(ServiceType.ADD_BUDDY,
+				new ContactAddAckResponse(sessionRoster, sessionGroup, sessionStatus));
 	}
 
 	@Override
@@ -86,5 +85,4 @@ public class SessionContactImpl implements SessionContact {
 	public void receivedContactLogoff(YahooContact contact) {
 		sessionStatus.statusUpdate(contact, new ContactStatusImpl(YahooStatus.OFFLINE, false, false));
 	}
-
 }

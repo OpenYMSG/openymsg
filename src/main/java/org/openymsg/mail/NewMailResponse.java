@@ -17,5 +17,4 @@ public class NewMailResponse implements SinglePacketResponse {
 		String count = packet.getValue("9");
 		log.info("new mail count: " + count);
 	}
-
 }

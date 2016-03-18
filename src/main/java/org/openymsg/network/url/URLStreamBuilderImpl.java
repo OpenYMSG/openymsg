@@ -1,5 +1,9 @@
 package org.openymsg.network.url;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openymsg.connection.TrustModifier;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -10,10 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openymsg.connection.TrustModifier;
 
 public class URLStreamBuilderImpl implements URLStreamBuilder {
 	/** logger */
@@ -52,8 +52,7 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 		URL u;
 		try {
 			u = new URL(url);
-		}
-		catch (MalformedURLException e) {
+		} catch (MalformedURLException e) {
 			log.warn("Failed opening url: " + url, e);
 			this.status.setMalformedURLException(e);
 			return null;
@@ -61,45 +60,36 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 		URLConnection uc = null;
 		try {
 			uc = u.openConnection();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			log.warn("Failed connection url: " + u, e);
 			this.status.setUrlConnectionException(e);
 			return null;
 		}
-
 		if (uc == null) {
 			log.warn("Failed connection url, returned null for: " + u);
 			// TODO add to status
 			return null;
 		}
-
 		if (cookie != null) {
 			uc.setRequestProperty("Cookie", cookie);
 		}
-
 		uc.setConnectTimeout(timeout);
 		uc.setReadTimeout(timeout);
-
 		if (uc instanceof HttpsURLConnection) {
 			HttpsURLConnection httpUc = (HttpsURLConnection) uc;
-
 			if (disableSSLCheck) {
 				try {
 					TrustModifier.relaxHostChecking(httpUc);
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					log.warn("Failed disabling ssl checking: " + u);
 				}
 			}
-
 			int responseCode = -1;
 			String responseMessage = null;
 			try {
 				responseCode = httpUc.getResponseCode();
 				responseMessage = httpUc.getResponseMessage();
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				log.warn("Failed reading responseCode and responseMessage", e);
 				this.status.setResponseException(e);
 				return null;
@@ -110,8 +100,7 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 				InputStream inputStream = null;
 				try {
 					inputStream = uc.getInputStream();
-				}
-				catch (IOException e) {
+				} catch (IOException e) {
 					this.status.setInputStreamException(e);
 					return null;
 				}

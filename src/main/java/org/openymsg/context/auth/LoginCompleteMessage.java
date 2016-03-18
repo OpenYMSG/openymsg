@@ -1,12 +1,12 @@
 package org.openymsg.context.auth;
 
-import java.io.IOException;
-
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
+
+import java.io.IOException;
 
 /**
  * Transmit an AUTHRESP packet, the second part of our login process. As we do not know our primary ID yet, both 0 and 1
@@ -59,5 +59,4 @@ public class LoginCompleteMessage implements Message {
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.WEBLOGIN;
 	}
-
 }

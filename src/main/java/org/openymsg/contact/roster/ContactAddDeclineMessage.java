@@ -1,12 +1,12 @@
 package org.openymsg.contact.roster;
 
-import java.io.IOException;
-
 import org.openymsg.YahooContact;
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
+
+import java.io.IOException;
 
 public class ContactAddDeclineMessage implements Message {
 	private final YahooContact contact;
@@ -29,8 +29,8 @@ public class ContactAddDeclineMessage implements Message {
 		body.addElement("13", "2");// Reject Authorization
 		body.addElement("97", "1");
 		// TODO if no message?
-		if (message != null) body.addElement("14", message);
-
+		if (message != null)
+			body.addElement("14", message);
 		return body;
 	}
 
@@ -43,5 +43,4 @@ public class ContactAddDeclineMessage implements Message {
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
 	}
-
 }

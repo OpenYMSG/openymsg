@@ -1,12 +1,12 @@
 package org.openymsg.contact.status;
 
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.connection.read.MultiplePacketResponse;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.YMSG9Packet;
+
+import java.util.List;
 
 /**
  * LOGON packets can contain multiple friend status sections, ISAWAY and ISBACK packets contain only one. Update the
@@ -38,5 +38,4 @@ public class ListOfStatusesResponse implements MultiplePacketResponse {
 	public boolean isFinished(long status) {
 		return status == MessageStatus.SERVER_ACK.getValue() || status == MessageStatus.DEFAULT.getValue();
 	}
-
 }

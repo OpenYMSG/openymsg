@@ -40,12 +40,15 @@ public abstract class AbstractStatusMessage implements StatusMessage {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (!(obj instanceof AbstractStatusMessage)) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof AbstractStatusMessage))
+			return false;
 		AbstractStatusMessage other = (AbstractStatusMessage) obj;
-		if (status != other.status) return false;
+		if (status != other.status)
+			return false;
 		return true;
 	}
-
 }

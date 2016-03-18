@@ -1,7 +1,5 @@
 package org.openymsg;
 
-import java.util.Set;
-
 import org.openymsg.conference.SessionConference;
 import org.openymsg.conference.SessionConferenceImpl;
 import org.openymsg.config.SessionConfig;
@@ -20,6 +18,8 @@ import org.openymsg.message.SessionMessage;
 import org.openymsg.message.SessionMessageImpl;
 import org.openymsg.network.ServiceType;
 import org.openymsg.unknown.SessionUnknown;
+
+import java.util.Set;
 
 public class SessionImpl implements YahooSession {
 	private SessionConfig config;
@@ -74,7 +74,6 @@ public class SessionImpl implements YahooSession {
 			// TODO - nah - log this or send exception("Session in wrong state: " + state);
 		}
 		context.logout();
-
 		// no event from yahoo anymore
 		state = YahooSessionState.LOGGED_OUT;
 	}
@@ -128,8 +127,8 @@ public class SessionImpl implements YahooSession {
 	}
 
 	@Override
-	public void sendConferenceMessage(YahooConference conference, String message) throws IllegalArgumentException,
-			IllegalStateException {
+	public void sendConferenceMessage(YahooConference conference, String message)
+			throws IllegalArgumentException, IllegalStateException {
 		if (!state.isAvailable()) {
 			throw new IllegalStateException("Session in wrong state: " + state);
 		}
@@ -145,8 +144,8 @@ public class SessionImpl implements YahooSession {
 	}
 
 	@Override
-	public void acceptConferenceInvite(YahooConference conference) throws IllegalArgumentException,
-			IllegalStateException {
+	public void acceptConferenceInvite(YahooConference conference)
+			throws IllegalArgumentException, IllegalStateException {
 		if (!state.isAvailable()) {
 			throw new IllegalStateException("Session in wrong state: " + state);
 		}
@@ -154,8 +153,8 @@ public class SessionImpl implements YahooSession {
 	}
 
 	@Override
-	public void declineConferenceInvite(YahooConference conference, String message) throws IllegalArgumentException,
-			IllegalStateException {
+	public void declineConferenceInvite(YahooConference conference, String message)
+			throws IllegalArgumentException, IllegalStateException {
 		if (!state.isAvailable()) {
 			throw new IllegalStateException("Session in wrong state: " + state);
 		}
@@ -321,5 +320,4 @@ public class SessionImpl implements YahooSession {
 	public void keepAlive() {
 		context.keepAlive();
 	}
-
 }

@@ -10,7 +10,6 @@ import java.util.Set;
  * @author neilhart
  */
 public class CollectionUtils {
-
 	/**
 	 * Return a protected Set. The Set is not modifiable and will provide a thread-safe iterator if the underlying set
 	 * changes. If the underlying Set changes, those changes will not go into the protected Set.
@@ -25,5 +24,4 @@ public class CollectionUtils {
 	public static <T> Set<T> unmodifiableSet(Set<? extends T> set) {
 		return Collections.unmodifiableSet(set);
 	}
-
 }

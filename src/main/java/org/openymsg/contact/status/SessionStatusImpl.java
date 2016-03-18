@@ -1,15 +1,15 @@
 package org.openymsg.contact.status;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactStatus;
 import org.openymsg.connection.YahooConnection;
 import org.openymsg.network.ServiceType;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Handles several kinds of status messages. Status15 - single messages for Yahoo 9 users logging in and out/invisible
@@ -31,6 +31,7 @@ public class SessionStatusImpl implements SessionStatus, SessionStatusCallback {
 		this.executor.register(ServiceType.Y6_STATUS_UPDATE, singleStatusResponse);
 	}
 
+	@Override
 	public YahooContactStatus getStatus(YahooContact contact) {
 		return this.statuses.get(contact);
 	}
@@ -68,11 +69,9 @@ public class SessionStatusImpl implements SessionStatus, SessionStatusCallback {
 		for (YahooContact contact : usersOnPendingList) {
 			this.statuses.put(contact, status);
 			this.callback.statusUpdate(contact, status);
-
 		}
 		// for (Contact contact : usersOnPendingList) {
 		// System.err.println("pending:" + contactImpl.getId() + "/" + contactImpl.getProtocol());
 		// }
 	}
-
 }

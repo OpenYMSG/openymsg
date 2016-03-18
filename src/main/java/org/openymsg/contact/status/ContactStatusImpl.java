@@ -3,16 +3,14 @@ package org.openymsg.contact.status;
 import org.openymsg.YahooContactStatus;
 import org.openymsg.YahooStatus;
 
-//TODO handle stealthBlocked and stealth mode
+// TODO handle stealthBlocked and stealth mode
 public class ContactStatusImpl implements YahooContactStatus {
-	public static final YahooContactStatus PENDING = new ContactStatusImpl(new PendingStatusMessage(),
-			ContactPresence.EMPTY, 0L);
+	public static final YahooContactStatus PENDING =
+			new ContactStatusImpl(new PendingStatusMessage(), ContactPresence.EMPTY, 0L);
 	/** The status message a user (away, available, etc). */
 	private final StatusMessage status;
-
 	/** The presence of a user */
 	private final ContactPresence presence;
-
 	/** The amount of seconds that the user has been idle (or -1 if the idle time is unknown). */
 	private final Long idleTime;
 
@@ -63,20 +61,28 @@ public class ContactStatusImpl implements YahooContactStatus {
 
 	@Override
 	public final boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (!(obj instanceof ContactStatusImpl)) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof ContactStatusImpl))
+			return false;
 		ContactStatusImpl other = (ContactStatusImpl) obj;
 		if (idleTime == null) {
-			if (other.idleTime != null) return false;
-		} else if (!idleTime.equals(other.idleTime)) return false;
+			if (other.idleTime != null)
+				return false;
+		} else if (!idleTime.equals(other.idleTime))
+			return false;
 		if (presence == null) {
-			if (other.presence != null) return false;
-		} else if (!presence.equals(other.presence)) return false;
+			if (other.presence != null)
+				return false;
+		} else if (!presence.equals(other.presence))
+			return false;
 		if (status == null) {
-			if (other.status != null) return false;
-		} else if (!status.equals(other.status)) return false;
+			if (other.status != null)
+				return false;
+		} else if (!status.equals(other.status))
+			return false;
 		return true;
 	}
-
 }

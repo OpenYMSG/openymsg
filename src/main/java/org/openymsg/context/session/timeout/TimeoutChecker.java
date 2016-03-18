@@ -31,5 +31,4 @@ public class TimeoutChecker implements Request {
 	public void failure(Exception ex) {
 		log.warn("Failure", ex);
 	}
-
 }

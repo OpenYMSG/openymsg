@@ -29,7 +29,6 @@ public enum ConnectionState {
 	 * Failed after connected
 	 */
 	FAILED_AFTER_CONNECTED(false, false);
-
 	private boolean connected;
 	private boolean startable;
 
@@ -45,5 +44,4 @@ public enum ConnectionState {
 	public boolean isStartable() {
 		return startable;
 	}
-
 }

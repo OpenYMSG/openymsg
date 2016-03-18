@@ -45,5 +45,4 @@ public class TimeoutCheckerShutdownStrategy implements TimeoutCheckerStrategy {
 			executor.execute(new ShutdownRequest(connection));
 		}
 	}
-
 }

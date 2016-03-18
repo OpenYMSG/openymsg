@@ -1,22 +1,16 @@
 /*
- * OpenYMSG, an implementation of the Yahoo Instant Messaging and Chat protocol.
- * Copyright (C) 2007 G. der Kinderen, Nimbuzz.com 
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
+ * OpenYMSG, an implementation of the Yahoo Instant Messaging and Chat protocol. Copyright (C) 2007 G. der Kinderen,
+ * Nimbuzz.com This program is free software; you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+ * License for more details. You should have received a copy of the GNU General Public License along with this program;
+ * if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 package org.openymsg.legacy.network;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -28,9 +22,6 @@ import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Queue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
@@ -38,33 +29,20 @@ import org.apache.commons.logging.LogFactory;
 public class HTTPConnectionHandler extends ConnectionHandler {
 	private static final Log log = LogFactory.getLog(HTTPConnectionHandler.class);
 	private final static long IDLE_TIMEOUT = 30 * 1000;
-
-	private static final String HTTP_HEADER_POST = "POST http://" + Util.httpHost() + "/notify HTTP/1.0"
-			+ NetworkConstants.END;
-
+	private static final String HTTP_HEADER_POST =
+			"POST http://" + Util.httpHost() + "/notify HTTP/1.0" + NetworkConstants.END;
 	private static final String HTTP_HEADER_AGENT = "User-Agent: " + NetworkConstants.USER_AGENT + NetworkConstants.END;
-
 	private static final String HTTP_HEADER_HOST = "Host: " + Util.httpHost() + NetworkConstants.END;
-
-	private static final String HTTP_HEADER_PROXY_AUTH = "Proxy-Authorization: " + Util.httpProxyAuth()
-			+ NetworkConstants.END;
-
+	private static final String HTTP_HEADER_PROXY_AUTH =
+			"Proxy-Authorization: " + Util.httpProxyAuth() + NetworkConstants.END;
 	private Session session; // Associated session object
-
 	private String proxyHost; // HTTP proxy host name
-
 	private int proxyPort; // HTTP proxy post
-
 	private long lastFetch; // Time of last packet fetch
-
 	private final Queue<YMSG9Packet> packets; // Incoming packet queue
-
 	private boolean connected = false; // Sending/receiving data?
-
 	private String cookie = null; // HTTP cookie field
-
 	private long identifier = 0; // Some kind of id, from LOGON incoming
-
 	private Notifier notifierThread; // Send IDLE packets on timeout
 
 	/**
@@ -87,10 +65,8 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 		}
 		this.proxyHost = proxyHost;
 		this.proxyPort = proxyPort;
-
 		packets = new LinkedList<YMSG9Packet>();
 		connected = false;
-
 		// Names are prefixed with "http." for 1.3 and after
 		Properties p = System.getProperties();
 		p.put(NetworkConstants.PROXY_HOST_OLD, this.proxyHost);
@@ -98,7 +74,6 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 		p.put(NetworkConstants.PROXY_PORT_OLD, this.proxyPort + "");
 		p.put(NetworkConstants.PROXY_PORT, this.proxyPort + "");
 		p.put(NetworkConstants.PROXY_SET, "true");
-
 		// Expand list to item|item|... , then store
 		if (blacklist != null) {
 			StringBuffer sb = new StringBuffer();
@@ -106,7 +81,6 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 				sb.append(host).append('|');
 			}
 			sb.setLength(sb.length() - 1);
-
 			System.getProperties().put(NetworkConstants.PROXY_NON, sb.toString());
 		}
 	}
@@ -151,7 +125,8 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 		connected = true;
 		synchronized (this) // In case two threads call open()
 		{
-			if (notifierThread == null) notifierThread = new Notifier("HTTP Notifier");
+			if (notifierThread == null)
+				notifierThread = new Notifier("HTTP Notifier");
 		}
 	}
 
@@ -179,22 +154,23 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 	@Override
 	synchronized void sendPacket(PacketBodyBuffer body, ServiceType service, long status, long sessionID)
 			throws IOException, IllegalStateException {
-		if (!connected) throw new IllegalStateException("Not logged in");
-
-		if (filterOutput(body, service)) return;
+		if (!connected)
+			throw new IllegalStateException("Not logged in");
+		if (filterOutput(body, service))
+			return;
 		byte[] b = body.getBuffer();
-
 		Socket soc = new Socket(proxyHost, proxyPort);
 		PushbackInputStream pbis = new PushbackInputStream(soc.getInputStream());
 		DataOutputStream dos = new DataOutputStream(soc.getOutputStream());
-
 		// HTTP header
 		dos.writeBytes(HTTP_HEADER_POST);
 		dos.writeBytes("Content-length: " + (b.length + NetworkConstants.YMSG9_HEADER_SIZE) + NetworkConstants.END);
 		dos.writeBytes(HTTP_HEADER_AGENT);
 		dos.writeBytes(HTTP_HEADER_HOST);
-		if (HTTP_HEADER_PROXY_AUTH != null) dos.writeBytes(HTTP_HEADER_PROXY_AUTH);
-		if (cookie != null) dos.writeBytes("Cookie: " + cookie + NetworkConstants.END);
+		if (HTTP_HEADER_PROXY_AUTH != null)
+			dos.writeBytes(HTTP_HEADER_PROXY_AUTH);
+		if (cookie != null)
+			dos.writeBytes("Cookie: " + cookie + NetworkConstants.END);
 		dos.writeBytes(NetworkConstants.END);
 		// YMSG9 header
 		dos.write(NetworkConstants.MAGIC, 0, 4);
@@ -206,7 +182,6 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 		// YMSG9 body
 		dos.write(b, 0, b.length);
 		dos.flush();
-
 		// HTTP response header
 		String s = readLine(pbis);
 		if (s == null || s.indexOf(" 200 ") < 0) // Not "HTTP/1.0 200 OK"
@@ -234,9 +209,7 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 				}
 			}
 		}
-
 		soc.close();
-
 		// Reset idle timeout
 		lastFetch = System.currentTimeMillis();
 	}
@@ -251,7 +224,8 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 		}
 		// Check next character
 		int c2 = pbis.read();
-		if ((c == '\n' && c2 != '\r') || (c == '\r' && c2 != '\n')) pbis.unread(c2);
+		if ((c == '\n' && c2 != '\r') || (c == '\r' && c2 != '\n'))
+			pbis.unread(c2);
 		return sb.toString();
 	}
 
@@ -260,19 +234,20 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 	 */
 	@Override
 	YMSG9Packet receivePacket() throws IOException {
-		if (!connected) throw new IllegalStateException("Not logged in");
+		if (!connected)
+			throw new IllegalStateException("Not logged in");
 		while (true) {
 			synchronized (this) {
 				if (packets.size() > 0) {
 					Object o = packets.poll();
-					if (o instanceof IOException) throw (IOException) o;
+					if (o instanceof IOException)
+						throw (IOException) o;
 					return (YMSG9Packet) o;
 				}
 			}
 			try {
 				Thread.sleep(100);
-			}
-			catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				// ignore
 			}
 		}
@@ -281,7 +256,6 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 	/**
 	 * ConnectionHandler methods end
 	 */
-
 	/**
 	 * Sometimes packets need to be altered, either going in or out. Typically this is about reading or adding extra
 	 * HTTP specific content which Yahoo uses. These methods are called to perform the necessary manipulations. Returns
@@ -289,43 +263,45 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 	 * @throws IOException
 	 * @throws UnsupportedEncodingException
 	 */
-	private boolean filterOutput(PacketBodyBuffer body, ServiceType service) throws UnsupportedEncodingException,
-			IOException {
+	private boolean filterOutput(PacketBodyBuffer body, ServiceType service)
+			throws UnsupportedEncodingException, IOException {
 		switch (service) {
-		case ISBACK:
-		case LOGOFF:
-			// Do not send ISBACK or LOGOFF
-			return true;
-		default:
-			break;
+			case ISBACK:
+			case LOGOFF:
+				// Do not send ISBACK or LOGOFF
+				return true;
+			default:
+				break;
 		}
-		if (identifier > 0) body.addElement("24", identifier + "");
+		if (identifier > 0)
+			body.addElement("24", identifier + "");
 		return false;
 	}
 
 	private boolean filterInput(YMSG9Packet pkt) {
 		switch (pkt.service) {
-		case LIST:
-			// Remember cookie and send it in subsequent packets
-			String[] cookieArr = extractCookies(pkt);
-			cookie = cookieArr[NetworkConstants.COOKIE_Y] + "; " + cookieArr[NetworkConstants.COOKIE_T];
-			break;
-		case LOGON:
-			// Remember the 24 tag and send it in subsequent packets
-			identifier = Long.parseLong(pkt.getValue("24"));
-			break;
-		case MESSAGE:
-			// When sending a message we often get a 0x06 packet back, empty
-			// or containing the status tag (66) of friend we messaged.
-			if (pkt.getValue("14") == null) {
-				if (pkt.getValue("10") != null)
-					pkt.service = ServiceType.ISBACK;
-				else if (pkt.body.length == 0) return true;
-			}
-			break;
-		default:
-			// do nothing
-			break;
+			case LIST:
+				// Remember cookie and send it in subsequent packets
+				String[] cookieArr = extractCookies(pkt);
+				cookie = cookieArr[NetworkConstants.COOKIE_Y] + "; " + cookieArr[NetworkConstants.COOKIE_T];
+				break;
+			case LOGON:
+				// Remember the 24 tag and send it in subsequent packets
+				identifier = Long.parseLong(pkt.getValue("24"));
+				break;
+			case MESSAGE:
+				// When sending a message we often get a 0x06 packet back, empty
+				// or containing the status tag (66) of friend we messaged.
+				if (pkt.getValue("14") == null) {
+					if (pkt.getValue("10") != null)
+						pkt.service = ServiceType.ISBACK;
+					else if (pkt.body.length == 0)
+						return true;
+				}
+				break;
+			default:
+				// do nothing
+				break;
 		}
 		return false;
 	}
@@ -354,8 +330,7 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 			while (!quitFlag) {
 				try {
 					Thread.sleep(1000);
-				}
-				catch (InterruptedException e) {
+				} catch (InterruptedException e) {
 					// ignore
 				}
 				long t = System.currentTimeMillis();
@@ -363,8 +338,7 @@ public class HTTPConnectionHandler extends ConnectionHandler {
 						&& session.getSessionStatus() == SessionState.LOGGED_ON) {
 					try {
 						session.transmitIdle();
-					}
-					catch (IOException e) {
+					} catch (IOException e) {
 						log.error(e, e);
 					}
 				}

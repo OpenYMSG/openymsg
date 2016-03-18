@@ -7,9 +7,7 @@ public enum YahooSessionState {
 	LOGGED_IN(),
 	LOGGED_OUT(),
 	FAILURE();
-
-	private YahooSessionState() {
-	}
+	private YahooSessionState() {}
 
 	public boolean isReadyToStart() {
 		return this != STARTED && this != CONNECTED && this != LOGGED_IN;

@@ -1,9 +1,9 @@
 package org.openymsg.connection.write;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.openymsg.execute.dispatch.Dispatcher;
 import org.openymsg.network.ConnectionHandler;
+
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class PacketWriterImpl implements PacketWriter {
 	private Dispatcher executor = null;
@@ -35,5 +35,4 @@ public class PacketWriterImpl implements PacketWriter {
 		this.writer.finished();
 		this.queue.clear();
 	}
-
 }

@@ -6,8 +6,7 @@ public class ChalllengeRespondBuilder {
 	private ChallengeResponseStrategy strategy = null;
 	private String challenge;
 
-	public ChalllengeRespondBuilder() {
-	}
+	public ChalllengeRespondBuilder() {}
 
 	public ChalllengeRespondBuilder challenge(String challenge) {
 		this.challenge = challenge;
@@ -22,5 +21,4 @@ public class ChalllengeRespondBuilder {
 	public String build() throws NoSuchAlgorithmException {
 		return this.strategy.getStrings(challenge);
 	}
-
 }

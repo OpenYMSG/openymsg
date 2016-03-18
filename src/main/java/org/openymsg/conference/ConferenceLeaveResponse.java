@@ -10,7 +10,6 @@ import org.openymsg.network.YMSG9Packet;
  * our invite.
  */
 public class ConferenceLeaveResponse extends AbstractConferenceResponse {
-
 	public ConferenceLeaveResponse(SessionConferenceImpl sessionConference) {
 		super(sessionConference);
 	}
@@ -28,7 +27,6 @@ public class ConferenceLeaveResponse extends AbstractConferenceResponse {
 		YahooConference conference = this.getConference(packet);
 		YahooContact contact = new YahooContact(from, YahooProtocol.YAHOO); // TODO protocol
 		sessionConference.receivedConferenceLeft(conference, contact);
-
 		// if (!yc.isClosed()) // Should never be closed!
 	}
 }

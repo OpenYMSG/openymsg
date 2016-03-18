@@ -1,9 +1,5 @@
 package org.openymsg.conference;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooConference;
@@ -11,6 +7,10 @@ import org.openymsg.YahooContact;
 import org.openymsg.connection.YahooConnection;
 import org.openymsg.network.ServiceType;
 import org.openymsg.util.CollectionUtils;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionConferenceImpl implements SessionConference {
 	/** logger */
@@ -21,7 +21,8 @@ public class SessionConferenceImpl implements SessionConference {
 	private Map<String, YahooConference> conferences = new ConcurrentHashMap<String, YahooConference>();
 	// private Map<String, YahooConferenceStatus> conferenceStatuses = new ConcurrentHashMap<String,
 	// YahooConferenceStatus>();
-	private Map<String, ConferenceMembershipImpl> conferenceMemberships = new ConcurrentHashMap<String, ConferenceMembershipImpl>();
+	private Map<String, ConferenceMembershipImpl> conferenceMemberships =
+			new ConcurrentHashMap<String, ConferenceMembershipImpl>();
 
 	public SessionConferenceImpl(String username, YahooConnection executor, SessionConferenceCallback callback)
 			throws IllegalArgumentException {
@@ -133,7 +134,6 @@ public class SessionConferenceImpl implements SessionConference {
 		if (contacts == null) {
 			throw new IllegalArgumentException("Contact cannot be null");
 		}
-
 		// final String id = username;
 		// if (primaryID.getId().equals(id) || loginID.getId().equals(id) || identities.containsKey(id)) {
 		// throw new IllegalIdentityException(id + " is an identity of this session and cannot be used here");
@@ -256,5 +256,4 @@ public class SessionConferenceImpl implements SessionConference {
 		membership.addLeft(contact);
 		callback.receivedConferenceLeft(conference, contact);
 	}
-
 }

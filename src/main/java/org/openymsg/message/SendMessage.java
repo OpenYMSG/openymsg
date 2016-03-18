@@ -1,12 +1,12 @@
 package org.openymsg.message;
 
-import java.io.IOException;
-
 import org.openymsg.YahooContact;
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
+
+import java.io.IOException;
 
 /**
  * Transmit a MESSAGE packet. * Doesn't support Doodling on whiteboard, whatever that is. imvironment is ":0"
@@ -57,9 +57,9 @@ public class SendMessage implements Message {
 	 */
 	public final boolean isUtf8(String s) {
 		for (int i = 0; i < s.length(); i++) {
-			if (s.charAt(i) > 0x7f) return true;
+			if (s.charAt(i) > 0x7f)
+				return true;
 		}
 		return false;
 	}
-
 }

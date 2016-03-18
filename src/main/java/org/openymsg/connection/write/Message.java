@@ -1,10 +1,10 @@
 package org.openymsg.connection.write;
 
-import java.io.IOException;
-
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
+
+import java.io.IOException;
 
 /**
  * Message used by the connection writer to build a Yahoo packet.
@@ -27,5 +27,4 @@ public interface Message {
 	 * @return message status
 	 */
 	MessageStatus getMessageStatus();
-
 }

@@ -1,9 +1,5 @@
 package org.openymsg.context.auth;
 
-import java.io.ByteArrayOutputStream;
-import java.util.List;
-import java.util.StringTokenizer;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.config.SessionConfig;
@@ -11,6 +7,10 @@ import org.openymsg.execute.dispatch.Request;
 import org.openymsg.network.url.URLStream;
 import org.openymsg.network.url.URLStreamBuilder;
 import org.openymsg.network.url.URLStreamStatus;
+
+import java.io.ByteArrayOutputStream;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Open a HTTP connection with a login URL with a generated token and retrieve some cookies and a crumb.
@@ -37,27 +37,22 @@ public class PasswordTokenLoginRequest implements Request {
 
 	private void yahooAuth16Stage2(String ymsgr) {
 		String loginLink = config.getPasswordTokenLoginUrl(ymsgr);
-
 		URLStreamBuilder builder = config.getURLStreamBuilder().url(loginLink).timeout(config.getConnectionTimeout())
 				.disableSSLCheck(config.isSSLCheckDisabled());
 		URLStream stream = builder.build();
 		URLStreamStatus status = builder.getStatus();
 		ByteArrayOutputStream out = stream.getOutputStream();
-
 		if (!status.isCorrect()) {
 			log.warn("Failed retrieving response for url: " + loginLink);
 			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE2);
 			return;
 		}
-
 		int responseNo = -1;
 		String crumb = null;
 		String cookieY = null;
 		String cookieT = null;
-
 		String response = out.toString();
 		log.info("response: " + response);
-
 		// TODO handle cookieB
 		List<String> cookies = stream.getHeaders().get("Set-Cookie");
 		log.info("cookies: " + cookies);
@@ -71,7 +66,6 @@ public class PasswordTokenLoginRequest implements Request {
 				}
 			}
 		}
-
 		// StringTokenizer
 		StringTokenizer toks = new StringTokenizer(response, "\r\n");
 		if (toks.countTokens() <= 0) {
@@ -79,16 +73,13 @@ public class PasswordTokenLoginRequest implements Request {
 			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE2);
 			return;
 		}
-
 		try {
 			responseNo = Integer.valueOf(toks.nextToken());
-		}
-		catch (NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			log.warn("Login Failed, wrong response in stage 2:");
 			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE2);
 			return;
 		}
-
 		if (responseNo != 0 || !toks.hasMoreTokens()) {
 			if (responseNo == 100) {
 				sessionAuthorize.setFailureState(AuthenticationFailure.TWO_FACTOR_AUTHENTICATION);
@@ -99,7 +90,6 @@ public class PasswordTokenLoginRequest implements Request {
 			log.warn("Login Failed, Unkown error");
 			return;
 		}
-
 		while (toks.hasMoreTokens()) {
 			String t = toks.nextToken();
 			if (t.startsWith("crumb=")) {
@@ -110,13 +100,11 @@ public class PasswordTokenLoginRequest implements Request {
 				cookieT = t.replaceAll("T=", "");
 			}
 		}
-
 		if (crumb == null || cookieT == null || cookieY == null) {
 			sessionAuthorize.setFailureState(AuthenticationFailure.STAGE2);
 			log.warn("Login Failed, Unkown error");
 			return;
 		}
-
 		token.setCookiesAndCrumb(cookieY, cookieT, crumb, cookieB);
 		this.sessionAuthorize.receivedPasswordTokenLogin();
 	}
@@ -126,5 +114,4 @@ public class PasswordTokenLoginRequest implements Request {
 		log.error("Failed token login", ex);
 		sessionAuthorize.setFailureState(AuthenticationFailure.STAGE2);
 	}
-
 }

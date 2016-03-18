@@ -45,7 +45,6 @@ public class TypingNotificationResponse implements SinglePacketResponse {
 		String message = packet.getValue("14"); // message (game)
 		String type = packet.getValue("49"); // type (typing/game)
 		String mode = packet.getValue("13"); // mode (on/off)
-
 		boolean isTyping = false;
 		if ("0".equals(mode)) {
 			isTyping = false;
@@ -54,7 +53,6 @@ public class TypingNotificationResponse implements SinglePacketResponse {
 		} else {
 			log.warn("mode not found: " + mode);
 		}
-
 		YahooContact contact = new YahooContact(from, YahooProtocol.YAHOO);
 		if (NOTIFY_TYPING.equalsIgnoreCase(type)) {
 			this.session.receivedTypingNotification(contact, isTyping);
@@ -64,5 +62,4 @@ public class TypingNotificationResponse implements SinglePacketResponse {
 			log.warn("Not handling notify with: " + type);
 		}
 	}
-
 }

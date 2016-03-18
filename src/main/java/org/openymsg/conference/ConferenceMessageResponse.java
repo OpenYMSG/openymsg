@@ -10,7 +10,6 @@ import org.openymsg.network.YMSG9Packet;
  * Note: in extreme circumstances this may arrive before the invite packet.
  */
 public class ConferenceMessageResponse extends AbstractConferenceResponse {
-
 	public ConferenceMessageResponse(SessionConferenceImpl sessionConference) {
 		super(sessionConference);
 	}
@@ -47,5 +46,4 @@ public class ConferenceMessageResponse extends AbstractConferenceResponse {
 		// throw new YMSG9BadFormatException("conference mesg", pkt, e);
 		// }
 	}
-
 }

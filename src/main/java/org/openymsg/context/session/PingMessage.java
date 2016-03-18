@@ -9,7 +9,6 @@ import org.openymsg.network.ServiceType;
  * Transmit a PING packet. Needed every hour to keep from getting knocked off by LOGGOFF 52
  */
 public class PingMessage implements Message {
-
 	@Override
 	public PacketBodyBuffer getBody() {
 		PacketBodyBuffer body = new PacketBodyBuffer();
@@ -25,5 +24,4 @@ public class PingMessage implements Message {
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
 	}
-
 }

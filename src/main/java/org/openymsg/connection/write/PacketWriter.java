@@ -4,5 +4,4 @@ public interface PacketWriter {
 	void execute(Message message);
 
 	void shutdown();
-
 }

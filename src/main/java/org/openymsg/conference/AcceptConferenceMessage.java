@@ -1,17 +1,16 @@
 package org.openymsg.conference;
 
-import java.io.IOException;
-
 import org.openymsg.YahooConference;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
+import java.io.IOException;
+
 /**
  * Transmit an CONFLOGON packet. Send this when we want to accept an offer to join a conference.
  */
 public class AcceptConferenceMessage extends AbstractConferenceMessage {
-
 	public AcceptConferenceMessage(String username, YahooConference conference, ConferenceMembership membership) {
 		super(username, conference, membership);
 	}
@@ -34,5 +33,4 @@ public class AcceptConferenceMessage extends AbstractConferenceMessage {
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
 	}
-
 }

@@ -37,5 +37,4 @@ public class ScheduledMessageSender implements Request {
 	public void failure(Exception ex) {
 		log.warn("Exception processing the message: " + message, ex);
 	}
-
 }

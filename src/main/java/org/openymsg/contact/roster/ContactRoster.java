@@ -1,12 +1,12 @@
 package org.openymsg.contact.roster;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooContact;
 import org.openymsg.util.CollectionUtils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Roster of contacts. This keeps a list of contacts given all of the different actions from both the user and yahoo.
@@ -98,5 +98,4 @@ public class ContactRoster {
 	public synchronized Set<YahooContact> getContacts() {
 		return CollectionUtils.protectedSet(this.contacts);
 	}
-
 }

@@ -1,22 +1,17 @@
 /*
- * OpenYMSG, an implementation of the Yahoo Instant Messaging and Chat protocol.
- * Copyright (C) 2007 G. der Kinderen, Nimbuzz.com 
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
+ * OpenYMSG, an implementation of the Yahoo Instant Messaging and Chat protocol. Copyright (C) 2007 G. der Kinderen,
+ * Nimbuzz.com This program is free software; you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+ * License for more details. You should have received a copy of the GNU General Public License along with this program;
+ * if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 package org.openymsg.legacy.network;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openymsg.legacy.network.task.GetConnectionServer;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -24,31 +19,19 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openymsg.legacy.network.task.GetConnectionServer;
-
 /**
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
 public class DirectConnectionHandler extends ConnectionHandler {
 	private String host; // Yahoo IM host
-
 	private int port; // Yahoo IM port
-
 	private boolean dontUseFallbacks = false; // Don't use fallback port
-
 	private Socket socket; // Network connection
-
 	private YMSG9InputStream ips; // For receiving messages
-
 	private DataOutputStream ops; // For sending messages
-
 	private Integer socketSize;
-
 	private static final Log log = LogFactory.getLog(DirectConnectionHandler.class);
-
 	private long lastWriteTimestamp = 0;
 
 	public DirectConnectionHandler(String h, int p, Integer socketSize) {
@@ -86,7 +69,6 @@ public class DirectConnectionHandler extends ConnectionHandler {
 		if (lastWriteTimestampCopy == 0) {
 			return false;
 		}
-
 		return System.currentTimeMillis() > lastWriteTimestampCopy + millisDuration;
 	}
 
@@ -127,23 +109,24 @@ public class DirectConnectionHandler extends ConnectionHandler {
 				try {
 					socket = new Socket(host, fallbackPorts[i]);
 					port = fallbackPorts[i];
-				}
-				catch (SocketException e) {
+				} catch (SocketException e) {
 					socket = null;
 					i++;
-					if (i >= fallbackPorts.length) throw e;
+					if (i >= fallbackPorts.length)
+						throw e;
 				}
 			}
 		}
-		log.debug("Source socket: " + socket.getLocalSocketAddress() + " yahoo socket: " + socket.getInetAddress()
-				+ ":" + this.socket.getPort());
+		log.debug("Source socket: " + socket.getLocalSocketAddress() + " yahoo socket: " + socket.getInetAddress() + ":"
+				+ this.socket.getPort());
 		ips = new YMSG9InputStream(socket.getInputStream());
 		ops = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 	}
 
 	@Override
 	void close() throws IOException {
-		if (socket != null) socket.close();
+		if (socket != null)
+			socket.close();
 		socket = null;
 		ips = null;
 		ops = null;
@@ -179,8 +162,7 @@ public class DirectConnectionHandler extends ConnectionHandler {
 				ops.write(b, 0, b.length);
 				// Now send the buffer
 				ops.flush();
-			}
-			finally {
+			} finally {
 				this.lastWriteTimestamp = 0;
 			}
 		}
@@ -207,10 +189,8 @@ public class DirectConnectionHandler extends ConnectionHandler {
 		this.host = host;
 		try {
 			close();
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			// silently fail;
 		}
 	}
-
 }

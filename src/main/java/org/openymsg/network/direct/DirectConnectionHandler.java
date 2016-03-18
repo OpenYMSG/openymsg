@@ -1,12 +1,5 @@
 package org.openymsg.network.direct;
 
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.ConnectionEndedReason;
@@ -17,6 +10,13 @@ import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.YMSG9Packet;
+
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DirectConnectionHandler implements ConnectionHandler {
 	/** logger */
@@ -35,8 +35,7 @@ public class DirectConnectionHandler implements ConnectionHandler {
 		try {
 			ips = new YMSG9InputStream(socket.getInputStream());
 			ops = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-		}
-		catch (IOException e) {// TODO handle failure
+		} catch (IOException e) {// TODO handle failure
 			log.info("Failed creating streams", e);
 			this.notifyListeners(ConnectionEndedReason.SocketClosed);
 		}
@@ -83,12 +82,10 @@ public class DirectConnectionHandler implements ConnectionHandler {
 				ops.write(b, 0, b.length);
 				// Now send the buffer
 				ops.flush();
-			}
-			finally {
+			} finally {
 				this.socketLockChecker.finishWriting();
 			}
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			log.info("sending packet", e);
 			this.notifyListeners(ConnectionEndedReason.SocketClosed);
 		}
@@ -101,7 +98,6 @@ public class DirectConnectionHandler implements ConnectionHandler {
 	// Feb 10, 2012 2:02:04 PM org.openymsg.network.ServiceType getServiceType
 	// WARNING: No such ServiceType value '2001' (which is '7d1' in hex).
 	// Magic:YMSG Version:0 Length:10 Service:null Status:-1 SessionId:0x30000000 [66] [1004]
-
 	@Override
 	public YMSG9Packet receivePacket() {
 		try {
@@ -120,13 +116,10 @@ public class DirectConnectionHandler implements ConnectionHandler {
 			} else {
 				log.trace("skipping with no message");
 			}
-
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			log.info("Failed reading connection", e);
 			this.notifyListeners(ConnectionEndedReason.SocketClosed);
-		}
-		catch (UnknowServiceException e) {
+		} catch (UnknowServiceException e) {
 			log.warn("unknown service: " + e.getPacket());
 		}
 		return null;
@@ -138,8 +131,7 @@ public class DirectConnectionHandler implements ConnectionHandler {
 			this.ips.close();
 			this.ops.close();
 			this.socket.close();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			log.warn("Failed shutdown connection", e);
 		}
 		this.sessionId = 0;
@@ -171,5 +163,4 @@ public class DirectConnectionHandler implements ConnectionHandler {
 		}
 		return answer;
 	}
-
 }

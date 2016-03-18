@@ -1,22 +1,22 @@
 package org.openymsg.connection.read;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.YMSG9Packet;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 public class ReaderRegistryImpl implements ReaderRegistry {
 	/** logger */
 	private static final Log log = LogFactory.getLog(ReaderRegistryImpl.class);
-	private Map<ServiceType, Set<SinglePacketResponse>> registry = new HashMap<ServiceType, Set<SinglePacketResponse>>();
+	private Map<ServiceType, Set<SinglePacketResponse>> registry =
+			new HashMap<ServiceType, Set<SinglePacketResponse>>();
 
-	public ReaderRegistryImpl() {
-	}
+	public ReaderRegistryImpl() {}
 
 	@Override
 	public void register(ServiceType type, SinglePacketResponse response) {
@@ -71,12 +71,10 @@ public class ReaderRegistryImpl implements ReaderRegistry {
 		for (SinglePacketResponse response : responses) {
 			try {
 				response.execute(packet);
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				log.error("Failed calling: " + packet, e);
 			}
 		}
-
 	}
 
 	@Override

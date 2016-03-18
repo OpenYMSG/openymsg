@@ -5,7 +5,6 @@ package org.openymsg.network;
  * @author neilhart
  */
 public interface ConnectionHandlerCallback {
-
 	/**
 	 * Connection has ended.
 	 */

@@ -75,8 +75,8 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 	/**
 	 * @return the failureState
 	 */
+	@Override
 	public AuthenticationFailure getFailureState() {
 		return failureState;
 	}
-
 }

@@ -41,7 +41,6 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 			log.warn("got ContactAddAckResponse with status: " + packet.status);
 			return;
 		}
-
 		String me = packet.getValue("1");
 		String contactUsername = packet.getValue("7");
 		String protocolString = packet.getValue("241");
@@ -57,9 +56,7 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 		if (!pending.equals("1")) {
 			log.warn("pending is not 1: " + pending);
 		}
-
 		YahooContact contact = new YahooContact(contactUsername, protocol);
-
 		if ("0".equals(friendAddStatus)) {
 			// log.info("Me: " + myName + " friend added: " + userId + ", pending: " + pending + ", protocol: "
 			// + protocol);
@@ -69,7 +66,6 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 		} else {
 			ContactAddFailure failure = ContactAddFailure.get(friendAddStatus);
 			log.warn("Me: " + me + " Friend add status is not 0: " + friendAddStatus);
-
 			if (failure == ContactAddFailure.ALREADY_IN_GROUP) {
 				if (!sessionRoster.getContacts().contains(contact)) {
 					log.warn("Getting already in group, but can't find it.  It will be added");
@@ -79,14 +75,11 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 					return;
 				}
 			}
-
 			if (failure == null) {
 				failure = ContactAddFailure.UNKNOWN;
 			}
-
 			sessionRoster.receivedContactAddFailure(contact, failure, friendAddStatus);
 		}
-
 	}
 
 	private void addContact(String pending, YahooContact contact, ContactGroupImpl group) {
@@ -102,5 +95,4 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 		sessionStatus.publishPending(contact);
 		log.info("Contact was added: " + contactWasAdded + " along with the group: " + groupWasAdded);
 	}
-
 }

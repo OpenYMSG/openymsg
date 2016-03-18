@@ -6,5 +6,4 @@ public interface PacketReader extends ReaderRegistry {
 	void initializeConnection(ConnectionHandler connection);
 
 	void shutdown();
-
 }

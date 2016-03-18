@@ -1,7 +1,5 @@
 package org.openymsg.contact.roster;
 
-import java.io.IOException;
-
 import org.openymsg.Name;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
@@ -10,12 +8,13 @@ import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
+import java.io.IOException;
+
 /**
  * Transmit a ADD_BUDDY packet. If all goes well we'll get a ADD_BUDDY packet back with the details of the friend to
  * confirm the transaction (usually preceded by a CONTACTNEW packet with well detailed info).
  */
 public class ContactAddMessage implements Message {
-
 	private final String username;
 	private final YahooContact contact;
 	private final YahooContactGroup group;
@@ -23,7 +22,8 @@ public class ContactAddMessage implements Message {
 	private final Name name;
 
 	// TODO what if name is null
-	public ContactAddMessage(String username, YahooContact contact, YahooContactGroup group, String message, Name name) {
+	public ContactAddMessage(String username, YahooContact contact, YahooContactGroup group, String message,
+			Name name) {
 		this.username = username;
 		this.contact = contact;
 		this.group = group;
@@ -66,5 +66,4 @@ public class ContactAddMessage implements Message {
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
 	}
-
 }

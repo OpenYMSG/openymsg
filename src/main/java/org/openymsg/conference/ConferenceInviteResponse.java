@@ -1,14 +1,14 @@
 package org.openymsg.conference;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.network.YMSG9Packet;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Process an incoming CONFINVITE packet. We get one of these when we are being invited to join someone else's
@@ -39,31 +39,25 @@ public class ConferenceInviteResponse extends AbstractConferenceResponse {
 		String value233 = packet.getValue("233"); // unknown
 		@SuppressWarnings("unused")
 		String value234 = packet.getValue("234"); // duplicate of conferenceId?
-
 		YahooContact inviter = new YahooContact(from, YahooProtocol.YAHOO);
 		Set<YahooContact> invitedContacts = getContacts(invitedContactIds);
-
 		final String[] memberContactId = packet.getValues("53");
 		Set<YahooContact> memberContacts = getContacts(memberContactId);
 		final String[] otherInvitedUserIds = packet.getValues("51");
 		Set<YahooContact> otherInvitedUsers = getContacts(otherInvitedUserIds);
 		invitedContacts.addAll(otherInvitedUsers);
-
 		YahooConference conference = new YahooConference(conferenceId);
 		// if (invitedContacts.isEmpty() && memberContacts.isEmpty()) {
 		// log.debug("Correctly not handling empty invite: " + packet);
 		// return;
 		// }
-
 		// Add inviter to members
 		memberContacts.add(inviter);
-
 		if (to.equals(from)) {
 			sessionConference.receivedConferenceInviteAck(conference, invitedContacts, memberContacts, message);
 		} else {
 			sessionConference.receivedConferenceInvite(conference, inviter, invitedContacts, memberContacts, message);
 		}
-
 		// Add the users
 		// yc.addUsers(invitedUserIds);
 		// yc.addUsers(currentUserIds);
@@ -89,5 +83,4 @@ public class ConferenceInviteResponse extends AbstractConferenceResponse {
 		}
 		return contacts;
 	}
-
 }

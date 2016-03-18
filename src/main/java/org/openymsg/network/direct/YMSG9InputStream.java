@@ -1,33 +1,24 @@
 /*
- * OpenYMSG, an implementation of the Yahoo Instant Messaging and Chat protocol.
- * Copyright (C) 2007 G. der Kinderen, Nimbuzz.com 
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
+ * OpenYMSG, an implementation of the Yahoo Instant Messaging and Chat protocol. Copyright (C) 2007 G. der Kinderen,
+ * Nimbuzz.com This program is free software; you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+ * License for more details. You should have received a copy of the GNU General Public License along with this program;
+ * if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 package org.openymsg.network.direct;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openymsg.network.ServiceType;
+import org.openymsg.network.YMSG9Packet;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openymsg.network.ServiceType;
-import org.openymsg.network.YMSG9Packet;
 
 /**
  * A YMSG9 packet has a 20 byte fixed format header. The first four bytes are the magic code "YMSG". The next four
@@ -61,11 +52,10 @@ public class YMSG9InputStream extends BufferedInputStream {
 	 */
 	public YMSG9Packet readPacket() throws IOException, UnknowServiceException {
 		YMSG9Packet p = new YMSG9Packet();
-
 		String charEncoding = System.getProperty("openymsg.network.charEncoding", "UTF-8");
-
 		byte[] header = new byte[HEADER_SIZE];
-		if (readBuffer(header) <= 0) return null;
+		if (readBuffer(header) <= 0)
+			return null;
 		// Somewhat ineligant way to extract the header data
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < 4; i++)
@@ -74,18 +64,17 @@ public class YMSG9InputStream extends BufferedInputStream {
 		p.version = u2i(header[5]);
 		p.length = (u2i(header[8]) << 8) + (u2i(header[9]));
 		p.service = ServiceType.getServiceType((u2i(header[10]) << 8) + (u2i(header[11])));
-
 		p.status = (u2i(header[12]) << 24) + (u2i(header[13]) << 16) + (u2i(header[14]) << 8) + (u2i(header[15]));
 		p.sessionId = (u2i(header[16]) << 24) + (u2i(header[17]) << 16) + (u2i(header[18]) << 8) + (u2i(header[19]));
 		// Check the header
-		if (!p.magic.equals("YMSG")) throw new IOException("Bad YMSG9 header");
-
+		if (!p.magic.equals("YMSG"))
+			throw new IOException("Bad YMSG9 header");
 		// Read the body
 		List<String> v = new ArrayList<String>();
 		byte[] body = new byte[p.length];
 		// TODO - check timeout
-		if (readBuffer(body) < 0) return null;
-
+		if (readBuffer(body) < 0)
+			return null;
 		// Now extract strings in the body
 		int start = 0;
 		boolean keyPos = true;
@@ -95,7 +84,8 @@ public class YMSG9InputStream extends BufferedInputStream {
 				String s = new String(body, start, i - start, charEncoding);
 				if (keyPos) {
 					s = cleanse(s);
-					if (isKey(s)) v.add(s);
+					if (isKey(s))
+						v.add(s);
 				} else
 					v.add(s);
 				keyPos = !keyPos;
@@ -107,13 +97,14 @@ public class YMSG9InputStream extends BufferedInputStream {
 		// There is an issue with Yahoo adding a terminating 0xc0 0x80 0c00
 		// onto the end of some chat packets. This creates a key '0'
 		// without a value. So, check for odd size and delete last index.
-		if ((v.size() % 2) != 0) v.remove(v.size() - 1);
+		if ((v.size() % 2) != 0)
+			v.remove(v.size() - 1);
 		// Convert the collection into an array
 		p.body = new String[v.size()];
 		p.body = v.toArray(p.body);
-
 		log.trace(p.toString());
-		if (p.service == null) throw new UnknowServiceException(p);
+		if (p.service == null)
+			throw new UnknowServiceException(p);
 		return p;
 	}
 
@@ -140,7 +131,8 @@ public class YMSG9InputStream extends BufferedInputStream {
 	private boolean isKey(String s) {
 		// If there are non digit characters, we've failed
 		for (int i = 0; i < s.length(); i++)
-			if (!Character.isDigit(s.charAt(i))) return false;
+			if (!Character.isDigit(s.charAt(i)))
+				return false;
 		// If the number is too big, we've failed
 		return (s.length() <= 5);
 	}
@@ -155,8 +147,8 @@ public class YMSG9InputStream extends BufferedInputStream {
 		int p = 0, r = 0;
 		while (p < buff.length) {
 			r = super.read(buff, p, buff.length - p);
-			if (r < 0) return (p + 1) * -1;
-
+			if (r < 0)
+				return (p + 1) * -1;
 			p += r;
 		}
 		return p;

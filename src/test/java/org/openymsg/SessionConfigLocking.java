@@ -11,6 +11,7 @@ public class SessionConfigLocking extends SessionConfigSimple {
 		this.socketLockChecker = socketLockChecker;
 	}
 
+	@Override
 	protected ConnectionBuilder createDirectConnectionBuilder() {
 		return new DirectConnectionBuilderLocking(socketLockChecker);
 	}

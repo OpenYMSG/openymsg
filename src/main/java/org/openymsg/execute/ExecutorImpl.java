@@ -37,5 +37,4 @@ public class ExecutorImpl implements Executor {
 	public boolean isTerminated() {
 		return dispatcher.isTerminated();
 	}
-
 }

@@ -1,20 +1,11 @@
 /*
- * OpenYMSG, an implementation of the Yahoo Instant Messaging and Chat protocol.
- * Copyright (C) 2007 G. der Kinderen, Nimbuzz.com 
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. 
+ * OpenYMSG, an implementation of the Yahoo Instant Messaging and Chat protocol. Copyright (C) 2007 G. der Kinderen,
+ * Nimbuzz.com This program is free software; you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+ * License for more details. You should have received a copy of the GNU General Public License along with this program;
+ * if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 package org.openymsg.network;
 
@@ -34,29 +25,24 @@ import java.util.List;
  */
 public class YMSG9Packet {
 	public String magic; // Header 1
-
 	public int version;
 	public int length; // Header 2
-
 	public ServiceType service;
-
 	public long status, sessionId; // Header 3
-
 	public String[] body; // Packet data body
-
 	String quickSetAccessSeparator; // String used to break sets
-
 	int[] quickSetAccess = null; // Speeds multi-set access
 
 	/**
 	 * General body accessors
 	 */
-
 	// Returns the *key index* (not value index) of n'th field of type k
 	private int getNthLocation(String k, int n) {
 		for (int i = 0; i < body.length; i += 2) {
-			if (body[i].equals(k)) n--;
-			if (n < 0) return i;
+			if (body[i].equals(k))
+				n--;
+			if (n < 0)
+				return i;
 		}
 		return -1;
 	}
@@ -64,7 +50,8 @@ public class YMSG9Packet {
 	// Returns n'th value of field of type k
 	public String getNthValue(String k, int n) {
 		int l = getNthLocation(k, n);
-		if (l < 0) return null;
+		if (l < 0)
+			return null;
 		return body[l + 1];
 	}
 
@@ -77,17 +64,20 @@ public class YMSG9Packet {
 	public String[] getValues(String k) {
 		int cnt = 0, j = 0;
 		for (int i = 0; i < body.length; i += 2)
-			if (body[i].equals(k)) cnt++;
+			if (body[i].equals(k))
+				cnt++;
 		String[] sa = new String[cnt];
 		for (int i = 0; i < body.length; i += 2)
-			if (body[i].equals(k)) sa[j++] = body[i + 1];
+			if (body[i].equals(k))
+				sa[j++] = body[i + 1];
 		return sa;
 	}
 
 	// Returns the value for field type k, in the n'th set beginning with 'set'
 	String getValueFromNthSet(String set, String k, int n) {
 		int i = getNthLocation(set, n);
-		if (i < 0) return null;
+		if (i < 0)
+			return null;
 		i += 2;
 		while (i < body.length) {
 			if (body[i].equals(k))
@@ -102,11 +92,9 @@ public class YMSG9Packet {
 
 	public Collection<String[]> entries() {
 		ArrayList<String[]> result = new ArrayList<String[]>();
-
 		for (int i = 0; i < body.length; i += 2) {
-			result.add(new String[] { body[i], body[i + 1] });
+			result.add(new String[] {body[i], body[i + 1]});
 		}
-
 		return result;
 	}
 
@@ -118,7 +106,6 @@ public class YMSG9Packet {
 	 * Quick access accessors, for working with bodies of multiple records (sets). The method
 	 * generateQuickSetAccessors() must be called before any accessor method will work.
 	 */
-
 	// Several packet types contain repeating groups of data, for example
 	// multiple lists of friends. Each 'record' in the body is signified
 	// by a standard field (a 'separator') which always (?) appears as the
@@ -130,13 +117,14 @@ public class YMSG9Packet {
 	// separator: the separator field type
 	void generateQuickSetAccessors(String separator) {
 		// Already generated?
-		if (quickSetAccess != null && quickSetAccessSeparator.equals(separator)) return;
-
+		if (quickSetAccess != null && quickSetAccessSeparator.equals(separator))
+			return;
 		quickSetAccessSeparator = separator;
 		// Count ahead, to work out how big our array must be
 		int cnt = 0;
 		for (int i = 0; i < body.length; i += 2)
-			if (body[i].equals(separator)) cnt++;
+			if (body[i].equals(separator))
+				cnt++;
 		// Create array
 		quickSetAccess = new int[cnt + 1];
 		// Populate array
@@ -155,7 +143,8 @@ public class YMSG9Packet {
 	// Returns the value for field type k, in the n'th set beginning with 'set'
 	String getValueFromNthSetQA(String k, int n) {
 		for (int i = quickSetAccess[n]; i < quickSetAccess[n + 1]; i += 2) {
-			if (body[i].equals(k)) return body[i + 1];
+			if (body[i].equals(k))
+				return body[i + 1];
 		}
 		return null;
 	}
@@ -167,7 +156,6 @@ public class YMSG9Packet {
 	/**
 	 * Other stuff
 	 */
-
 	// FIX: Not thread safe (reading array while copies are taking place)
 	public void append(YMSG9Packet pkt) {
 		String[] arr = new String[body.length + pkt.body.length];
@@ -184,7 +172,6 @@ public class YMSG9Packet {
 	// FIX: Not thread safe (reading array while copies are taking place)
 	void merge(YMSG9Packet pkt, String[] concatFields) {
 		List<String> appendBuffer = new ArrayList<String>();
-
 		for (int i = 0; i < pkt.body.length; i += 2) {
 			// Get next key/value
 			String k = pkt.body[i], v = pkt.body[i + 1];

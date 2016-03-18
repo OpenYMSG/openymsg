@@ -6,5 +6,4 @@ public interface YahooContactStatus {
 	StatusMessage getMessage();
 
 	Long getIdleTime();
-
 }

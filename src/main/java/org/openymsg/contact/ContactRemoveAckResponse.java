@@ -32,7 +32,6 @@ public class ContactRemoveAckResponse implements SinglePacketResponse {
 		String groupName = packet.getValue("65");
 		String removeStatus = packet.getValue("66"); // TODO what is this: 40 - failed MSN, 0 success yahoo,
 		String protocol = packet.getValue("241");
-
 		YahooProtocol yahooProtocol = YahooProtocol.YAHOO;
 		if (protocol != null) {
 			yahooProtocol = YahooProtocol.getProtocolOrDefault(protocol, contactUsername);
@@ -45,11 +44,8 @@ public class ContactRemoveAckResponse implements SinglePacketResponse {
 		}
 		ContactGroupImpl group = new ContactGroupImpl(groupName);
 		group.add(contact);
-
 		boolean contactWasRemoved = sessionRoster.possibleRemoveContact(contact);
 		boolean groupWasRemoved = sessionGroup.possibleRemoveGroup(group);
 		log.info("Contact was remove: " + contactWasRemoved + " along with the group: " + groupWasRemoved);
-
 	}
-
 }

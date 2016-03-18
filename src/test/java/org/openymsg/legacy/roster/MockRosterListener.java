@@ -15,7 +15,8 @@ public class MockRosterListener implements RosterListener {
      * 
      * @see org.openymsg.legacy.roster.RosterListener#rosterChanged(org.openymsg.legacy.roster.RosterEvent)
      */
-    public void rosterChanged(RosterEvent event) {
+    @Override
+	public void rosterChanged(RosterEvent event) {
         eventCount++;
     }
 

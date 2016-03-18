@@ -1,12 +1,11 @@
 package org.openymsg.contact.roster;
 
-import java.util.Set;
-
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 
-public interface SessionRoster {
+import java.util.Set;
 
+public interface SessionRoster {
 	Set<YahooContact> getContacts();
 
 	void acceptFriendAuthorization(String id, YahooContact contact) throws IllegalStateException;
@@ -32,6 +31,5 @@ public interface SessionRoster {
 	 */
 	// TODO what to do for new group
 	void addContact(YahooContact contact, YahooContactGroup group, String message) throws IllegalArgumentException;
-
 	// void moveToGroup(Contact contact, ContactGroup group) throws IllegalArgumentException;
 }

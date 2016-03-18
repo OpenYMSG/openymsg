@@ -13,5 +13,4 @@ public interface SessionConnection {
 	 * @return information of the connection
 	 */
 	ConnectionInfo getConnectionInfo();
-
 }

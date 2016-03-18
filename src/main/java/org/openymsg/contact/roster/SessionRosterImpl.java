@@ -1,7 +1,5 @@
 package org.openymsg.contact.roster;
 
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.Name;
@@ -9,6 +7,8 @@ import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 import org.openymsg.connection.YahooConnection;
 import org.openymsg.network.ServiceType;
+
+import java.util.Set;
 
 public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	/** logger */
@@ -72,7 +72,6 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	// checkStatus();
 	// transmitList();
 	// }
-
 	public void loadedContact(YahooContact contact) {
 		log.trace("loadedContact: " + contact);
 		if (this.rosterLoaded) {
@@ -146,5 +145,4 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 		// contactImpl.getGroupIds());
 		// }
 	}
-
 }

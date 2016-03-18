@@ -1,12 +1,12 @@
 package org.openymsg.conference;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.PacketBodyBuffer;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public abstract class AbstractConferenceMessage implements Message {
 	private ConferenceMembership membership;
@@ -41,5 +41,4 @@ public abstract class AbstractConferenceMessage implements Message {
 	protected void writeConference(PacketBodyBuffer body, String key) throws UnsupportedEncodingException, IOException {
 		body.addElement(key, this.conference.getId());
 	}
-
 }

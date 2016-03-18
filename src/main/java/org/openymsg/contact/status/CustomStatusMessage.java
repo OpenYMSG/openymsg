@@ -6,7 +6,6 @@ import org.openymsg.YahooStatus;
  * Returns the custom status, or <tt>null</tt> if no such status has been set. Returns the custom status message, or
  * <tt>null</tt> if no such message has been set.
  */
-
 public class CustomStatusMessage extends AbstractStatusMessage {
 	/** An free form status message. */
 	protected final String statusMessage;
@@ -41,14 +40,18 @@ public class CustomStatusMessage extends AbstractStatusMessage {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (!super.equals(obj)) return false;
-		if (getClass() != obj.getClass()) return false;
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
 		CustomStatusMessage other = (CustomStatusMessage) obj;
 		if (statusMessage == null) {
-			if (other.statusMessage != null) return false;
-		} else if (!statusMessage.equals(other.statusMessage)) return false;
+			if (other.statusMessage != null)
+				return false;
+		} else if (!statusMessage.equals(other.statusMessage))
+			return false;
 		return true;
 	}
-
 }

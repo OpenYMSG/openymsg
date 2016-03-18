@@ -33,7 +33,6 @@ public class MessageOnlineResponse implements SinglePacketResponse {
 		String value252 = packet.getValue("252"); // something from MSN
 		@SuppressWarnings("unused")
 		String value455 = packet.getValue("455"); // something from MSN
-
 		YahooProtocol protocol = YahooProtocol.YAHOO;
 		if (fed != null) {
 			protocol = YahooProtocol.getProtocolOrDefault(fed, from);
@@ -45,5 +44,4 @@ public class MessageOnlineResponse implements SinglePacketResponse {
 			this.session.receivedMessage(contact, message, id);
 		}
 	}
-
 }

@@ -1,12 +1,12 @@
 package org.openymsg.context.session;
 
-import java.io.IOException;
-
 import org.openymsg.YahooStatus;
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
+
+import java.io.IOException;
 
 /**
  * Transmit the current status to the Yahoo network.
@@ -57,5 +57,4 @@ public class StatusChangeRequest implements Message {
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
 	}
-
 }

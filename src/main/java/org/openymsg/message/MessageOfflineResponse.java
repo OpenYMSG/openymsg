@@ -42,7 +42,6 @@ public class MessageOfflineResponse implements SinglePacketResponse {
 			protocol = YahooProtocol.getProtocolOrDefault(fed, from);
 		}
 		YahooContact contact = new YahooContact(from, protocol);
-
 		if (timestamp == null || timestamp.length() == 0) {
 			log.warn("Offline message with no timestamp");
 			this.session.receivedOfflineMessage(contact, message, 0L);
@@ -51,5 +50,4 @@ public class MessageOfflineResponse implements SinglePacketResponse {
 			this.session.receivedOfflineMessage(contact, message, timestampInMillis);
 		}
 	}
-
 }

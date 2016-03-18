@@ -25,7 +25,8 @@ public class MockFriendManager implements FriendManager {
      * 
      * @see org.openymsg.legacy.network.FriendManager#removeFriendFromGroup(java.lang.String, java.lang.String)
      */
-    public void removeFriendFromGroup(String friendId, String groupId) throws IOException {
+    @Override
+	public void removeFriendFromGroup(String friendId, String groupId) throws IOException {
         log.info("Mock removeFriendFromGroup triggered with friendId [" + friendId + "] and groupId [" + groupId + "]");
         this.friendId = friendId;
         this.groupId = groupId;
@@ -38,7 +39,8 @@ public class MockFriendManager implements FriendManager {
      * 
      * @see org.openymsg.legacy.network.FriendManager#sendNewFriendRequest(java.lang.String, java.lang.String)
      */
-    public void sendNewFriendRequest(String userId, String groupId, YahooProtocol yahooProtocol) throws IOException {
+    @Override
+	public void sendNewFriendRequest(String userId, String groupId, YahooProtocol yahooProtocol) throws IOException {
         log.info("Mock sendNewFriendRequest triggered with friendId [" + userId + "] and groupId [" + groupId + "]");
         this.friendId = userId;
         this.groupId = groupId;

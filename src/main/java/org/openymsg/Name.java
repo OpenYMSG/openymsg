@@ -44,16 +44,23 @@ public class Name {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (!(obj instanceof Name)) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Name))
+			return false;
 		Name other = (Name) obj;
 		if (firstName == null) {
-			if (other.firstName != null) return false;
-		} else if (!firstName.equals(other.firstName)) return false;
+			if (other.firstName != null)
+				return false;
+		} else if (!firstName.equals(other.firstName))
+			return false;
 		if (lastName == null) {
-			if (other.lastName != null) return false;
-		} else if (!lastName.equals(other.lastName)) return false;
+			if (other.lastName != null)
+				return false;
+		} else if (!lastName.equals(other.lastName))
+			return false;
 		return true;
 	}
 
@@ -61,5 +68,4 @@ public class Name {
 	public String toString() {
 		return "Name [firstName=" + firstName + ", lastName=" + lastName + "]";
 	}
-
 }

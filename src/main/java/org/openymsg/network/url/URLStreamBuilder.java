@@ -5,7 +5,6 @@ package org.openymsg.network.url;
  * @author neilhart
  */
 public interface URLStreamBuilder {
-
 	/**
 	 * Set the URL
 	 * @param url string representing the URL

@@ -21,5 +21,4 @@ public class DispatcherExecutorLoggingCallback implements DispatcherExecutorCall
 	public void rejectedExecution(Runnable runnable) {
 		log.error("got rejected running: " + runnable);
 	}
-
 }

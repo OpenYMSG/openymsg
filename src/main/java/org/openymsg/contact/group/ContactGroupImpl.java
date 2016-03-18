@@ -1,12 +1,12 @@
 package org.openymsg.contact.group;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 import org.openymsg.util.CollectionUtils;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ContactGroupImpl implements YahooContactGroup {
 	private String name;
@@ -41,14 +41,18 @@ public class ContactGroupImpl implements YahooContactGroup {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
 		ContactGroupImpl other = (ContactGroupImpl) obj;
 		if (name == null) {
-			if (other.name != null) return false;
-		}
-		else if (!name.equals(other.name)) return false;
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
 		return true;
 	}
 
@@ -56,5 +60,4 @@ public class ContactGroupImpl implements YahooContactGroup {
 	public boolean isActive() {
 		return this.active;
 	}
-
 }

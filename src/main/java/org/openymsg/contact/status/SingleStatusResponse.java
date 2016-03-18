@@ -1,7 +1,5 @@
 package org.openymsg.contact.status;
 
-import java.util.Iterator;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooContact;
@@ -10,6 +8,8 @@ import org.openymsg.YahooStatus;
 import org.openymsg.connection.read.SinglePacketResponse;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.YMSG9Packet;
+
+import java.util.Iterator;
 
 /**
  * LOGON packets can contain multiple friend status sections, ISAWAY and ISBACK packets contain only one. Update the
@@ -48,84 +48,80 @@ public class SingleStatusResponse implements SinglePacketResponse {
 		String clientVersion = null;
 		while (iter.hasNext()) {
 			String[] s = iter.next();
-
 			int key = Integer.valueOf(s[0]);
 			String value = s[1];
 			// log.info("Key: " + key + ", value: " + value);
 			switch (key) {
-			case 300:
-				// initial row, most of the time
-				break;
-			case 7:
-				// check and see if we have one
-				if (userId != null) {
-					updateFriendStatus(logoff, userId, onChat, onPager, visibility, clearIdleTime, idleTime,
-							customMessage, customStatus, longStatus, protocol, clientVersion);
-					longStatus = 0;
-					onChat = null;
-					onPager = null;
-					visibility = null;
-					clearIdleTime = null;
-					idleTime = null;
-					customMessage = null;
-					customStatus = null;
-					userId = null;
-					clientVersion = null;
-					protocol = YahooProtocol.YAHOO;
-
-				}
-				userId = value;
-				break;
-			case 10:
-				try {
-					longStatus = Long.parseLong(value);
-				}
-				catch (NumberFormatException e) {
+				case 300:
+					// initial row, most of the time
+					break;
+				case 7:
+					// check and see if we have one
+					if (userId != null) {
+						updateFriendStatus(logoff, userId, onChat, onPager, visibility, clearIdleTime, idleTime,
+								customMessage, customStatus, longStatus, protocol, clientVersion);
+						longStatus = 0;
+						onChat = null;
+						onPager = null;
+						visibility = null;
+						clearIdleTime = null;
+						idleTime = null;
+						customMessage = null;
+						customStatus = null;
+						userId = null;
+						clientVersion = null;
+						protocol = YahooProtocol.YAHOO;
+					}
+					userId = value;
+					break;
+				case 10:
+					try {
+						longStatus = Long.parseLong(value);
+					} catch (NumberFormatException e) {
+						customMessage = value;
+					}
+					break;
+				case 17:
+					onChat = value.equals("1");
+					break;
+				case 13: // one of these matters
+					onPager = value.equals("1");
+					visibility = value;
+					break;
+				case 19:
 					customMessage = value;
-				}
-				break;
-			case 17:
-				onChat = value.equals("1");
-				break;
-			case 13: // one of these matters
-				onPager = value.equals("1");
-				visibility = value;
-				break;
-			case 19:
-				customMessage = value;
-				break;
-			case 47:
-				customStatus = value;
-				break;
-			case 97:
-				// TODO - unicodeStatus
-				@SuppressWarnings("unused")
-				boolean unicodeStatusMessage = value.equals("1");
-				break;
-			case 138:
-				clearIdleTime = value;
-				break;
-			case 241:
-				protocol = YahooProtocol.getProtocolOrDefault(value, userId);
-				break;
-			case 244:
-				// TODO - track version
-				clientVersion = value;
-				// 6 - at least MSN - Windows Live Messenger 2011 (Build 15.4.3538.513)
-				break;
-			case 137:
-				idleTime = value;
-				break;
-			case 301:
-				// ending row, most of the time
-				break;
+					break;
+				case 47:
+					customStatus = value;
+					break;
+				case 97:
+					// TODO - unicodeStatus
+					@SuppressWarnings("unused")
+					boolean unicodeStatusMessage = value.equals("1");
+					break;
+				case 138:
+					clearIdleTime = value;
+					break;
+				case 241:
+					protocol = YahooProtocol.getProtocolOrDefault(value, userId);
+					break;
+				case 244:
+					// TODO - track version
+					clientVersion = value;
+					// 6 - at least MSN - Windows Live Messenger 2011 (Build 15.4.3538.513)
+					break;
+				case 137:
+					idleTime = value;
+					break;
+				case 301:
+					// ending row, most of the time
+					break;
 			}
 		}
 		if (userId != null) {
 			updateFriendStatus(logoff, userId, onChat, onPager, visibility, clearIdleTime, idleTime, customMessage,
 					customStatus, longStatus, protocol, clientVersion);
 		}
-
 	}
 
 	private void updateFriendStatus(boolean logoff, String userId, Boolean onChat, Boolean onPager, String visibility,
@@ -143,28 +139,23 @@ public class SingleStatusResponse implements SinglePacketResponse {
 		// getting a confirmation ADD_BUDDY packet (crazy!)
 		// if (status == null) {
 		// }
-
 		// TODO - do this check
 		// if (user.getProtocol() == null || !user.getProtocol().equals(protocol)) {
 		// log.warn("In updateFriendStatus, Protocols do not match for user: " + user.getId() + " "
 		// + user.getProtocol() + "/" + protocol);
 		// }
-
 		if (longStatus == -1 && (onPager == null || !onPager)) {
 			// Offline -- usually federated or msn live
 			logoff = true;
 		}
 		try {
 			newStatus = logoff ? YahooStatus.OFFLINE : YahooStatus.getStatus(longStatus);
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			log.error("missing status: " + longStatus);
 			newStatus = YahooStatus.OFFLINE;
 		}
-
 		ContactPresence presence = null;
 		StatusMessage status = null;
-
 		if (onChat != null) {
 			presence = new ContactPresence(onChat, onPager);
 			status = new NormalStatusMessage(newStatus);
@@ -202,11 +193,9 @@ public class SingleStatusResponse implements SinglePacketResponse {
 				}
 			}
 			status = new CustomStatusMessage(newStatus, customMessage);
-
 			// log.info("update custom: " + customMessage + "/" + customStatus);
 			// status.setCustom(customMessage, customStatus);
 		}
-
 		Long statusIdleTime = getIdleTime(clearIdleTime, idleTime);
 		// Hack for MSN users
 		if (contact.getProtocol().isMsn() && status.is(YahooStatus.STEPPEDOUT)) {

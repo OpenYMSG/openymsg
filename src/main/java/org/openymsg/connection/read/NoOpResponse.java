@@ -15,5 +15,4 @@ public class NoOpResponse implements SinglePacketResponse {
 	public void execute(YMSG9Packet packet) {
 		log.debug("handled packet: " + packet);
 	}
-
 }

@@ -1,5 +1,12 @@
 package org.openymsg.network.direct;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openymsg.config.SessionConfig;
+import org.openymsg.connection.ConnectionInfo;
+import org.openymsg.network.ConnectionBuilder;
+import org.openymsg.network.NetworkConstants;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -7,13 +14,6 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Collection;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openymsg.config.SessionConfig;
-import org.openymsg.connection.ConnectionInfo;
-import org.openymsg.network.ConnectionBuilder;
-import org.openymsg.network.NetworkConstants;
 
 /**
  * Builder for DirectConnection.
@@ -33,9 +33,7 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 		return handlerStatus;
 	}
 
-	public DirectConnectionBuilder() {
-
-	}
+	public DirectConnectionBuilder() {}
 
 	@Override
 	public ConnectionBuilder with(SessionConfig config) {
@@ -92,10 +90,8 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 					} else {
 						handlerStatus.addScsIpAddressFailure(scsHost, inetAddress);
 					}
-
 				}
-			}
-			catch (UnknownHostException e) {
+			} catch (UnknownHostException e) {
 				log.warn("Failed finding host for: " + scsHost);
 				handlerStatus.addScsHostFailure(scsHost);
 			}
@@ -115,8 +111,7 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 					handlerStatus.setCapacityIpAddressConnected(this.socket);
 					return true;
 				}
-			}
-			catch (UnknownHostException e) {
+			} catch (UnknownHostException e) {
 				log.error("Failed finding host for: " + ipAddress);
 				handlerStatus.addCapacityIpAddressFailure(ipAddress);
 			}
@@ -137,11 +132,9 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 				log.debug("Socket before: " + oldSocketSize + ", after: " + socket.getReceiveBufferSize());
 			}
 			return true;
-		}
-		catch (SocketTimeoutException e) {
+		} catch (SocketTimeoutException e) {
 			log.warn("Failed connecting to: " + endpoint + " from: " + socket.getLocalSocketAddress(), e);
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			log.warn("Failed connecting to: " + endpoint + " from: " + socket.getLocalSocketAddress(), e);
 		}
 		return false;
@@ -150,5 +143,4 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 	protected Socket getSocket() {
 		return socket;
 	}
-
 }

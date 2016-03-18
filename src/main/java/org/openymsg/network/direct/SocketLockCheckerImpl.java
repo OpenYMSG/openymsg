@@ -19,8 +19,6 @@ public class SocketLockCheckerImpl implements SocketLockChecker {
 		if (lastWriteTimestampCopy == 0) {
 			return false;
 		}
-
 		return System.currentTimeMillis() > lastWriteTimestampCopy + millisDuration;
 	}
-
 }

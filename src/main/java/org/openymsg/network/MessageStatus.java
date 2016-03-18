@@ -17,7 +17,6 @@ public enum MessageStatus {
 	NOTIFY(0x16),
 	WEBLOGIN(0x5a55aa55), // 1515563605
 	OFFLINE(0x5a55aa56);
-
 	/** Unique long representation of this MessageStatus. */
 	private long value;
 
@@ -50,8 +49,6 @@ public enum MessageStatus {
 				return all[i];
 			}
 		}
-
 		throw new IllegalArgumentException("No MessageStatus matching long value '" + value + "'.");
 	}
-
 }

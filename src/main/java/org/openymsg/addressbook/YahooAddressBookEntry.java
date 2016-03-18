@@ -2,7 +2,6 @@ package org.openymsg.addressbook;
 
 public class YahooAddressBookEntry {
 	static final public YahooAddressBookEntry EMPTY = new YahooAddressBookEntry(null, null, null, null, null);
-
 	private String id;
 	private String firstName;
 	private String lastName;
@@ -43,25 +42,28 @@ public class YahooAddressBookEntry {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
 		YahooAddressBookEntry other = (YahooAddressBookEntry) obj;
 		if (id == null) {
-			if (other.id != null) return false;
-		}
-		else if (!id.equals(other.id)) return false;
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "YahooAddressBookEntry [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName
-				+ ", nickName=" + nickName + "]";
+		return "YahooAddressBookEntry [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", nickName="
+				+ nickName + "]";
 	}
 
 	public String getGroupName() {
 		return groupName;
 	}
-
 }
