@@ -30,7 +30,7 @@ public class YahooContactTest {
 	public void testNullName() {
 		String username = null;
 		YahooProtocol protocol = YahooProtocol.LOTUS;
-		exception.expect(IllegalStateException.class);
+		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("id cannot be null");
 		new YahooContact(username, protocol);
 	}
@@ -39,7 +39,7 @@ public class YahooContactTest {
 	public void testNullProtocol() {
 		String username = "testuser";
 		YahooProtocol protocol = null;
-		exception.expect(IllegalStateException.class);
+		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("protocol cannot be null");
 		new YahooContact(username, protocol);
 	}

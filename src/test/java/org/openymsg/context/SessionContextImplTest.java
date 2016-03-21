@@ -3,6 +3,7 @@ package org.openymsg.context;
 import static org.junit.Assert.fail;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -27,6 +28,7 @@ public class SessionContextImplTest {
 	}
 
 	@Test
+	@Ignore
 	public void test() {
 		SessionContextImpl session = new SessionContextImpl(sessionConfig, executor, connection, username, callback);
 		fail("unimplemented");

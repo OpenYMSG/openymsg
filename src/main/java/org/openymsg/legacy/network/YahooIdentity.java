@@ -79,23 +79,30 @@ public class YahooIdentity // Cannot be serialised
 	}
 
 	@Override
-	public boolean equals(Object other) {
-		if (this == other) {
+	public final boolean equals(Object obj) {
+		if (this == obj)
 			return true;
-		}
-		if (!(other instanceof YahooIdentity)) {
+		if (obj == null)
 			return false;
-		}
-		return ((YahooIdentity) other).getId().equals(this.getId());
+		if (getClass() != obj.getClass())
+			return false;
+		YahooIdentity other = (YahooIdentity) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (login != other.login)
+			return false;
+		return true;
 	}
 
 	@Override
-	public int hashCode() {
-		int hash = 4133;
-		hash *= 37 + id.hashCode();
-		hash *= 37 + (primary ? 1231 : 1237);
-		hash *= 37 + (login ? 1231 : 1237);
-		hash *= 37 + (active ? 1231 : 1237);
-		return hash;
+	public final int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + (login ? 1231 : 1237);
+		return result;
 	}
 }

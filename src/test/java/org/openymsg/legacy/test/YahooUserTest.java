@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.openymsg.legacy.network.YahooUser;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 /**
  * Basic Equality and HashCode contract checks.
@@ -21,6 +22,6 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 public class YahooUserTest {
 	@Test
 	public void testEquals() {
-		EqualsVerifier.forClass(YahooUser.class).verify();
+		EqualsVerifier.forClass(YahooUser.class).suppress(Warning.STRICT_INHERITANCE).verify();
 	}
 }
