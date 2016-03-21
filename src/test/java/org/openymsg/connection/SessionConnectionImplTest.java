@@ -18,14 +18,14 @@ import org.openymsg.network.ConnectionEndedReason;
 import org.openymsg.network.TestingConnectionBuilder;
 
 public class SessionConnectionImplTest {
-	private String username;
+	private static String username;
 	private Executor executor;
 	private SessionConnectionCallback listener;
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
 	@BeforeClass
-	public void setUp() {
+	public static void setUp() {
 		username = "testuser";
 	}
 

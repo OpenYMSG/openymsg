@@ -23,7 +23,7 @@ public class ReaderRegistryTest {
 	public void testRegisterSingleNoResponse() {
 		ServiceType type = ServiceType.ADDIDENT;
 		SinglePacketResponse response = null;
-		exception.expect(IllegalStateException.class);
+		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("response may not be null");
 		registry.register(type, response);
 	}
@@ -32,7 +32,7 @@ public class ReaderRegistryTest {
 	public void testRegisterSingleNoServiceType() {
 		ServiceType type = null;
 		SinglePacketResponse response = new NoOpResponse();
-		exception.expect(IllegalStateException.class);
+		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("type may not be null");
 		registry.register(type, response);
 	}
@@ -59,7 +59,7 @@ public class ReaderRegistryTest {
 	public void testRegisterMultiNoResponse() {
 		ServiceType type = ServiceType.ADDIDENT;
 		MultiplePacketResponse response = null;
-		exception.expect(IllegalStateException.class);
+		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("response may not be null");
 		registry.register(type, response);
 	}
@@ -68,7 +68,7 @@ public class ReaderRegistryTest {
 	public void testRegisterrMultiNoServiceType() {
 		ServiceType type = null;
 		MultiplePacketResponse response = new ListOfStatusesResponse(null);
-		exception.expect(IllegalStateException.class);
+		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("type may not be null");
 		registry.register(type, response);
 	}
