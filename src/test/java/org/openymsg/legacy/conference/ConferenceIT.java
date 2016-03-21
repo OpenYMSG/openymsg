@@ -15,7 +15,7 @@ import org.openymsg.legacy.network.event.SessionConferenceMessageEvent;
 import org.openymsg.legacy.network.event.SessionListener;
 import org.openymsg.legacy.test.YahooTestAbstract;
 
-public class ConferenceTest extends YahooTestAbstract {
+public class ConferenceIT extends YahooTestAbstract {
     
     @Test
     public void testSendingInvite() throws IllegalStateException, IllegalIdentityException, IOException, InterruptedException {

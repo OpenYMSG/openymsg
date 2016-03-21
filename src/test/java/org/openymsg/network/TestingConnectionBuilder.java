@@ -1,15 +1,14 @@
 package org.openymsg.network;
 
-import java.net.Socket;
-
 import org.openymsg.config.SessionConfig;
 import org.openymsg.connection.ConnectionInfo;
+
+import java.net.Socket;
 
 public class TestingConnectionBuilder implements ConnectionBuilder {
 	private ConnectionInfo connectionInfo = new ConnectionInfo();
 	private final boolean connect;
-	
-	
+
 	public TestingConnectionBuilder(boolean connect) {
 		this.connect = connect;
 	}
@@ -41,5 +40,4 @@ public class TestingConnectionBuilder implements ConnectionBuilder {
 	public ConnectionHandler build() {
 		return new TestingConnectionHandler();
 	}
-
 }
