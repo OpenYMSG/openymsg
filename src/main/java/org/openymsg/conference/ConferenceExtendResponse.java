@@ -7,7 +7,10 @@ import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.network.YMSG9Packet;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -31,7 +34,7 @@ public class ConferenceExtendResponse extends AbstractConferenceResponse {
 		// String value13 = packet.getValue("13");
 		String from = packet.getValue("50");
 		// final String[] invitedContactIds = packet.getValues("52");
-		final String[] otherInvitedUserIds = packet.getValues("51");
+		final String[] otherInvitedUserIds = getCommaSeperated(packet.getValues("51"));
 		String conferenceId = packet.getValue("57");
 		YahooContact inviter = new YahooContact(from, YahooProtocol.YAHOO);
 		Set<YahooContact> invitedContacts = getContacts(otherInvitedUserIds);
@@ -61,6 +64,14 @@ public class ConferenceExtendResponse extends AbstractConferenceResponse {
 		// process(packet);
 		// }
 		// }
+	}
+
+	private String[] getCommaSeperated(String[] values) {
+		List<String> allValues = new ArrayList<String>();
+		for (String value : values) {
+			allValues.addAll(Arrays.asList(value.split(",")));
+		}
+		return allValues.toArray(new String[allValues.size()]);
 	}
 
 	private Set<YahooContact> getContacts(final String[] contactIds) {
