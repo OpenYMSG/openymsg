@@ -17,6 +17,11 @@ public class ContactGroupImpl implements YahooContactGroup {
 		this.name = name;
 	}
 
+	@Override
+	public String toString() {
+		return "ContactGroupImpl [name=" + name + ", active=" + active + ", contacts=" + contacts + "]";
+	}
+
 	public void add(YahooContact contact) {
 		this.contacts.add(contact);
 	}

@@ -20,6 +20,11 @@ public class ContactAddDeclineMessage implements Message {
 	}
 
 	@Override
+	public String toString() {
+		return "ContactAddDeclineMessage [contact=" + contact + ", username=" + username + ", message=" + message + "]";
+	}
+
+	@Override
 	public PacketBodyBuffer getBody() throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("1", this.username);

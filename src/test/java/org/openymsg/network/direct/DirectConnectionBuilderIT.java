@@ -7,7 +7,7 @@ import org.openymsg.config.SessionConfigSimple;
 import org.openymsg.connection.ConnectionInfo;
 import org.openymsg.network.ConnectionBuilder;
 
-public class DirectConnectionBuilderTest {
+public class DirectConnectionBuilderIT {
 	private SessionConfig config;
 	private ConnectionBuilder builder;
 

@@ -32,6 +32,12 @@ public class ContactAddMessage implements Message {
 	}
 
 	@Override
+	public String toString() {
+		return "ContactAddMessage [username=" + username + ", contact=" + contact + ", group=" + group + ", message="
+				+ message + ", name=" + name + "]";
+	}
+
+	@Override
 	public PacketBodyBuffer getBody() throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		if (this.message == null) {

@@ -7,7 +7,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetConnectionServerTest {
+public class GetConnectionServerIT {
 	@Test
 	public void testSingleSuccessCase() {
 		List<String> hosts = new ArrayList<String>();

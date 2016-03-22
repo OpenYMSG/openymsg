@@ -23,7 +23,7 @@ package org.openymsg.legacy.network;
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
-public class YahooIdentity // Cannot be serialised
+public final class YahooIdentity // Cannot be serialised
 {
 	protected final String id; // Yahoo id
 	private boolean primary, login; // Is primary or login id?
@@ -92,8 +92,6 @@ public class YahooIdentity // Cannot be serialised
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (login != other.login)
-			return false;
 		return true;
 	}
 
@@ -102,7 +100,6 @@ public class YahooIdentity // Cannot be serialised
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + (login ? 1231 : 1237);
 		return result;
 	}
 }

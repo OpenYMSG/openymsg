@@ -10,14 +10,20 @@ import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MessageAssert {
+	private static final Pattern BODY_PATTERN = Pattern.compile("\\[(.*?)\\]");
+
 	public static final void assertEquals(Message message, String comparisonString, String... excludeFields)
 			throws IOException {
 		ServiceType serviceType = message.getServiceType();
@@ -59,25 +65,42 @@ public class MessageAssert {
 	private static void check(String comparisonString, PacketBodyBuffer body, String... excludeFields) {
 		@SuppressWarnings("unchecked")
 		List<String> excludedFieldList = excludeFields != null ? Arrays.asList(excludeFields) : Collections.EMPTY_LIST;
-		StringTokenizer tokenizer = new StringTokenizer(comparisonString, " ");
-		String token = tokenizer.nextToken();
-		while (!token.startsWith("SessionId:"))
-			token = tokenizer.nextToken();
-		StringTokenizer bodyTokenizer = new StringTokenizer(body.toString(), " ");
-		while (tokenizer.hasMoreTokens()) {
-			String comparisonKey = tokenizer.nextToken();
-			String comparisonValue = tokenizer.nextToken();
+		// StringTokenizer tokenizer = new StringTokenizer(comparisonString, " ");
+		// Iterator<String> tokenizer = Arrays.asList(comparisonString.split(" ")).iterator();
+		// String token = tokenizer.next();
+		// while (!token.startsWith("SessionId:"))
+		// token = tokenizer.next();
+		// if (tokenizer.hasNext()) {
+		// token = tokenizer.next(); // skip one
+		// }
+		Matcher comparisonMatcher = BODY_PATTERN.matcher(comparisonString);
+		List<String> comparisonList = new ArrayList<String>();
+		while (comparisonMatcher.find()) {
+			String token = comparisonMatcher.group(1);
+			// System.out.println(token);
+			comparisonList.add(token);
+		}
+		Iterator<String> tokenizer = comparisonList.iterator();
+		String bodyString = body.toString();
+		String[] values = bodyString.split(" ");
+		Iterator<String> bodyTokenizer = Arrays.asList(values).iterator();
+		while (tokenizer.hasNext()) {
+			String comparisonKey = tokenizer.next();
+			String comparisonValue = tokenizer.next();
 			if (!excludedFieldList.contains(strip(comparisonKey))) {
-				String bodyKey = bodyTokenizer.nextToken();
-				String bodyValue = null;
-				// special hack for handling space as a value. this is tokenized out of the body.
-				if (comparisonValue.length() == 1) {
-					comparisonValue = tokenizer.nextToken();
-					comparisonValue = "[ ]";
-					bodyValue = " ";
-				} else {
-					bodyValue = bodyTokenizer.nextToken();
+				String bodyKey = bodyTokenizer.next();
+				if (bodyKey.isEmpty()) {
+					bodyKey = bodyTokenizer.next();
 				}
+				String bodyValue = bodyTokenizer.next();
+				// special hack for handling space as a value. this is tokenized out of the body.
+				// if (comparisonValue.length() == 1) {
+				// // comparisonValue = tokenizer.next();
+				// comparisonValue = " ";
+				// bodyValue = " ";
+				// } else {
+				// bodyValue = bodyTokenizer.next();
+				// }
 				try {
 					// System.err.println("comparing: " + comparisonKey + ":" + comparisonValue + "-" + bodyKey + ":"
 					// + bodyValue);
@@ -95,7 +118,7 @@ public class MessageAssert {
 		if (!strip(comparisonKey).equals(bodyKey))
 			failNotEquals(bodyKey, strip(comparisonKey), "Body key is not the same");
 		String stripValue = strip(comparisonValue);
-		if (!stripValue.equals(bodyValue)) {
+		if (!stripValue.equals(strip(bodyValue))) {
 			if (!checkIfCommaSeperated(stripValue, bodyValue)) {
 				failNotEquals(bodyValue, strip(comparisonValue), "Body value is not the same for key: " + bodyKey);
 			}
@@ -115,7 +138,7 @@ public class MessageAssert {
 	}
 
 	private static String strip(String string) {
-		return string.substring(1, string.length() - 1);
+		return string.trim();
 	}
 
 	static private void failNotEquals(Object actual, Object expected, String message) {

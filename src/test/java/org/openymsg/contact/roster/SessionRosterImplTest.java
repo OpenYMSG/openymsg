@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.openymsg.Name;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 import org.openymsg.YahooProtocol;
@@ -38,8 +37,7 @@ public class SessionRosterImplTest {
 		YahooContactGroup group = new ContactGroupImpl("group");
 		String message = "message";
 		session.addContact(contact, group, message);
-		verify(executor).execute(
-				argThatMessage(new ContactAddMessage(username, contact, group, message, new Name(null, null))));
+		verify(executor).execute(argThatMessage(new ContactAddMessage(username, contact, group, message, null)));
 	}
 
 	@Test
@@ -47,8 +45,7 @@ public class SessionRosterImplTest {
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		YahooContactGroup group = new ContactGroupImpl("group");
 		session.addContact(contact, group, null);
-		verify(executor)
-				.execute(argThatMessage(new ContactAddMessage(username, contact, group, null, new Name(null, null))));
+		verify(executor).execute(argThatMessage(new ContactAddMessage(username, contact, group, null, null)));
 	}
 
 	@Test()

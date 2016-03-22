@@ -21,8 +21,8 @@ import java.util.Set;
  * TODO: manipulating the group should also cause relevant packets to be sent to the network.
  */
 public class YahooGroup {
-	private String name;
-	private boolean isOpen;
+	private final String name;
+	private final boolean isOpen;
 	private Set<YahooUser> users;
 
 	/**
@@ -52,16 +52,8 @@ public class YahooGroup {
 		return name;
 	}
 
-	public void setName(String nm) {
-		name = nm;
-	}
-
 	public boolean isOpen() {
 		return isOpen;
-	}
-
-	public void setOpen(boolean isOpen) {
-		this.isOpen = isOpen;
 	}
 
 	public Set<YahooUser> getUsers() {
