@@ -112,6 +112,7 @@ public class DirectConnectionHandler implements ConnectionHandler {
 				} else if (this.sessionId != packet.sessionId) {
 					log.error("Problem with not matching session ids: " + this.sessionId + " and " + packet.sessionId);
 				}
+				log.debug("receiving packet:" + packet);
 				return packet;
 			} else {
 				log.trace("skipping with no message");
