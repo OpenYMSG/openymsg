@@ -1,12 +1,13 @@
 package org.openymsg.contact.status;
 
 import org.openymsg.YahooContactStatus;
-import org.openymsg.YahooStatus;
 
 // TODO handle stealthBlocked and stealth mode
 public class ContactStatusImpl implements YahooContactStatus {
 	public static final YahooContactStatus PENDING =
-			new ContactStatusImpl(new PendingStatusMessage(), ContactPresence.EMPTY, 0L);
+			new ContactStatusImpl(new PendingStatusMessage(), ContactPresence.EMPTY, -1L);
+	public static final ContactStatusImpl OFFLINE =
+			new ContactStatusImpl(NormalStatusMessage.OFFLINE, ContactPresence.EMPTY, -1L);
 	/** The status message a user (away, available, etc). */
 	private final StatusMessage status;
 	/** The presence of a user */
@@ -18,16 +19,6 @@ public class ContactStatusImpl implements YahooContactStatus {
 		this.status = status;
 		this.presence = presence;
 		this.idleTime = idleTime;
-	}
-
-	@Deprecated
-	public ContactStatusImpl(YahooStatus status, boolean onChat, boolean onPager) {
-		if (status.isCustom()) {
-			throw new IllegalArgumentException("status cannot be custom");
-		}
-		this.status = new NormalStatusMessage(status);
-		this.presence = new ContactPresence(onChat, onPager);
-		this.idleTime = -1L;
 	}
 
 	/**

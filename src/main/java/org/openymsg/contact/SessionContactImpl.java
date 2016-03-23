@@ -3,7 +3,6 @@ package org.openymsg.contact;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 import org.openymsg.YahooContactStatus;
-import org.openymsg.YahooStatus;
 import org.openymsg.connection.YahooConnection;
 import org.openymsg.contact.group.SessionGroupImpl;
 import org.openymsg.contact.roster.SessionRosterImpl;
@@ -83,6 +82,6 @@ public class SessionContactImpl implements SessionContact {
 	}
 
 	public void receivedContactLogoff(YahooContact contact) {
-		sessionStatus.statusUpdate(contact, new ContactStatusImpl(YahooStatus.OFFLINE, false, false));
+		sessionStatus.statusUpdate(contact, ContactStatusImpl.OFFLINE);
 	}
 }

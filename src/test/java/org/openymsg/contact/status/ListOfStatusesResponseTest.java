@@ -25,7 +25,7 @@ public class ListOfStatusesResponseTest {
 		List<YMSG9Packet> packets = new ArrayList<YMSG9Packet>();
 		packets.add(packet);
 		response.execute(packets);
-		ContactStatusImpl status = new ContactStatusImpl(YahooStatus.AVAILABLE, false, true);
+		ContactStatusImpl status = getContactstatus(YahooStatus.AVAILABLE, false, true);
 		verify(sessionStatus).statusUpdate(new YahooContact("testuser", YahooProtocol.YAHOO), status);
 	}
 
@@ -40,7 +40,17 @@ public class ListOfStatusesResponseTest {
 		List<YMSG9Packet> packets = new ArrayList<YMSG9Packet>();
 		packets.add(packet);
 		response.execute(packets);
-		ContactStatusImpl status = new ContactStatusImpl(YahooStatus.AVAILABLE, false, true);
+		ContactStatusImpl status = getContactstatus(YahooStatus.AVAILABLE, false, true);
 		verify(sessionStatus).statusUpdate(new YahooContact("testuser", YahooProtocol.YAHOO), status);
+	}
+
+	private ContactStatusImpl getContactstatus(YahooStatus yahooStatus, boolean onChat, boolean onPager) {
+		if (yahooStatus.isCustom()) {
+			throw new IllegalArgumentException("status cannot be custom");
+		}
+		NormalStatusMessage status = new NormalStatusMessage(yahooStatus);
+		ContactPresence presence = new ContactPresence(onChat, onPager);
+		long idleTime = -1L;
+		return new ContactStatusImpl(status, presence, idleTime);
 	}
 }
