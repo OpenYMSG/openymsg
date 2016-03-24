@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.config.SessionConfigSimple;
 import org.openymsg.context.auth.AuthenticationFailure;
@@ -22,6 +23,7 @@ public class SessionIT {
 
 	// @Parameters({"badUsername", "badUsernamePassword"})
 	@Test()
+	@Category(SlowTest.class)
 	public void testBadUsername(String badUsername, String badUsernamePassword) {
 		SessionConfig config = new SessionConfigSimple();
 		YahooSessionCallback callback = mock(YahooSessionCallback.class);
@@ -41,6 +43,7 @@ public class SessionIT {
 
 	// @Parameters({"badPasswordUsername", "badPassword"})
 	@Test()
+	@Category(SlowTest.class)
 	public void testLocked(String badPasswordUsername, String badPassword) {
 		SessionConfig config = new SessionConfigSimple();
 		YahooSessionCallback callback = mock(YahooSessionCallback.class);
@@ -65,6 +68,7 @@ public class SessionIT {
 	 */
 	// @Parameters({"username2", "password2", "username3", "password3", "username1", "password1"})
 	@Test()
+	@Category(SlowTest.class)
 	public void testTwo(String username1, String password1, String username2, String password2, String username3,
 			String password3) {
 		SessionConfig config = new SessionConfigSimple();

@@ -1,12 +1,15 @@
 package org.openymsg.execute.dispatch;
 
+import static com.jayway.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -23,35 +26,18 @@ public class DispatcherExecutorServiceTest {
 	}
 
 	@Test
+	@Category(org.openymsg.SlowTest.class)
 	public void testCancelScheduled() {
 		String name = "name";
 		TestingDispatcherExecutorCallback callback = new TestingDispatcherExecutorCallback();
 		DispatcherExecutorService executor = new DispatcherExecutorService(name, callback);
 		QuiteRunnable runnable = new QuiteRunnable();
 		executor.scheduleAtFixedRate(runnable, 0, 1, TimeUnit.SECONDS);
-		// System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		// System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
-		assertTrue(runnable.checkAndResetHasRun());
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		assertTrue(runnable.checkAndResetHasRun());
-		// System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
+		await().atMost(1100, TimeUnit.MILLISECONDS).until(runnable.getRunCount(), equalTo(1));
+		await().atMost(1100, TimeUnit.MILLISECONDS).until(runnable.getRunCount(), equalTo(2));
+		await().atMost(1100, TimeUnit.MILLISECONDS).until(runnable.getRunCount(), equalTo(3));
 		runnable.setException(new ScheduleTaskCompletionException());
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		// System.out.println(executor.getCompletedTaskCount() + "/" + executor.getQueue().size());
-		assertFalse(runnable.hasRun());
+		await().atMost(1100, TimeUnit.MILLISECONDS).until(runnable.hasThrowException());
 	}
 
 	@Test
@@ -72,25 +58,37 @@ public class DispatcherExecutorServiceTest {
 	}
 
 	private final class QuiteRunnable implements Runnable {
-		boolean ran = false;
+		int runCount = 0;
 		RuntimeException exception = null;
+		boolean threwException = false;
 
 		@Override
 		public void run() {
 			if (exception != null) {
+				threwException = true;
 				throw exception;
 			}
-			this.ran = true;
+			this.runCount++;
+		}
+
+		private Callable<Integer> getRunCount() {
+			return new Callable<Integer>() {
+				public Integer call() throws Exception {
+					return runCount;
+				}
+			};
+		}
+
+		private Callable<Boolean> hasThrowException() {
+			return new Callable<Boolean>() {
+				public Boolean call() throws Exception {
+					return threwException;
+				}
+			};
 		}
 
 		public boolean hasRun() {
-			return this.ran;
-		}
-
-		public boolean checkAndResetHasRun() {
-			boolean answer = this.ran;
-			this.ran = false;
-			return answer;
+			return this.runCount > 1;
 		}
 
 		/**

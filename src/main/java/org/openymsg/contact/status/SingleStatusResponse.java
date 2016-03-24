@@ -109,6 +109,7 @@ public class SingleStatusResponse implements SinglePacketResponse {
 					// TODO - track version
 					clientVersion = value;
 					// 6 - at least MSN - Windows Live Messenger 2011 (Build 15.4.3538.513)
+					// 244 going invisible with latest yahoo desktop client.
 					break;
 				case 137:
 					idleTime = value;

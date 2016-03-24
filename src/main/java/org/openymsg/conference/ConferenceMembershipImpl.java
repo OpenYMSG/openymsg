@@ -5,8 +5,8 @@ import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooContact;
 import org.openymsg.util.CollectionUtils;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Information on membership of a YahooConference. It contains the contact that were invited, established membership,
@@ -21,11 +21,11 @@ public class ConferenceMembershipImpl implements ConferenceMembership {
 	/** logger */
 	private static final Log log = LogFactory.getLog(ConferenceMembershipImpl.class);
 	/** set of Contacts that are currently members */
-	private Set<YahooContact> memberContacts = new HashSet<YahooContact>();
+	private Set<YahooContact> memberContacts = new TreeSet<YahooContact>();
 	/** set of Contacts that are invited, but not yet members */
-	private Set<YahooContact> invitedContacts = new HashSet<YahooContact>();
+	private Set<YahooContact> invitedContacts = new TreeSet<YahooContact>();
 	/** set of Contacts that were members that left or declined an invitation */
-	private Set<YahooContact> declinedOrLeftContacts = new HashSet<YahooContact>();
+	private Set<YahooContact> declinedOrLeftContacts = new TreeSet<YahooContact>();
 
 	/**
 	 * Add a set of contacts to the invited list. Contacts are removed from the declinedOrLeft list if they is there.

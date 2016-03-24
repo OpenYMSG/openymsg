@@ -2,10 +2,10 @@ package org.openymsg;
 
 /**
  * Identity of a contact. This consists of two parts: id and protocol. Most of the time the protocol is
- * YahooProtocol.YAHOO.
+ * YahooProtocol.YAHOO. Comparable to enable easier testing.
  * @author neilhart
  */
-public class YahooContact {
+public class YahooContact implements Comparable<YahooContact> {
 	/** unique name within a specific protocol */
 	private final String name;
 	/** system the id is on. Mostly YahooProtocol.YAHOO */
@@ -83,5 +83,17 @@ public class YahooContact {
 		if (protocol != other.protocol)
 			return false;
 		return true;
+	}
+
+	@Override
+	public int compareTo(YahooContact other) {
+		if (this == other)
+			return 0;
+		if (other == null)
+			return 1;
+		else if (name.equals(other.name))
+			return protocol.compareTo(other.protocol);
+		else
+			return name.compareTo(other.name);
 	}
 }

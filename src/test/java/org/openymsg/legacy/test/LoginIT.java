@@ -13,6 +13,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.openymsg.SlowTest;
 import org.openymsg.legacy.network.LoginRefusedException;
 import org.openymsg.legacy.network.ServiceType;
 import org.openymsg.legacy.network.Session;
@@ -154,6 +156,7 @@ public class LoginIT {
 	}
 
 	@Test
+	@Category(SlowTest.class)
 	public void testLoginLogoutAndLoginAgainUsingTheSameSessionObject() throws Exception {
 		final Session session = new Session();
 		WaitListener wl = new WaitListener(session);

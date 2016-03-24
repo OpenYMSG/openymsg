@@ -10,6 +10,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.openymsg.SlowTest;
 import org.openymsg.legacy.network.FireEvent;
 import org.openymsg.legacy.network.ServiceType;
 import org.openymsg.legacy.network.Status;
@@ -21,8 +23,10 @@ import java.io.IOException;
 /**
  * @author Giancarlo Frison - Nimbuzz B.V. <giancarlo@nimbuzz.com>
  */
+@Category(SlowTest.class)
 public class ContactsIT extends YahooTestAbstract {
 	@Test
+	@Category(SlowTest.class)
 	public void testAddContact() throws Exception {
 		removeAllContacts(sess1, listener1);
 		if (!sess1.getRoster().isEmpty()) {
@@ -41,6 +45,7 @@ public class ContactsIT extends YahooTestAbstract {
 	}
 
 	@Test
+	@Category(SlowTest.class)
 	public void testReLoginFriendAndChangeStatusBuddy() throws Exception {
 		YahooUser buddy = sess1.getRoster().getUser(OTHERUSR);
 		assertNotNull(buddy);
@@ -72,6 +77,7 @@ public class ContactsIT extends YahooTestAbstract {
 	}
 
 	@Test
+	@Category(SlowTest.class)
 	public void testRejectContact() throws IOException, InterruptedException {
 		removeAllContacts(sess1, listener1);
 		assertFalse(sess1.getRoster().containsUser(OTHERUSR));

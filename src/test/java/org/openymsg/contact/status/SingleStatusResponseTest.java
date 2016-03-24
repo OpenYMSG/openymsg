@@ -3,7 +3,6 @@ package org.openymsg.contact.status;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
@@ -11,6 +10,14 @@ import org.openymsg.YahooStatus;
 import org.openymsg.network.YMSG9Packet;
 import org.openymsg.testing.PacketReader;
 
+/**
+ * <ul>
+ * <li>STATUS_15 is for coming online.
+ * <li>Y6_STATUS_UPDATE is for available/away and custom message.
+ * <li>LOGOFF is for logoff or invisible
+ * <ul>
+ * @author nhart
+ */
 public class SingleStatusResponseTest {
 	@Test
 	public void testAvailableProtocol() {
@@ -24,23 +31,11 @@ public class SingleStatusResponseTest {
 		verify(sessionStatus).statusUpdate(new YahooContact("testuser@live.com", YahooProtocol.MSN), status);
 	}
 
-	@Test()
-	public void testInvisibleToAvailableProtocol() {
-		String test =
-				"Magic:YMSG Version:16 Length:143 Service:Y6_STATUS_UPDATE Status:SERVER_ACK SessionId:0x45130f  [7] [testuser] [10] [0] [97] [1] [302] [316] [300] [316] [135] [2.0.4] [258] [4eb73995-f313-4f4a-49a5-1bc4d7c3ee68] [310] [en-us] [301] [316] [303] [316] [317] [1]";
-		YMSG9Packet packet = PacketReader.readString(test);
-		SessionStatusImpl sessionStatus = mock(SessionStatusImpl.class);
-		SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
-		response.execute(packet);
-		ContactStatusImpl status = getContactstatus(YahooStatus.AVAILABLE, false, true);
-		verify(sessionStatus).statusUpdate(new YahooContact("testuser", YahooProtocol.YAHOO), status);
-	}
-
 	@Test
 	public void testAvailableFromInvisibleYahoo() {
-		String test =
+		String statusTest =
 				"Magic:YMSG Version:16 Length:307 Service:STATUS_15 Status:SERVER_ACK SessionId:0x45130f  [302] [315] [300] [315] [7] [testuser] [10] [0] [13] [1] [97] [1] [192] [672912674] [198] [0] [213] [0] [244] [12582847] [283] [1] [317] [1] [300] [444] [440] [0] [301] [444] [550] [C2YM4G6G222Q3T5RNEHYB5K54Y] [301] [315] [303] [315] [302] [316] [300] [316] [135] [2.0.4] [258] [4eb73995-f313-4f4a-49a5-1bc4d7c3ee68] [310] [en-us] [301] [316] [303] [316]";
-		YMSG9Packet packet = PacketReader.readString(test);
+		YMSG9Packet packet = PacketReader.readString(statusTest);
 		SessionStatusImpl sessionStatus = mock(SessionStatusImpl.class);
 		SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
 		response.execute(packet);
@@ -84,18 +79,11 @@ public class SingleStatusResponseTest {
 		verify(sessionStatus).statusUpdate(new YahooContact("testuser@live.com", YahooProtocol.MSN), status);
 	}
 
-	@Test
-	@Ignore
-	public void testSign(String test, ContactStatusImpl status, YahooContact contact) {
-		// String test =
-		// "Magic:YMSG Version:16 Length:95 Service:STATUS_15 Status:SERVER_ACK SessionId:0x45130f [302] [315] [300]
-		// [315] [7] [testuser@live.com] [10] [0] [13] [1] [241] [2] [244] [6] [301] [315] [303] [315]";
+	private void testSign(String test, ContactStatusImpl status, YahooContact contact) {
 		YMSG9Packet packet = PacketReader.readString(test);
 		SessionStatusImpl sessionStatus = mock(SessionStatusImpl.class);
 		SingleStatusResponse response = new SingleStatusResponse(sessionStatus);
 		response.execute(packet);
-		// ContactStatusImpl status = new ContactStatusImpl();
-		// status.update(Status.AVAILABLE, false, true);
 		verify(sessionStatus).statusUpdate(contact, status);
 	}
 
