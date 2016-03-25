@@ -14,6 +14,7 @@ import static org.junit.Assert.assertNotNull;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.openymsg.legacy.network.chatroom.ChatroomManager;
 import org.openymsg.legacy.network.chatroom.YahooChatCategory;
 import org.openymsg.legacy.network.chatroom.YahooChatLobby;
@@ -39,6 +40,7 @@ public class ChatroomManagerTest {
 	}
 
 	@Test
+	@Category(org.openymsg.WebTest.class)
 	public void testLoadCategories() throws Exception {
 		final Date start = new Date();
 		final ChatroomManager manager = new ChatroomManager(null, null);

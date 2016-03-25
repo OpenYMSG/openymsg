@@ -4,13 +4,19 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.config.SessionConfigSimple;
 import org.openymsg.context.auth.AuthenticationFailure;
 import org.openymsg.context.session.LogoutReason;
+
+import io.github.benas.easyproperties.annotations.Property;
+import io.github.benas.easyproperties.api.PropertiesInjector;
+import io.github.benas.easyproperties.api.PropertyInjectionException;
 // import org.testng.annotations.Parameters;
+import io.github.benas.easyproperties.impl.PropertiesInjectorBuilder;
 
 /**
  * Integration tests. Developers will need to supply the needed values for usernames and passwords. Running this often
@@ -18,13 +24,28 @@ import org.openymsg.context.session.LogoutReason;
  * @author neilhart
  */
 public class SessionIT {
-	// TODO fix test to use junit
-	String badUsername;
+	@Property(source = "users.properties", key = "badUsername")
+	private String badUsername;
+	@Property(source = "users.properties", key = "badUsernamePassword")
+	private String badUsernamePassword;
+	@Property(source = "users.properties", key = "badPasswordUsername")
+	private String badPasswordUsername;
+	@Property(source = "users.properties", key = "badPassword")
+	private String badPassword;
+	@Property(source = "users.properties", key = "username1")
+	private String username1;
+	@Property(source = "users.properties", key = "password1")
+	private String password1;
 
-	// @Parameters({"badUsername", "badUsernamePassword"})
+	@Before
+	public void before() throws PropertyInjectionException {
+		PropertiesInjector propertiesInjector = new PropertiesInjectorBuilder().build();
+		propertiesInjector.injectProperties(this);
+	}
+
 	@Test()
 	@Category(SlowTest.class)
-	public void testBadUsername(String badUsername, String badUsernamePassword) {
+	public void testBadUsername() {
 		SessionConfig config = new SessionConfigSimple();
 		YahooSessionCallback callback = mock(YahooSessionCallback.class);
 		YahooSession session = new SessionImpl(config, callback);
@@ -41,10 +62,9 @@ public class SessionIT {
 		assertTrue(session.isDisconnected());
 	}
 
-	// @Parameters({"badPasswordUsername", "badPassword"})
 	@Test()
 	@Category(SlowTest.class)
-	public void testLocked(String badPasswordUsername, String badPassword) {
+	public void testLocked() {
 		SessionConfig config = new SessionConfigSimple();
 		YahooSessionCallback callback = mock(YahooSessionCallback.class);
 		YahooSession session = new SessionImpl(config, callback);
@@ -63,14 +83,10 @@ public class SessionIT {
 
 	/**
 	 * Start up a few sessions with no buddies and run through some tests.
-	 * @param username1
-	 * @param password1, String username2, String password2, String username3, String password3
 	 */
-	// @Parameters({"username2", "password2", "username3", "password3", "username1", "password1"})
 	@Test()
 	@Category(SlowTest.class)
-	public void testTwo(String username1, String password1, String username2, String password2, String username3,
-			String password3) {
+	public void testTwo() {
 		SessionConfig config = new SessionConfigSimple();
 		YahooSessionCallback callback1a = mock(YahooSessionCallback.class);
 		YahooSession session1a = new SessionImpl(config, callback1a);
@@ -108,5 +124,29 @@ public class SessionIT {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void setBadUsername(String badUsername) {
+		this.badUsername = badUsername;
+	}
+
+	public void setBadUsernamePassword(String badUsernamePassword) {
+		this.badUsernamePassword = badUsernamePassword;
+	}
+
+	public void setBadPasswordUsername(String badPasswordUsername) {
+		this.badPasswordUsername = badPasswordUsername;
+	}
+
+	public void setBadPassword(String badPassword) {
+		this.badPassword = badPassword;
+	}
+
+	public void setUsername1(String username1) {
+		this.username1 = username1;
+	}
+
+	public void setPassword1(String password1) {
+		this.password1 = password1;
 	}
 }
