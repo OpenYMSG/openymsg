@@ -6,6 +6,7 @@ import org.openymsg.config.SessionConfig;
 import org.openymsg.connection.ConnectionInfo;
 import org.openymsg.connection.ConnectionState;
 import org.openymsg.connection.SessionConnectionImpl;
+import org.openymsg.connection.YahooConnection;
 import org.openymsg.contact.SessionContactImpl;
 import org.openymsg.context.SessionCallbackHandler;
 import org.openymsg.context.SessionContextImpl;
@@ -22,9 +23,9 @@ import org.openymsg.unknown.SessionUnknown;
 import java.util.Set;
 
 public class SessionImpl implements YahooSession {
-	private SessionConfig config;
-	protected SessionConnectionImpl connection;
-	protected YahooSessionCallback callback;
+	private final SessionConfig config;
+	protected YahooConnection connection;
+	protected final YahooSessionCallback callback;
 	private SessionContextImpl context;
 	protected SessionMessage message;
 	private SessionContactImpl contact;
@@ -57,15 +58,22 @@ public class SessionImpl implements YahooSession {
 
 	private void initialize(String username) {
 		this.executor = new ExecutorImpl(username);
-		this.connection = new SessionConnectionImpl(executor, callback);
-		this.connection.initialize(config);
+		this.connection = createConnection(executor, callback, config);
 		this.contact = new SessionContactImpl(connection, username, callback);
 		this.context = new SessionContextImpl(config, executor, connection, username, callback);
 		initializeSessionMessage(username);
 		this.conference = new SessionConferenceImpl(username, connection, callback);
 		this.mail = new SessionMailImpl(connection);
 		this.unknown = new SessionUnknown(connection);
+		// TODO Why register here?
 		connection.register(ServiceType.LOGOFF, new PagerLogoffResponse(username, context, contact));
+	}
+
+	protected YahooConnection createConnection(ExecutorImpl executor, YahooSessionCallback callback,
+			SessionConfig config) {
+		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, callback);
+		sessionConnection.initialize(config);
+		return sessionConnection;
 	}
 
 	@Override

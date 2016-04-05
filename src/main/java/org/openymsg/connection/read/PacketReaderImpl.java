@@ -23,7 +23,7 @@ public class PacketReaderImpl implements PacketReader {
 			throw new IllegalArgumentException("Connection cannot be null");
 		}
 		this.reader = new ConnectionReader(connection, this.registry);
-		this.executor.schedule(this.reader, 500);
+		this.executor.schedule(this.reader, 100);
 	}
 
 	@Override

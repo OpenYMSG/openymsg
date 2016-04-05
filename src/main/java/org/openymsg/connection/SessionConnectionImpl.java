@@ -17,20 +17,24 @@ import org.openymsg.network.ServiceType;
 public class SessionConnectionImpl implements YahooConnection, ConnectionHandlerCallback {
 	/** logger */
 	private static final Log log = LogFactory.getLog(SessionConnectionImpl.class);
-	private Executor executor;
+	private final Executor executor;
 	private ConnectionState state;
 	private ConnectionInfo status;
-	private SessionConnectionCallback callback;
-	private PacketWriterImpl writer;
-	private PacketReaderImpl reader;
+	private final SessionConnectionCallback callback;
+	private final PacketWriterImpl writer;
+	private final PacketReaderImpl reader;
 	private ConnectionHandler connection;
 
 	public SessionConnectionImpl(Executor executor, SessionConnectionCallback callback) {
 		this.executor = executor;
 		this.callback = callback;
 		this.state = ConnectionState.UNSTARTED;
-		this.writer = new PacketWriterImpl(this.executor);
+		this.writer = createWriter(this.executor);
 		this.reader = new PacketReaderImpl(this.executor);
+	}
+
+	protected PacketWriterImpl createWriter(Executor executor) {
+		return new PacketWriterImpl(executor);
 	}
 
 	/**

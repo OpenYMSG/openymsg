@@ -1,13 +1,15 @@
 package org.openymsg.execute.dispatch;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadFactory;
 
-// TODO can I just create one.
+/**
+ * One factory for each user. Each additional thread will have a name of name + ":" + count
+ * @author nhart
+ */
 public class NamedThreadFactory implements ThreadFactory {
-	// TODO, remove
-	private static final Map<String, Integer> NAMES = new HashMap<String, Integer>();
+	private static final Map<String, Integer> NAMES = new ConcurrentHashMap<String, Integer>();
 	private String name;
 
 	public NamedThreadFactory(String name) {
@@ -27,6 +29,6 @@ public class NamedThreadFactory implements ThreadFactory {
 		}
 		count++;
 		NAMES.put(name, count);
-		return name + count;
+		return name + ":" + count;
 	}
 }

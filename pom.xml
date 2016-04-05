@@ -171,6 +171,11 @@
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>findbugs-maven-plugin</artifactId>
+					<version>3.0.4-SNAPSHOT</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>taglist-maven-plugin</artifactId>
 					<version>2.4</version>
 				</plugin>
@@ -217,7 +222,7 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<!-- Switch to 1.7 for testing.  Probably will switch back -->
+					<!-- Switch to 1.7 for testing. Probably will switch back -->
 					<source>1.7</source>
 					<target>1.7</target>
 				</configuration>
@@ -326,10 +331,6 @@
 						</excludes>
 					</instrumentation>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
