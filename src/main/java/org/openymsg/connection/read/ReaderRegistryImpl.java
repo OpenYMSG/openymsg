@@ -1,22 +1,22 @@
 package org.openymsg.connection.read;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openymsg.network.ServiceType;
-import org.openymsg.network.YMSG9Packet;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class ReaderRegistryImpl implements ReaderRegistry {
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openymsg.network.ServiceType;
+import org.openymsg.network.YMSG9Packet;
+
+public class ReaderRegistryImpl implements ReaderRegistry, ReaderReceiver {
 	/** logger */
 	private static final Log log = LogFactory.getLog(ReaderRegistryImpl.class);
-	private Map<ServiceType, Set<SinglePacketResponse>> registry =
-			new HashMap<ServiceType, Set<SinglePacketResponse>>();
+	private Map<ServiceType, Set<SinglePacketResponse>> registry = new HashMap<ServiceType, Set<SinglePacketResponse>>();
 
-	public ReaderRegistryImpl() {}
+	public ReaderRegistryImpl() {
+	}
 
 	@Override
 	public void register(ServiceType type, SinglePacketResponse response) {
@@ -57,6 +57,7 @@ public class ReaderRegistryImpl implements ReaderRegistry {
 		return false;
 	}
 
+	@Override
 	public void received(YMSG9Packet packet) {
 		log.debug("received packet: " + packet);
 		ServiceType type = packet.service;

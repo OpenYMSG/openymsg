@@ -61,6 +61,7 @@ public class CapacityServers {
 		String url = String.format(NetworkConstants.CAPACITY_URL_FORMAT, host);
 		try {
 			URL u = new URL(url);
+			// TODO check time out for these
 			URLConnection uc = u.openConnection();
 			if (uc instanceof HttpURLConnection) {
 				int responseCode = ((HttpURLConnection) uc).getResponseCode();

@@ -4,7 +4,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.connection.YahooConnection;
+import org.openymsg.connection.write.Message;
 import org.openymsg.execute.Executor;
+import org.openymsg.execute.dispatch.Request;
 import org.openymsg.network.ServiceType;
 
 public class SessionAuthenticationImpl implements SessionAuthentication {
@@ -12,9 +14,6 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 	private static final Log log = LogFactory.getLog(SessionAuthenticationImpl.class);
 	private Executor executor;
 	private YahooConnection connection;
-	// private String username;
-	// private String password;
-	// private String seed;
 	AuthenticationToken token;
 	private SessionAuthenticationCallback callback;
 	private SessionConfig sessionConfig;
@@ -40,8 +39,6 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 		if (password == null || password.isEmpty()) {
 			throw new IllegalArgumentException("password may not be null");
 		}
-		// this.username = username;
-		// this.password = password;
 		token.setUsernameAndPassword(username, password);
 		// TODO move status check to Session
 		// ConnectionState executionState = this.executor.getState();
@@ -49,7 +46,8 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 		connection.execute(new LoginInitMessage(username));
 		// }
 		// else {
-		// throw new IllegalStateException("Don't call login when status is: " + executionState);
+		// throw new IllegalStateException("Don't call login when status is: " +
+		// executionState);
 		// }
 	}
 
@@ -60,15 +58,23 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 	}
 
 	protected void receivedLoginInit() {
-		this.executor.execute(new PasswordTokenRequest(this, sessionConfig, token));
+		execute(new PasswordTokenRequest(this, sessionConfig, token));
 	}
 
 	protected void receivedPasswordToken() {
-		this.executor.execute(new PasswordTokenLoginRequest(this, sessionConfig, token));
+		execute(new PasswordTokenLoginRequest(this, sessionConfig, token));
+	}
+
+	protected void execute(Request request) {
+		this.executor.execute(request);
+	}
+
+	protected void execute(Message message) {
+		this.connection.execute(message);
 	}
 
 	protected void receivedPasswordTokenLogin() {
-		this.connection.execute(new LoginCompleteMessage(token));
+		execute(new LoginCompleteMessage(token));
 		this.callback.authenticationSuccess();
 	}
 

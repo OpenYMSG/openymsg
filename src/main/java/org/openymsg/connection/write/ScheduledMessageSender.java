@@ -2,21 +2,21 @@ package org.openymsg.connection.write;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openymsg.connection.YahooConnection;
 import org.openymsg.execute.dispatch.Request;
 
 /**
- * A request the sends a message when executed. This is primarily used for scheduling messages to be sent in the future
- * once or recurring.
+ * A request the sends a message when executed. This is primarily used for
+ * scheduling messages to be sent in the future once or recurring.
+ * 
  * @author neilhart
  */
 public class ScheduledMessageSender implements Request {
 	/** logger */
 	private static final Log log = LogFactory.getLog(ScheduledMessageSender.class);
-	private YahooConnection executor;
+	private PacketWriter executor;
 	private Message message;
 
-	public ScheduledMessageSender(YahooConnection executor, Message message) {
+	public ScheduledMessageSender(PacketWriter executor, Message message) {
 		if (executor == null) {
 			throw new IllegalArgumentException("Executor cannot be null");
 		}

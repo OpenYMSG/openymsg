@@ -62,8 +62,16 @@ public class SessionSessionImpl implements SessionSession {
 			throw new IllegalStateException("State is not logging in: " + state);
 		}
 		state = LoginState.LOGGED_IN;
-		executor.schedule(new ScheduledMessageSender(connection, new PingMessage()), (60 * 60 * 1000));
-		executor.schedule(new ScheduledMessageSender(connection, new KeepAliveMessage(username)), (60 * 1000));
+		executor.schedule(createPingSchedule(), (60 * 60 * 1000));
+		executor.schedule(createKeepAliveSchedule(), (60 * 1000));
+	}
+
+	protected ScheduledMessageSender createKeepAliveSchedule() {
+		return new ScheduledMessageSender(connection, new KeepAliveMessage(username));
+	}
+
+	protected ScheduledMessageSender createPingSchedule() {
+		return new ScheduledMessageSender(connection, new PingMessage());
 	}
 
 	/**

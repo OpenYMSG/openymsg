@@ -10,15 +10,20 @@ import org.openymsg.context.session.SessionSessionImpl;
 import org.openymsg.execute.Executor;
 
 public class SessionContextImpl implements SessionContext, SessionContextCallback {
-	private SessionAuthenticationImpl authentication;
-	private SessionSessionImpl session;
-	private SessionContextCallback callback;
+	protected final SessionAuthenticationImpl authentication;
+	private final SessionSessionImpl session;
+	private final SessionContextCallback callback;
 
 	public SessionContextImpl(SessionConfig sessionConfig, Executor executor, YahooConnection connection,
 			String username, SessionContextCallback callback) {
 		this.callback = callback;
-		authentication = new SessionAuthenticationImpl(sessionConfig, connection, executor, this);
+		authentication = createAuthentication(sessionConfig, executor, connection);
 		session = new SessionSessionImpl(username, executor, connection, sessionConfig.getSessionTimeout(), this);
+	}
+
+	protected SessionAuthenticationImpl createAuthentication(SessionConfig sessionConfig, Executor executor,
+			YahooConnection connection) {
+		return new SessionAuthenticationImpl(sessionConfig, connection, executor, this);
 	}
 
 	@Override

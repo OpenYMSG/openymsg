@@ -11,10 +11,10 @@ public class ConnectionReader implements Request {
 	/** logger */
 	private static final Log log = LogFactory.getLog(ConnectionReader.class);
 	private ConnectionHandler connection;
-	private ReaderRegistryImpl registry;
+	private ReaderReceiver registry;
 	private boolean isFinished = false;
 
-	public ConnectionReader(ConnectionHandler connection, ReaderRegistryImpl registry) {
+	public ConnectionReader(ConnectionHandler connection, ReaderReceiver registry) {
 		if (connection == null) {
 			throw new IllegalArgumentException("Connection cannot be null");
 		}

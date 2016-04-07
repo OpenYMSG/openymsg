@@ -5,9 +5,9 @@ import org.openymsg.network.ConnectionHandler;
 import org.openymsg.network.ServiceType;
 
 public class PacketReaderImpl implements PacketReader {
-	private ReaderRegistryImpl registry;
+	protected ReaderRegistryImpl registry;
 	private ConnectionReader reader;
-	private Dispatcher executor;
+	private final Dispatcher executor;
 
 	public PacketReaderImpl(Dispatcher executor) {
 		if (executor == null) {
@@ -17,12 +17,16 @@ public class PacketReaderImpl implements PacketReader {
 		this.registry = new ReaderRegistryImpl();
 	}
 
+	protected ReaderReceiver getReceiver() {
+		return this.registry;
+	}
+
 	@Override
 	public void initializeConnection(ConnectionHandler connection) {
 		if (connection == null) {
 			throw new IllegalArgumentException("Connection cannot be null");
 		}
-		this.reader = new ConnectionReader(connection, this.registry);
+		this.reader = new ConnectionReader(connection, getReceiver());
 		this.executor.schedule(this.reader, 100);
 	}
 

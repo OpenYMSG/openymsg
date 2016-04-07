@@ -21,16 +21,23 @@ public class SessionConnectionImpl implements YahooConnection, ConnectionHandler
 	private ConnectionState state;
 	private ConnectionInfo status;
 	private final SessionConnectionCallback callback;
-	private final PacketWriterImpl writer;
-	private final PacketReaderImpl reader;
+	private PacketWriterImpl writer;
+	private PacketReaderImpl reader;
 	private ConnectionHandler connection;
 
 	public SessionConnectionImpl(Executor executor, SessionConnectionCallback callback) {
 		this.executor = executor;
 		this.callback = callback;
+	}
+
+	private void initialize() {
 		this.state = ConnectionState.UNSTARTED;
 		this.writer = createWriter(this.executor);
-		this.reader = new PacketReaderImpl(this.executor);
+		this.reader = createReader(this.executor);
+	}
+
+	protected PacketReaderImpl createReader(Executor executor) {
+		return new PacketReaderImpl(executor);
 	}
 
 	protected PacketWriterImpl createWriter(Executor executor) {
@@ -38,10 +45,14 @@ public class SessionConnectionImpl implements YahooConnection, ConnectionHandler
 	}
 
 	/**
-	 * initialize the connection based on the config. Config options should not change
-	 * @param sessionConfig configuration
+	 * initialize the connection based on the config. Config options should not
+	 * change
+	 * 
+	 * @param sessionConfig
+	 *            configuration
 	 */
 	public void initialize(SessionConfig sessionConfig) throws IllegalArgumentException {
+		initialize();
 		if (sessionConfig == null) {
 			throw new IllegalArgumentException("sessionConfig must not be null");
 		}

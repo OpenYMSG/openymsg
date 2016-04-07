@@ -1,5 +1,7 @@
 package org.openymsg;
 
+import java.util.Set;
+
 import org.openymsg.conference.SessionConference;
 import org.openymsg.conference.SessionConferenceImpl;
 import org.openymsg.config.SessionConfig;
@@ -19,8 +21,6 @@ import org.openymsg.message.SessionMessage;
 import org.openymsg.message.SessionMessageImpl;
 import org.openymsg.network.ServiceType;
 import org.openymsg.unknown.SessionUnknown;
-
-import java.util.Set;
 
 public class SessionImpl implements YahooSession {
 	private final SessionConfig config;
@@ -44,7 +44,8 @@ public class SessionImpl implements YahooSession {
 	}
 
 	/**
-	 * {@inheritDoc} Initialize the connection and login to yahoo and return immediately.
+	 * {@inheritDoc} Initialize the connection and login to yahoo and return
+	 * immediately.
 	 */
 	@Override
 	public void login(String username, String password) throws IllegalArgumentException, IllegalStateException {
@@ -60,13 +61,18 @@ public class SessionImpl implements YahooSession {
 		this.executor = new ExecutorImpl(username);
 		this.connection = createConnection(executor, callback, config);
 		this.contact = new SessionContactImpl(connection, username, callback);
-		this.context = new SessionContextImpl(config, executor, connection, username, callback);
+		this.context = createContext(executor, username, callback, config);
 		initializeSessionMessage(username);
 		this.conference = new SessionConferenceImpl(username, connection, callback);
 		this.mail = new SessionMailImpl(connection);
 		this.unknown = new SessionUnknown(connection);
 		// TODO Why register here?
 		connection.register(ServiceType.LOGOFF, new PagerLogoffResponse(username, context, contact));
+	}
+
+	protected SessionContextImpl createContext(ExecutorImpl executor, String username, YahooSessionCallback callback,
+			SessionConfig config) {
+		return new SessionContextImpl(config, executor, connection, username, callback);
 	}
 
 	protected YahooConnection createConnection(ExecutorImpl executor, YahooSessionCallback callback,
@@ -79,7 +85,8 @@ public class SessionImpl implements YahooSession {
 	@Override
 	public void logout() throws IllegalStateException {
 		if (!state.isLoggedIn() || !state.isFailure()) {
-			// TODO - nah - log this or send exception("Session in wrong state: " + state);
+			// TODO - nah - log this or send exception("Session in wrong state:
+			// " + state);
 		}
 		context.logout();
 		// no event from yahoo anymore
