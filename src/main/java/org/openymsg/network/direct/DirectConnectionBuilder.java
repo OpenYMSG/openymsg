@@ -1,12 +1,5 @@
 package org.openymsg.network.direct;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openymsg.config.SessionConfig;
-import org.openymsg.connection.ConnectionInfo;
-import org.openymsg.network.ConnectionBuilder;
-import org.openymsg.network.NetworkConstants;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -15,8 +8,17 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Collection;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openymsg.config.SessionConfig;
+import org.openymsg.connection.ConnectionInfo;
+import org.openymsg.network.ConnectionBuilder;
+import org.openymsg.network.ConnectionHandler;
+import org.openymsg.network.NetworkConstants;
+
 /**
  * Builder for DirectConnection.
+ * 
  * @author neilhart
  */
 public class DirectConnectionBuilder implements ConnectionBuilder {
@@ -33,7 +35,8 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 		return handlerStatus;
 	}
 
-	public DirectConnectionBuilder() {}
+	public DirectConnectionBuilder() {
+	}
 
 	@Override
 	public ConnectionBuilder with(SessionConfig config) {
@@ -54,9 +57,9 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 	}
 
 	@Override
-	public DirectConnectionHandler build() {
+	public ConnectionHandler build() {
 		handlerStatus = new ConnectionInfo();
-		DirectConnectionHandler connection = null;
+		ConnectionHandler connection = null;
 		boolean connected = false;
 		if (capacityBuilding) {
 			connected = connectViaCapacityServers(config, handlerStatus);
@@ -72,7 +75,7 @@ public class DirectConnectionBuilder implements ConnectionBuilder {
 		return connection;
 	}
 
-	protected DirectConnectionHandler createHandler() {
+	protected ConnectionHandler createHandler() {
 		SocketLockChecker socketLockChecker = new SocketLockCheckerImpl();
 		return new DirectConnectionHandler(this.socket, socketLockChecker);
 	}

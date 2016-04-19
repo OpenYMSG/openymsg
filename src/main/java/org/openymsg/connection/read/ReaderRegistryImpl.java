@@ -13,7 +13,7 @@ import org.openymsg.network.YMSG9Packet;
 public class ReaderRegistryImpl implements ReaderRegistry, ReaderReceiver {
 	/** logger */
 	private static final Log log = LogFactory.getLog(ReaderRegistryImpl.class);
-	private Map<ServiceType, Set<SinglePacketResponse>> registry = new HashMap<ServiceType, Set<SinglePacketResponse>>();
+	private final Map<ServiceType, Set<SinglePacketResponse>> registry = new HashMap<ServiceType, Set<SinglePacketResponse>>();
 
 	public ReaderRegistryImpl() {
 	}

@@ -11,14 +11,19 @@ import org.openymsg.execute.Executor;
 
 public class SessionContextImpl implements SessionContext, SessionContextCallback {
 	protected final SessionAuthenticationImpl authentication;
-	private final SessionSessionImpl session;
+	protected final SessionSessionImpl session;
 	private final SessionContextCallback callback;
 
 	public SessionContextImpl(SessionConfig sessionConfig, Executor executor, YahooConnection connection,
 			String username, SessionContextCallback callback) {
 		this.callback = callback;
 		authentication = createAuthentication(sessionConfig, executor, connection);
-		session = new SessionSessionImpl(username, executor, connection, sessionConfig.getSessionTimeout(), this);
+		session = createSessionSession(sessionConfig, executor, connection, username);
+	}
+
+	protected SessionSessionImpl createSessionSession(SessionConfig sessionConfig, Executor executor,
+			YahooConnection connection, String username) {
+		return new SessionSessionImpl(username, executor, connection, sessionConfig.getSessionTimeout(), this);
 	}
 
 	protected SessionAuthenticationImpl createAuthentication(SessionConfig sessionConfig, Executor executor,

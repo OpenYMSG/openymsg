@@ -7,6 +7,7 @@ import org.openymsg.connection.YahooConnection;
 import org.openymsg.connection.write.ScheduledMessageSender;
 import org.openymsg.context.session.timeout.TimeoutChecker;
 import org.openymsg.execute.Executor;
+import org.openymsg.execute.dispatch.Request;
 import org.openymsg.network.ServiceType;
 
 public class SessionSessionImpl implements SessionSession {
@@ -47,7 +48,8 @@ public class SessionSessionImpl implements SessionSession {
 
 	// TODO - looks cool
 	// /**
-	// * Ask server to return refreshed stats for this session. Server will send back a USERSTAT and truncated NEWMAIL
+	// * Ask server to return refreshed stats for this session. Server will send
+	// back a USERSTAT and truncated NEWMAIL
 	// * packet.
 	// */
 	// public void refreshStats() throws IllegalStateException, IOException {
@@ -66,11 +68,11 @@ public class SessionSessionImpl implements SessionSession {
 		executor.schedule(createKeepAliveSchedule(), (60 * 1000));
 	}
 
-	protected ScheduledMessageSender createKeepAliveSchedule() {
+	protected Request createKeepAliveSchedule() {
 		return new ScheduledMessageSender(connection, new KeepAliveMessage(username));
 	}
 
-	protected ScheduledMessageSender createPingSchedule() {
+	protected Request createPingSchedule() {
 		return new ScheduledMessageSender(connection, new PingMessage());
 	}
 
@@ -92,10 +94,13 @@ public class SessionSessionImpl implements SessionSession {
 	}
 
 	/**
-	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc. If you want to login as invisible, set
-	 * this to Status.INVISIBLE before you call login(). Note: this setter is overloaded. The second version is intended
-	 * for use when setting custom status messages.
-	 * @param status The new Status to be set for this user.
+	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc.
+	 * If you want to login as invisible, set this to Status.INVISIBLE before
+	 * you call login(). Note: this setter is overloaded. The second version is
+	 * intended for use when setting custom status messages.
+	 * 
+	 * @param status
+	 *            The new Status to be set for this user.
 	 * @throws IllegalArgumentException
 	 */
 	@Override
@@ -114,10 +119,13 @@ public class SessionSessionImpl implements SessionSession {
 	}
 
 	/**
-	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc. Legit values are in the StatusConstants
-	 * interface. If you want to login as invisible, set this to Status.INVISIBLE before you call login() Note: setter
-	 * is overloaded, the second version is intended for use when setting custom status messages. The boolean is true if
-	 * available and false if away.
+	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc.
+	 * Legit values are in the StatusConstants interface. If you want to login
+	 * as invisible, set this to Status.INVISIBLE before you call login() Note:
+	 * setter is overloaded, the second version is intended for use when setting
+	 * custom status messages. The boolean is true if available and false if
+	 * away.
+	 * 
 	 * @param message
 	 * @param showBusyIcon
 	 * @throws IllegalArgumentException

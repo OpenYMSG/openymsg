@@ -1,23 +1,24 @@
 package org.openymsg.connection.write;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.execute.dispatch.Dispatcher;
+import org.openymsg.execute.dispatch.MessageRequest;
 import org.openymsg.execute.dispatch.Request;
 import org.openymsg.execute.dispatch.ScheduleTaskCompletionException;
 import org.openymsg.network.ConnectionHandler;
-
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ConnectionWriter implements Request {
 	/** logger */
 	private static final Log log = LogFactory.getLog(ConnectionWriter.class);
 	private ConnectionHandler connection;
-	private ConcurrentLinkedQueue<Message> queue;
+	private ConcurrentLinkedQueue<MessageRequest> queue;
 	private Dispatcher executor;
 	private boolean isFinished = false;
 
-	public ConnectionWriter(ConcurrentLinkedQueue<Message> queue, Dispatcher executor) {
+	public ConnectionWriter(ConcurrentLinkedQueue<MessageRequest> queue, Dispatcher executor) {
 		this.queue = queue;
 		this.executor = executor;
 	}
@@ -31,9 +32,9 @@ public class ConnectionWriter implements Request {
 		if (this.isFinished) {
 			throw new ScheduleTaskCompletionException();
 		}
-		Message message = this.queue.poll();
-		if (message != null) {
-			MessageExecuteRequest request = new MessageExecuteRequest(message, connection);
+		MessageRequest request = this.queue.poll();
+		if (request != null) {
+			request.setConnection(connection);
 			this.executor.execute(request);
 		} else {
 			log.trace("message is null");

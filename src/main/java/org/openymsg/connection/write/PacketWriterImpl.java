@@ -1,14 +1,15 @@
 package org.openymsg.connection.write;
 
-import org.openymsg.execute.dispatch.Dispatcher;
-import org.openymsg.network.ConnectionHandler;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.openymsg.execute.dispatch.Dispatcher;
+import org.openymsg.execute.dispatch.MessageRequest;
+import org.openymsg.network.ConnectionHandler;
 
 public class PacketWriterImpl implements PacketWriter {
 	private Dispatcher executor = null;
 	// TODO don't let this get to big
-	private ConcurrentLinkedQueue<Message> queue = new ConcurrentLinkedQueue<Message>();
+	private ConcurrentLinkedQueue<MessageRequest> queue = new ConcurrentLinkedQueue<MessageRequest>();
 	private ConnectionWriter writer;
 
 	// TODO only schedule when queue is active
@@ -27,7 +28,13 @@ public class PacketWriterImpl implements PacketWriter {
 		if (writer.isLocked(2000)) {
 			// TODO what is this for?
 		}
-		this.queue.add(message);
+		MessageRequest request = wrapMessage(message);
+		this.queue.add(request);
+	}
+
+	protected MessageRequest wrapMessage(Message message) {
+		MessageRequest request = new MessageExecuteRequest(message);
+		return request;
 	}
 
 	@Override

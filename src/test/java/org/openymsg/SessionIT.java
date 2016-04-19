@@ -52,7 +52,7 @@ public class SessionIT {
 		// callback.setSession(session);
 		session.login(badUsername, badUsernamePassword);
 		try {
-			Thread.sleep(3000);
+			Thread.sleep(30000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
