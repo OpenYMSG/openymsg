@@ -1,5 +1,9 @@
 package org.openymsg.context.auth;
 
+import java.io.ByteArrayOutputStream;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.config.SessionConfig;
@@ -8,12 +12,10 @@ import org.openymsg.network.url.URLStream;
 import org.openymsg.network.url.URLStreamBuilder;
 import org.openymsg.network.url.URLStreamStatus;
 
-import java.io.ByteArrayOutputStream;
-import java.util.List;
-import java.util.StringTokenizer;
-
 /**
- * Open a HTTP connection with a login URL with a generated token and retrieve some cookies and a crumb.
+ * Open a HTTP connection with a login URL with a generated token and retrieve
+ * some cookies and a crumb.
+ * 
  * @author neilhart
  */
 public class PasswordTokenLoginRequest implements Request {
@@ -52,7 +54,7 @@ public class PasswordTokenLoginRequest implements Request {
 		String cookieY = null;
 		String cookieT = null;
 		String response = out.toString();
-		log.info("response: " + response);
+		log.info("Received PasswordTokenLoginResponse: " + response);
 		// TODO handle cookieB
 		List<String> cookies = stream.getHeaders().get("Set-Cookie");
 		log.info("cookies: " + cookies);
