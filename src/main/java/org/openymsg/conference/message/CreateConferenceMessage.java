@@ -1,4 +1,4 @@
-package org.openymsg.conference;
+package org.openymsg.conference.message;
 
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;

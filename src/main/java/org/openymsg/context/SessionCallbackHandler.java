@@ -1,5 +1,7 @@
 package org.openymsg.context;
 
+import java.util.Set;
+
 import org.openymsg.Name;
 import org.openymsg.SessionImpl;
 import org.openymsg.YahooConference;
@@ -11,8 +13,6 @@ import org.openymsg.YahooSessionCallback;
 import org.openymsg.contact.roster.ContactAddFailure;
 import org.openymsg.context.auth.AuthenticationFailure;
 import org.openymsg.context.session.LogoutReason;
-
-import java.util.Set;
 
 public class SessionCallbackHandler implements YahooSessionCallback {
 	private SessionImpl session;
@@ -173,4 +173,5 @@ public class SessionCallbackHandler implements YahooSessionCallback {
 			Set<YahooContact> members, String message) {
 		callback.receivedConferenceInviteAck(conference, invited, members, message);
 	}
+
 }

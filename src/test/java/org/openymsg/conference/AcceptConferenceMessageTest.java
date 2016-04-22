@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
+import org.openymsg.conference.message.AcceptConferenceMessage;
 import org.openymsg.testing.MessageAssert;
 
 import java.io.IOException;

@@ -5,32 +5,36 @@ import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.connection.read.SinglePacketResponse;
-import org.openymsg.contact.SessionContactImpl;
+import org.openymsg.contact.status.ContactStatusChangeCallback;
 import org.openymsg.context.SessionContextImpl;
 import org.openymsg.network.YMSG9Packet;
 
 // TODO - connection isn't closed yet
 // TODO - really a Pager Log off
 /**
- * Process an incoming AUTHRESP packet. If we get one of these it means the logon process has failed. Set the session
- * state to be failed, and flag the end of login. Note: we don't throw exceptions on the input thread, but instead we
- * pass them to the thread which called login()
+ * Process an incoming AUTHRESP packet. If we get one of these it means the
+ * logon process has failed. Set the session state to be failed, and flag the
+ * end of login. Note: we don't throw exceptions on the input thread, but
+ * instead we pass them to the thread which called login()
  */
 public class PagerLogoffResponse implements SinglePacketResponse {
 	private static final Log log = LogFactory.getLog(PagerLogoffResponse.class);
 	private final String username;
 	private final SessionContextImpl sessionContext;
-	private final SessionContactImpl sessionContact;
+	private final ContactStatusChangeCallback contactCallback;
 
-	public PagerLogoffResponse(String username, SessionContextImpl sessionContext, SessionContactImpl sessionContact) {
+	public PagerLogoffResponse(String username, SessionContextImpl sessionContext,
+			ContactStatusChangeCallback contactCallback) {
 		this.username = username;
 		this.sessionContext = sessionContext;
-		this.sessionContact = sessionContact;
+		this.contactCallback = contactCallback;
 	}
 
 	/**
 	 * handle the incoming packet.
-	 * @param packet incoming packet
+	 * 
+	 * @param packet
+	 *            incoming packet
 	 */
 	@Override
 	public void execute(YMSG9Packet packet) {
@@ -42,7 +46,7 @@ public class PagerLogoffResponse implements SinglePacketResponse {
 		} else {
 			log.warn("Got a logoff for another user: " + packet);
 			YahooContact contact = new YahooContact(packetUser, YahooProtocol.YAHOO);
-			sessionContact.receivedContactLogoff(contact);
+			contactCallback.receivedContactLogoff(contact);
 		}
 	}
 

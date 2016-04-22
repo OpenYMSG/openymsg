@@ -2,14 +2,16 @@ package org.openymsg;
 
 import java.util.Set;
 
+import org.openymsg.conference.ConferenceServiceBuilder;
 import org.openymsg.conference.SessionConference;
-import org.openymsg.conference.SessionConferenceImpl;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.connection.ConnectionInfo;
 import org.openymsg.connection.ConnectionState;
 import org.openymsg.connection.SessionConnectionImpl;
 import org.openymsg.connection.YahooConnection;
-import org.openymsg.contact.SessionContactImpl;
+import org.openymsg.contact.ContactServiceBuilder;
+import org.openymsg.contact.ContactUserService;
+import org.openymsg.contact.status.ContactStatusChangeCallback;
 import org.openymsg.context.SessionCallbackHandler;
 import org.openymsg.context.SessionContextImpl;
 import org.openymsg.context.auth.AuthenticationFailure;
@@ -28,7 +30,7 @@ public class SessionImpl implements YahooSession {
 	protected final YahooSessionCallback callback;
 	private SessionContextImpl context;
 	protected SessionMessage message;
-	private SessionContactImpl contact;
+	private ContactUserService contact;
 	private SessionConference conference;
 	@SuppressWarnings("unused")
 	private SessionUnknown unknown;
@@ -36,6 +38,7 @@ public class SessionImpl implements YahooSession {
 	private SessionMail mail;
 	private YahooSessionState state;
 	protected ExecutorImpl executor;
+	private ContactStatusChangeCallback statusChangeCallback;
 
 	public SessionImpl(SessionConfig config, YahooSessionCallback callback) {
 		this.config = config;
@@ -60,14 +63,27 @@ public class SessionImpl implements YahooSession {
 	private void initialize(String username) {
 		this.executor = new ExecutorImpl(username);
 		this.connection = createConnection(executor, callback, config);
-		this.contact = new SessionContactImpl(connection, username, callback);
+		createContact(username);
 		this.context = createContext(executor, username, callback, config);
 		initializeSessionMessage(username);
-		this.conference = new SessionConferenceImpl(username, connection, callback);
+		createConferenceService(username);
 		this.mail = new SessionMailImpl(connection);
 		this.unknown = new SessionUnknown(connection);
-		// TODO Why register here?
-		connection.register(ServiceType.LOGOFF, new PagerLogoffResponse(username, context, contact));
+		// TODO Why register here? can go to myself context or contact
+		connection.register(ServiceType.LOGOFF, new PagerLogoffResponse(username, context, statusChangeCallback));
+	}
+
+	private void createConferenceService(String username) {
+		ConferenceServiceBuilder builder = new ConferenceServiceBuilder().setCallback(callback).setUsername(username)
+				.setConnection(connection);
+		this.conference = builder.build();
+	}
+
+	protected void createContact(String username) {
+		ContactServiceBuilder builder = new ContactServiceBuilder().setCallback(callback).setUsername(username)
+				.setConnection(connection);
+		this.contact = builder.build();
+		statusChangeCallback = builder.getContactStatusChangeCallback();
 	}
 
 	protected SessionContextImpl createContext(ExecutorImpl executor, String username, YahooSessionCallback callback,

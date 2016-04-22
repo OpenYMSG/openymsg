@@ -1,11 +1,4 @@
-package org.openymsg.conference;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openymsg.YahooConference;
-import org.openymsg.YahooContact;
-import org.openymsg.YahooProtocol;
-import org.openymsg.network.YMSG9Packet;
+package org.openymsg.conference.response;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,17 +6,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.openymsg.YahooConference;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooProtocol;
+import org.openymsg.conference.SessionConferenceCallback;
+import org.openymsg.network.YMSG9Packet;
+
 /**
- * Process an incoming CONFADDINVITE packet. We get one of these when we are being invited to join someone else's
- * conference. Note: it is possible for conference packets (ie: logon) can arrive before the invite. These are buffered
- * until the invite is received.
+ * Process an incoming CONFADDINVITE packet. We get one of these when we are
+ * being invited to join someone else's conference. Note: it is possible for
+ * conference packets (ie: logon) can arrive before the invite. These are
+ * buffered until the invite is received.
+ * 
  * @param pkt
  */
 public class ConferenceExtendResponse extends AbstractConferenceResponse {
-	/** logger */
-	private static final Log log = LogFactory.getLog(ConferenceExtendResponse.class);
 
-	public ConferenceExtendResponse(SessionConferenceImpl sessionConference) {
+	public ConferenceExtendResponse(SessionConferenceCallback sessionConference) {
 		super(sessionConference);
 	}
 
@@ -46,7 +45,8 @@ public class ConferenceExtendResponse extends AbstractConferenceResponse {
 		sessionConference.receivedConferenceExtend(conference, inviter, invitedContacts);
 		// if (to.equals(from)) {
 		// sessionConference
-		// .receivedConferenceInviteAck(conference, inviter, invitedContacts, memberContacts, message);
+		// .receivedConferenceInviteAck(conference, inviter, invitedContacts,
+		// memberContacts, message);
 		// } else {
 		// }
 		// Add the users

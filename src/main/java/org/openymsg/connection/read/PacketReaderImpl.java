@@ -5,7 +5,7 @@ import org.openymsg.network.ConnectionHandler;
 import org.openymsg.network.ServiceType;
 
 public class PacketReaderImpl implements PacketReader {
-	protected ReaderRegistryImpl registry;
+	protected final ReaderRegistryImpl registry;
 	private ConnectionReader reader;
 	private final Dispatcher executor;
 
@@ -14,7 +14,11 @@ public class PacketReaderImpl implements PacketReader {
 			throw new IllegalArgumentException("Executor cannot be null");
 		}
 		this.executor = executor;
-		this.registry = new ReaderRegistryImpl();
+		this.registry = createRegistry();
+	}
+
+	protected ReaderRegistryImpl createRegistry() {
+		return new ReaderRegistryImpl();
 	}
 
 	protected ReaderReceiver getReceiver() {

@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.openymsg.contact.status.ListOfStatusesResponse;
+import org.openymsg.contact.status.response.ListOfStatusesResponse;
 import org.openymsg.network.ServiceType;
 
 public class ReaderRegistryTest {

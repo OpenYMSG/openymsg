@@ -1,26 +1,25 @@
-package org.openymsg.conference;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openymsg.YahooConference;
-import org.openymsg.YahooContact;
-import org.openymsg.YahooProtocol;
-import org.openymsg.network.YMSG9Packet;
+package org.openymsg.conference.response;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import org.openymsg.YahooConference;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooProtocol;
+import org.openymsg.conference.SessionConferenceCallback;
+import org.openymsg.network.YMSG9Packet;
+
 /**
- * Process an incoming CONFINVITE packet. We get one of these when we are being invited to join someone else's
- * conference. Note: it is possible for conference packets (ie: logon) can arrive before the invite. These are buffered
- * until the invite is received.
+ * Process an incoming CONFINVITE packet. We get one of these when we are being
+ * invited to join someone else's conference. Note: it is possible for
+ * conference packets (ie: logon) can arrive before the invite. These are
+ * buffered until the invite is received.
+ * 
  * @param pkt
  */
 public class ConferenceInviteResponse extends AbstractConferenceResponse {
-	/** logger */
-	private static final Log log = LogFactory.getLog(ConferenceInviteResponse.class);
 
-	public ConferenceInviteResponse(SessionConferenceImpl sessionConference) {
+	public ConferenceInviteResponse(SessionConferenceCallback sessionConference) {
 		super(sessionConference);
 	}
 

@@ -1,4 +1,4 @@
-package org.openymsg.contact.status;
+package org.openymsg.contact.status.response;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -1,4 +1,6 @@
-package org.openymsg.contact.status;
+package org.openymsg.contact.status.response;
+
+import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -6,26 +8,33 @@ import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.YahooStatus;
 import org.openymsg.connection.read.SinglePacketResponse;
+import org.openymsg.contact.status.ContactPresence;
+import org.openymsg.contact.status.ContactStatusImpl;
+import org.openymsg.contact.status.CustomStatusMessage;
+import org.openymsg.contact.status.NormalStatusMessage;
+import org.openymsg.contact.status.SessionStatusCallback;
+import org.openymsg.contact.status.StatusMessage;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.YMSG9Packet;
 
-import java.util.Iterator;
-
 /**
- * LOGON packets can contain multiple friend status sections, ISAWAY and ISBACK packets contain only one. Update the
- * YahooUser details and fire event. status == 0 is a single status
+ * LOGON packets can contain multiple friend status sections, ISAWAY and ISBACK
+ * packets contain only one. Update the YahooUser details and fire event. status
+ * == 0 is a single status
  */
 public class SingleStatusResponse implements SinglePacketResponse {
 	private static final Log log = LogFactory.getLog(SingleStatusResponse.class);
-	private SessionStatusImpl sessionStatus;
+	private SessionStatusCallback sessionStatus;
 
-	public SingleStatusResponse(SessionStatusImpl sessionStatus) {
+	public SingleStatusResponse(SessionStatusCallback sessionStatus) {
 		this.sessionStatus = sessionStatus;
 	}
 
 	/**
 	 * handle the incoming packet.
-	 * @param packet incoming packet
+	 * 
+	 * @param packet
+	 *            incoming packet
 	 */
 	@Override
 	public void execute(YMSG9Packet packet) {
@@ -52,71 +61,72 @@ public class SingleStatusResponse implements SinglePacketResponse {
 			String value = s[1];
 			// log.info("Key: " + key + ", value: " + value);
 			switch (key) {
-				case 300:
-					// initial row, most of the time
-					break;
-				case 7:
-					// check and see if we have one
-					if (userId != null) {
-						updateFriendStatus(logoff, userId, onChat, onPager, visibility, clearIdleTime, idleTime,
-								customMessage, customStatus, longStatus, protocol, clientVersion);
-						longStatus = 0;
-						onChat = null;
-						onPager = null;
-						visibility = null;
-						clearIdleTime = null;
-						idleTime = null;
-						customMessage = null;
-						customStatus = null;
-						userId = null;
-						clientVersion = null;
-						protocol = YahooProtocol.YAHOO;
-					}
-					userId = value;
-					break;
-				case 10:
-					try {
-						longStatus = Long.parseLong(value);
-					} catch (NumberFormatException e) {
-						customMessage = value;
-					}
-					break;
-				case 17:
-					onChat = value.equals("1");
-					break;
-				case 13: // one of these matters
-					onPager = value.equals("1");
-					visibility = value;
-					break;
-				case 19:
+			case 300:
+				// initial row, most of the time
+				break;
+			case 7:
+				// check and see if we have one
+				if (userId != null) {
+					updateFriendStatus(logoff, userId, onChat, onPager, visibility, clearIdleTime, idleTime,
+							customMessage, customStatus, longStatus, protocol, clientVersion);
+					longStatus = 0;
+					onChat = null;
+					onPager = null;
+					visibility = null;
+					clearIdleTime = null;
+					idleTime = null;
+					customMessage = null;
+					customStatus = null;
+					userId = null;
+					clientVersion = null;
+					protocol = YahooProtocol.YAHOO;
+				}
+				userId = value;
+				break;
+			case 10:
+				try {
+					longStatus = Long.parseLong(value);
+				} catch (NumberFormatException e) {
 					customMessage = value;
-					break;
-				case 47:
-					customStatus = value;
-					break;
-				case 97:
-					// TODO - unicodeStatus
-					@SuppressWarnings("unused")
-					boolean unicodeStatusMessage = value.equals("1");
-					break;
-				case 138:
-					clearIdleTime = value;
-					break;
-				case 241:
-					protocol = YahooProtocol.getProtocolOrDefault(value, userId);
-					break;
-				case 244:
-					// TODO - track version
-					clientVersion = value;
-					// 6 - at least MSN - Windows Live Messenger 2011 (Build 15.4.3538.513)
-					// 244 going invisible with latest yahoo desktop client.
-					break;
-				case 137:
-					idleTime = value;
-					break;
-				case 301:
-					// ending row, most of the time
-					break;
+				}
+				break;
+			case 17:
+				onChat = value.equals("1");
+				break;
+			case 13: // one of these matters
+				onPager = value.equals("1");
+				visibility = value;
+				break;
+			case 19:
+				customMessage = value;
+				break;
+			case 47:
+				customStatus = value;
+				break;
+			case 97:
+				// TODO - unicodeStatus
+				@SuppressWarnings("unused")
+				boolean unicodeStatusMessage = value.equals("1");
+				break;
+			case 138:
+				clearIdleTime = value;
+				break;
+			case 241:
+				protocol = YahooProtocol.getProtocolOrDefault(value, userId);
+				break;
+			case 244:
+				// TODO - track version
+				clientVersion = value;
+				// 6 - at least MSN - Windows Live Messenger 2011 (Build
+				// 15.4.3538.513)
+				// 244 going invisible with latest yahoo desktop client.
+				break;
+			case 137:
+				idleTime = value;
+				break;
+			case 301:
+				// ending row, most of the time
+				break;
 			}
 		}
 		if (userId != null) {
@@ -141,8 +151,10 @@ public class SingleStatusResponse implements SinglePacketResponse {
 		// if (status == null) {
 		// }
 		// TODO - do this check
-		// if (user.getProtocol() == null || !user.getProtocol().equals(protocol)) {
-		// log.warn("In updateFriendStatus, Protocols do not match for user: " + user.getId() + " "
+		// if (user.getProtocol() == null ||
+		// !user.getProtocol().equals(protocol)) {
+		// log.warn("In updateFriendStatus, Protocols do not match for user: " +
+		// user.getId() + " "
 		// + user.getProtocol() + "/" + protocol);
 		// }
 		if (longStatus == -1 && (onPager == null || !onPager)) {
@@ -170,11 +182,13 @@ public class SingleStatusResponse implements SinglePacketResponse {
 		} else if (logoff) {
 			presence = new ContactPresence(false, false);
 			status = new NormalStatusMessage(newStatus);
-			// logoff message doesn't have chat or pager info, but we reset those in this case.
+			// logoff message doesn't have chat or pager info, but we reset
+			// those in this case.
 			// log.info("update: " + newStatus + " and false/false");
 			// status.update(newStatus, false, false);
 		} else {
-			// status update with no chat, nor pager information, so leave those values alone.
+			// status update with no chat, nor pager information, so leave those
+			// values alone.
 			// log.info("update: " + newStatus);
 			status = new NormalStatusMessage(newStatus);
 			// status.update(newStatus);
@@ -208,7 +222,9 @@ public class SingleStatusResponse implements SinglePacketResponse {
 
 	/**
 	 * Updates the YahooUser with the new values.
-	 * @param visibility encoded visibility string
+	 * 
+	 * @param visibility
+	 *            encoded visibility string
 	 */
 	public ContactPresence getPresenceByVisibility(String visibility) {
 		// This is the new version, where 13=combined pager/chat

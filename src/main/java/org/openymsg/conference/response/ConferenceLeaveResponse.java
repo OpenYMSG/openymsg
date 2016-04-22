@@ -1,16 +1,17 @@
-package org.openymsg.conference;
+package org.openymsg.conference.response;
 
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
+import org.openymsg.conference.SessionConferenceCallback;
 import org.openymsg.network.YMSG9Packet;
 
 /**
- * Process an incoming CONFLOGON packet. We get one of these when someone we previously invited to a conference, accepts
- * our invite.
+ * Process an incoming CONFLOGON packet. We get one of these when someone we
+ * previously invited to a conference, accepts our invite.
  */
 public class ConferenceLeaveResponse extends AbstractConferenceResponse {
-	public ConferenceLeaveResponse(SessionConferenceImpl sessionConference) {
+	public ConferenceLeaveResponse(SessionConferenceCallback sessionConference) {
 		super(sessionConference);
 	}
 
@@ -25,7 +26,8 @@ public class ConferenceLeaveResponse extends AbstractConferenceResponse {
 		String value303 = packet.getValue("302"); // 3
 		String from = packet.getValue("56");
 		YahooConference conference = this.getConference(packet);
-		YahooContact contact = new YahooContact(from, YahooProtocol.YAHOO); // TODO protocol
+		YahooContact contact = new YahooContact(from, YahooProtocol.YAHOO); // TODO
+																			// protocol
 		sessionConference.receivedConferenceLeft(conference, contact);
 		// if (!yc.isClosed()) // Should never be closed!
 	}

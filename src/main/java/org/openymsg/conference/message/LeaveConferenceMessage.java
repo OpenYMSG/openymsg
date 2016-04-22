@@ -1,6 +1,7 @@
-package org.openymsg.conference;
+package org.openymsg.conference.message;
 
 import org.openymsg.YahooConference;
+import org.openymsg.conference.ConferenceMembership;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
@@ -8,10 +9,10 @@ import org.openymsg.network.ServiceType;
 import java.io.IOException;
 
 /**
- * Transmit an CONFLOGON packet. Send this when we want to accept an offer to join a conference.
+ * Transmit an CONFLOGOFF packet. We send one of these when we wish to leave a conference.
  */
-public class AcceptConferenceMessage extends AbstractConferenceMessage {
-	public AcceptConferenceMessage(String username, YahooConference conference, ConferenceMembership membership) {
+public class LeaveConferenceMessage extends AbstractConferenceMessage {
+	public LeaveConferenceMessage(String username, YahooConference conference, ConferenceMembership membership) {
 		super(username, conference, membership);
 	}
 
@@ -20,13 +21,15 @@ public class AcceptConferenceMessage extends AbstractConferenceMessage {
 		PacketBodyBuffer body = new PacketBodyBuffer();
 		this.writeUsername(body, "1");
 		this.writeConference(body, "57");
+		// TODO merge sets to avoid dups
 		this.writeMembers(body, "3");
+		this.writeInvited(body, "3");
 		return body;
 	}
 
 	@Override
 	public ServiceType getServiceType() {
-		return ServiceType.CONFLOGON;
+		return ServiceType.CONFLOGOFF;
 	}
 
 	@Override

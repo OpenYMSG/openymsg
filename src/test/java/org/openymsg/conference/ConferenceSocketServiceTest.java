@@ -2,84 +2,36 @@ package org.openymsg.conference;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Matchers;
-import org.mockito.Mockito;
-import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
-import org.openymsg.YahooConference;
-import org.openymsg.YahooContact;
-import org.openymsg.YahooProtocol;
-import org.openymsg.connection.YahooConnection;
-import org.openymsg.connection.write.Message;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SessionConferenceImplTest {
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.openymsg.YahooConference;
+import org.openymsg.YahooContact;
+import org.openymsg.YahooProtocol;
+import org.openymsg.connection.YahooConnection;
+
+public class ConferenceSocketServiceTest {
 	private String username = "testuser";
+	@Mock
 	private YahooConnection executor;
-	private SessionConferenceImpl session;
+	private ConferenceSocketService session;
+	@Mock
 	private SessionConferenceCallback callback;
+	private ConferenceServiceState state;
 
 	@Before
 	public void beforeMethod() {
-		executor = Mockito.mock(YahooConnection.class);
-		callback = Mockito.mock(SessionConferenceCallback.class);
-		session = new SessionConferenceImpl(username, executor, callback);
-	}
-
-	@Test
-	public void testSendMessage() {
-		String conferenceId = "id";
-		YahooConference conference = new YahooConference(conferenceId);
-		Set<YahooContact> contacts = new HashSet<YahooContact>();
-		String message = "message";
-		session.createConference(conferenceId, contacts, null);
-		session.sendConferenceMessage(conference, message);
-		ConferenceMembership membership = session.getConferenceMembership(conference);
-		Mockito.verify(executor).execute(argThat(new CreateConferenceMessage(username, conference, contacts, null)));
-		Mockito.verify(executor).execute(argThat(new SendConfereneMessage(username, conference, membership, message)));
-	}
-
-	@Test
-	public void testConferenceDecline() {
-		String conferenceId = "id";
-		YahooConference conference = new YahooConference(conferenceId);
-		YahooContact inviter = null;
-		YahooContact me = new YahooContact(username, YahooProtocol.YAHOO);
-		Set<YahooContact> invited = new HashSet<YahooContact>();
-		invited.add(me);
-		Set<YahooContact> members = new HashSet<YahooContact>();
-		String message = null;
-		session.receivedConferenceInvite(conference, inviter, invited, members, message);
-		ConferenceMembership membership = session.getConferenceMembership(conference);
-		assertEquals(invited, membership.getInvited());
-		assertEquals(members, membership.getMembers());
-		session.declineConferenceInvite(conference, null);
-		Mockito.verify(callback).receivedConferenceInvite(conference, inviter, invited, members, message);
-		Mockito.verify(executor).execute(argThat(new DeclineConferenceMessage(username, conference, membership, null)));
-	}
-
-	@Test
-	public void testConferenceAccept() {
-		String conferenceId = "id";
-		YahooConference conference = new YahooConference(conferenceId);
-		YahooContact inviter = null;
-		YahooContact me = new YahooContact(username, YahooProtocol.YAHOO);
-		Set<YahooContact> invited = new HashSet<YahooContact>();
-		invited.add(me);
-		Set<YahooContact> members = new HashSet<YahooContact>();
-		String message = null;
-		session.receivedConferenceInvite(conference, inviter, invited, members, message);
-		ConferenceMembership membership = session.getConferenceMembership(conference);
-		assertEquals(invited, membership.getInvited());
-		assertEquals(members, membership.getMembers());
-		session.acceptConferenceInvite(conference);
-		Mockito.verify(callback).receivedConferenceInvite(conference, inviter, invited, members, message);
-		Mockito.verify(executor).execute(argThat(new AcceptConferenceMessage(username, conference, membership)));
+		MockitoAnnotations.initMocks(this);
+		state = new ConferenceServiceState();
+		session = new ConferenceSocketService(callback, state);
 	}
 
 	@Test
@@ -90,7 +42,7 @@ public class SessionConferenceImplTest {
 		Set<YahooContact> members = new HashSet<YahooContact>();
 		members.add(accepter);
 		session.receivedConferenceAccept(conference, accepter);
-		ConferenceMembership membership = session.getConferenceMembership(conference);
+		ConferenceMembership membership = state.getMembership(conference.getId());
 		assertEquals(members, membership.getMembers());
 		Mockito.verify(callback).receivedConferenceAccept(conference, accepter);
 	}
@@ -102,18 +54,20 @@ public class SessionConferenceImplTest {
 		YahooContact decliner = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		String message = "Nothankyou.";
 		session.receivedConferenceDecline(conference, decliner, message);
-		ConferenceMembership membership = session.getConferenceMembership(conference);
+		ConferenceMembership membership = state.getMembership(conference.getId());
 		assertTrue(membership.getDeclineOrLeft().contains(decliner));
 		Mockito.verify(callback).receivedConferenceDecline(conference, decliner, message);
 	}
 
 	/**
-	 * testuser receives a notice that testbuddy has invited testbuddy2 to a conference that testuser is already in
+	 * testuser receives a notice that testbuddy has invited testbuddy2 to a
+	 * conference that testuser is already in
+	 * 
 	 * @throws IOException
 	 */
 	// TODO this was an announcement
 	@Test
-	public void testReceiveConferenceExtendSingleExistingSingleInvite() throws IOException {
+	public void testReceivedConferenceExtendSingleExistingSingleInvite() throws IOException {
 		String id = "testbuddy-8iVmHcCkflGJpBXpjBbzCw--";
 		YahooConference conference = new YahooConference(id);
 		YahooContact inviter = new YahooContact("testbuddy", YahooProtocol.YAHOO);
@@ -121,19 +75,20 @@ public class SessionConferenceImplTest {
 		Set<YahooContact> invitedContacts = new HashSet<YahooContact>();
 		invitedContacts.add(invited);
 		session.receivedConferenceExtend(conference, inviter, invitedContacts);
-		ConferenceMembership membership = session.getConferenceMembership(conference);
+		ConferenceMembership membership = state.getMembership(conference.getId());
 		assertTrue(membership.getInvited().containsAll(invitedContacts));
 		Mockito.verify(callback).receivedConferenceExtend(conference, inviter, invitedContacts);
 	}
 
 	/**
-	 * testuser receives a notice that testbuddy has invited testbuddy3, testbuddy4, testbuddy5 to a conference that
-	 * testuser is already in
+	 * testuser receives a notice that testbuddy has invited testbuddy3,
+	 * testbuddy4, testbuddy5 to a conference that testuser is already in
+	 * 
 	 * @throws IOException
 	 */
 	// TODO this was an announcement
 	@Test
-	public void testReceiveConferenceExtendMultiInvite() throws IOException {
+	public void testReceivedConferenceExtendMultiInvite() throws IOException {
 		String id = "testbuddy-8iVmHcCkflGJpBXpjBbzCw--";
 		YahooConference conference = new YahooConference(id);
 		YahooContact inviter = new YahooContact("testbuddy", YahooProtocol.YAHOO);
@@ -145,20 +100,15 @@ public class SessionConferenceImplTest {
 		invitedContacts.add(invited2);
 		invitedContacts.add(invited3);
 		session.receivedConferenceExtend(conference, inviter, invitedContacts);
-		ConferenceMembership membership = session.getConferenceMembership(conference);
+		ConferenceMembership membership = state.getMembership(conference.getId());
 		assertTrue(membership.getInvited().contains(invited1));
 		assertTrue(membership.getInvited().contains(invited2));
 		assertTrue(membership.getInvited().contains(invited3));
 		Mockito.verify(callback).receivedConferenceExtend(conference, inviter, invitedContacts);
 	}
 
-	// TODO copied
-	private Message argThat(Message message, String... excludeFields) {
-		return (Message) Matchers.argThat(new ReflectionEquals(message, excludeFields));
-	}
-
 	@Test
-	public void testReceiveSingleInviteYahoo() throws IOException {
+	public void testReceivedSingleInviteYahoo() throws IOException {
 		String id = "testbuddy-8iVmHcCkflGJpBXpjBbzCw--";
 		YahooConference conference = new YahooConference(id);
 		YahooContact inviter = new YahooContact("testbuddy", YahooProtocol.YAHOO);
@@ -169,14 +119,14 @@ public class SessionConferenceImplTest {
 		Set<YahooContact> members = new HashSet<YahooContact>();
 		members.add(inviter);
 		session.receivedConferenceInvite(conference, inviter, invited, members, message);
-		ConferenceMembership membership = session.getConferenceMembership(conference);
+		ConferenceMembership membership = state.getMembership(conference.getId());
 		assertEquals(members, membership.getMembers());
 		assertEquals(invited, membership.getInvited());
 		Mockito.verify(callback).receivedConferenceInvite(conference, inviter, invited, members, message);
 	}
 
 	@Test
-	public void testReceiveSingleInviteAckYahoo() throws IOException {
+	public void testReceivedSingleInviteAckYahoo() throws IOException {
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
 		YahooConference conference = new YahooConference(id);
 		Set<YahooContact> invited = new HashSet<YahooContact>();
@@ -187,24 +137,24 @@ public class SessionConferenceImplTest {
 		members.add(me);
 		String message = "Invitingtestuser";
 		session.receivedConferenceInviteAck(conference, invited, members, message);
-		ConferenceMembership membership = session.getConferenceMembership(conference);
+		ConferenceMembership membership = state.getMembership(conference.getId());
 		assertEquals(members, membership.getMembers());
 		assertEquals(invited, membership.getInvited());
 	}
 
 	@Test
-	public void testReceiveLogoffMultipleMembersYahoo() throws IOException {
+	public void testReceivedLogoffMultipleMembersYahoo() throws IOException {
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
 		YahooConference conference = new YahooConference(id);
 		YahooContact leaver = new YahooContact("testbuddy2", YahooProtocol.YAHOO);
 		session.receivedConferenceLeft(conference, leaver);
-		ConferenceMembership membership = session.getConferenceMembership(conference);
+		ConferenceMembership membership = state.getMembership(conference.getId());
 		assertTrue(membership.getDeclineOrLeft().contains(leaver));
 		Mockito.verify(callback).receivedConferenceLeft(conference, leaver);
 	}
 
 	@Test
-	public void testReceiveMessage() throws IOException {
+	public void testReceivedMessage() throws IOException {
 		String id = "testuser-8iVmHcCkflGJpBXpjBbzCw--";
 		YahooConference conference = new YahooConference(id);
 		YahooContact sender = new YahooContact("testbuddy", YahooProtocol.YAHOO);
@@ -212,4 +162,22 @@ public class SessionConferenceImplTest {
 		session.receivedConferenceMessage(conference, sender, message);
 		Mockito.verify(callback).receivedConferenceMessage(conference, sender, message);
 	}
+
+	@Test
+	public void testReceivedConferenceInvite() {
+		String conferenceId = "id";
+		YahooConference conference = new YahooConference(conferenceId);
+		YahooContact inviter = null;
+		YahooContact me = new YahooContact(username, YahooProtocol.YAHOO);
+		Set<YahooContact> invited = new HashSet<YahooContact>();
+		invited.add(me);
+		Set<YahooContact> members = new HashSet<YahooContact>();
+		String message = null;
+		session.receivedConferenceInvite(conference, inviter, invited, members, message);
+		ConferenceMembership membership = state.getMembership(conference.getId());
+		assertEquals(invited, membership.getInvited());
+		assertEquals(members, membership.getMembers());
+		verify(callback).receivedConferenceInvite(conference, inviter, invited, members, message);
+	}
+
 }

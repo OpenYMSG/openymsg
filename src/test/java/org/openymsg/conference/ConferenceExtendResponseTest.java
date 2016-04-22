@@ -6,25 +6,30 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
+import org.openymsg.conference.response.ConferenceExtendResponse;
 import org.openymsg.network.YMSG9Packet;
 import org.openymsg.testing.PacketReader;
 
-
 public class ConferenceExtendResponseTest {
 	String username = "testuser";
-	private SessionConferenceImpl session;
+	@Mock
+	private SessionConferenceCallback callback;
 
 	@Before
 	public void beforeMethod() {
-		session = Mockito.mock(SessionConferenceImpl.class);
+		MockitoAnnotations.initMocks(this);
 	}
 
 	/**
-	 * testuser receives a notice that testbuddy has invited testbuddy2 to a conference that testuser is already in
+	 * testuser receives a notice that testbuddy has invited testbuddy2 to a
+	 * conference that testuser is already in
+	 * 
 	 * @throws IOException
 	 */
 	// TODO this was an announcement
@@ -32,7 +37,7 @@ public class ConferenceExtendResponseTest {
 	public void testYahooSingleExistingSingleInvite() throws IOException {
 		String test = "Magic:YMSG Version:16 Length:88 Service:CONFADDINVITE Status:SOMETHING11 SessionId:0x58fe2f  [1] [testuser] [50] [testbuddy] [51] [testbuddy2] [57] [testbuddy-8iVmHcCkflGJpBXpjBbzCw--]";
 		YMSG9Packet packet = PacketReader.readString(test);
-		ConferenceExtendResponse response = new ConferenceExtendResponse(session);
+		ConferenceExtendResponse response = new ConferenceExtendResponse(callback);
 		response.execute(packet);
 		String id = "testbuddy-8iVmHcCkflGJpBXpjBbzCw--";
 		YahooConference conference = new YahooConference(id);
@@ -42,12 +47,13 @@ public class ConferenceExtendResponseTest {
 		invitedContacts.add(invited);
 
 		// Verify
-		Mockito.verify(session).receivedConferenceExtend(conference, inviter, invitedContacts);
+		Mockito.verify(callback).receivedConferenceExtend(conference, inviter, invitedContacts);
 	}
 
 	/**
-	 * testuser receives a notice that testbuddy has invited testbuddy3, testbuddy4, testbuddy5 to a conference that
-	 * testuser is already in
+	 * testuser receives a notice that testbuddy has invited testbuddy3,
+	 * testbuddy4, testbuddy5 to a conference that testuser is already in
+	 * 
 	 * @throws IOException
 	 */
 	@Test
@@ -55,7 +61,7 @@ public class ConferenceExtendResponseTest {
 	public void testYahoo() throws IOException {
 		String test = "Magic:YMSG Version:16 Length:106 Service:CONFADDINVITE Status:SOMETHING11 SessionId:0x56cf6d  [1] [testuser] [50] [testbuddy] [51] [testbuddy3,testbuddy4,testbuddy5] [57] [testbuddy-8iVmHcCkflGJpBXpjBbzCw--]";
 		YMSG9Packet packet = PacketReader.readString(test);
-		ConferenceExtendResponse response = new ConferenceExtendResponse(session);
+		ConferenceExtendResponse response = new ConferenceExtendResponse(callback);
 		response.execute(packet);
 		String id = "testbuddy-8iVmHcCkflGJpBXpjBbzCw--";
 		YahooConference conference = new YahooConference(id);
@@ -69,6 +75,6 @@ public class ConferenceExtendResponseTest {
 		invitedContacts.add(invited3);
 
 		// Verify
-		Mockito.verify(session).receivedConferenceExtend(conference, inviter, invitedContacts);
+		Mockito.verify(callback).receivedConferenceExtend(conference, inviter, invitedContacts);
 	}
 }

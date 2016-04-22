@@ -9,30 +9,33 @@ import org.openymsg.contact.group.ContactGroupImpl;
 import org.openymsg.contact.group.SessionGroupImpl;
 import org.openymsg.contact.roster.ContactAddFailure;
 import org.openymsg.contact.roster.SessionRosterImpl;
-import org.openymsg.contact.status.SessionStatusImpl;
+import org.openymsg.contact.status.ContactStatusChangeCallback;
 import org.openymsg.network.YMSG9Packet;
 
 /**
- * Process an incoming ADD_BUDDY packet. We get one of these after we've sent a ADD_BUDDY packet, as confirmation. It
- * contains basic details of our new friend, although it seems a bit redundant as Yahoo sents a CONTACTNEW with these
- * details before this packet.
+ * Process an incoming ADD_BUDDY packet. We get one of these after we've sent a
+ * ADD_BUDDY packet, as confirmation. It contains basic details of our new
+ * friend, although it seems a bit redundant as Yahoo sents a CONTACTNEW with
+ * these details before this packet.
  */
 public class ContactAddAckResponse implements SinglePacketResponse {
 	private static final Log log = LogFactory.getLog(ContactAddAckResponse.class);
-	private SessionRosterImpl sessionRoster;
-	private SessionGroupImpl sessionGroup;
-	private SessionStatusImpl sessionStatus;
+	private final SessionRosterImpl sessionRoster;
+	private final SessionGroupImpl sessionGroup;
+	private final ContactStatusChangeCallback statusCallback;
 
 	public ContactAddAckResponse(SessionRosterImpl sessionRoster, SessionGroupImpl sessionGroup,
-			SessionStatusImpl sessionStatus) {
+			ContactStatusChangeCallback statusCallback) {
 		this.sessionRoster = sessionRoster;
 		this.sessionGroup = sessionGroup;
-		this.sessionStatus = sessionStatus;
+		this.statusCallback = statusCallback;
 	}
 
 	/**
 	 * handle the incoming packet.
-	 * @param packet incoming packet
+	 * 
+	 * @param packet
+	 *            incoming packet
 	 */
 	@Override
 	public void execute(YMSG9Packet packet) {
@@ -51,14 +54,17 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 			protocol = YahooProtocol.getProtocolOrDefault(protocolString, contactUsername);
 		}
 		String groupName = packet.getValue("65");
-		String friendAddStatus = packet.getValue("66"); // TODO what is this: 40 - failed MSN, 0 success yahoo,
+		String friendAddStatus = packet.getValue("66"); // TODO what is this: 40
+														// - failed MSN, 0
+														// success yahoo,
 		String pending = packet.getValue("223"); // 1
 		if (!pending.equals("1")) {
 			log.warn("pending is not 1: " + pending);
 		}
 		YahooContact contact = new YahooContact(contactUsername, protocol);
 		if ("0".equals(friendAddStatus)) {
-			// log.info("Me: " + myName + " friend added: " + userId + ", pending: " + pending + ", protocol: "
+			// log.info("Me: " + myName + " friend added: " + userId + ",
+			// pending: " + pending + ", protocol: "
 			// + protocol);
 			ContactGroupImpl group = new ContactGroupImpl(groupName);
 			group.add(contact);
@@ -84,7 +90,7 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 
 	private void addContact(String pending, YahooContact contact, ContactGroupImpl group) {
 		if ("1".equals(pending)) {
-			sessionStatus.addPending(contact);
+			statusCallback.addPending(contact);
 		} else {
 			log.warn("added contact with pending: " + pending);
 		}
@@ -92,7 +98,7 @@ public class ContactAddAckResponse implements SinglePacketResponse {
 		boolean contactWasAdded = true;
 		sessionRoster.receivedContactAddAck(contact);
 		boolean groupWasAdded = sessionGroup.possibleAddGroup(group);
-		sessionStatus.publishPending(contact);
+		statusCallback.publishPending(contact);
 		log.info("Contact was added: " + contactWasAdded + " along with the group: " + groupWasAdded);
 	}
 }

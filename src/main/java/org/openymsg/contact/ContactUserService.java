@@ -1,34 +1,25 @@
 package org.openymsg.contact;
 
+import java.util.Set;
+
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 import org.openymsg.YahooContactStatus;
-import org.openymsg.connection.YahooConnection;
 import org.openymsg.contact.group.SessionGroupImpl;
 import org.openymsg.contact.roster.SessionRosterImpl;
-import org.openymsg.contact.status.ContactStatusImpl;
-import org.openymsg.contact.status.SessionStatusImpl;
-import org.openymsg.network.ServiceType;
-
-import java.util.Set;
+import org.openymsg.contact.status.ContactStatusUserService;
 
 // TODO verify, no status without a contact
-public class SessionContactImpl implements SessionContact {
-	private SessionRosterImpl sessionRoster;
-	private SessionGroupImpl sessionGroup;
-	private SessionStatusImpl sessionStatus;
-	private YahooConnection executor;
+public class ContactUserService implements SessionContact {
+	private final SessionRosterImpl sessionRoster;
+	private final SessionGroupImpl sessionGroup;
+	private final ContactStatusUserService sessionStatus;
 
-	public SessionContactImpl(YahooConnection executor, String username, SessionContactCallback callback) {
-		this.executor = executor;
-		sessionRoster = new SessionRosterImpl(executor, username, callback);
-		sessionGroup = new SessionGroupImpl(executor, username);
-		sessionStatus = new SessionStatusImpl(executor, callback);
-		this.executor.register(ServiceType.LIST_15,
-				new ListOfContactsResponse(sessionRoster, sessionGroup, sessionStatus));
-		this.executor.register(ServiceType.REMOVE_BUDDY, new ContactRemoveAckResponse(sessionRoster, sessionGroup));
-		this.executor.register(ServiceType.ADD_BUDDY,
-				new ContactAddAckResponse(sessionRoster, sessionGroup, sessionStatus));
+	public ContactUserService(SessionRosterImpl sessionRoster, SessionGroupImpl sessionGroup,
+			ContactStatusUserService sessionStatus) {
+		this.sessionRoster = sessionRoster;
+		this.sessionGroup = sessionGroup;
+		this.sessionStatus = sessionStatus;
 	}
 
 	@Override
@@ -81,7 +72,4 @@ public class SessionContactImpl implements SessionContact {
 		this.sessionGroup.renameGroup(group, newName);
 	}
 
-	public void receivedContactLogoff(YahooContact contact) {
-		sessionStatus.statusUpdate(contact, ContactStatusImpl.OFFLINE);
-	}
 }

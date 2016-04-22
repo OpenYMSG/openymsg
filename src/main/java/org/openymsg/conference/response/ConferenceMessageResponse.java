@@ -1,16 +1,18 @@
-package org.openymsg.conference;
+package org.openymsg.conference.response;
 
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
+import org.openymsg.conference.SessionConferenceCallback;
 import org.openymsg.network.YMSG9Packet;
 
 /**
- * Process an incoming CONFMSG packet. We get one of these when someone in a conference we are part of sends a message.
- * Note: in extreme circumstances this may arrive before the invite packet.
+ * Process an incoming CONFMSG packet. We get one of these when someone in a
+ * conference we are part of sends a message. Note: in extreme circumstances
+ * this may arrive before the invite packet.
  */
 public class ConferenceMessageResponse extends AbstractConferenceResponse {
-	public ConferenceMessageResponse(SessionConferenceImpl sessionConference) {
+	public ConferenceMessageResponse(SessionConferenceCallback sessionConference) {
 		super(sessionConference);
 	}
 
@@ -37,10 +39,12 @@ public class ConferenceMessageResponse extends AbstractConferenceResponse {
 		// }
 		// // Otherwise, handle the packet
 		// try {
-		// SessionConferenceMessageEvent se = new SessionConferenceMessageEvent(this, to,
+		// SessionConferenceMessageEvent se = new
+		// SessionConferenceMessageEvent(this, to,
 		// from, message, yc);
 		// // Fire event
-		// if (!yc.isClosed()) eventDispatchQueue.append(se, ServiceType.CONFMSG);
+		// if (!yc.isClosed()) eventDispatchQueue.append(se,
+		// ServiceType.CONFMSG);
 		// }
 		// catch (Exception e) {
 		// throw new YMSG9BadFormatException("conference mesg", pkt, e);
