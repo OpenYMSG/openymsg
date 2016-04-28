@@ -9,41 +9,6 @@
  */
 package org.openymsg.legacy.network;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.jdom.JDOMException;
-import org.openymsg.connection.TrustModifier;
-import org.openymsg.legacy.addressBook.BuddyListImport;
-import org.openymsg.legacy.network.challenge.ChallengeResponseV10;
-import org.openymsg.legacy.network.challenge.ChallengeResponseV16;
-import org.openymsg.legacy.network.challenge.ChallengeResponseV9;
-import org.openymsg.legacy.network.chatroom.ChatroomManager;
-import org.openymsg.legacy.network.chatroom.YahooChatLobby;
-import org.openymsg.legacy.network.chatroom.YahooChatUser;
-import org.openymsg.legacy.network.event.SessionAuthorizationEvent;
-import org.openymsg.legacy.network.event.SessionChatEvent;
-import org.openymsg.legacy.network.event.SessionConferenceDeclineInviteEvent;
-import org.openymsg.legacy.network.event.SessionConferenceLogoffEvent;
-import org.openymsg.legacy.network.event.SessionConferenceLogonEvent;
-import org.openymsg.legacy.network.event.SessionConferenceMessageEvent;
-import org.openymsg.legacy.network.event.SessionErrorEvent;
-import org.openymsg.legacy.network.event.SessionEvent;
-import org.openymsg.legacy.network.event.SessionExceptionEvent;
-import org.openymsg.legacy.network.event.SessionFileTransferEvent;
-import org.openymsg.legacy.network.event.SessionFriendAcceptedEvent;
-import org.openymsg.legacy.network.event.SessionFriendEvent;
-import org.openymsg.legacy.network.event.SessionFriendFailureEvent;
-import org.openymsg.legacy.network.event.SessionFriendRejectedEvent;
-import org.openymsg.legacy.network.event.SessionGroupEvent;
-import org.openymsg.legacy.network.event.SessionListEvent;
-import org.openymsg.legacy.network.event.SessionListener;
-import org.openymsg.legacy.network.event.SessionLogoutEvent;
-import org.openymsg.legacy.network.event.SessionNewMailEvent;
-import org.openymsg.legacy.network.event.SessionNotifyEvent;
-import org.openymsg.legacy.network.event.SessionPictureEvent;
-import org.openymsg.legacy.network.event.SessionPictureHandler;
-import org.openymsg.legacy.roster.Roster;
-
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -83,9 +48,46 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.jdom.JDOMException;
+import org.openymsg.connection.TrustModifier;
+import org.openymsg.legacy.addressBook.BuddyListImport;
+import org.openymsg.legacy.network.challenge.ChallengeResponseV10;
+import org.openymsg.legacy.network.challenge.ChallengeResponseV16;
+import org.openymsg.legacy.network.challenge.ChallengeResponseV9;
+import org.openymsg.legacy.network.chatroom.ChatroomManager;
+import org.openymsg.legacy.network.chatroom.YahooChatLobby;
+import org.openymsg.legacy.network.chatroom.YahooChatUser;
+import org.openymsg.legacy.network.event.SessionAuthorizationEvent;
+import org.openymsg.legacy.network.event.SessionChatEvent;
+import org.openymsg.legacy.network.event.SessionConferenceDeclineInviteEvent;
+import org.openymsg.legacy.network.event.SessionConferenceLogoffEvent;
+import org.openymsg.legacy.network.event.SessionConferenceLogonEvent;
+import org.openymsg.legacy.network.event.SessionConferenceMessageEvent;
+import org.openymsg.legacy.network.event.SessionErrorEvent;
+import org.openymsg.legacy.network.event.SessionEvent;
+import org.openymsg.legacy.network.event.SessionExceptionEvent;
+import org.openymsg.legacy.network.event.SessionFileTransferEvent;
+import org.openymsg.legacy.network.event.SessionFriendAcceptedEvent;
+import org.openymsg.legacy.network.event.SessionFriendEvent;
+import org.openymsg.legacy.network.event.SessionFriendFailureEvent;
+import org.openymsg.legacy.network.event.SessionFriendRejectedEvent;
+import org.openymsg.legacy.network.event.SessionGroupEvent;
+import org.openymsg.legacy.network.event.SessionListEvent;
+import org.openymsg.legacy.network.event.SessionListener;
+import org.openymsg.legacy.network.event.SessionLogoutEvent;
+import org.openymsg.legacy.network.event.SessionNewMailEvent;
+import org.openymsg.legacy.network.event.SessionNotifyEvent;
+import org.openymsg.legacy.network.event.SessionPictureEvent;
+import org.openymsg.legacy.network.event.SessionPictureHandler;
+import org.openymsg.legacy.roster.Roster;
+
 /**
- * Written by FISH, Feb 2003 , Copyright FISH 2003 - 2007 This class represents the main entry point into the YMSG9 API.
- * A Session represents one IM connection.
+ * Written by FISH, Feb 2003 , Copyright FISH 2003 - 2007 This class represents
+ * the main entry point into the YMSG9 API. A Session represents one IM
+ * connection.
+ * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
@@ -146,7 +148,9 @@ public class Session implements StatusConstants, FriendManager {
 	private boolean isInvisible;
 
 	/**
-	 * Creates a new Session based on a ConnectionHandler as configured in the current System properties.
+	 * Creates a new Session based on a ConnectionHandler as configured in the
+	 * current System properties.
+	 * 
 	 * @throws IOException
 	 * @throws JDOMException
 	 * @throws MalformedURLException
@@ -157,9 +161,13 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Creates a new Session based on the provided ConnectionHandler. If the attribute is 'null', a ConnectionHandler as
-	 * configured in the current System properties will be used.
-	 * @param connectionHandler The ConnectionHandler that backs the connection to the Yahoo Network.
+	 * Creates a new Session based on the provided ConnectionHandler. If the
+	 * attribute is 'null', a ConnectionHandler as configured in the current
+	 * System properties will be used.
+	 * 
+	 * @param connectionHandler
+	 *            The ConnectionHandler that backs the connection to the Yahoo
+	 *            Network.
 	 * @throws IOException
 	 * @throws JDOMException
 	 * @throws MalformedURLException
@@ -191,8 +199,11 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Adds a session listener to the collection of listeners to which events are dispatched.
-	 * @param sessionListener SessionListener to be added.
+	 * Adds a session listener to the collection of listeners to which events
+	 * are dispatched.
+	 * 
+	 * @param sessionListener
+	 *            SessionListener to be added.
 	 */
 	public void addSessionListener(SessionListener sessionListener) {
 		if (sessionListener == null) {
@@ -206,8 +217,11 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Removes the listener from the collection of listeners to which events are dispatched.
-	 * @param sessionListener The SessionListener to be removed
+	 * Removes the listener from the collection of listeners to which events are
+	 * dispatched.
+	 * 
+	 * @param sessionListener
+	 *            The SessionListener to be removed
 	 */
 	public void removeSessionListener(SessionListener sessionListener) {
 		if (sessionListener == null) {
@@ -226,10 +240,14 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Call this to connect to the Yahoo server and do all the initial handshaking and accepting of data Session will do
-	 * it's own thread for pings and keepAlives
-	 * @param username Yahoo id
-	 * @param password password
+	 * Call this to connect to the Yahoo server and do all the initial
+	 * handshaking and accepting of data Session will do it's own thread for
+	 * pings and keepAlives
+	 * 
+	 * @param username
+	 *            Yahoo id
+	 * @param password
+	 *            password
 	 */
 	public void login(String username, String password) throws IllegalStateException, IOException,
 			AccountLockedException, LoginRefusedException, FailedLoginException {
@@ -237,10 +255,15 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Call this to connect to the Yahoo server and do all the initial handshaking and accepting of data
-	 * @param username Yahoo id
-	 * @param password password
-	 * @param createPingerTask Session will do it's own thread for pings and keepAlives
+	 * Call this to connect to the Yahoo server and do all the initial
+	 * handshaking and accepting of data
+	 * 
+	 * @param username
+	 *            Yahoo id
+	 * @param password
+	 *            password
+	 * @param createPingerTask
+	 *            Session will do it's own thread for pings and keepAlives
 	 */
 	public void login(String username, String password, boolean createPingerTask, boolean searchForAddress,
 			boolean checkSSL, boolean isInvisible) throws IllegalStateException, IOException, AccountLockedException,
@@ -321,6 +344,7 @@ public class Session implements StatusConstants, FriendManager {
 
 	/**
 	 * Logs off the current session.
+	 * 
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 */
@@ -349,8 +373,9 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Reset a failed session, so the session object can be used again (for all those who like to minimise the number of
-	 * discarded objects for the GC to clean up ;-)
+	 * Reset a failed session, so the session object can be used again (for all
+	 * those who like to minimise the number of discarded objects for the GC to
+	 * clean up ;-)
 	 */
 	public synchronized void reset() throws IllegalStateException {
 		if (sessionStatus != SessionState.FAILED && sessionStatus != SessionState.UNSTARTED)
@@ -361,8 +386,9 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Send keepAlive. Should not call if the session is doing this itself. This allows calling clients to manage the
-	 * threads.
+	 * Send keepAlive. Should not call if the session is doing this itself. This
+	 * allows calling clients to manage the threads.
+	 * 
 	 * @return true if a ping was sent
 	 */
 	public boolean sendKeepAliveAndPing() {
@@ -397,8 +423,11 @@ public class Session implements StatusConstants, FriendManager {
 
 	/**
 	 * Send a chat message.
-	 * @param to Yahoo ID of the user to transmit the message.
-	 * @param message The message to transmit.
+	 * 
+	 * @param to
+	 *            Yahoo ID of the user to transmit the message.
+	 * @param message
+	 *            The message to transmit.
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 */
@@ -408,9 +437,13 @@ public class Session implements StatusConstants, FriendManager {
 
 	/**
 	 * Send a chat message
-	 * @param to Yahoo ID of the user to transmit the message.
-	 * @param message The message to transmit.
-	 * @param yid Yahoo Identity used to transmit the message from.
+	 * 
+	 * @param to
+	 *            Yahoo ID of the user to transmit the message.
+	 * @param message
+	 *            The message to transmit.
+	 * @param yid
+	 *            Yahoo Identity used to transmit the message from.
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 * @throws IllegalIdentityException
@@ -427,7 +460,9 @@ public class Session implements StatusConstants, FriendManager {
 
 	/**
 	 * Send a buzz message
-	 * @param to Recipient of the buzz.
+	 * 
+	 * @param to
+	 *            Recipient of the buzz.
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 */
@@ -437,8 +472,11 @@ public class Session implements StatusConstants, FriendManager {
 
 	/**
 	 * Send a buzz message
-	 * @param to Recipient of the buzz.
-	 * @param yid Yahoo Identity used to send the buzz.
+	 * 
+	 * @param to
+	 *            Recipient of the buzz.
+	 * @param yid
+	 *            Yahoo Identity used to send the buzz.
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 * @throws IllegalIdentityException
@@ -449,8 +487,9 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Get the status of the session, ie: unstarted, authenticating, etc. Check this after login() to find out if you've
-	 * connected to Yahoo okay.
+	 * Get the status of the session, ie: unstarted, authenticating, etc. Check
+	 * this after login() to find out if you've connected to Yahoo okay.
+	 * 
 	 * @return Current Status of this session object.
 	 */
 	public SessionState getSessionStatus() {
@@ -459,6 +498,7 @@ public class Session implements StatusConstants, FriendManager {
 
 	/**
 	 * Get the Yahoo status, ie: available, invisible, busy, not at desk, etc.
+	 * 
 	 * @return Current presence status of the user.
 	 */
 	public synchronized Status getStatus() {
@@ -466,10 +506,13 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc. If you want to login as invisible, set
-	 * this to Status.INVISIBLE before you call login(). Note: this setter is overloaded. The second version is intended
-	 * for use when setting custom status messages.
-	 * @param status The new Status to be set for this user.
+	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc.
+	 * If you want to login as invisible, set this to Status.INVISIBLE before
+	 * you call login(). Note: this setter is overloaded. The second version is
+	 * intended for use when setting custom status messages.
+	 * 
+	 * @param status
+	 *            The new Status to be set for this user.
 	 * @throws IllegalArgumentException
 	 * @throws IOException
 	 */
@@ -488,10 +531,13 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc. Legit values are in the StatusConstants
-	 * interface. If you want to login as invisible, set this to Status.INVISIBLE before you call login() Note: setter
-	 * is overloaded, the second version is intended for use when setting custom status messages. The boolean is true if
-	 * available and false if away.
+	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc.
+	 * Legit values are in the StatusConstants interface. If you want to login
+	 * as invisible, set this to Status.INVISIBLE before you call login() Note:
+	 * setter is overloaded, the second version is intended for use when setting
+	 * custom status messages. The boolean is true if available and false if
+	 * away.
+	 * 
 	 * @param message
 	 * @param showBusyIcon
 	 * @throws IllegalArgumentException
@@ -522,8 +568,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Ask server to return refreshed stats for this session. Server will send back a USERSTAT and truncated NEWMAIL
-	 * packet.
+	 * Ask server to return refreshed stats for this session. Server will send
+	 * back a USERSTAT and truncated NEWMAIL packet.
 	 */
 	public void refreshStats() throws IllegalStateException, IOException {
 		checkStatus();
@@ -531,8 +577,11 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Checks if the provided ID matches one of the identities of the user of this session.
-	 * @param yahooIdentity The identity to check for.
+	 * Checks if the provided ID matches one of the identities of the user of
+	 * this session.
+	 * 
+	 * @param yahooIdentity
+	 *            The identity to check for.
 	 * @return ''true'' if the ID matches one of the IDs belonging to this user.
 	 */
 	public boolean isValidYahooID(String yahooIdentity) {
@@ -541,6 +590,7 @@ public class Session implements StatusConstants, FriendManager {
 
 	/**
 	 * Return the primary Yahoo Identity of this session.
+	 * 
 	 * @return This users primary identity.
 	 */
 	public YahooIdentity getPrimaryIdentity() {
@@ -549,6 +599,7 @@ public class Session implements StatusConstants, FriendManager {
 
 	/**
 	 * Returns the Yahoo Identity that was used to login to the network.
+	 * 
 	 * @return YahooIdentity used to login with.
 	 */
 	public YahooIdentity getLoginIdentity() {
@@ -557,6 +608,7 @@ public class Session implements StatusConstants, FriendManager {
 
 	/**
 	 * Activate or deactivate a particular Yahoo Identity.
+	 * 
 	 * @param yid
 	 * @param activate
 	 * @throws IllegalStateException
@@ -686,13 +738,22 @@ public class Session implements StatusConstants, FriendManager {
 
 	// Friend Management code.
 	/**
-	 * Sends a new request to become friends to the user. This is a subscription request, to which to other user should
-	 * reply to. Responses will arrive asynchronously.
-	 * @param userId Yahoo id of user to add as a new friend.
-	 * @param groupId Name of the group to add the new friend to.
-	 * @throws IllegalArgumentException if one of the arguments is null or an empty String.
-	 * @throws IllegalStateException if this session is not logged onto the Yahoo network correctly.
-	 * @throws IOException if any problem occured related to creating or sending the request to the Yahoo network.
+	 * Sends a new request to become friends to the user. This is a subscription
+	 * request, to which to other user should reply to. Responses will arrive
+	 * asynchronously.
+	 * 
+	 * @param userId
+	 *            Yahoo id of user to add as a new friend.
+	 * @param groupId
+	 *            Name of the group to add the new friend to.
+	 * @throws IllegalArgumentException
+	 *             if one of the arguments is null or an empty String.
+	 * @throws IllegalStateException
+	 *             if this session is not logged onto the Yahoo network
+	 *             correctly.
+	 * @throws IOException
+	 *             if any problem occured related to creating or sending the
+	 *             request to the Yahoo network.
 	 */
 	@Override
 	public void sendNewFriendRequest(final String userId, final String groupId, YahooProtocol yahooProtocol)
@@ -704,13 +765,22 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Instructs the Yahoo network to remove this friend from the particular group on the roster of the current user. If
-	 * this is the last group that the user is removed from, the user is effectively removed from the roster.
-	 * @param friendId Yahoo IDof the contact to remove from a group.
-	 * @param groupId Group to remove the contact from.
-	 * @throws IllegalArgumentException if one of the arguments is null or an empty String.
-	 * @throws IllegalStateException if this session is not logged onto the Yahoo network correctly.
-	 * @throws IOException on any problem while trying to create or send the packet.
+	 * Instructs the Yahoo network to remove this friend from the particular
+	 * group on the roster of the current user. If this is the last group that
+	 * the user is removed from, the user is effectively removed from the
+	 * roster.
+	 * 
+	 * @param friendId
+	 *            Yahoo IDof the contact to remove from a group.
+	 * @param groupId
+	 *            Group to remove the contact from.
+	 * @throws IllegalArgumentException
+	 *             if one of the arguments is null or an empty String.
+	 * @throws IllegalStateException
+	 *             if this session is not logged onto the Yahoo network
+	 *             correctly.
+	 * @throws IOException
+	 *             on any problem while trying to create or send the packet.
 	 */
 	@Override
 	public void removeFriendFromGroup(final String friendId, final String groupId) throws IOException {
@@ -755,11 +825,14 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * File transfer 'save as' saves to a particular directory and filename, 'save to' uses the file's own name and
-	 * saves it to a particular directory. Note: the 'to' method gets its filename from different sources. Initially the
-	 * URL filename (minus the path), however the header Content-Disposition will override this. The 'as' method always
-	 * uses its own specified filename. If both _path_ and _filename_ are not null then the saveFT() method assumes
-	 * 'to'... but if _path_ is null, saveFT() assumes 'as' and _filename_ is the entire path+filename.
+	 * File transfer 'save as' saves to a particular directory and filename,
+	 * 'save to' uses the file's own name and saves it to a particular
+	 * directory. Note: the 'to' method gets its filename from different
+	 * sources. Initially the URL filename (minus the path), however the header
+	 * Content-Disposition will override this. The 'as' method always uses its
+	 * own specified filename. If both _path_ and _filename_ are not null then
+	 * the saveFT() method assumes 'to'... but if _path_ is null, saveFT()
+	 * assumes 'as' and _filename_ is the entire path+filename.
 	 */
 	public void sendFileTransfer(String user, File file, String msg)
 			throws IllegalStateException, FileTransferFailedException, IOException {
@@ -824,8 +897,11 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Logs the current default identity of this session into the provided lobby.
-	 * @param lobby Lobby to login to.
+	 * Logs the current default identity of this session into the provided
+	 * lobby.
+	 * 
+	 * @param lobby
+	 *            Lobby to login to.
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 * @throws LoginRefusedException
@@ -836,8 +912,11 @@ public class Session implements StatusConstants, FriendManager {
 
 	/**
 	 * Logs the provided yahoo identity into the provided lobby.
-	 * @param lobby Lobby to login to.
-	 * @param yahooId Yahoo Identity that should login to the lobby.
+	 * 
+	 * @param lobby
+	 *            Lobby to login to.
+	 * @param yahooId
+	 *            Yahoo Identity that should login to the lobby.
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 * @throws LoginRefusedException
@@ -850,7 +929,8 @@ public class Session implements StatusConstants, FriendManager {
 			throw new IllegalIdentityException(
 					"The YahooIdentity '" + yahooId.getId() + "'is not a valid identity for this session.");
 		}
-		// TODO synchronized blocks don't really work (java optimization problem). Need a separate synchronized method
+		// TODO synchronized blocks don't really work (java optimization
+		// problem). Need a separate synchronized method
 		// for this
 		synchronized (this) {
 			if (chatSessionStatus != SessionState.UNSTARTED && chatSessionStatus != SessionState.LOGGED_ON) {
@@ -944,8 +1024,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit an AUTH packet, as a way of introduction to the server. As we do not know our primary ID yet, both 0 and
-	 * 1 use loginID .
+	 * Transmit an AUTH packet, as a way of introduction to the server. As we do
+	 * not know our primary ID yet, both 0 and 1 use loginID .
 	 */
 	protected void transmitAuth() throws IOException {
 		if (sessionStatus != SessionState.CONNECTING) {
@@ -961,8 +1041,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit an VERIFY packet, as a way of introduction to the server. As we do not know our primary ID yet, both 0
-	 * and 1 use loginID .
+	 * Transmit an VERIFY packet, as a way of introduction to the server. As we
+	 * do not know our primary ID yet, both 0 and 1 use loginID .
 	 */
 	protected void transmitVerify() throws IOException {
 		if (sessionStatus != SessionState.CONNECTING) {
@@ -975,9 +1055,10 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit an AUTHRESP packet, the second part of our login process. As we do not know our primary ID yet, both 0
-	 * and 1 use loginID . Note: message also contains our initial status. plp - plain response (not MD5Crypt'd) crp -
-	 * crypted response (MD5Crypt'd)
+	 * Transmit an AUTHRESP packet, the second part of our login process. As we
+	 * do not know our primary ID yet, both 0 and 1 use loginID . Note: message
+	 * also contains our initial status. plp - plain response (not MD5Crypt'd)
+	 * crp - crypted response (MD5Crypt'd)
 	 */
 	protected void transmitAuthResp(String plp, String crp, String base64, String cookieB) throws IOException {
 		if (sessionStatus != SessionState.CONNECTED) {
@@ -999,7 +1080,9 @@ public class Session implements StatusConstants, FriendManager {
 			// body.addElement("135", "6,0,0,1710"); // Needed for v12(?)
 			body.addElement("244", "2097087"); // Needed for v15(?)
 			body.addElement("148", "180"); // Needed for v15(?)
-			body.addElement("135", NetworkConstants.CLIENT_VERSION); // Needed for v15(?)
+			body.addElement("135", NetworkConstants.CLIENT_VERSION); // Needed
+																		// for
+																		// v15(?)
 			body.addElement("1", loginID.getId());
 			// add our picture checksum, if it's available
 			if (pictureHandler != null && pictureHandler.getPictureChecksum() != null) {
@@ -1016,10 +1099,14 @@ public class Session implements StatusConstants, FriendManager {
 			body.addElement("277", plp);// 277 Needed for v16(?)
 			body.addElement("278", crp);// 278 Needed for v16(?)
 			body.addElement("307", base64);// 307 Needed for v16(?)
-			body.addElement("244", NetworkConstants.CLIENT_VERSION_ID); // Needed for v15(?)
+			body.addElement("244", NetworkConstants.CLIENT_VERSION_ID); // Needed
+																		// for
+																		// v15(?)
 			body.addElement("2", loginID.getId());
 			body.addElement("2", "1");
-			body.addElement("135", NetworkConstants.CLIENT_VERSION); // Needed for v15(?)
+			body.addElement("135", NetworkConstants.CLIENT_VERSION); // Needed
+																		// for
+																		// v15(?)
 			if (pictureHandler != null && pictureHandler.getPictureChecksum() != null) {
 				body.addElement("192", pictureHandler.getPictureChecksum());
 			}
@@ -1031,8 +1118,9 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit a CHATCONNECT packet. We send one of these as the first packet to the chat server - by way of
-	 * introduction. The server responds with its own 0x96 packet back at us, and then we can logon.
+	 * Transmit a CHATCONNECT packet. We send one of these as the first packet
+	 * to the chat server - by way of introduction. The server responds with its
+	 * own 0x96 packet back at us, and then we can logon.
 	 */
 	protected void transmitChatConnect(String yid) throws IOException {
 		chatSessionStatus = SessionState.CONNECTING; // Set status
@@ -1071,7 +1159,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit a CHATADDINVITE packet. We send one of these to invite a fellow Yahoo user to a chat room.
+	 * Transmit a CHATADDINVITE packet. We send one of these to invite a fellow
+	 * Yahoo user to a chat room.
 	 */
 	protected void transmitChatInvite(String netname, long id, String to, String msg) throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
@@ -1084,8 +1173,9 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit a CHATJOINpacket. We send one of these after the CHATCONNECT packet, as the second phase of chat login.
-	 * Note: netname uses network name of "room:lobby".
+	 * Transmit a CHATJOINpacket. We send one of these after the CHATCONNECT
+	 * packet, as the second phase of chat login. Note: netname uses network
+	 * name of "room:lobby".
 	 */
 	protected void transmitChatJoin(String netname, long roomId) throws IOException {
 		if (sessionStatus != SessionState.CONNECTED) {
@@ -1105,8 +1195,9 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit a CHATMSG packet. The contents of this message will be forwarded to other users of the chatroom, BUT NOT
-	 * TO US! Note: 'netname' is the network name of "room:lobby".
+	 * Transmit a CHATMSG packet. The contents of this message will be forwarded
+	 * to other users of the chatroom, BUT NOT TO US! Note: 'netname' is the
+	 * network name of "room:lobby".
 	 */
 	protected void transmitChatMsg(String netname, String msg, boolean emote) throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
@@ -1141,7 +1232,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit an CONFADDINVITE packet. We send one of these when we wish to invite more users to our conference.
+	 * Transmit an CONFADDINVITE packet. We send one of these when we wish to
+	 * invite more users to our conference.
 	 */
 	protected void transmitConfAddInvite(String username, String room, String yid, String msg)
 			throws IOException, NoSuchConferenceException {
@@ -1164,7 +1256,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit an CONFDECLINE packet. We send one of these when we decline an offer to join a conference.
+	 * Transmit an CONFDECLINE packet. We send one of these when we decline an
+	 * offer to join a conference.
 	 */
 	protected void transmitConfDecline(String room, String yid, String msg)
 			throws IOException, NoSuchConferenceException {
@@ -1184,8 +1277,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit an CONFINVITE packet. This is sent when we want to create a new conference, with the specified users and
-	 * with a given welcome message.
+	 * Transmit an CONFINVITE packet. This is sent when we want to create a new
+	 * conference, with the specified users and with a given welcome message.
 	 */
 	protected void transmitConfInvite(String[] users, String yid, String room, String msg) throws IOException {
 		// Create a new conference object
@@ -1204,7 +1297,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit an CONFLOGOFF packet. We send one of these when we wish to leave a conference.
+	 * Transmit an CONFLOGOFF packet. We send one of these when we wish to leave
+	 * a conference.
 	 */
 	protected void transmitConfLogoff(String room, String yid) throws IOException, NoSuchConferenceException {
 		// Flag this conference as now dead
@@ -1222,7 +1316,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit an CONFLOGON packet. Send this when we want to accept an offer to join a conference.
+	 * Transmit an CONFLOGON packet. Send this when we want to accept an offer
+	 * to join a conference.
 	 */
 	protected void transmitConfLogon(String room, String yid) throws IOException, NoSuchConferenceException {
 		// Get a list of users for this conference
@@ -1237,7 +1332,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit an CONFMSG packet. We send one of these when we wish to send a message to a conference.
+	 * Transmit an CONFMSG packet. We send one of these when we wish to send a
+	 * message to a conference.
 	 */
 	protected void transmitConfMsg(String room, String yid, String msg) throws IOException, NoSuchConferenceException {
 		// Get a list of users for this conference
@@ -1256,8 +1352,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit an CONTACTIGNORE packet. We would do this in response to an ADDFRIEND packet arriving. (???) FIX: when
-	 * does this get sent?
+	 * Transmit an CONTACTIGNORE packet. We would do this in response to an
+	 * ADDFRIEND packet arriving. (???) FIX: when does this get sent?
 	 */
 	protected void transmitContactIgnore(String friend, boolean ignore) throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
@@ -1271,8 +1367,9 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit a CONTACTREJECT packet. We would do this when we wish to overrule an attempt to add us as a friend (when
-	 * we get a ADDFRIEND packet!)
+	 * Transmit a CONTACTREJECT packet. We would do this when we wish to
+	 * overrule an attempt to add us as a friend (when we get a ADDFRIEND
+	 * packet!)
 	 */
 	protected void transmitContactReject(String friend, String yid, String msg) throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
@@ -1318,7 +1415,7 @@ public class Session implements StatusConstants, FriendManager {
 			throw new FileTransferFailedException("File transfer: empty file");
 		}
 		final String cookie = cookieY + "; " + cookieT;
-		final byte[] marker = {'2', '9', (byte) 0xc0, (byte) 0x80};
+		final byte[] marker = { '2', '9', (byte) 0xc0, (byte) 0x80 };
 		// Create a Yahoo packet into 'packet'
 		final PacketBodyBuffer body = new PacketBodyBuffer();
 		body.addElement("0", primaryID.getId());
@@ -1367,13 +1464,21 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit a FRIENDADD packet. If all goes well we'll get a FRIENDADD packet back with the details of the friend to
-	 * confirm the transaction (usually preceded by a CONTACTNEW packet with well detailed info).
-	 * @param userId Yahoo id of friend to add group
-	 * @param groupId Group to add the new friend in
-	 * @throws IllegalArgumentException if one of the arguments is null or an empty String.
-	 * @throws IllegalStateException if this session is not logged onto the Yahoo network correctly.
-	 * @throws IOException on any problem while trying to create or send the packet.
+	 * Transmit a FRIENDADD packet. If all goes well we'll get a FRIENDADD
+	 * packet back with the details of the friend to confirm the transaction
+	 * (usually preceded by a CONTACTNEW packet with well detailed info).
+	 * 
+	 * @param userId
+	 *            Yahoo id of friend to add group
+	 * @param groupId
+	 *            Group to add the new friend in
+	 * @throws IllegalArgumentException
+	 *             if one of the arguments is null or an empty String.
+	 * @throws IllegalStateException
+	 *             if this session is not logged onto the Yahoo network
+	 *             correctly.
+	 * @throws IOException
+	 *             on any problem while trying to create or send the packet.
 	 */
 	protected void transmitFriendAdd(final String userId, final String groupId, YahooProtocol yahooProtocol)
 			throws IOException {
@@ -1403,16 +1508,23 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit a FRIENDREMOVE packet. We should get a FRIENDREMOVE packet back (usually preceded by a CONTACTNEW
-	 * packet).
+	 * Transmit a FRIENDREMOVE packet. We should get a FRIENDREMOVE packet back
+	 * (usually preceded by a CONTACTNEW packet).
 	 * <p>
-	 * Note that removing a user from all groups that it is in, equals removing the user from the contact list
-	 * completely.
-	 * @param friendId Yahoo IDof the contact to remove from a group.
-	 * @param groupId Group to remove the contact from.
-	 * @throws IllegalArgumentException if one of the arguments is null or an empty String.
-	 * @throws IllegalStateException if this session is not logged onto the Yahoo network correctly.
-	 * @throws IOException on any problem while trying to create or send the packet.
+	 * Note that removing a user from all groups that it is in, equals removing
+	 * the user from the contact list completely.
+	 * 
+	 * @param friendId
+	 *            Yahoo IDof the contact to remove from a group.
+	 * @param groupId
+	 *            Group to remove the contact from.
+	 * @throws IllegalArgumentException
+	 *             if one of the arguments is null or an empty String.
+	 * @throws IllegalStateException
+	 *             if this session is not logged onto the Yahoo network
+	 *             correctly.
+	 * @throws IOException
+	 *             on any problem while trying to create or send the packet.
 	 */
 	protected void transmitFriendRemove(final String friendId, final String groupId) throws IOException {
 		if (friendId == null || friendId.length() == 0) {
@@ -1432,11 +1544,13 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit a GOTGROUPRENAME packet, to change the name of one of our friends groups.
+	 * Transmit a GOTGROUPRENAME packet, to change the name of one of our
+	 * friends groups.
 	 */
 	/*
-	 * TODO: Currently, this behavior is as it was in jYMSG. Protocol specification would suggest that not 0x13
-	 * (GOTGROUPRENAME) but 0x89 (GROUPRENAME) should be used for this operation. Find out and make sure.
+	 * TODO: Currently, this behavior is as it was in jYMSG. Protocol
+	 * specification would suggest that not 0x13 (GOTGROUPRENAME) but 0x89
+	 * (GROUPRENAME) should be used for this operation. Find out and make sure.
 	 */
 	protected void transmitGroupRename(String oldName, String newName) throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
@@ -1465,9 +1579,10 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit an IDLE packet. Used by the HTTP proxy connection to provide a mechanism were by incoming packets can be
-	 * delivered. An idle packet is sent every thirty seconds (as part of a HTTP POST) and the server responds with all
-	 * the packets accumulated since last contact.
+	 * Transmit an IDLE packet. Used by the HTTP proxy connection to provide a
+	 * mechanism were by incoming packets can be delivered. An idle packet is
+	 * sent every thirty seconds (as part of a HTTP POST) and the server
+	 * responds with all the packets accumulated since last contact.
 	 */
 	protected void transmitIdle() throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
@@ -1478,6 +1593,7 @@ public class Session implements StatusConstants, FriendManager {
 
 	/**
 	 * Transmit the current status to the Yahoo network.
+	 * 
 	 * @throws IOException
 	 */
 	protected void transmitNewStatus(boolean wasInvisible) throws IOException {
@@ -1499,6 +1615,7 @@ public class Session implements StatusConstants, FriendManager {
 
 	/**
 	 * Transmit the current custom status to the Yahoo network.
+	 * 
 	 * @throws IOException
 	 */
 	protected void transmitNewCustomStatus(boolean wasInvisible) throws IOException {
@@ -1547,9 +1664,13 @@ public class Session implements StatusConstants, FriendManager {
 
 	/**
 	 * Transmit a MESSAGE packet.
-	 * @param to he Yahoo ID of the user to send the message to
-	 * @param yid Yahoo identity used to send the message from
-	 * @param msg the text of the message
+	 * 
+	 * @param to
+	 *            he Yahoo ID of the user to send the message to
+	 * @param yid
+	 *            Yahoo identity used to send the message from
+	 * @param msg
+	 *            the text of the message
 	 */
 	protected String transmitMessage(String to, YahooIdentity yid, String msg) throws IOException {
 		if (to == null || to.length() == 0) {
@@ -1589,16 +1710,20 @@ public class Session implements StatusConstants, FriendManager {
 	protected String buildMessageNumber() {
 		String blankMessageNumber = "0000000000000000";
 		String messageNumber = "" + this.messageNumber++;
-		messageNumber =
-				blankMessageNumber.substring(0, blankMessageNumber.length() - messageNumber.length()) + messageNumber;
+		messageNumber = blankMessageNumber.substring(0, blankMessageNumber.length() - messageNumber.length())
+				+ messageNumber;
 		return messageNumber;
 	}
 
 	/**
-	 * notify to friend the typing start or end action message parameters Version: 16 Service: Notify (75) Status:
-	 * Notify (22) 49: TYPING 1: userId 14: <empty> 13: 1 or 0 5: sendingToId
-	 * @param friend user whose sending message
-	 * @param isTyping true if start typing, false if typing end up
+	 * notify to friend the typing start or end action message parameters
+	 * Version: 16 Service: Notify (75) Status: Notify (22) 49: TYPING 1: userId
+	 * 14: <empty> 13: 1 or 0 5: sendingToId
+	 * 
+	 * @param friend
+	 *            user whose sending message
+	 * @param isTyping
+	 *            true if start typing, false if typing end up
 	 * @throws IOException
 	 */
 	public void sendTypingNotification(String friend, boolean isTyping) throws IOException {
@@ -1607,12 +1732,16 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit a NOTIFY packet. Could be used for all sorts of purposes, but mainly games and typing notifications.
-	 * Only typing is supported by this API. The mode determines the type of notification, "TYPING" or "GAME"; msg holds
-	 * the game name (or a single space if typing). *
+	 * Transmit a NOTIFY packet. Could be used for all sorts of purposes, but
+	 * mainly games and typing notifications. Only typing is supported by this
+	 * API. The mode determines the type of notification, "TYPING" or "GAME";
+	 * msg holds the game name (or a single space if typing). *
+	 * 
 	 * @param friend
-	 * @param yid id
-	 * @param on true start typing, false stop typing
+	 * @param yid
+	 *            id
+	 * @param on
+	 *            true start typing, false stop typing
 	 * @param msg
 	 * @param mode
 	 * @throws IOException
@@ -1637,10 +1766,13 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmits a Keep-Alive packet to the Yahoo network. At the time of implementation, this packet gets sent by the
-	 * official Yahoo client once every 60 seconds, and seems to replace the older PING service type (although this
-	 * service type is still received by the client just after authentication). The keep-alive does not appear to be
-	 * sent to a Yahoo Chatrooms.
+	 * Transmits a Keep-Alive packet to the Yahoo network. At the time of
+	 * implementation, this packet gets sent by the official Yahoo client once
+	 * every 60 seconds, and seems to replace the older PING service type
+	 * (although this service type is still received by the client just after
+	 * authentication). The keep-alive does not appear to be sent to a Yahoo
+	 * Chatrooms.
+	 * 
 	 * @throws IOException
 	 */
 	protected void transmitKeepAlive() throws IOException {
@@ -1650,8 +1782,9 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit a PING packet always and a CHATPING packet, if the user is logged into a lobby. Needed every hour to
-	 * keep from getting knocked off by LOGGOFF 52
+	 * Transmit a PING packet always and a CHATPING packet, if the user is
+	 * logged into a lobby. Needed every hour to keep from getting knocked off
+	 * by LOGGOFF 52
 	 */
 	protected void transmitPings() throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
@@ -1663,9 +1796,10 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit a USERSTAT packet. Purpose? Unknown :-) It would seem that transmiting this packet results in a USERSTAT
-	 * (0x0a) packet followed by a NEWMAIL (0x0b) packet with just the 9 field (new mail count) set being sent by the
-	 * server.
+	 * Transmit a USERSTAT packet. Purpose? Unknown :-) It would seem that
+	 * transmiting this packet results in a USERSTAT (0x0a) packet followed by a
+	 * NEWMAIL (0x0b) packet with just the 9 field (new mail count) set being
+	 * sent by the server.
 	 */
 	protected void transmitUserStat() throws IOException // 0x0a
 	{
@@ -1674,8 +1808,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Transmit a STEALTHSESSION packet. This is used to set our on/offline status for the current session only on a
-	 * user-by-user basis. (???)
+	 * Transmit a STEALTHSESSION packet. This is used to set our on/offline
+	 * status for the current session only on a user-by-user basis. (???)
 	 */
 	protected void transmitStealthSession(int stat, int flag, String yid, String target) throws IOException {
 		PacketBodyBuffer body = new PacketBodyBuffer();
@@ -1687,10 +1821,12 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming ADDIGNORE packet. We get one of these when we ignore/unignore someone, although their purpose
-	 * is unknown as Yahoo follows up with a CONTACTIGNORE packet. The only disting- uising feature is the latter is
-	 * always sent, wereas this packet is only sent if there's an actual change in ignore status. The packet's payload
-	 * appears to always be empty.
+	 * Process an incoming ADDIGNORE packet. We get one of these when we
+	 * ignore/unignore someone, although their purpose is unknown as Yahoo
+	 * follows up with a CONTACTIGNORE packet. The only disting- uising feature
+	 * is the latter is always sent, wereas this packet is only sent if there's
+	 * an actual change in ignore status. The packet's payload appears to always
+	 * be empty.
 	 */
 	protected void receiveAddIgnore(YMSG9Packet pkt) // 0x11
 	{
@@ -1698,12 +1834,14 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming AUTH packet (in response to the AUTH packet we transmitted to the server).
+	 * Process an incoming AUTH packet (in response to the AUTH packet we
+	 * transmitted to the server).
 	 * <p>
 	 * Format: <tt>"1" <loginID> "94" <challenge string * (24 chars)></tt>
 	 * <p>
-	 * Note: for YMSG10 and later, Yahoo sneakily changed the challenge/response method dependent upon a switch in field
-	 * '13'. If this field is absent or 0, use v9, if 1 or 2, then use v10.
+	 * Note: for YMSG10 and later, Yahoo sneakily changed the challenge/response
+	 * method dependent upon a switch in field '13'. If this field is absent or
+	 * 0, use v9, if 1 or 2, then use v10.
 	 */
 	protected void receiveAuth(YMSG9Packet pkt) // 0x57
 			throws IOException, YahooException {
@@ -1831,20 +1969,20 @@ public class Session implements StatusConstants, FriendManager {
 				}
 				if (responseNo != 0 || !toks.hasMoreTokens()) {
 					switch (responseNo) {
-						case 1235:
-							throw new LoginRefusedException("Login Failed, Invalid username",
-									AuthenticationState.BADUSERNAME);
-						case 1212:
-							throw new LoginRefusedException("Login Failed, Wrong password", AuthenticationState.BAD);
-						case 1213:
-							throw new LoginRefusedException("Login locked: Too many failed login attempts",
-									AuthenticationState.LOCKED);
-						case 1236:
-							throw new LoginRefusedException("Login locked", AuthenticationState.LOCKED);
-						case 100:
-							throw new LoginRefusedException("Username or password missing", AuthenticationState.BAD);
-						default:
-							throw new LoginRefusedException("Login Failed, Unkown error", AuthenticationState.BAD);
+					case 1235:
+						throw new LoginRefusedException("Login Failed, Invalid username",
+								AuthenticationState.BADUSERNAME);
+					case 1212:
+						throw new LoginRefusedException("Login Failed, Wrong password", AuthenticationState.BAD);
+					case 1213:
+						throw new LoginRefusedException("Login locked: Too many failed login attempts",
+								AuthenticationState.LOCKED);
+					case 1236:
+						throw new LoginRefusedException("Login locked", AuthenticationState.LOCKED);
+					case 100:
+						throw new LoginRefusedException("Username or password missing", AuthenticationState.BAD);
+					default:
+						throw new LoginRefusedException("Login Failed, Unkown error", AuthenticationState.BAD);
 					}
 				}
 				String ymsgr = toks.nextToken();
@@ -1866,7 +2004,8 @@ public class Session implements StatusConstants, FriendManager {
 			log.error("Failed opening login url: " + authLink + " returns: " + ucType);
 			throw new LoginRefusedException("Login Failed, Unable to submit login url");
 		}
-		// throw new LoginRefusedException("Login Failed, unable to retrieve stage 1 url");
+		// throw new LoginRefusedException("Login Failed, unable to retrieve
+		// stage 1 url");
 	}
 
 	private String[] yahooAuth16Stage2(String token, String seed)
@@ -1938,7 +2077,8 @@ public class Session implements StatusConstants, FriendManager {
 					throw new LoginRefusedException("Login Failed, Unkown error", AuthenticationState.BAD);
 				}
 				// Iterator<String> iter =
-				// ((HttpURLConnection) uc).getHeaderFields().get("Set-Cookie").iterator();
+				// ((HttpURLConnection)
+				// uc).getHeaderFields().get("Set-Cookie").iterator();
 				// while (iter.hasNext())
 				// {
 				// String string = iter.next();
@@ -1959,9 +2099,10 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming AUTHRESP packet. If we get one of these it means the logon process has failed. Set the
-	 * session state to be failed, and flag the end of login. Note: we don't throw exceptions on the input thread, but
-	 * instead we pass them to the thread which called login()
+	 * Process an incoming AUTHRESP packet. If we get one of these it means the
+	 * logon process has failed. Set the session state to be failed, and flag
+	 * the end of login. Note: we don't throw exceptions on the input thread,
+	 * but instead we pass them to the thread which called login()
 	 */
 	protected void receiveAuthResp(YMSG9Packet pkt) // 0x54
 	{
@@ -1972,57 +2113,58 @@ public class Session implements StatusConstants, FriendManager {
 				final long l = Long.parseLong(pkt.getValue("66"));
 				AuthenticationState authenticationState = AuthenticationState.getStatus(l);
 				switch (authenticationState) {
-					// Account locked out?
-					case LOCKED:
-						URL u;
-						try {
-							u = new URL(pkt.getValue("20"));
-						} catch (Exception e) {
-							u = null;
-						}
-						loginException = new AccountLockedException("User " + loginID + " has been locked out", u);
-						log.info("AUTHRESP says: authentication failed! " + loginID, loginException);
-						sessionEvent = new SessionLogoutEvent(AuthenticationState.LOCKED);
-						break;
-					// Bad login (password?)
-					case BAD2:
-					case BAD:
-						loginException = new LoginRefusedException("User " + loginID + " refused login" + loginID,
-								AuthenticationState.BAD);
-						log.info("AUTHRESP says: authentication failed! " + loginID, loginException);
-						sessionEvent = new SessionLogoutEvent(AuthenticationState.BAD);
-						break;
-					// unknown account?
-					case BADUSERNAME:
-						loginException = new LoginRefusedException("User " + loginID + " unknown" + loginID,
-								AuthenticationState.BADUSERNAME);
-						log.info("AUTHRESP says: authentication failed! " + loginID, loginException);
-						sessionEvent = new SessionLogoutEvent(AuthenticationState.BADUSERNAME);
-						break;
-					case INVALID_CREDENTIALS:
-						loginException = new LoginRefusedException("User " + loginID + " invalid Credentials" + loginID,
-								AuthenticationState.BADUSERNAME);
-						log.info("AUTHRESP says: authentication failed! " + loginID, loginException);
-						sessionEvent = new SessionLogoutEvent(AuthenticationState.INVALID_CREDENTIALS);
-						break;
-					// You have been logged out of the yahoo service, possibly due to a duplicate login.
-					case DUPLICATE_LOGIN1:
-					case DUPLICATE_LOGIN2:
-						loginException = new LoginRefusedException("User " + loginID + " unknown" + loginID,
-								authenticationState);
-						log.info("AUTHRESP says: authentication failed! " + loginID, loginException);
-						sessionEvent = new SessionLogoutEvent(authenticationState);
-						break;
-					case UNKNOWN_52:
-						loginException = new LoginRefusedException("User " + loginID + " was forced off" + loginID,
-								AuthenticationState.UNKNOWN_52);
-						log.info("AUTHRESP says: authentication failed with unknown: " + AuthenticationState.UNKNOWN_52
-								+ " " + loginID, loginException);
-						sessionEvent = new SessionLogoutEvent(AuthenticationState.UNKNOWN_52);
-					default:
-						log.warn("AUTHRESP says: authentication is unknown: " + authenticationState + " " + loginID,
-								loginException);
-						break;
+				// Account locked out?
+				case LOCKED:
+					URL u;
+					try {
+						u = new URL(pkt.getValue("20"));
+					} catch (Exception e) {
+						u = null;
+					}
+					loginException = new AccountLockedException("User " + loginID + " has been locked out", u);
+					log.info("AUTHRESP says: authentication failed! " + loginID, loginException);
+					sessionEvent = new SessionLogoutEvent(AuthenticationState.LOCKED);
+					break;
+				// Bad login (password?)
+				case BAD2:
+				case BAD:
+					loginException = new LoginRefusedException("User " + loginID + " refused login" + loginID,
+							AuthenticationState.BAD);
+					log.info("AUTHRESP says: authentication failed! " + loginID, loginException);
+					sessionEvent = new SessionLogoutEvent(AuthenticationState.BAD);
+					break;
+				// unknown account?
+				case BADUSERNAME:
+					loginException = new LoginRefusedException("User " + loginID + " unknown" + loginID,
+							AuthenticationState.BADUSERNAME);
+					log.info("AUTHRESP says: authentication failed! " + loginID, loginException);
+					sessionEvent = new SessionLogoutEvent(AuthenticationState.BADUSERNAME);
+					break;
+				case INVALID_CREDENTIALS:
+					loginException = new LoginRefusedException("User " + loginID + " invalid Credentials" + loginID,
+							AuthenticationState.BADUSERNAME);
+					log.info("AUTHRESP says: authentication failed! " + loginID, loginException);
+					sessionEvent = new SessionLogoutEvent(AuthenticationState.INVALID_CREDENTIALS);
+					break;
+				// You have been logged out of the yahoo service, possibly due
+				// to a duplicate login.
+				case DUPLICATE_LOGIN1:
+				case DUPLICATE_LOGIN2:
+					loginException = new LoginRefusedException("User " + loginID + " unknown" + loginID,
+							authenticationState);
+					log.info("AUTHRESP says: authentication failed! " + loginID, loginException);
+					sessionEvent = new SessionLogoutEvent(authenticationState);
+					break;
+				case UNKNOWN_52:
+					loginException = new LoginRefusedException("User " + loginID + " was forced off" + loginID,
+							AuthenticationState.UNKNOWN_52);
+					log.info("AUTHRESP says: authentication failed with unknown: " + AuthenticationState.UNKNOWN_52
+							+ " " + loginID, loginException);
+					sessionEvent = new SessionLogoutEvent(AuthenticationState.UNKNOWN_52);
+				default:
+					log.warn("AUTHRESP says: authentication is unknown: " + authenticationState + " " + loginID,
+							loginException);
+					break;
 				}
 			} else {
 				loginException = new LoginRefusedException("User " + loginID + " was forced off" + loginID,
@@ -2044,9 +2186,10 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming CHATCONNECT packet. We get one of these in reply to sending a CHATCONNECT packet to Yahoo. It
-	 * marks the end of the first stage of the chat login handshake. chatLogin() waits for this packet before proceeding
-	 * to the next stage.
+	 * Process an incoming CHATCONNECT packet. We get one of these in reply to
+	 * sending a CHATCONNECT packet to Yahoo. It marks the end of the first
+	 * stage of the chat login handshake. chatLogin() waits for this packet
+	 * before proceeding to the next stage.
 	 */
 	protected void receiveChatConnect(YMSG9Packet pkt) // 0x96
 	{
@@ -2059,7 +2202,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming CHATDISCONNECT packet. We get one of these to confirm we have logged off.
+	 * Process an incoming CHATDISCONNECT packet. We get one of these to confirm
+	 * we have logged off.
 	 */
 	protected void receiveChatDisconnect(YMSG9Packet pkt) // 0xa0
 	{
@@ -2074,9 +2218,11 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming CHATEXIT packet. We get one of these when someone leaves the chatroom - including ourselves,
-	 * received just prior to our CHATDISCONNECT confirmation packet (see above). Note: on rare occassions this packet
-	 * has been received for a user we previously had not been informed about.
+	 * Process an incoming CHATEXIT packet. We get one of these when someone
+	 * leaves the chatroom - including ourselves, received just prior to our
+	 * CHATDISCONNECT confirmation packet (see above). Note: on rare occassions
+	 * this packet has been received for a user we previously had not been
+	 * informed about.
 	 */
 	protected void receiveChatExit(YMSG9Packet pkt) // 0x9b
 	{
@@ -2103,13 +2249,17 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming CHATJOIN packet. We get one of these: (a) as a way of finishing the login handshaking
-	 * process, containing room details (we already know) and a list of current members. (b) when the login process
-	 * fails (room full?), containing only a 114 field (set to '-35'?) - see error handling code elsewhere (c) as a
-	 * stripped down version when a new user enters the room (including ourselves!) (d) as a stripped down version when
-	 * an existing member updates their details. (e) when we need to deal with a chat captcha. Sometimes a login packet
-	 * is broken over several packets. The clue here appears to be that the first (and subsequent?) packets have a
-	 * status of 5, while the final packet has a status of 1.
+	 * Process an incoming CHATJOIN packet. We get one of these: (a) as a way of
+	 * finishing the login handshaking process, containing room details (we
+	 * already know) and a list of current members. (b) when the login process
+	 * fails (room full?), containing only a 114 field (set to '-35'?) - see
+	 * error handling code elsewhere (c) as a stripped down version when a new
+	 * user enters the room (including ourselves!) (d) as a stripped down
+	 * version when an existing member updates their details. (e) when we need
+	 * to deal with a chat captcha. Sometimes a login packet is broken over
+	 * several packets. The clue here appears to be that the first (and
+	 * subsequent?) packets have a status of 5, while the final packet has a
+	 * status of 1.
 	 */
 	protected void receiveChatJoin(YMSG9Packet pkt) // 0x98
 	{
@@ -2216,10 +2366,13 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming CHATMSG packet. We get one of these when a chatroom user sends a message to the room. (Note:
-	 * very very occassionally we *might* get a message from a user we have not been told about yet! I've not seen any
-	 * chat message packets like this, but it *does* happen with other chat packets, so I have to assume it can happen
-	 * to chat message packets too!) Note: status checked because we may have timed out on chat login
+	 * Process an incoming CHATMSG packet. We get one of these when a chatroom
+	 * user sends a message to the room. (Note: very very occassionally we
+	 * *might* get a message from a user we have not been told about yet! I've
+	 * not seen any chat message packets like this, but it *does* happen with
+	 * other chat packets, so I have to assume it can happen to chat message
+	 * packets too!) Note: status checked because we may have timed out on chat
+	 * login
 	 */
 	protected void receiveChatMsg(YMSG9Packet pkt) // 0xa8
 	{
@@ -2247,9 +2400,11 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming CHATPM packet. We get one of these when someone 'personal messages' us from within a
-	 * chatroom. Why this packet is used, not a regular MESSAGE packet is unknown. It seems that the web-based chat
-	 * clients, at least, prefer this packet type. Note: status checked because we may have timed out on chat login
+	 * Process an incoming CHATPM packet. We get one of these when someone
+	 * 'personal messages' us from within a chatroom. Why this packet is used,
+	 * not a regular MESSAGE packet is unknown. It seems that the web-based chat
+	 * clients, at least, prefer this packet type. Note: status checked because
+	 * we may have timed out on chat login
 	 */
 	protected void receiveChatPM(YMSG9Packet pkt) // 0x20
 	{
@@ -2268,8 +2423,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming CONFDECLINE packet. We get one of these when someone we previously invited to a conference,
-	 * declines our invite.
+	 * Process an incoming CONFDECLINE packet. We get one of these when someone
+	 * we previously invited to a conference, declines our invite.
 	 */
 	protected void receiveConfDecline(YMSG9Packet pkt) // 0x1a
 	{
@@ -2279,8 +2434,8 @@ public class Session implements StatusConstants, FriendManager {
 			String from = pkt.getValue("54");
 			String message = pkt.getValue("14");
 			// Create event
-			SessionConferenceDeclineInviteEvent se =
-					new SessionConferenceDeclineInviteEvent(this, to, from, message, yc);
+			SessionConferenceDeclineInviteEvent se = new SessionConferenceDeclineInviteEvent(this, to, from, message,
+					yc);
 			// Remove the user
 			yc.removeUser(se.getFrom());
 			// Fire invite event
@@ -2292,8 +2447,9 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming CONFLOGOFF packet. We get one of these when someone leaves the conference. Note: in *very*
-	 * extreme circum- stances, this may arrive before the invite packet.
+	 * Process an incoming CONFLOGOFF packet. We get one of these when someone
+	 * leaves the conference. Note: in *very* extreme circum- stances, this may
+	 * arrive before the invite packet.
 	 */
 	protected void receiveConfLogoff(YMSG9Packet pkt) // 0x1b
 	{
@@ -2321,9 +2477,10 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming CONFLOGON packet. We get one of these when someone joins a conference we have been invited to
-	 * (even if we ourselves have yet to accept/decline). Note: in extreme circum- stances, this may arrive before the
-	 * invite packet.
+	 * Process an incoming CONFLOGON packet. We get one of these when someone
+	 * joins a conference we have been invited to (even if we ourselves have yet
+	 * to accept/decline). Note: in extreme circum- stances, this may arrive
+	 * before the invite packet.
 	 */
 	protected void receiveConfLogon(YMSG9Packet pkt) // 0x19
 	{
@@ -2351,8 +2508,9 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming CONFMSG packet. We get one of these when someone in a conference we are part of sends a
-	 * message. Note: in extreme circumstances this may arrive before the invite packet.
+	 * Process an incoming CONFMSG packet. We get one of these when someone in a
+	 * conference we are part of sends a message. Note: in extreme circumstances
+	 * this may arrive before the invite packet.
 	 */
 	protected void receiveConfMsg(YMSG9Packet pkt) // 0x1d
 	{
@@ -2379,8 +2537,9 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming CONTACTIGNORE packet. We get one of these to confirm an outgoing CONTACTIGNORE - an ADDIGNORE
-	 * packet may precede this, but only if the ignore status has genuinely changed state.
+	 * Process an incoming CONTACTIGNORE packet. We get one of these to confirm
+	 * an outgoing CONTACTIGNORE - an ADDIGNORE packet may precede this, but
+	 * only if the ignore status has genuinely changed state.
 	 */
 	protected void receiveContactIgnore(YMSG9Packet pkt) // 0x85
 	{
@@ -2399,18 +2558,18 @@ public class Session implements StatusConstants, FriendManager {
 				// Error
 				String m = "Contact ignore error: ";
 				switch (st) {
-					case 2:
-						m = m + "Already on ignore list";
-						break;
-					case 3:
-						m = m + "Not currently ignored";
-						break;
-					case 12:
-						m = m + "Cannot ignore friend";
-						break;
-					default:
-						m = m + "Unknown error";
-						break;
+				case 2:
+					m = m + "Already on ignore list";
+					break;
+				case 3:
+					m = m + "Not currently ignored";
+					break;
+				case 12:
+					m = m + "Cannot ignore friend";
+					break;
+				default:
+					m = m + "Unknown error";
+					break;
 				}
 				errorMessage(pkt, m);
 			}
@@ -2428,10 +2587,13 @@ public class Session implements StatusConstants, FriendManager {
 	/**
 	 * Process an incoming CONTACTNEW packet. We get one of these:
 	 * <ol>
-	 * <li>when someone has added us to their friends list, giving us the chance to refuse them;</li>
-	 * <li>when we add or remove a friend (see FRIENDADD/REMOVE outgoing) as confirmation prior to the FRIENDADD/REMOVE
-	 * packet being echoed back to us - if the friend is online status info may be included (supposedly for multiple
-	 * friends, although given the circumstances probably always contains only one!);</li>
+	 * <li>when someone has added us to their friends list, giving us the chance
+	 * to refuse them;</li>
+	 * <li>when we add or remove a friend (see FRIENDADD/REMOVE outgoing) as
+	 * confirmation prior to the FRIENDADD/REMOVE packet being echoed back to us
+	 * - if the friend is online status info may be included (supposedly for
+	 * multiple friends, although given the circumstances probably always
+	 * contains only one!);</li>
 	 * <li>when someone refuses a contact request (add friend) from us.</li>
 	 * </ol>
 	 */
@@ -2465,7 +2627,8 @@ public class Session implements StatusConstants, FriendManager {
 			log.trace("Someone is sending us a subscription request: " + userId);
 			final String to = pkt.getValue("1");
 			// final String timestamp = pkt.getValue("15");
-			String protocolString = pkt.getValue("241"); // not there, it is yahoo
+			String protocolString = pkt.getValue("241"); // not there, it is
+															// yahoo
 			YahooProtocol protocol = YahooProtocol.getProtocol(protocolString);
 			final SessionEvent se;
 			// if (timestamp == null || timestamp.length() == 0) {
@@ -2483,7 +2646,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * pkt.status: 1 - Authorization Accepted 2 - Authorization Denied 3 - Authorization Request
+	 * pkt.status: 1 - Authorization Accepted 2 - Authorization Denied 3 -
+	 * Authorization Request
 	 */
 	protected void receiveAuthorization(YMSG9Packet pkt) { // 0xd6
 		try {
@@ -2505,7 +2669,8 @@ public class Session implements StatusConstants, FriendManager {
 					YahooUser user = roster.getUser(who);
 					if (user == null) {
 						log.debug("Sleeping because user is not added yet");
-						// Sleep for new add buddy logic. user added to roster the event thread
+						// Sleep for new add buddy logic. user added to roster
+						// the event thread
 						try {
 							Thread.sleep(1000L);
 						} catch (Exception e) {
@@ -2532,8 +2697,8 @@ public class Session implements StatusConstants, FriendManager {
 					log.info("Unexpected authorization packet. Do not know how to handle: " + pkt);
 				}
 			} else if (pkt.status == 3) {
-				SessionAuthorizationEvent se =
-						new SessionAuthorizationEvent(this, id, who, fname, lname, msg, protocol);
+				SessionAuthorizationEvent se = new SessionAuthorizationEvent(this, id, who, fname, lname, msg,
+						protocol);
 				se.setStatus(pkt.status);
 				log.trace("Someone is sending us a subscription request: " + who);
 				eventDispatchQueue.append(se, ServiceType.Y7_AUTHORIZATION);
@@ -2555,10 +2720,11 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming FILETRANSFER packet. This packet can be received under two circumstances: after a successful
-	 * FT upload, in which case it contains a text message with the download URL, or because someone has sent us a file.
-	 * Note: TF packets do not contain the file data itself, but rather a link to a tmp area on Yahoo's webservers which
-	 * holds the file.
+	 * Process an incoming FILETRANSFER packet. This packet can be received
+	 * under two circumstances: after a successful FT upload, in which case it
+	 * contains a text message with the download URL, or because someone has
+	 * sent us a file. Note: TF packets do not contain the file data itself, but
+	 * rather a link to a tmp area on Yahoo's webservers which holds the file.
 	 */
 	protected void receiveFileTransfer(YMSG9Packet pkt) // 0x46
 	{
@@ -2574,8 +2740,8 @@ public class Session implements StatusConstants, FriendManager {
 				// Receive file transfer
 				final String expires = pkt.getValue("38");
 				final String url = pkt.getValue("20");
-				final SessionFileTransferEvent se =
-						new SessionFileTransferEvent(this, to, from, message, Long.valueOf(expires), url);
+				final SessionFileTransferEvent se = new SessionFileTransferEvent(this, to, from, message,
+						Long.valueOf(expires), url);
 				eventDispatchQueue.append(se, ServiceType.FILETRANSFER);
 			}
 		} catch (Exception e) {
@@ -2584,9 +2750,10 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming FRIENDADD packet. We get one of these after we've sent a FRIENDADD packet, as confirmation.
-	 * It contains basic details of our new friend, although it seems a bit redundant as Yahoo sents a CONTACTNEW with
-	 * these details before this packet.
+	 * Process an incoming FRIENDADD packet. We get one of these after we've
+	 * sent a FRIENDADD packet, as confirmation. It contains basic details of
+	 * our new friend, although it seems a bit redundant as Yahoo sents a
+	 * CONTACTNEW with these details before this packet.
 	 */
 	protected void receiveFriendAdd(YMSG9Packet pkt) // 0x83
 	{
@@ -2610,7 +2777,8 @@ public class Session implements StatusConstants, FriendManager {
 					log.info("Me: " + myName + " friend added: " + userId + ", pending: " + pending + ", protocol: "
 							+ protocol);
 					// Sometimes, a status update arrives before the FRIENDADD
-					// confirmation. If that's the case, we'll already have this contact
+					// confirmation. If that's the case, we'll already have this
+					// contact
 					// on our roster.
 					user = this.roster.getUser(userId);
 					if (user == null) {
@@ -2658,8 +2826,9 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming FRIENDREMOVE packet. We get one of these after we've sent a FRIENDREMOVE packet, as
-	 * confirmation. It contains basic details of the friend we've deleted.
+	 * Process an incoming FRIENDREMOVE packet. We get one of these after we've
+	 * sent a FRIENDREMOVE packet, as confirmation. It contains basic details of
+	 * the friend we've deleted.
 	 */
 	protected void receiveFriendRemove(YMSG9Packet pkt) // 0x84
 	{
@@ -2674,8 +2843,10 @@ public class Session implements StatusConstants, FriendManager {
 				user = new YahooUser(userId);
 			} else {
 				userId = pkt.getValue("7");
-				// TODO: if this is a request to remove a user from one particular
-				// group, and that same user exists in another group, this might go
+				// TODO: if this is a request to remove a user from one
+				// particular
+				// group, and that same user exists in another group, this might
+				// go
 				// terribly wrong...
 				groupName = pkt.getValue("65");
 				user = roster.getUser(userId);
@@ -2730,9 +2901,12 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming V6_STATUS_UPDATE packet. This most likely replaces {@link #receiveIsAway(YMSG9Packet)} and
+	 * Process an incoming V6_STATUS_UPDATE packet. This most likely replaces
+	 * {@link #receiveIsAway(YMSG9Packet)} and
 	 * {@link #receiveIsBack(YMSG9Packet)}.
-	 * @param pkt The V6_STATUS_UPDATE packet.
+	 * 
+	 * @param pkt
+	 *            The V6_STATUS_UPDATE packet.
 	 */
 	protected void receiveStatusUpdate(YMSG9Packet pkt) // 0xC6
 	{
@@ -2751,7 +2925,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming ISBACK packet. God alone knows what I'm supposed to do with this when the payload is empty!!
+	 * Process an incoming ISBACK packet. God alone knows what I'm supposed to
+	 * do with this when the payload is empty!!
 	 */
 	protected void receiveIsBack(YMSG9Packet pkt) // 0x04
 	{
@@ -2785,14 +2960,16 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process and incoming LIST packet. We'll typically get one of these when our logon is sucessful. (It should arrive
-	 * before the LOGON packet.) Note: this packet can arrive in several parts. Taking a look at other third-party YMSG
-	 * implemenations it would seem that the absence of cookies is the trait marking an incomplete packet.
+	 * Process and incoming LIST packet. We'll typically get one of these when
+	 * our logon is sucessful. (It should arrive before the LOGON packet.) Note:
+	 * this packet can arrive in several parts. Taking a look at other
+	 * third-party YMSG implemenations it would seem that the absence of cookies
+	 * is the trait marking an incomplete packet.
 	 */
 	protected void receiveList(YMSG9Packet pkt) // 0x55
 	{
 		// These fields will be concatenated, others will be appended
-		String[] concatFields = {"87", "88", "89"};
+		String[] concatFields = { "87", "88", "89" };
 		// Either cache or merge with cached packet
 		if (cachePacket == null) {
 			cachePacket = pkt;
@@ -2807,16 +2984,21 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Handles a completely constructed LIST packet. LIST packets can come in several parts. These are being merged into
-	 * one by {@link #receiveList(YMSG9Packet)}. The final, merged packet is then used to call this method.
-	 * @param pkt A 'complete' LIST packet - the result of merging all fragmented LIST packets sent by the Yahoo
-	 *        Network.
+	 * Handles a completely constructed LIST packet. LIST packets can come in
+	 * several parts. These are being merged into one by
+	 * {@link #receiveList(YMSG9Packet)}. The final, merged packet is then used
+	 * to call this method.
+	 * 
+	 * @param pkt
+	 *            A 'complete' LIST packet - the result of merging all
+	 *            fragmented LIST packets sent by the Yahoo Network.
 	 */
 	private void _receiveList(YMSG9Packet pkt) // 0x55
 	{
 		/*
-		 * Friends list, each group is encoded as the group name (ie: "Friends") followed by a colon, followed by a
-		 * comma separated list of friend ids, followed by a single \n (0x0a).
+		 * Friends list, each group is encoded as the group name (ie: "Friends")
+		 * followed by a colon, followed by a comma separated list of friend
+		 * ids, followed by a single \n (0x0a).
 		 */
 		try {
 			final String grps = pkt.getValue("87"); // Value for key "87"
@@ -2961,79 +3143,88 @@ public class Session implements StatusConstants, FriendManager {
 				int key = Integer.valueOf(s[0]);
 				String value = s[1];
 				switch (key) {
-					case 302:
-						/*
-						 * This is always 318 before a group, 319 before the first s/n in a group, 320 before any
-						 * ignored s/n. It is not sent for s/n's in a group after the first. All ignored s/n's are
-						 * listed last, so when we see a 320 we clear the group and begin marking the s/n's as ignored.
-						 * It is always followed by an identical 300 key.
-						 */
-						if (value != null && value.equals("320")) {
-							currentListGroup = null;
-						}
-						break;
-					case 301:
-						/*
-						 * This is 319 before all s/n's in a group after the first. It is followed by an identical 300.
-						 */
-						if (username != null) {
-							YahooUser yu = null;
-							if (currentListGroup != null) {
-								for (YahooUser friend : usersOnFriendsList) {
-									if (friend.getId().equals(username)) {
-										yu = friend;
-										yu.addGroupId(currentListGroup.getName());
-										if (!yu.getProtocol().equals(protocol)
-												&& yu.getProtocol().equals(YahooProtocol.YAHOO)) {
-											log.debug("Switching protocols because user is in list more that once: "
-													+ yu.getId() + " from: " + yu.getProtocol() + " to: " + protocol);
-											yu.update(protocol);
-										}
+				case 302:
+					/*
+					 * This is always 318 before a group, 319 before the first
+					 * s/n in a group, 320 before any ignored s/n. It is not
+					 * sent for s/n's in a group after the first. All ignored
+					 * s/n's are listed last, so when we see a 320 we clear the
+					 * group and begin marking the s/n's as ignored. It is
+					 * always followed by an identical 300 key.
+					 */
+					if (value != null && value.equals("320")) {
+						currentListGroup = null;
+					}
+					break;
+				case 301:
+					/*
+					 * This is 319 before all s/n's in a group after the first.
+					 * It is followed by an identical 300.
+					 */
+					if (username != null) {
+						YahooUser yu = null;
+						if (currentListGroup != null) {
+							for (YahooUser friend : usersOnFriendsList) {
+								if (friend.getId().equals(username)) {
+									yu = friend;
+									yu.addGroupId(currentListGroup.getName());
+									if (!yu.getProtocol().equals(protocol)
+											&& yu.getProtocol().equals(YahooProtocol.YAHOO)) {
+										log.debug("Switching protocols because user is in list more that once: "
+												+ yu.getId() + " from: " + yu.getProtocol() + " to: " + protocol);
+										yu.update(protocol);
 									}
 								}
-								if (yu == null) {
-									/* This buddy is in a group */
-									yu = new YahooUser(username, currentListGroup.getName(), protocol);
-									usersOnFriendsList.add(yu);
-								}
-								currentListGroup.addUser(yu);
-							} else {
-								/* This buddy is on the ignore list (and therefore in no group) */
-								yu = new YahooUser(username, new HashSet<String>(), protocol);
-								yu.setIgnored(true);
-								usersOnIgnoreList.add(yu);
 							}
-							if (isPending) {
-								usersOnPendingList.add(yu);
+							if (yu == null) {
+								/* This buddy is in a group */
+								yu = new YahooUser(username, currentListGroup.getName(), protocol);
+								usersOnFriendsList.add(yu);
 							}
-							username = null;
-							isPending = false;
-							protocol = YahooProtocol.YAHOO;
+							currentListGroup.addUser(yu);
+						} else {
+							/*
+							 * This buddy is on the ignore list (and therefore
+							 * in no group)
+							 */
+							yu = new YahooUser(username, new HashSet<String>(), protocol);
+							yu.setIgnored(true);
+							usersOnIgnoreList.add(yu);
 						}
-						break;
-					case 223: /* Pending add user request */
-						isPending = true;
-						break;
-					case 300: /*
-								 * This is 318 before a group, 319 before any s/n in a group, and 320 before any ignored
-								 * s/n.
-								 */
-						break;
-					case 65: /* This is the group */
-						currentListGroup = new YahooGroup(value);
-						receivedGroups.add(currentListGroup);
-						break;
-					case 7: /* buddy's s/n */
-						username = value;
-						break;
-					case 241: /* another protocol user */
-						protocol = getUserProtocol(value, username);
-						break;
-					case 59: /* somebody told cookies come here too, but im not sure */
-						break;
-					case 317: /* Stealth Setting */
-						// stealth = Integer.valueOf(value);
-						break;
+						if (isPending) {
+							usersOnPendingList.add(yu);
+						}
+						username = null;
+						isPending = false;
+						protocol = YahooProtocol.YAHOO;
+					}
+					break;
+				case 223: /* Pending add user request */
+					isPending = true;
+					break;
+				case 300: /*
+							 * This is 318 before a group, 319 before any s/n in
+							 * a group, and 320 before any ignored s/n.
+							 */
+					break;
+				case 65: /* This is the group */
+					currentListGroup = new YahooGroup(value);
+					receivedGroups.add(currentListGroup);
+					break;
+				case 7: /* buddy's s/n */
+					username = value;
+					break;
+				case 241: /* another protocol user */
+					protocol = getUserProtocol(value, username);
+					break;
+				case 59: /*
+							 * somebody told cookies come here too, but im not
+							 * sure
+							 */
+					break;
+				case 317: /* Stealth Setting */
+					// stealth = Integer.valueOf(value);
+					break;
 				}
 			}
 			if (username != null) {
@@ -3052,7 +3243,10 @@ public class Session implements StatusConstants, FriendManager {
 					}
 					currentListGroup.addUser(yu);
 				} else {
-					/* This buddy is on the ignore list (and therefore in no group) */
+					/*
+					 * This buddy is on the ignore list (and therefore in no
+					 * group)
+					 */
 					yu = new YahooUser(username, new HashSet<String>(), protocol);
 					yu.setIgnored(true);
 					usersOnIgnoreList.add(yu);
@@ -3098,9 +3292,10 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming LOGOFF packet. If we get one of these it means Yahoo wants to throw us off the system. When
-	 * logging in using the same Yahoo ID using a second client, I noticed the Yahoo server sent one of these (just a
-	 * header, no contents) and closed the socket.
+	 * Process an incoming LOGOFF packet. If we get one of these it means Yahoo
+	 * wants to throw us off the system. When logging in using the same Yahoo ID
+	 * using a second client, I noticed the Yahoo server sent one of these (just
+	 * a header, no contents) and closed the socket.
 	 */
 	public void receiveLogoff(YMSG9Packet pkt) // 0x02
 	{
@@ -3142,9 +3337,11 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming LOGON packet. If we get one of these it means the logon process has been successful. If the
-	 * user has friends already online, an extra section of varying length is appended, starting with a count, and then
-	 * detailing each friend in turn.
+	 * Process an incoming LOGON packet. If we get one of these it means the
+	 * logon process has been successful. If the user has friends already
+	 * online, an extra section of varying length is appended, starting with a
+	 * count, and then detailing each friend in turn.
+	 * 
 	 * @throws IOException
 	 */
 	protected void receiveLogon(YMSG9Packet pkt) throws IOException // 0x01
@@ -3173,8 +3370,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming MESSAGE packet. Message can be either online or offline, the latter having a datestamp of
-	 * when they were sent.
+	 * Process an incoming MESSAGE packet. Message can be either online or
+	 * offline, the latter having a datestamp of when they were sent.
 	 */
 	protected void receiveMessage(YMSG9Packet pkt) // 0x06
 	{
@@ -3223,9 +3420,11 @@ public class Session implements StatusConstants, FriendManager {
 					if (previousIds.size() > 10)
 						previousIds.removeFirst();
 					/*
-					 * Send acknowledgement. If we don't do this then the official Yahoo Messenger client for Windows
-					 * will send us the same message 7 seconds later as an offline message. This is true for at least
-					 * version 9.0.0.2162 on Windows XP.
+					 * Send acknowledgement. If we don't do this then the
+					 * official Yahoo Messenger client for Windows will send us
+					 * the same message 7 seconds later as an offline message.
+					 * This is true for at least version 9.0.0.2162 on Windows
+					 * XP.
 					 */
 					PacketBodyBuffer body = new PacketBodyBuffer();
 					body.addElement("1", loginID.getId());
@@ -3243,7 +3442,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an incoming NEWMAIL packet, informing us of how many unread Yahoo mail messages we have.
+	 * Process an incoming NEWMAIL packet, informing us of how many unread Yahoo
+	 * mail messages we have.
 	 */
 	protected void receiveNewMail(YMSG9Packet pkt) // 0x0b
 	{
@@ -3304,8 +3504,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Process an error CHATLOGIN packet. The only time these seem to be sent is when we fail to connect to a chat room
-	 * - perhaps because it is full (?)
+	 * Process an error CHATLOGIN packet. The only time these seem to be sent is
+	 * when we fail to connect to a chat room - perhaps because it is full (?)
 	 */
 	protected void erroneousChatLogin(YMSG9Packet pkt) // 0x98
 	{
@@ -3313,10 +3513,12 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Note: the term 'packet' here refers to a YMSG message, not a TCP packet (although in almost all cases the two
-	 * will be synonymous). This is to avoid confusion with a 'YMSG message' - the actual discussion packet. service -
-	 * the Yahoo service number status - the Yahoo status number (not sessionStatus above!) body - the payload of the
-	 * packet Note: it is assumed that the ConnectionHandler has been open()'d
+	 * Note: the term 'packet' here refers to a YMSG message, not a TCP packet
+	 * (although in almost all cases the two will be synonymous). This is to
+	 * avoid confusion with a 'YMSG message' - the actual discussion packet.
+	 * service - the Yahoo service number status - the Yahoo status number (not
+	 * sessionStatus above!) body - the payload of the packet Note: it is
+	 * assumed that the ConnectionHandler has been open()'d
 	 */
 	protected void sendPacket(PacketBodyBuffer body, ServiceType service, Status status) throws IOException {
 		log.debug("Sending packet on/to the network. SessionId[0x" + Long.toHexString(sessionId) + "] ServiceType["
@@ -3448,11 +3650,14 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Chat logins sometimes use multiple packets. The clue is that incomplete packets carry a status of 5, and the
-	 * final packet carries a status of 1. This method compounds incoming 0x98 packets and returns null until the last
-	 * ('1') packet is delivered, when it returns the compounded packet.
-	 * @return null if the current packet being processed was not the final packet making up this login, otherwise the
-	 *         compounded packet will be returned.
+	 * Chat logins sometimes use multiple packets. The clue is that incomplete
+	 * packets carry a status of 5, and the final packet carries a status of 1.
+	 * This method compounds incoming 0x98 packets and returns null until the
+	 * last ('1') packet is delivered, when it returns the compounded packet.
+	 * 
+	 * @return null if the current packet being processed was not the final
+	 *         packet making up this login, otherwise the compounded packet will
+	 *         be returned.
 	 */
 	private YMSG9Packet compoundChatLoginPacket(YMSG9Packet pkt) {
 		if (pkt.status != 5 && pkt.status != 1) {
@@ -3478,8 +3683,9 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * LOGON packets can contain multiple friend status sections, ISAWAY and ISBACK packets contain only one. Update the
-	 * YahooUser details and fire event.
+	 * LOGON packets can contain multiple friend status sections, ISAWAY and
+	 * ISBACK packets contain only one. Update the YahooUser details and fire
+	 * event.
 	 */
 	protected void updateFriendsStatus(YMSG9Packet pkt) {
 		// If LOGOFF packet, the packet's user status is wrong (available)
@@ -3503,59 +3709,59 @@ public class Session implements StatusConstants, FriendManager {
 			String value = s[1];
 			// log.info("Key: " + key + ", value: " + value);
 			switch (key) {
-				case 300:
-					// initial row, most of the time
-					break;
-				case 7:
-					// check and see if we have one
-					if (userId != null) {
-						updateFriendStatus(logoff, userId, onChat, onPager, visibility, clearIdleTime, idleTime,
-								customMessage, customStatus, longStatus, protocol);
-						longStatus = 0;
-						onChat = null;
-						onPager = null;
-						visibility = null;
-						clearIdleTime = null;
-						idleTime = null;
-						customMessage = null;
-						customStatus = null;
-						userId = null;
-						protocol = YahooProtocol.YAHOO;
-					}
-					userId = value;
-					break;
-				case 10:
-					try {
-						longStatus = Long.parseLong(value);
-					} catch (NumberFormatException e) {
-						customMessage = value;
-					}
-					break;
-				case 17:
-					onChat = value.equals("1");
-					break;
-				case 13: // one of these matters
-					onPager = value.equals("1");
-					visibility = value;
-					break;
-				case 19:
+			case 300:
+				// initial row, most of the time
+				break;
+			case 7:
+				// check and see if we have one
+				if (userId != null) {
+					updateFriendStatus(logoff, userId, onChat, onPager, visibility, clearIdleTime, idleTime,
+							customMessage, customStatus, longStatus, protocol);
+					longStatus = 0;
+					onChat = null;
+					onPager = null;
+					visibility = null;
+					clearIdleTime = null;
+					idleTime = null;
+					customMessage = null;
+					customStatus = null;
+					userId = null;
+					protocol = YahooProtocol.YAHOO;
+				}
+				userId = value;
+				break;
+			case 10:
+				try {
+					longStatus = Long.parseLong(value);
+				} catch (NumberFormatException e) {
 					customMessage = value;
-					break;
-				case 47:
-					customStatus = value;
-					break;
-				case 138:
-					clearIdleTime = value;
-					break;
-				case 241:
-					protocol = getUserProtocol(value, userId);
-					break;
-				case 137:
-					idleTime = value;
-					break;
-				case 301:
-					// ending row, most of the time
-					break;
+				}
+				break;
+			case 17:
+				onChat = value.equals("1");
+				break;
+			case 13: // one of these matters
+				onPager = value.equals("1");
+				visibility = value;
+				break;
+			case 19:
+				customMessage = value;
+				break;
+			case 47:
+				customStatus = value;
+				break;
+			case 138:
+				clearIdleTime = value;
+				break;
+			case 241:
+				protocol = getUserProtocol(value, userId);
+				break;
+			case 137:
+				idleTime = value;
+				break;
+			case 301:
+				// ending row, most of the time
+				break;
 			}
 		}
 		if (userId != null) {
@@ -3602,10 +3808,12 @@ public class Session implements StatusConstants, FriendManager {
 		} else if (onPager != null) {
 			user.update(newStatus, visibility);
 		} else if (logoff) {
-			// logoff message doesn't have chat or pager info, but we reset those in this case.
+			// logoff message doesn't have chat or pager info, but we reset
+			// those in this case.
 			user.update(newStatus, false, false);
 		} else {
-			// status update with no chat, nor pager information, so leave those values alone.
+			// status update with no chat, nor pager information, so leave those
+			// values alone.
 			user.update(newStatus);
 		}
 		if (customMessage != null) {
@@ -3625,7 +3833,8 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Create chat user from a chat packet. Note: a YahooUser is created if necessary.
+	 * Create chat user from a chat packet. Note: a YahooUser is created if
+	 * necessary.
 	 */
 	private YahooChatUser createChatUser(YMSG9Packet pkt, int i) {
 		pkt.generateQuickSetAccessors("109");
@@ -3653,18 +3862,25 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Verifies that the a particular name is of suitable format for a conference name. Conference names shoudl start
-	 * with the Yahoo ID of the initiating user, followed by a dash (-), eg: <tt>SomeUserID-3432622</tt>. Tests indicate
-	 * that the part after the dash is free form (and can even be absent).
-	 * @param name The name to verify.
-	 * @return <tt>true</tt> if the name is a valid conference name, otherwise <tt>false</tt>.
+	 * Verifies that the a particular name is of suitable format for a
+	 * conference name. Conference names shoudl start with the Yahoo ID of the
+	 * initiating user, followed by a dash (-), eg: <tt>SomeUserID-3432622</tt>.
+	 * Tests indicate that the part after the dash is free form (and can even be
+	 * absent).
+	 * 
+	 * @param name
+	 *            The name to verify.
+	 * @return <tt>true</tt> if the name is a valid conference name, otherwise
+	 *         <tt>false</tt>.
 	 */
 	public boolean isValidConferenceName(String name) {
 		if (name == null) {
 			return false;
 		}
-		// Not ending with "--" does not cause any issues, as far as I've been able to determine. - Guus
-		// The part after "<yid>-" appears to be freeform. So far, there are no known limitations. Tests show that it
+		// Not ending with "--" does not cause any issues, as far as I've been
+		// able to determine. - Guus
+		// The part after "<yid>-" appears to be freeform. So far, there are no
+		// known limitations. Tests show that it
 		// can even be absent ( <yid>- is a valid name in itself).
 		if (name.startsWith(primaryID.getId() + "-")) {
 			return true;
@@ -3672,7 +3888,8 @@ public class Session implements StatusConstants, FriendManager {
 		if (name.startsWith(loginID.getId() + "-")) {
 			return true;
 		}
-		// I assume (but did not verify) that all of the other ID's are fine. - Guus
+		// I assume (but did not verify) that all of the other ID's are fine. -
+		// Guus
 		for (String alternateID : identities.keySet()) {
 			if (name.startsWith(alternateID + "-")) {
 				return true;
@@ -3702,9 +3919,13 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Convenience method to add a event to the eventdispatcher (fire the event to all listeners).
-	 * @param event The SessionEvent to be dispatched.
-	 * @param type Type of the event to be dispatched.
+	 * Convenience method to add a event to the eventdispatcher (fire the event
+	 * to all listeners).
+	 * 
+	 * @param event
+	 *            The SessionEvent to be dispatched.
+	 * @param type
+	 *            Type of the event to be dispatched.
 	 */
 	void fire(SessionEvent event, ServiceType type) {
 		if (event == null) {
@@ -3718,6 +3939,7 @@ public class Session implements StatusConstants, FriendManager {
 
 	/**
 	 * Returns the ID for this session object.
+	 * 
 	 * @return Session object ID.
 	 */
 	public long getSessionID() {
@@ -3726,7 +3948,9 @@ public class Session implements StatusConstants, FriendManager {
 
 	/**
 	 * Sends out a request to receive a picture (avatar) from a contact
-	 * @param friend The name of the contact for which a picture is requested.
+	 * 
+	 * @param friend
+	 *            The name of the contact for which a picture is requested.
 	 * @throws IOException
 	 */
 	public void requestPicture(final String friend) throws IOException {
@@ -3738,8 +3962,11 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Processes an incoming 'PICTURE' packet, which contains avatar-like information of a contact.
-	 * @param pkt The packet to parse.
+	 * Processes an incoming 'PICTURE' packet, which contains avatar-like
+	 * information of a contact.
+	 * 
+	 * @param pkt
+	 *            The packet to parse.
 	 */
 	protected void receivePicture(YMSG9Packet pkt) // 0xbe
 	{
@@ -3757,7 +3984,9 @@ public class Session implements StatusConstants, FriendManager {
 			while ((bytesRead = imgIn.read(buff)) > 0) {
 				out.write(buff, 0, bytesRead);
 			}
-			final SessionPictureEvent se = new SessionPictureEvent(this, pkt.getValue("5"), // to / us
+			final SessionPictureEvent se = new SessionPictureEvent(this, pkt.getValue("5"), // to
+																							// /
+																							// us
 					pkt.getValue("4"), // from
 					out.toByteArray() // data
 			);
@@ -3780,6 +4009,7 @@ public class Session implements StatusConstants, FriendManager {
 
 	/**
 	 * Sets the SessionPictureHandler for this session.
+	 * 
 	 * @param pictureHandler
 	 */
 	public void setSessionPictureHandler(SessionPictureHandler pictureHandler) {
@@ -3787,8 +4017,10 @@ public class Session implements StatusConstants, FriendManager {
 	}
 
 	/**
-	 * Returns the roster that contains the list of friends. The roster will be represented by a new object after each
-	 * call to {@link Session#login(String, String)}
+	 * Returns the roster that contains the list of friends. The roster will be
+	 * represented by a new object after each call to
+	 * {@link Session#login(String, String)}
+	 * 
 	 * @return the roster that belongs to this Session
 	 */
 	public Roster getRoster() {
