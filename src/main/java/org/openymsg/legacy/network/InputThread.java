@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.NDC;
 import org.openymsg.legacy.network.event.SessionConferenceInviteEvent;
 
 /**
@@ -56,28 +57,33 @@ public class InputThread extends Thread {
 	 */
 	@Override
 	public void run() {
-		while (!quit) {
-			try {
-				process(parentSession.network.receivePacket());
-			} catch (UnknowServiceException e) {
-				log.warn("unknow packet: " + e.getPacket().toString());
-			} catch (Exception e) {
-				// ignore SocketExceptions if we're closing the thread.
-				if (quit && e instanceof SocketException) {
-					log.debug("logging out so don't handle exception");
-					return;
-				}
-				log.error("error on process packet", e);
+		try {
+			while (!quit) {
 				try {
-					parentSession.sendExceptionEvent(e, "Source: InputThread");
-				} catch (Exception e2) {
-					log.error("error on sendException to the session", e2);
-				}
-				// IO exceptions? Close the connection!
-				if (e instanceof IOException) {
-					quit = true;
+					process(parentSession.network.receivePacket());
+				} catch (UnknowServiceException e) {
+					log.warn("unknow packet: " + e.getPacket().toString());
+				} catch (Exception e) {
+					// ignore SocketExceptions if we're closing the thread.
+					if (quit && e instanceof SocketException) {
+						log.debug("logging out so don't handle exception");
+						return;
+					}
+					log.error("error on process packet", e);
+					try {
+						parentSession.sendExceptionEvent(e, "Source: InputThread");
+					} catch (Exception e2) {
+						log.error("error on sendException to the session", e2);
+					}
+					// IO exceptions? Close the connection!
+					if (e instanceof IOException) {
+						quit = true;
+					}
 				}
 			}
+		} finally {
+			log.info("Removing NDC");
+			NDC.remove();
 		}
 	}
 

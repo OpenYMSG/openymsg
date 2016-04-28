@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.NDC;
 import org.openymsg.legacy.network.event.SessionEvent;
 import org.openymsg.legacy.network.event.SessionListener;
 
@@ -88,11 +89,21 @@ public class EventDispatcher extends Thread {
 	 */
 	@Override
 	public void run() {
-		while (!quitFlag) {
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				// ignore.
+		try {
+			while (!quitFlag) {
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					// ignore.
+				}
+				while (!queue.isEmpty()) {
+					final FireEvent event = queue.remove(0);
+					try {
+						runEventNOW(event);
+					} catch (Exception e) {
+						log.error("Failed proceessing runEventNOW", e);
+					}
+				}
 			}
 			while (!queue.isEmpty()) {
 				final FireEvent event = queue.remove(0);
@@ -102,6 +113,9 @@ public class EventDispatcher extends Thread {
 					log.error("Failed proceessing runEventNOW", e);
 				}
 			}
+		} finally {
+			log.info("Removing NDC");
+			NDC.remove();
 		}
 	}
 

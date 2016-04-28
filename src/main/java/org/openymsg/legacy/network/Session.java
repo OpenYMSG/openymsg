@@ -3572,9 +3572,11 @@ public class Session implements StatusConstants, FriendManager {
 		// Close the input thread (unless ipThread itself is calling us)
 		sessionStatus = SessionState.UNSTARTED;
 		sleepABit();
-		if (ipThread != null && Thread.currentThread() != ipThread) {
+		if (ipThread != null) {
 			ipThread.stopMe();
-			ipThread.interrupt();
+			if (Thread.currentThread() != ipThread) {
+				ipThread.interrupt();
+			}
 			ipThread = null;
 		}
 		// Remove our pinger task from the timer
