@@ -9,21 +9,25 @@
  */
 package org.openymsg.legacy.network;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openymsg.legacy.network.event.SessionEvent;
-import org.openymsg.legacy.network.event.SessionListener;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.NDC;
+import org.openymsg.legacy.network.event.SessionEvent;
+import org.openymsg.legacy.network.event.SessionListener;
+
 /**
- * Dispatcher for events that are fired. Events that get fired are broadcasted to all listeners that are registered to
- * the instance of this object. The process of dispatching events is threaded so the network code which instigates these
- * events can return to listening for input, and not get tied up in each listener's event handler.
+ * Dispatcher for events that are fired. Events that get fired are broadcasted
+ * to all listeners that are registered to the instance of this object. The
+ * process of dispatching events is threaded so the network code which
+ * instigates these events can return to listening for input, and not get tied
+ * up in each listener's event handler.
+ * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
@@ -40,8 +44,8 @@ public class EventDispatcher extends Thread {
 	}
 
 	/**
-	 * Gracefully stops this thread after sending out all currently queued events. No new events can be queued after
-	 * calling this method.
+	 * Gracefully stops this thread after sending out all currently queued
+	 * events. No new events can be queued after calling this method.
 	 */
 	public void kill() {
 		quitFlag = true;
@@ -49,17 +53,24 @@ public class EventDispatcher extends Thread {
 	}
 
 	/**
-	 * Add an event to the dispatch queue. This causes the event to be dispatched to all registered listeners.
-	 * @param type The service typ of the event that's being dispatched.
+	 * Add an event to the dispatch queue. This causes the event to be
+	 * dispatched to all registered listeners.
+	 * 
+	 * @param type
+	 *            The service typ of the event that's being dispatched.
 	 */
 	public void append(final ServiceType type) {
 		append(null, type);
 	}
 
 	/**
-	 * Add an event to the dispatch queue. This causes the event to be dispatched to all registered listeners.
-	 * @param event The sessionEvent that needs to be dispatched.
-	 * @param type The service typ of the event that's being dispatched.
+	 * Add an event to the dispatch queue. This causes the event to be
+	 * dispatched to all registered listeners.
+	 * 
+	 * @param event
+	 *            The sessionEvent that needs to be dispatched.
+	 * @param type
+	 *            The service typ of the event that's being dispatched.
 	 */
 	public void append(final SessionEvent event, final ServiceType type) {
 		if (type == null) {
@@ -73,15 +84,26 @@ public class EventDispatcher extends Thread {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Thread#run()
 	 */
 	@Override
 	public void run() {
-		while (!quitFlag) {
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				// ignore.
+		try {
+			while (!quitFlag) {
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					// ignore.
+				}
+				while (!queue.isEmpty()) {
+					final FireEvent event = queue.remove(0);
+					try {
+						runEventNOW(event);
+					} catch (Exception e) {
+						log.error("Failed proceessing runEventNOW", e);
+					}
+				}
 			}
 			while (!queue.isEmpty()) {
 				final FireEvent event = queue.remove(0);
@@ -91,12 +113,18 @@ public class EventDispatcher extends Thread {
 					log.error("Failed proceessing runEventNOW", e);
 				}
 			}
+		} finally {
+			log.info("Removing NDC");
+			NDC.remove();
 		}
 	}
 
 	/**
-	 * Do not use this directly unless you need it out of sequence or to run w/o an event queue.
-	 * @param event to run
+	 * Do not use this directly unless you need it out of sequence or to run w/o
+	 * an event queue.
+	 * 
+	 * @param event
+	 *            to run
 	 */
 	public void runEventNOW(final FireEvent event) {
 		if (event == null) {
