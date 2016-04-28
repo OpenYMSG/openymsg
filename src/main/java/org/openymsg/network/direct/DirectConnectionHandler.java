@@ -1,5 +1,12 @@
 package org.openymsg.network.direct;
 
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.ConnectionEndedReason;
@@ -10,13 +17,6 @@ import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 import org.openymsg.network.YMSG9Packet;
-
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
-import java.util.HashSet;
-import java.util.Set;
 
 public class DirectConnectionHandler implements ConnectionHandler {
 	/** logger */
@@ -51,10 +51,12 @@ public class DirectConnectionHandler implements ConnectionHandler {
 	}
 
 	/**
-	 * Note: the term 'packet' here refers to a YMSG message, not a TCP packet (although in almost all cases the two
-	 * will be synonymous). This is to avoid confusion with a 'YMSG message' - the actual discussion packet. service -
-	 * the Yahoo service number status - the Yahoo status number (not sessionStatus!) body - the payload of the packet
-	 * Note: it is assumed that 'ops' will have been set by the time this method is called.
+	 * Note: the term 'packet' here refers to a YMSG message, not a TCP packet
+	 * (although in almost all cases the two will be synonymous). This is to
+	 * avoid confusion with a 'YMSG message' - the actual discussion packet.
+	 * service - the Yahoo service number status - the Yahoo status number (not
+	 * sessionStatus!) body - the payload of the packet Note: it is assumed that
+	 * 'ops' will have been set by the time this method is called.
 	 */
 	@Override
 	public synchronized void sendPacket(PacketBodyBuffer body, ServiceType service, MessageStatus status) {
@@ -71,10 +73,13 @@ public class DirectConnectionHandler implements ConnectionHandler {
 				this.socketLockChecker.startWriting();
 				ops.write(NetworkConstants.PROTOCOL, 0, 4); // Magic code 'YMSG'
 				ops.write(NetworkConstants.VERSION, 0, 4); // Version
-				ops.writeShort(b.length & 0xFFFF); // Body length (16 bit unsigned)
+				ops.writeShort(b.length & 0xFFFF); // Body length (16 bit
+													// unsigned)
 				ops.writeShort(service.getValue() & 0xFFFF); // Service ID (16
 				// bit unsigned
-				ops.writeInt((int) (status.getValue() & 0xFFFFFFFF)); // Status (32 bit
+				ops.writeInt((int) (status.getValue() & 0xFFFFFFFF)); // Status
+																		// (32
+																		// bit
 				// unsigned)
 				ops.writeInt((int) (sessionId & 0xFFFFFFFF)); // Session id (32
 				// bit unsigned)
@@ -97,7 +102,8 @@ public class DirectConnectionHandler implements ConnectionHandler {
 	// TODO - handle 2001 - bad sign in using Fred
 	// Feb 10, 2012 2:02:04 PM org.openymsg.network.ServiceType getServiceType
 	// WARNING: No such ServiceType value '2001' (which is '7d1' in hex).
-	// Magic:YMSG Version:0 Length:10 Service:null Status:-1 SessionId:0x30000000 [66] [1004]
+	// Magic:YMSG Version:0 Length:10 Service:null Status:-1
+	// SessionId:0x30000000 [66] [1004]
 	@Override
 	public YMSG9Packet receivePacket() {
 		try {
@@ -112,7 +118,7 @@ public class DirectConnectionHandler implements ConnectionHandler {
 				} else if (this.sessionId != packet.sessionId) {
 					log.error("Problem with not matching session ids: " + this.sessionId + " and " + packet.sessionId);
 				}
-				log.debug("receiving packet:" + packet);
+				log.debug("Received packet:" + packet);
 				return packet;
 			} else {
 				log.trace("skipping with no message");

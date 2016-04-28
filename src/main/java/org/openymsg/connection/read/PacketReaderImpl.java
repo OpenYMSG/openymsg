@@ -32,6 +32,7 @@ public class PacketReaderImpl implements PacketReader {
 		}
 		this.reader = new ConnectionReader(connection, getReceiver());
 		this.executor.schedule(this.reader, 100);
+		
 	}
 
 	@Override

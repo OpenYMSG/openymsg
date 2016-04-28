@@ -1,18 +1,20 @@
 package org.openymsg.context.session;
 
+import java.util.StringTokenizer;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.connection.read.SinglePacketResponse;
 import org.openymsg.network.YMSG9Packet;
-
-import java.util.StringTokenizer;
 
 public class ListResponse implements SinglePacketResponse {
 	private static final Log log = LogFactory.getLog(ListResponse.class);
 
 	/**
 	 * handle the incoming packet.
-	 * @param packet incoming packet
+	 * 
+	 * @param packet
+	 *            incoming packet
 	 */
 	@Override
 	public void execute(YMSG9Packet packet) {
@@ -40,6 +42,7 @@ public class ListResponse implements SinglePacketResponse {
 			boolean foundOne = false;
 			while (st.hasMoreTokens()) {
 				final String id = st.nextToken().toLowerCase();
+				log.info("Got yahoo id:" + id);
 				if (foundOne) {
 					log.info("Getting more than one identity: " + id);
 				}
