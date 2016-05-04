@@ -21,6 +21,7 @@ public class ContactServiceBuilder {
 		sessionRoster = new SessionRosterImpl(connection, username, callback);
 		sessionGroup = new SessionGroupImpl(connection, username);
 		buildStatus();
+		initialize();
 		return new ContactUserService(sessionRoster, sessionGroup, sessionStatus);
 	}
 
