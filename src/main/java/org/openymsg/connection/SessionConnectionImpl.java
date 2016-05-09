@@ -9,6 +9,7 @@ import org.openymsg.connection.read.SinglePacketResponse;
 import org.openymsg.connection.write.Message;
 import org.openymsg.connection.write.PacketWriterImpl;
 import org.openymsg.execute.Executor;
+import org.openymsg.execute.dispatch.Request;
 import org.openymsg.network.ConnectionEndedReason;
 import org.openymsg.network.ConnectionHandler;
 import org.openymsg.network.ConnectionHandlerCallback;
@@ -60,7 +61,11 @@ public class SessionConnectionImpl implements YahooConnection, ConnectionHandler
 		// ConnectionState state = this.getConnectionState();
 		// if (state.isStartable()) {
 		this.setState(ConnectionState.CONNECTING);
-		this.executor.execute(new ConnectionInitalize(sessionConfig, this));
+		this.executor.execute(createConnectionInitialize(sessionConfig));
+	}
+
+	protected Request createConnectionInitialize(SessionConfig sessionConfig) {
+		return new ConnectionInitalize(sessionConfig, this);
 	}
 
 	@Override
