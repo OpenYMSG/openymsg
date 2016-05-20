@@ -6,6 +6,7 @@ import org.openymsg.Name;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 import org.openymsg.connection.YahooConnection;
+import org.openymsg.connection.write.PacketWriter;
 import org.openymsg.network.ServiceType;
 
 import java.util.Set;
@@ -13,17 +14,18 @@ import java.util.Set;
 public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 	/** logger */
 	private static final Log log = LogFactory.getLog(SessionRosterImpl.class);
-	private YahooConnection executor;
-	private String username;
-	private ContactRoster contacts = new ContactRoster();
-	private SessionRosterCallback callback;
+	private final PacketWriter writer;
+	private final String username;
+	private final ContactRoster contacts = new ContactRoster();
+	private final SessionRosterCallback callback;
 	private boolean rosterLoaded = false;
 
-	public SessionRosterImpl(YahooConnection executor, String username, SessionRosterCallback callback) {
-		this.executor = executor;
+	public SessionRosterImpl(YahooConnection connection, String username, SessionRosterCallback callback) {
+		this.writer = connection.getPacketWriter();
 		this.username = username;
 		this.callback = callback;
-		this.executor.register(ServiceType.Y7_BUDDY_AUTHORIZATION, new ContactAddAuthorizationResponse(this));
+		connection.getReaderRegistry().register(ServiceType.Y7_BUDDY_AUTHORIZATION,
+				new ContactAddAuthorizationResponse(this));
 	}
 
 	@Override
@@ -40,7 +42,7 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 			throw new IllegalArgumentException("Contact already exists");
 		}
 		// TODO handle name
-		this.executor.execute(new ContactAddMessage(this.username, contact, group, message, null));
+		this.writer.execute(new ContactAddMessage(this.username, contact, group, message, null));
 	}
 
 	@Override
@@ -54,17 +56,17 @@ public class SessionRosterImpl implements SessionRoster, SessionRosterCallback {
 		if (!group.getContacts().contains(contact)) {
 			throw new IllegalArgumentException("Contact not in group");
 		}
-		this.executor.execute(new ContactRemoveMessage(this.username, contact, group));
+		this.writer.execute(new ContactRemoveMessage(this.username, contact, group));
 	}
 
 	@Override
 	public void acceptFriendAuthorization(String id, YahooContact contact) throws IllegalStateException {
-		this.executor.execute(new ContactAddAcceptMessage(id, contact));
+		this.writer.execute(new ContactAddAcceptMessage(id, contact));
 	}
 
 	@Override
 	public void rejectFriendAuthorization(YahooContact contact, String message) throws IllegalStateException {
-		this.executor.execute(new ContactAddDeclineMessage(this.username, contact, message));
+		this.writer.execute(new ContactAddDeclineMessage(this.username, contact, message));
 	}
 
 	// TODO - this look cool

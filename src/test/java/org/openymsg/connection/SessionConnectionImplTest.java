@@ -21,14 +21,17 @@ import org.openymsg.network.ConnectionHandler;
 import org.openymsg.network.TestingConnectionBuilder;
 
 public class SessionConnectionImplTest {
+	private SessionConnectionBuilder builder = new SessionConnectionBuilder();
 	private static String username;
 	private Executor executor;
 	@Mock
-	private SessionConnectionCallback listener;
+	private SessionConnectionCallback callback;
 	@Mock
 	SessionConfig sessionConfig;
 	@Mock
 	private ConnectionHandler connection;
+	@Mock
+	private ConnectionInfo status;
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
@@ -48,20 +51,12 @@ public class SessionConnectionImplTest {
 		executor.shutdown();
 	}
 
-	@Test()
-	public void testNullConfig() {
-		sessionConfig = null;
-		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, listener);
-		exception.expect(IllegalArgumentException.class);
-		sessionConnection.initialize(sessionConfig);
-	}
-
 	@Test
 	public void testConnection() {
 		when(sessionConfig.getConnectionBuilder()).thenReturn(new TestingConnectionBuilder(true));
-		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, listener);
-		sessionConnection.initialize(sessionConfig);
-		verify(listener, timeout(100)).connectionSuccessful();
+		SessionConnectionImpl sessionConnection =
+				builder.setCallback(callback).setExecutor(executor).setSessionConfig(sessionConfig).build();
+		verify(callback, timeout(100)).connectionSuccessful();
 		sessionConnection.getConnectionState();
 	}
 
@@ -70,18 +65,17 @@ public class SessionConnectionImplTest {
 	/** Test that a connection never connects */
 	public void testFailed() {
 		when(sessionConfig.getConnectionBuilder()).thenReturn(new TestingConnectionBuilder(false));
-		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, listener);
-		sessionConnection.initialize(sessionConfig);
-		verify(listener, timeout(100)).connectionFailure();
+		builder.setCallback(callback).setExecutor(executor).setSessionConfig(sessionConfig).build();
+		verify(callback, timeout(100)).connectionFailure();
 	}
 
 	@Test
 	public void testFailLater() {
 		when(sessionConfig.getConnectionBuilder()).thenReturn(new TestingConnectionBuilder(true));
-		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, listener);
-		sessionConnection.initialize(sessionConfig);
-		sessionConnection.initializeConnection(connection);
-		sessionConnection.connectionEnded(ConnectionEndedReason.SocketClosed);
-		verify(listener).connectionPrematurelyEnded();
+		builder.setCallback(callback).setExecutor(executor).setSessionConfig(sessionConfig).build();
+		ConnectionStateAndDetails state = builder.getConnectionStateForTest();
+		state.setConnected(connection, status);
+		state.connectionEnded(ConnectionEndedReason.SocketClosed);
+		verify(callback).connectionPrematurelyEnded();
 	}
 }

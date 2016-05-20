@@ -1,26 +1,26 @@
 package org.openymsg.contact.group;
 
-import org.openymsg.YahooContactGroup;
-import org.openymsg.connection.YahooConnection;
-import org.openymsg.util.CollectionUtils;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.openymsg.YahooContactGroup;
+import org.openymsg.connection.write.PacketWriter;
+import org.openymsg.util.CollectionUtils;
+
 public class SessionGroupImpl implements SessionGroup, SessionGroupCallback {
-	private YahooConnection executor;
+	private PacketWriter connection;
 	private String username;
 	private Set<YahooContactGroup> contactGroups = Collections.synchronizedSet(new HashSet<YahooContactGroup>());
 
-	public SessionGroupImpl(YahooConnection executor, String username) {
-		if (executor == null) {
-			throw new IllegalArgumentException("Executor may not be null");
+	public SessionGroupImpl(PacketWriter connection, String username) {
+		if (connection == null) {
+			throw new IllegalArgumentException("Connection may not be null");
 		}
 		if (username == null) {
 			throw new IllegalArgumentException("username may not be null");
 		}
-		this.executor = executor;
+		this.connection = connection;
 		this.username = username;
 	}
 
@@ -40,7 +40,7 @@ public class SessionGroupImpl implements SessionGroup, SessionGroupCallback {
 		if (!this.contactGroups.contains(group)) {
 			throw new IllegalArgumentException("group is not in the existing group list");
 		}
-		this.executor.execute(new ContactGroupRenameMessage(username, group, newName));
+		this.connection.execute(new ContactGroupRenameMessage(username, group, newName));
 	}
 
 	@Override

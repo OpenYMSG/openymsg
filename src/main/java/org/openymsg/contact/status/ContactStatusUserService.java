@@ -1,10 +1,7 @@
 package org.openymsg.contact.status;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactStatus;
-import org.openymsg.connection.YahooConnection;
 
 /**
  * Handles several kinds of status messages. Status15 - single messages for
@@ -14,13 +11,9 @@ import org.openymsg.connection.YahooConnection;
  * @author neilhart
  */
 public class ContactStatusUserService implements SessionStatus {
-	/** logger */
-	private static final Log log = LogFactory.getLog(ContactStatusUserService.class);
-	private YahooConnection executor;
 	private final ContactStatusState state;
 
-	public ContactStatusUserService(YahooConnection executor, ContactStatusState state) {
-		this.executor = executor;
+	public ContactStatusUserService(ContactStatusState state) {
 		// this(executor, new
 		// SessionStatusCallbackHandlerBuilder().setCallback(callback));
 		this.state = state;

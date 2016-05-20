@@ -1,21 +1,22 @@
 package org.openymsg.message;
 
+import java.io.IOException;
+
 import org.openymsg.YahooContact;
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
-import java.io.IOException;
-
 /**
- * Transmit a MESSAGE packet. * Doesn't support Doodling on whiteboard, whatever that is. imvironment is ":0"
+ * Transmit a MESSAGE packet. * Doesn't support Doodling on whiteboard, whatever
+ * that is. imvironment is ":0"
  */
 public class SendMessage implements Message {
-	private String username;
-	private YahooContact contact;
-	private String message;
-	private String messageId;
+	private final String username;
+	private final YahooContact contact;
+	private final String message;
+	private final String messageId;
 
 	public SendMessage(String username, YahooContact contact, String message, String messageId) {
 		this.username = username;
@@ -35,7 +36,8 @@ public class SendMessage implements Message {
 		body.addElement("97", "1");
 		body.addElement("63", ";0");
 		body.addElement("64", "0");
-		body.addElement("206", "0"); /* 0 = no picture, 2 = picture, maybe 1 = avatar? */
+		body.addElement("206",
+				"0"); /* 0 = no picture, 2 = picture, maybe 1 = avatar? */
 		body.addElement("14", message);
 		body.addElement("429", messageId);
 		body.addElement("450", "0");

@@ -2,10 +2,10 @@ package org.openymsg.message;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.openymsg.testing.MessageAssert.argThatMessage;
 
 import org.junit.After;
@@ -13,42 +13,53 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooProtocol;
 import org.openymsg.connection.YahooConnection;
+import org.openymsg.connection.read.ReaderRegistry;
 import org.openymsg.connection.read.SinglePacketResponse;
+import org.openymsg.connection.write.PacketWriter;
 import org.openymsg.network.ServiceType;
 
 public class SessionMessageImplTest {
 	private String username = "testuser";
 	private YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
-	private YahooConnection executor;
+	@Mock
+	private YahooConnection connection;
+	@Mock
 	private SessionMessageCallback callback;
+	@Mock
+	private PacketWriter writer;
+	@Mock
+	private ReaderRegistry registry;
 	private SessionMessageImpl session;
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
 	@Before
 	public void beforeMethod() {
-		executor = mock(YahooConnection.class);
-		callback = mock(SessionMessageCallback.class);
-		session = new SessionMessageImpl(executor, username, callback);
+		MockitoAnnotations.initMocks(this);
+		when(connection.getPacketWriter()).thenReturn(writer);
+		when(connection.getReaderRegistry()).thenReturn(registry);
+		session = new SessionMessageImpl(connection, username, callback);
 	}
 
 	@After
 	public void afterMethod() {
 		verifyNoMoreInteractions(callback);
-		verify(executor).register(eq(ServiceType.MESSAGE_ACK), (SinglePacketResponse) any());
-		verify(executor).register(eq(ServiceType.MESSAGE), (SinglePacketResponse) any());
-		verify(executor).register(eq(ServiceType.NOTIFY), (SinglePacketResponse) any());
-		verifyNoMoreInteractions(executor);
+		verify(registry).register(eq(ServiceType.MESSAGE_ACK), (SinglePacketResponse) any());
+		verify(registry).register(eq(ServiceType.MESSAGE), (SinglePacketResponse) any());
+		verify(registry).register(eq(ServiceType.NOTIFY), (SinglePacketResponse) any());
+		verifyNoMoreInteractions(registry);
 	}
 
 	@Test
 	public void testSendMessage() {
 		String message = "dfgfdgdfgdfgfdg";
 		session.sendMessage(contact, message);
-		verify(executor).execute(argThatMessage(new SendMessage(username, contact, message, "0"), "messageId"));
+		verify(writer).execute(argThatMessage(new SendMessage(username, contact, message, "0"), "messageId"));
 	}
 
 	@Test()
@@ -69,20 +80,20 @@ public class SessionMessageImplTest {
 	@Test
 	public void testSendBuzz() {
 		session.sendBuzz(contact);
-		verify(executor)
+		verify(writer)
 				.execute(argThatMessage(new SendMessage(username, contact, SessionMessageImpl.BUZZ, "0"), "messageId"));
 	}
 
 	@Test
 	public void testTypingStarted() {
 		session.sendTypingNotification(contact, true);
-		verify(executor).execute(argThatMessage((new TypingNotificationMessage(username, contact, true))));
+		verify(writer).execute(argThatMessage((new TypingNotificationMessage(username, contact, true))));
 	}
 
 	@Test
 	public void testTypingDone() {
 		session.sendTypingNotification(contact, false);
-		verify(executor).execute(argThatMessage(new TypingNotificationMessage(username, contact, false)));
+		verify(writer).execute(argThatMessage(new TypingNotificationMessage(username, contact, false)));
 	}
 
 	@Test
@@ -98,7 +109,7 @@ public class SessionMessageImplTest {
 		String messageId = "id";
 		session.receivedMessage(contact, message, messageId);
 		verify(callback).receivedMessage(contact, message);
-		verify(executor).execute(argThatMessage(new MessageAckMessage(username, contact, messageId)));
+		verify(writer).execute(argThatMessage(new MessageAckMessage(username, contact, messageId)));
 	}
 
 	@Test
@@ -130,6 +141,6 @@ public class SessionMessageImplTest {
 		session.receivedBuzz(contact, null);
 		session.receivedBuzz(contact, messageId);
 		verify(callback, times(2)).receivedBuzz(contact);
-		verify(executor).execute(argThatMessage(new MessageAckMessage(username, contact, messageId)));
+		verify(writer).execute(argThatMessage(new MessageAckMessage(username, contact, messageId)));
 	}
 }

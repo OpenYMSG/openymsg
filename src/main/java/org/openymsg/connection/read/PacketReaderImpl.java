@@ -1,63 +1,47 @@
 package org.openymsg.connection.read;
 
-import org.openymsg.execute.dispatch.Dispatcher;
-import org.openymsg.network.ConnectionHandler;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.ServiceType;
+import org.openymsg.network.YMSG9Packet;
 
-public class PacketReaderImpl implements PacketReader {
-	protected final ReaderRegistryImpl registry;
-	private ConnectionReader reader;
-	private final Dispatcher executor;
+public class PacketReaderImpl implements ConnectionReaderReceiver {
+	/** logger */
+	private static final Log log = LogFactory.getLog(PacketReaderImpl.class);
+	private final Map<ServiceType, Set<SinglePacketResponse>> registry;
 
-	public PacketReaderImpl(Dispatcher executor) {
-		if (executor == null) {
-			throw new IllegalArgumentException("Executor cannot be null");
+	public PacketReaderImpl(Map<ServiceType, Set<SinglePacketResponse>> registry) {
+		if (registry == null) {
+			throw new IllegalArgumentException("registry cannot be null");
 		}
-		this.executor = executor;
-		this.registry = createRegistry();
-	}
-
-	protected ReaderRegistryImpl createRegistry() {
-		return new ReaderRegistryImpl();
-	}
-
-	protected ReaderReceiver getReceiver() {
-		return this.registry;
+		this.registry = registry;
 	}
 
 	@Override
-	public void initializeConnection(ConnectionHandler connection) {
-		if (connection == null) {
-			throw new IllegalArgumentException("Connection cannot be null");
+	public void received(YMSG9Packet packet) {
+		log.debug("received packet: " + packet);
+		ServiceType type = packet.service;
+		Set<SinglePacketResponse> responses = this.registry.get(type);
+		if (responses == null || responses.isEmpty()) {
+			log.warn("Not handling serviceType: + " + type);
+			return;
 		}
-		this.reader = new ConnectionReader(connection, getReceiver());
-		this.executor.schedule(this.reader, 100);
-		
+		if (responses.size() > 1) {
+			log.warn("multiple responses for serviceType: + " + type);
+		}
+		for (SinglePacketResponse response : responses) {
+			try {
+				forwardPacket(packet, response);
+			} catch (Exception e) {
+				log.error("Failed calling: " + packet, e);
+			}
+		}
 	}
 
-	@Override
-	public void register(ServiceType type, SinglePacketResponse response) {
-		this.registry.register(type, response);
-	}
-
-	@Override
-	public boolean deregister(ServiceType type, SinglePacketResponse response) {
-		return this.registry.deregister(type, response);
-	}
-
-	@Override
-	public void register(ServiceType type, MultiplePacketResponse response) {
-		this.registry.register(type, response);
-	}
-
-	@Override
-	public boolean deregister(ServiceType type, MultiplePacketResponse response) {
-		return this.registry.deregister(type, response);
-	}
-
-	@Override
-	public void shutdown() {
-		this.reader.finished();
-		this.registry.clear();
+	protected void forwardPacket(YMSG9Packet packet, SinglePacketResponse response) {
+		response.execute(packet);
 	}
 }

@@ -1,12 +1,11 @@
 package org.openymsg.execute;
 
-import org.openymsg.execute.dispatch.Dispatcher;
 import org.openymsg.execute.dispatch.DispatcherExecutorService;
 import org.openymsg.execute.dispatch.DispatcherImpl;
 import org.openymsg.execute.dispatch.Request;
 
 public class ExecutorImpl implements Executor {
-	private Dispatcher dispatcher;
+	private Executor dispatcher;
 
 	public ExecutorImpl(String username) {
 		DispatcherExecutorService executor = new DispatcherExecutorService(username);

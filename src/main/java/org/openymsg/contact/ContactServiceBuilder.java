@@ -1,6 +1,7 @@
 package org.openymsg.contact;
 
 import org.openymsg.connection.YahooConnection;
+import org.openymsg.connection.read.ReaderRegistry;
 import org.openymsg.contact.group.SessionGroupImpl;
 import org.openymsg.contact.roster.SessionRosterImpl;
 import org.openymsg.contact.status.ContactStatusChangeCallback;
@@ -19,17 +20,18 @@ public class ContactServiceBuilder {
 
 	public ContactUserService build() {
 		sessionRoster = new SessionRosterImpl(connection, username, callback);
-		sessionGroup = new SessionGroupImpl(connection, username);
+		sessionGroup = new SessionGroupImpl(connection.getPacketWriter(), username);
 		buildStatus();
 		initialize();
 		return new ContactUserService(sessionRoster, sessionGroup, sessionStatus);
 	}
 
 	protected void initialize() {
-		connection.register(ServiceType.LIST_15,
+		ReaderRegistry registry = connection.getReaderRegistry();
+		registry.register(ServiceType.LIST_15,
 				new ListOfContactsResponse(sessionRoster, sessionGroup, contactStatusChangeCallback));
-		connection.register(ServiceType.REMOVE_BUDDY, new ContactRemoveAckResponse(sessionRoster, sessionGroup));
-		connection.register(ServiceType.ADD_BUDDY,
+		registry.register(ServiceType.REMOVE_BUDDY, new ContactRemoveAckResponse(sessionRoster, sessionGroup));
+		registry.register(ServiceType.ADD_BUDDY,
 				new ContactAddAckResponse(sessionRoster, sessionGroup, contactStatusChangeCallback));
 	}
 
@@ -61,5 +63,4 @@ public class ContactServiceBuilder {
 	public ContactStatusChangeCallback getContactStatusChangeCallback() {
 		return contactStatusChangeCallback;
 	}
-
 }

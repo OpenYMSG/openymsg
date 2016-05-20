@@ -8,7 +8,7 @@ import org.openymsg.execute.dispatch.Request;
 public class ShutdownRequest implements Request {
 	/** logger */
 	private static final Log log = LogFactory.getLog(ShutdownRequest.class);
-	YahooConnection connection;
+	private final YahooConnection connection;
 
 	public ShutdownRequest(YahooConnection connection) {
 		this.connection = connection;

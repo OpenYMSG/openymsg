@@ -9,6 +9,10 @@ import org.junit.rules.ExpectedException;
 import org.openymsg.contact.status.response.ListOfStatusesResponse;
 import org.openymsg.network.ServiceType;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 public class ReaderRegistryTest {
 	private ReaderRegistry registry;
 	@Rule
@@ -16,7 +20,8 @@ public class ReaderRegistryTest {
 
 	@Before
 	public void beforeMethod() {
-		registry = new ReaderRegistryImpl();
+		Map<ServiceType, Set<SinglePacketResponse>> registryMap = new HashMap<ServiceType, Set<SinglePacketResponse>>();
+		registry = new ReaderRegistryImpl(registryMap);
 	}
 
 	@Test()

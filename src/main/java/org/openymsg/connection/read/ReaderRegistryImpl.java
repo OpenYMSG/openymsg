@@ -1,6 +1,5 @@
 package org.openymsg.connection.read;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -8,14 +7,14 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.ServiceType;
-import org.openymsg.network.YMSG9Packet;
 
-public class ReaderRegistryImpl implements ReaderRegistry, ReaderReceiver {
+public class ReaderRegistryImpl implements ReaderRegistry {
 	/** logger */
 	private static final Log log = LogFactory.getLog(ReaderRegistryImpl.class);
-	private final Map<ServiceType, Set<SinglePacketResponse>> registry = new HashMap<ServiceType, Set<SinglePacketResponse>>();
+	private final Map<ServiceType, Set<SinglePacketResponse>> registry;
 
-	public ReaderRegistryImpl() {
+	public ReaderRegistryImpl(Map<ServiceType, Set<SinglePacketResponse>> registry) {
+		this.registry = registry;
 	}
 
 	@Override
@@ -55,27 +54,6 @@ public class ReaderRegistryImpl implements ReaderRegistry, ReaderReceiver {
 			}
 		}
 		return false;
-	}
-
-	@Override
-	public void received(YMSG9Packet packet) {
-		log.debug("received packet: " + packet);
-		ServiceType type = packet.service;
-		Set<SinglePacketResponse> responses = this.registry.get(type);
-		if (responses == null || responses.isEmpty()) {
-			log.warn("Not handling serviceType: + " + type);
-			return;
-		}
-		if (responses.size() > 1) {
-			log.warn("multiple responses for serviceType: + " + type);
-		}
-		for (SinglePacketResponse response : responses) {
-			try {
-				response.execute(packet);
-			} catch (Exception e) {
-				log.error("Failed calling: " + packet, e);
-			}
-		}
 	}
 
 	@Override

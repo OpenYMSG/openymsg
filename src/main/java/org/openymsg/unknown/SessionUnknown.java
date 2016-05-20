@@ -1,6 +1,6 @@
 package org.openymsg.unknown;
 
-import org.openymsg.connection.read.PacketReader;
+import org.openymsg.connection.YahooConnection;
 import org.openymsg.network.ServiceType;
 
 /**
@@ -8,10 +8,7 @@ import org.openymsg.network.ServiceType;
  * @author neilhart
  */
 public class SessionUnknown {
-	private PacketReader reader;
-
-	public SessionUnknown(PacketReader reader) {
-		this.reader = reader;
-		this.reader.register(ServiceType.UNKNOWN002, new Unknown002Response());
+	public SessionUnknown(YahooConnection connection) {
+		connection.getReaderRegistry().register(ServiceType.UNKNOWN002, new Unknown002Response());
 	}
 }

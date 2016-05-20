@@ -4,7 +4,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.connection.YahooConnection;
+import org.openymsg.connection.read.ReaderRegistry;
 import org.openymsg.connection.write.Message;
+import org.openymsg.connection.write.PacketWriter;
 import org.openymsg.execute.Executor;
 import org.openymsg.execute.dispatch.Request;
 import org.openymsg.network.ServiceType;
@@ -13,7 +15,7 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 	/** logger */
 	private static final Log log = LogFactory.getLog(SessionAuthenticationImpl.class);
 	private Executor executor;
-	private YahooConnection connection;
+	private final PacketWriter writer;
 	AuthenticationToken token;
 	private SessionAuthenticationCallback callback;
 	private SessionConfig sessionConfig;
@@ -24,10 +26,11 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 		this.sessionConfig = sessionConfig;
 		this.executor = executor;
 		this.callback = callback;
-		this.connection = connection;
+		this.writer = connection.getPacketWriter();
 		this.token = new AuthenticationToken();
-		this.connection.register(ServiceType.AUTH, new LoginInitResponse(this, token));
-		this.connection.register(ServiceType.AUTHRESP, new LoginFailureResponse(this));
+		ReaderRegistry registry = connection.getReaderRegistry();
+		registry.register(ServiceType.AUTH, new LoginInitResponse(this, token));
+		registry.register(ServiceType.AUTHRESP, new LoginFailureResponse(this));
 	}
 
 	@Override
@@ -43,7 +46,7 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 		// TODO move status check to Session
 		// ConnectionState executionState = this.executor.getState();
 		// if (executionState.isLoginable()) {
-		connection.execute(new LoginInitMessage(username));
+		writer.execute(new LoginInitMessage(username));
 		// }
 		// else {
 		// throw new IllegalStateException("Don't call login when status is: " +
@@ -70,7 +73,7 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 	}
 
 	protected void execute(Message message) {
-		this.connection.execute(message);
+		this.writer.execute(message);
 	}
 
 	protected void receivedPasswordTokenLogin() {

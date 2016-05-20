@@ -7,22 +7,22 @@ import org.openymsg.execute.dispatch.ScheduleTaskCompletionException;
 import org.openymsg.network.ConnectionHandler;
 import org.openymsg.network.YMSG9Packet;
 
-public class ConnectionReader implements Request {
+public class ConnectionReaderJob implements Request {
 	/** logger */
-	private static final Log log = LogFactory.getLog(ConnectionReader.class);
+	private static final Log log = LogFactory.getLog(ConnectionReaderJob.class);
 	private ConnectionHandler connection;
-	private ReaderReceiver registry;
+	private ConnectionReaderReceiver receiver;
 	private boolean isFinished = false;
 
-	public ConnectionReader(ConnectionHandler connection, ReaderReceiver registry) {
+	public ConnectionReaderJob(ConnectionHandler connection, ConnectionReaderReceiver receiver) {
 		if (connection == null) {
 			throw new IllegalArgumentException("Connection cannot be null");
 		}
-		if (registry == null) {
-			throw new IllegalArgumentException("Registry cannot be null");
+		if (receiver == null) {
+			throw new IllegalArgumentException("Receiver cannot be null");
 		}
 		this.connection = connection;
-		this.registry = registry;
+		this.receiver = receiver;
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class ConnectionReader implements Request {
 		}
 		YMSG9Packet packet = connection.receivePacket();
 		while (packet != null) {
-			registry.received(packet);
+			receiver.received(packet);
 			packet = connection.receivePacket();
 		}
 	}

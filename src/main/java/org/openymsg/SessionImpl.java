@@ -1,14 +1,12 @@
 package org.openymsg;
 
-import java.util.Set;
-
 import org.openymsg.conference.ConferenceServiceBuilder;
 import org.openymsg.conference.SessionConference;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.connection.ConnectionInfo;
 import org.openymsg.connection.ConnectionState;
+import org.openymsg.connection.SessionConnectionBuilder;
 import org.openymsg.connection.SessionConnectionImpl;
-import org.openymsg.connection.YahooConnection;
 import org.openymsg.contact.ContactServiceBuilder;
 import org.openymsg.contact.ContactUserService;
 import org.openymsg.contact.status.ContactStatusChangeCallback;
@@ -24,9 +22,11 @@ import org.openymsg.message.SessionMessageImpl;
 import org.openymsg.network.ServiceType;
 import org.openymsg.unknown.SessionUnknown;
 
+import java.util.Set;
+
 public class SessionImpl implements YahooSession {
 	private final SessionConfig config;
-	protected YahooConnection connection;
+	protected SessionConnectionImpl connection;
 	protected final YahooSessionCallback callback;
 	private SessionContextImpl context;
 	protected SessionMessage message;
@@ -47,8 +47,7 @@ public class SessionImpl implements YahooSession {
 	}
 
 	/**
-	 * {@inheritDoc} Initialize the connection and login to yahoo and return
-	 * immediately.
+	 * {@inheritDoc} Initialize the connection and login to yahoo and return immediately.
 	 */
 	@Override
 	public void login(String username, String password) throws IllegalArgumentException, IllegalStateException {
@@ -70,18 +69,19 @@ public class SessionImpl implements YahooSession {
 		this.mail = new SessionMailImpl(connection);
 		this.unknown = new SessionUnknown(connection);
 		// TODO Why register here? can go to myself context or contact
-		connection.register(ServiceType.LOGOFF, new PagerLogoffResponse(username, context, statusChangeCallback));
+		connection.getReaderRegistry().register(ServiceType.LOGOFF,
+				new PagerLogoffResponse(username, context, statusChangeCallback));
 	}
 
 	private void createConferenceService(String username) {
-		ConferenceServiceBuilder builder = new ConferenceServiceBuilder().setCallback(callback).setUsername(username)
-				.setConnection(connection);
+		ConferenceServiceBuilder builder =
+				new ConferenceServiceBuilder().setCallback(callback).setUsername(username).setConnection(connection);
 		this.conference = builder.build();
 	}
 
 	protected void createContact(String username) {
-		ContactServiceBuilder builder = new ContactServiceBuilder().setCallback(callback).setUsername(username)
-				.setConnection(connection);
+		ContactServiceBuilder builder =
+				new ContactServiceBuilder().setCallback(callback).setUsername(username).setConnection(connection);
 		this.contact = builder.build();
 		statusChangeCallback = builder.getContactStatusChangeCallback();
 	}
@@ -91,11 +91,10 @@ public class SessionImpl implements YahooSession {
 		return new SessionContextImpl(config, executor, connection, username, callback);
 	}
 
-	protected YahooConnection createConnection(ExecutorImpl executor, YahooSessionCallback callback,
+	protected SessionConnectionImpl createConnection(ExecutorImpl executor, YahooSessionCallback callback,
 			SessionConfig config) {
-		SessionConnectionImpl sessionConnection = new SessionConnectionImpl(executor, callback);
-		sessionConnection.initialize(config);
-		return sessionConnection;
+		SessionConnectionBuilder builder = new SessionConnectionBuilder();
+		return builder.setCallback(callback).setExecutor(executor).setSessionConfig(config).build();
 	}
 
 	@Override

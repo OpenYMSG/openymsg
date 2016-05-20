@@ -8,7 +8,7 @@ import org.openymsg.execute.Executor;
 
 public class TimeoutCheckerShutdownStrategy implements TimeoutCheckerStrategy {
 	final static Log log = LogFactory.getLog(TimeoutCheckerShutdownStrategy.class);
-	private YahooConnection connection;
+	private final YahooConnection connection;
 	private final Executor executor;
 	private long lastKeepAlive = System.currentTimeMillis();
 	private int timeout = 0;
@@ -20,9 +20,9 @@ public class TimeoutCheckerShutdownStrategy implements TimeoutCheckerStrategy {
 	 * @param connection connection to shutdown
 	 */
 	public TimeoutCheckerShutdownStrategy(int timeout, Executor executor, YahooConnection connection) {
+		this.connection = connection;
 		this.timeout = timeout * 1000;
 		this.executor = executor;
-		this.connection = connection;
 	}
 
 	/**

@@ -1,7 +1,5 @@
 package org.openymsg.conference;
 
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooConference;
@@ -12,28 +10,30 @@ import org.openymsg.conference.message.DeclineConferenceMessage;
 import org.openymsg.conference.message.ExtendConferenceMessage;
 import org.openymsg.conference.message.LeaveConferenceMessage;
 import org.openymsg.conference.message.SendConfereneMessage;
-import org.openymsg.connection.YahooConnection;
+import org.openymsg.connection.write.PacketWriter;
+
+import java.util.Set;
 
 public class ConferenceUserService implements SessionConference {
 	/** logger */
 	private static final Log log = LogFactory.getLog(ConferenceUserService.class);
 	private final String username;
-	private final YahooConnection connection;
+	private final PacketWriter writer;
 	private final ConferenceServiceState state;
 
-	public ConferenceUserService(String username, YahooConnection connection, ConferenceServiceState state)
+	public ConferenceUserService(String username, PacketWriter writer, ConferenceServiceState state)
 			throws IllegalArgumentException {
 		if (username == null) {
 			throw new IllegalArgumentException("Username cannot be null");
 		}
-		if (connection == null) {
-			throw new IllegalArgumentException("Connection cannot be null");
+		if (writer == null) {
+			throw new IllegalArgumentException("Writer cannot be null");
 		}
 		if (state == null) {
 			throw new IllegalArgumentException("State cannot be null");
 		}
 		this.username = username;
-		this.connection = connection;
+		this.writer = writer;
 		this.state = state;
 	}
 
@@ -41,7 +41,6 @@ public class ConferenceUserService implements SessionConference {
 	// createCallbackHandler(SessionConferenceCallback callback) {
 	// return new ConferenceSocketService(callback, conferenceMemberships);
 	// }
-
 	@Override
 	public void sendConferenceMessage(YahooConference conference, String message) throws IllegalStateException {
 		if (conference == null) {
@@ -54,7 +53,7 @@ public class ConferenceUserService implements SessionConference {
 		if (membership == null) {
 			throw new IllegalArgumentException("Unknown conference: " + conference);
 		}
-		connection.execute(new SendConfereneMessage(username, conference, membership, message));
+		writer.execute(new SendConfereneMessage(username, conference, membership, message));
 	}
 
 	@Override
@@ -72,7 +71,7 @@ public class ConferenceUserService implements SessionConference {
 				throw new IllegalArgumentException("Unknown conference: " + conference);
 			}
 		}
-		connection.execute(new LeaveConferenceMessage(username, conference, membership));
+		writer.execute(new LeaveConferenceMessage(username, conference, membership));
 	}
 
 	@Override
@@ -84,7 +83,7 @@ public class ConferenceUserService implements SessionConference {
 		if (membership == null) {
 			throw new IllegalArgumentException("Unknown conference: " + conference);
 		}
-		connection.execute(new AcceptConferenceMessage(username, conference, membership));
+		writer.execute(new AcceptConferenceMessage(username, conference, membership));
 	}
 
 	// TODO generate conferenceId
@@ -101,7 +100,7 @@ public class ConferenceUserService implements SessionConference {
 		YahooConference conference = new YahooConference(conferenceId);
 		// TODO - cannot reused id
 		state.addMembership(conferenceId, new ConferenceMembershipImpl());
-		connection.execute(new CreateConferenceMessage(username, conference, contacts, message));
+		writer.execute(new CreateConferenceMessage(username, conference, contacts, message));
 		return conference;
 	}
 
@@ -114,7 +113,7 @@ public class ConferenceUserService implements SessionConference {
 		if (membership == null) {
 			throw new IllegalArgumentException("Unknown conference: " + conference);
 		}
-		connection.execute(new DeclineConferenceMessage(username, conference, membership, message));
+		writer.execute(new DeclineConferenceMessage(username, conference, membership, message));
 	}
 
 	@Override
@@ -136,7 +135,7 @@ public class ConferenceUserService implements SessionConference {
 		if (membership == null) {
 			throw new IllegalArgumentException("Unknown conference: " + conference);
 		}
-		connection.execute(new ExtendConferenceMessage(username, conference, membership, contacts, message));
+		writer.execute(new ExtendConferenceMessage(username, conference, membership, contacts, message));
 	}
 
 	@Override
@@ -161,5 +160,4 @@ public class ConferenceUserService implements SessionConference {
 		}
 		return state.getMembership(conference.getId());
 	}
-
 }

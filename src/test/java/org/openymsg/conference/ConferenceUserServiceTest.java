@@ -2,9 +2,6 @@ package org.openymsg.conference;
 
 import static org.mockito.Mockito.verify;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -18,13 +15,16 @@ import org.openymsg.conference.message.AcceptConferenceMessage;
 import org.openymsg.conference.message.CreateConferenceMessage;
 import org.openymsg.conference.message.DeclineConferenceMessage;
 import org.openymsg.conference.message.SendConfereneMessage;
-import org.openymsg.connection.YahooConnection;
 import org.openymsg.connection.write.Message;
+import org.openymsg.connection.write.PacketWriter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ConferenceUserServiceTest {
 	private String username = "testuser";
 	@Mock
-	private YahooConnection executor;
+	private PacketWriter writer;
 	private ConferenceUserService session;
 	@Mock
 	private SessionConferenceCallback callback;
@@ -34,7 +34,7 @@ public class ConferenceUserServiceTest {
 	public void beforeMethod() {
 		MockitoAnnotations.initMocks(this);
 		state = new ConferenceServiceState();
-		session = new ConferenceUserService(username, executor, state);
+		session = new ConferenceUserService(username, writer, state);
 	}
 
 	@Test
@@ -46,8 +46,8 @@ public class ConferenceUserServiceTest {
 		session.createConference(conferenceId, contacts, null);
 		session.sendConferenceMessage(conference, message);
 		ConferenceMembership membership = session.getConferenceMembership(conference);
-		verify(executor).execute(argThat(new CreateConferenceMessage(username, conference, contacts, null)));
-		verify(executor).execute(argThat(new SendConfereneMessage(username, conference, membership, message)));
+		verify(writer).execute(argThat(new CreateConferenceMessage(username, conference, contacts, null)));
+		verify(writer).execute(argThat(new SendConfereneMessage(username, conference, membership, message)));
 	}
 
 	@Test
@@ -63,7 +63,7 @@ public class ConferenceUserServiceTest {
 		membership.addInvited(invited);
 		membership.addMember(members);
 		session.declineConferenceInvite(conference, null);
-		verify(executor).execute(argThat(new DeclineConferenceMessage(username, conference, membership, null)));
+		verify(writer).execute(argThat(new DeclineConferenceMessage(username, conference, membership, null)));
 	}
 
 	@Test
@@ -79,12 +79,11 @@ public class ConferenceUserServiceTest {
 		membership.addInvited(invited);
 		membership.addMember(members);
 		session.acceptConferenceInvite(conference);
-		verify(executor).execute(argThat(new AcceptConferenceMessage(username, conference, membership)));
+		verify(writer).execute(argThat(new AcceptConferenceMessage(username, conference, membership)));
 	}
 
 	// TODO copied
 	private Message argThat(Message message, String... excludeFields) {
 		return (Message) Matchers.argThat(new ReflectionEquals(message, excludeFields));
 	}
-
 }

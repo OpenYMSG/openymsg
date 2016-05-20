@@ -2,33 +2,44 @@ package org.openymsg.contact.roster;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.openymsg.testing.MessageAssert.argThatMessage;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 import org.openymsg.YahooProtocol;
 import org.openymsg.connection.YahooConnection;
+import org.openymsg.connection.read.ReaderRegistry;
+import org.openymsg.connection.write.PacketWriter;
 import org.openymsg.contact.group.ContactGroupImpl;
 
 public class SessionRosterImplTest {
 	private String username = "testuser";
-	private YahooConnection executor;
+	@Mock
+	private YahooConnection connection;
+	@Mock
 	private SessionRosterCallback callback;
+	@Mock
+	private PacketWriter writer;
+	@Mock
+	private ReaderRegistry registry;
 	private SessionRosterImpl session;
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
 	@Before
 	public void beforeMethod() {
-		executor = mock(YahooConnection.class);
-		callback = mock(SessionRosterCallback.class);
-		session = new SessionRosterImpl(executor, username, callback);
+		MockitoAnnotations.initMocks(this);
+		when(connection.getPacketWriter()).thenReturn(writer);
+		when(connection.getReaderRegistry()).thenReturn(registry);
+		session = new SessionRosterImpl(connection, username, callback);
 	}
 
 	@Test
@@ -37,7 +48,7 @@ public class SessionRosterImplTest {
 		YahooContactGroup group = new ContactGroupImpl("group");
 		String message = "message";
 		session.addContact(contact, group, message);
-		verify(executor).execute(argThatMessage(new ContactAddMessage(username, contact, group, message, null)));
+		verify(writer).execute(argThatMessage(new ContactAddMessage(username, contact, group, message, null)));
 	}
 
 	@Test
@@ -45,7 +56,7 @@ public class SessionRosterImplTest {
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		YahooContactGroup group = new ContactGroupImpl("group");
 		session.addContact(contact, group, null);
-		verify(executor).execute(argThatMessage(new ContactAddMessage(username, contact, group, null, null)));
+		verify(writer).execute(argThatMessage(new ContactAddMessage(username, contact, group, null, null)));
 	}
 
 	@Test()
@@ -73,7 +84,7 @@ public class SessionRosterImplTest {
 		group.add(contact);
 		session.removeFromGroup(contact, group);
 		// TODO remove from status
-		verify(executor).execute(argThatMessage(new ContactRemoveMessage(this.username, contact, group)));
+		verify(writer).execute(argThatMessage(new ContactRemoveMessage(this.username, contact, group)));
 		assertFalse(session.getContacts().contains(contact));
 	}
 
@@ -97,7 +108,7 @@ public class SessionRosterImplTest {
 	public void testAcceptContact() {
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		session.acceptFriendAuthorization(username, contact);
-		verify(executor).execute(argThatMessage(new ContactAddAcceptMessage(username, contact)));
+		verify(writer).execute(argThatMessage(new ContactAddAcceptMessage(username, contact)));
 	}
 
 	@Test
@@ -105,7 +116,7 @@ public class SessionRosterImplTest {
 		YahooContact contact = new YahooContact("testbuddy", YahooProtocol.YAHOO);
 		String message = "message";
 		session.rejectFriendAuthorization(contact, message);
-		verify(executor).execute(argThatMessage(new ContactAddDeclineMessage(username, contact, message)));
+		verify(writer).execute(argThatMessage(new ContactAddDeclineMessage(username, contact, message)));
 	}
 
 	@Test

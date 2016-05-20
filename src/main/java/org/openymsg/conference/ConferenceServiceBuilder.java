@@ -7,6 +7,7 @@ import org.openymsg.conference.response.ConferenceInviteResponse;
 import org.openymsg.conference.response.ConferenceLeaveResponse;
 import org.openymsg.conference.response.ConferenceMessageResponse;
 import org.openymsg.connection.YahooConnection;
+import org.openymsg.connection.read.ReaderRegistry;
 import org.openymsg.network.ServiceType;
 
 public class ConferenceServiceBuilder {
@@ -18,7 +19,7 @@ public class ConferenceServiceBuilder {
 	public ConferenceUserService build() {
 		ConferenceSocketService socketService = createSocketService();
 		this.initializeRegistry(socketService);
-		return new ConferenceUserService(username, connection, state);
+		return new ConferenceUserService(username, connection.getPacketWriter(), state);
 	}
 
 	private ConferenceSocketService createSocketService() {
@@ -26,12 +27,13 @@ public class ConferenceServiceBuilder {
 	}
 
 	protected void initializeRegistry(ConferenceSocketService socketService) {
-		connection.register(ServiceType.CONFMSG, new ConferenceMessageResponse(socketService));
-		connection.register(ServiceType.CONFINVITE, new ConferenceInviteResponse(socketService));
-		connection.register(ServiceType.CONFADDINVITE, new ConferenceExtendResponse(socketService));
-		connection.register(ServiceType.CONFDECLINE, new ConferenceDeclineResponse(socketService));
-		connection.register(ServiceType.CONFLOGON, new ConferenceAcceptResponse(socketService));
-		connection.register(ServiceType.CONFLOGOFF, new ConferenceLeaveResponse(socketService));
+		ReaderRegistry registry = connection.getReaderRegistry();
+		registry.register(ServiceType.CONFMSG, new ConferenceMessageResponse(socketService));
+		registry.register(ServiceType.CONFINVITE, new ConferenceInviteResponse(socketService));
+		registry.register(ServiceType.CONFADDINVITE, new ConferenceExtendResponse(socketService));
+		registry.register(ServiceType.CONFDECLINE, new ConferenceDeclineResponse(socketService));
+		registry.register(ServiceType.CONFLOGON, new ConferenceAcceptResponse(socketService));
+		registry.register(ServiceType.CONFLOGOFF, new ConferenceLeaveResponse(socketService));
 	}
 
 	public ConferenceServiceBuilder setUsername(String username) {
@@ -48,5 +50,4 @@ public class ConferenceServiceBuilder {
 		this.callback = callback;
 		return this;
 	}
-
 }

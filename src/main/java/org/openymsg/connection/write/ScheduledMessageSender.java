@@ -5,31 +5,30 @@ import org.apache.commons.logging.LogFactory;
 import org.openymsg.execute.dispatch.Request;
 
 /**
- * A request the sends a message when executed. This is primarily used for
- * scheduling messages to be sent in the future once or recurring.
- * 
+ * A request the sends a message when executed. This is primarily used for scheduling messages to be sent in the future
+ * once or recurring.
  * @author neilhart
  */
 public class ScheduledMessageSender implements Request {
 	/** logger */
 	private static final Log log = LogFactory.getLog(ScheduledMessageSender.class);
-	private PacketWriter executor;
+	private PacketWriter writer;
 	private Message message;
 
-	public ScheduledMessageSender(PacketWriter executor, Message message) {
-		if (executor == null) {
-			throw new IllegalArgumentException("Executor cannot be null");
+	public ScheduledMessageSender(PacketWriter writer, Message message) {
+		if (writer == null) {
+			throw new IllegalArgumentException("Writer cannot be null");
 		}
 		if (message == null) {
 			throw new IllegalArgumentException("Message cannot be null");
 		}
-		this.executor = executor;
+		this.writer = writer;
 		this.message = message;
 	}
 
 	@Override
 	public void execute() {
-		this.executor.execute(this.message);
+		this.writer.execute(this.message);
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package org.openymsg.contact.status;
 
 import org.openymsg.connection.YahooConnection;
+import org.openymsg.connection.read.ReaderRegistry;
 import org.openymsg.contact.status.response.ListOfStatusesResponse;
 import org.openymsg.contact.status.response.SingleStatusResponse;
 import org.openymsg.network.ServiceType;
@@ -14,7 +15,7 @@ public class ContactStatusServiceBuilder {
 	public ContactStatusUserService build() {
 		ContactStatusSocketService socketService = createSocketService();
 		this.initializeRegistry(socketService);
-		return new ContactStatusUserService(connection, state);
+		return new ContactStatusUserService(state);
 	}
 
 	private ContactStatusSocketService createSocketService() {
@@ -24,8 +25,9 @@ public class ContactStatusServiceBuilder {
 
 	protected void initializeRegistry(ContactStatusSocketService socketService) {
 		SingleStatusResponse singleStatusResponse = new SingleStatusResponse(socketService);
-		connection.register(ServiceType.STATUS_15, new ListOfStatusesResponse(singleStatusResponse));
-		connection.register(ServiceType.Y6_STATUS_UPDATE, singleStatusResponse);
+		ReaderRegistry registry = connection.getReaderRegistry();
+		registry.register(ServiceType.STATUS_15, new ListOfStatusesResponse(singleStatusResponse));
+		registry.register(ServiceType.Y6_STATUS_UPDATE, singleStatusResponse);
 	}
 
 	public ContactStatusServiceBuilder setConnection(YahooConnection connection) {

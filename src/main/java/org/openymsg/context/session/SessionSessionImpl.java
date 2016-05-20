@@ -4,6 +4,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.YahooStatus;
 import org.openymsg.connection.YahooConnection;
+import org.openymsg.connection.read.ReaderRegistry;
+import org.openymsg.connection.write.PacketWriter;
 import org.openymsg.connection.write.ScheduledMessageSender;
 import org.openymsg.context.session.timeout.TimeoutChecker;
 import org.openymsg.execute.Executor;
@@ -13,10 +15,11 @@ import org.openymsg.network.ServiceType;
 public class SessionSessionImpl implements SessionSession {
 	/** logger */
 	private static final Log log = LogFactory.getLog(SessionSessionImpl.class);
-	private String username;
-	private Executor executor;
-	private YahooConnection connection;
-	private SessionSessionCallback callback;
+	private final String username;
+	private final Executor executor;
+	private final YahooConnection connection;
+	private final PacketWriter writer;
+	private final SessionSessionCallback callback;
 	private LoginState state;
 	private TimeoutChecker timeoutChecker;
 
@@ -34,10 +37,12 @@ public class SessionSessionImpl implements SessionSession {
 		this.username = username;
 		this.executor = executor;
 		this.connection = connection;
+		this.writer = connection.getPacketWriter();
 		this.callback = callback;
 		state = LoginState.LOGGING_IN;
-		connection.register(ServiceType.LIST, new ListResponse());
-		connection.register(ServiceType.PING, new PingResponse());
+		ReaderRegistry registry = connection.getReaderRegistry();
+		registry.register(ServiceType.LIST, new ListResponse());
+		registry.register(ServiceType.PING, new PingResponse());
 		initializeTimeout(timeout);
 	}
 
@@ -69,11 +74,11 @@ public class SessionSessionImpl implements SessionSession {
 	}
 
 	protected Request createKeepAliveSchedule() {
-		return new ScheduledMessageSender(connection, new KeepAliveMessage(username));
+		return new ScheduledMessageSender(writer, new KeepAliveMessage(username));
 	}
 
 	protected Request createPingSchedule() {
-		return new ScheduledMessageSender(connection, new PingMessage());
+		return new ScheduledMessageSender(writer, new PingMessage());
 	}
 
 	/**
@@ -86,7 +91,7 @@ public class SessionSessionImpl implements SessionSession {
 			throw new IllegalStateException("State is not logging in: " + state);
 		}
 		state = LoginState.LOGGING_OUT;
-		connection.execute(new LogoutMessage(username));
+		writer.execute(new LogoutMessage(username));
 		// TODO schedule this incase no response from yahoo, not here
 		executor.scheduleOnce(new ShutdownRequest(connection), 1000);
 		// no longer getting a response from yahoo
@@ -94,13 +99,10 @@ public class SessionSessionImpl implements SessionSession {
 	}
 
 	/**
-	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc.
-	 * If you want to login as invisible, set this to Status.INVISIBLE before
-	 * you call login(). Note: this setter is overloaded. The second version is
-	 * intended for use when setting custom status messages.
-	 * 
-	 * @param status
-	 *            The new Status to be set for this user.
+	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc. If you want to login as invisible, set
+	 * this to Status.INVISIBLE before you call login(). Note: this setter is overloaded. The second version is intended
+	 * for use when setting custom status messages.
+	 * @param status The new Status to be set for this user.
 	 * @throws IllegalArgumentException
 	 */
 	@Override
@@ -109,7 +111,7 @@ public class SessionSessionImpl implements SessionSession {
 		if (status == YahooStatus.CUSTOM) {
 			throw new IllegalArgumentException("Cannot set custom state without message");
 		}
-		connection.execute(new StatusChangeRequest(status));
+		writer.execute(new StatusChangeRequest(status));
 		// TODO set internal status
 		// status = status;
 		// customStatusMessage = null;
@@ -119,13 +121,10 @@ public class SessionSessionImpl implements SessionSession {
 	}
 
 	/**
-	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc.
-	 * Legit values are in the StatusConstants interface. If you want to login
-	 * as invisible, set this to Status.INVISIBLE before you call login() Note:
-	 * setter is overloaded, the second version is intended for use when setting
-	 * custom status messages. The boolean is true if available and false if
-	 * away.
-	 * 
+	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc. Legit values are in the StatusConstants
+	 * interface. If you want to login as invisible, set this to Status.INVISIBLE before you call login() Note: setter
+	 * is overloaded, the second version is intended for use when setting custom status messages. The boolean is true if
+	 * available and false if away.
 	 * @param message
 	 * @param showBusyIcon
 	 * @throws IllegalArgumentException
@@ -140,7 +139,7 @@ public class SessionSessionImpl implements SessionSession {
 		// status = Status.CUSTOM;
 		// customStatusMessage = message;
 		// customStatusBusy = showBusyIcon;
-		connection.execute(new StatusChangeRequest(YahooStatus.CUSTOM, message, showBusyIcon));
+		writer.execute(new StatusChangeRequest(YahooStatus.CUSTOM, message, showBusyIcon));
 	}
 
 	public void receivedLogout(LogoutReason reason) {

@@ -10,12 +10,12 @@ import org.openymsg.network.ConnectionHandler;
 public class ConnectionInitalize implements Request {
 	/** logger */
 	private static final Log log = LogFactory.getLog(ConnectionInitalize.class);
-	private SessionConfig config;
-	private SessionConnectionImpl session;
+	private final SessionConfig config;
+	private ConnectionStateAndDetails connectionState;
 
-	public ConnectionInitalize(SessionConfig config, SessionConnectionImpl session) {
+	public ConnectionInitalize(SessionConfig config, ConnectionStateAndDetails connectionState) {
 		this.config = config;
-		this.session = session;
+		this.connectionState = connectionState;
 	}
 
 	@Override
@@ -24,21 +24,19 @@ public class ConnectionInitalize implements Request {
 		ConnectionBuilder builder = config.getConnectionBuilder();
 		ConnectionHandler connection = builder.useCapacityServers().useScsServers().build();
 		// TODO - null
-		connection.addListener(session);
+		connection.addListener(connectionState);
 		ConnectionInfo status = builder.getConnectionInfo();
 		if (status.isConnected()) {
-			// TODO all one method
-			this.session.initializeConnection(connection);
-			this.session.setState(ConnectionState.CONNECTED, status);
+			this.connectionState.setConnected(connection, status);
 		} else {
-			this.session.setState(ConnectionState.FAILED_CONNECTING, status);
+			this.connectionState.setState(ConnectionState.FAILED_CONNECTING, status);
 		}
 	}
 
 	@Override
 	public void failure(Exception ex) {
 		log.warn("Failure, setting ConnectionState to: " + ConnectionState.FAILED_CONNECTING, ex);
-		this.session.setState(ConnectionState.FAILED_CONNECTING);
+		this.connectionState.setState(ConnectionState.FAILED_CONNECTING);
 		// TODO shutdown
 	}
 }

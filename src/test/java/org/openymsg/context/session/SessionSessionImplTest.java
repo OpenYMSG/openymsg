@@ -1,22 +1,33 @@
 package org.openymsg.context.session;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.openymsg.testing.MessageAssert.argThatMessage;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.openymsg.YahooStatus;
 import org.openymsg.connection.YahooConnection;
+import org.openymsg.connection.read.ReaderRegistry;
+import org.openymsg.connection.write.PacketWriter;
 import org.openymsg.execute.Executor;
 
 public class SessionSessionImplTest {
 	private String username = "testuser";
+	@Mock
 	private YahooConnection connection;
+	@Mock
 	private Executor executor;
+	@Mock
 	private SessionSessionCallback callback;
+	@Mock
+	private PacketWriter writer;
+	@Mock
+	private ReaderRegistry registry;
 	private SessionSessionImpl session;
 	private Integer timeout = 60 * 1000;
 	@Rule
@@ -24,9 +35,9 @@ public class SessionSessionImplTest {
 
 	@Before
 	public void beforeMethod() {
-		connection = mock(YahooConnection.class);
-		executor = mock(Executor.class);
-		callback = mock(SessionSessionCallback.class);
+		MockitoAnnotations.initMocks(this);
+		when(connection.getPacketWriter()).thenReturn(writer);
+		when(connection.getReaderRegistry()).thenReturn(registry);
 		session = new SessionSessionImpl(username, executor, connection, timeout, callback);
 	}
 
@@ -34,7 +45,7 @@ public class SessionSessionImplTest {
 	public void testSetStatus() {
 		YahooStatus status = YahooStatus.AVAILABLE;
 		session.setStatus(status);
-		verify(connection).execute(argThatMessage(new StatusChangeRequest(status)));
+		verify(writer).execute(argThatMessage(new StatusChangeRequest(status)));
 	}
 
 	@Test()
@@ -43,7 +54,7 @@ public class SessionSessionImplTest {
 		exception.expectMessage("Cannot set custom state without message");
 		YahooStatus status = YahooStatus.CUSTOM;
 		session.setStatus(status);
-		verify(connection).execute(argThatMessage(new StatusChangeRequest(status)));
+		verify(writer).execute(argThatMessage(new StatusChangeRequest(status)));
 	}
 
 	@Test
@@ -52,14 +63,14 @@ public class SessionSessionImplTest {
 		String message = "myMessage";
 		boolean showBusyIcon = false;
 		session.setCustomStatus(message, showBusyIcon);
-		verify(connection).execute(argThatMessage(new StatusChangeRequest(YahooStatus.CUSTOM, message, false)));
+		verify(writer).execute(argThatMessage(new StatusChangeRequest(YahooStatus.CUSTOM, message, false)));
 	}
 
 	@Test
 	public void testLogout() {
 		session.loginComplete();
 		session.logout();
-		verify(connection).execute(argThatMessage(new LogoutMessage(username)));
+		verify(writer).execute(argThatMessage(new LogoutMessage(username)));
 	}
 
 	@Test()

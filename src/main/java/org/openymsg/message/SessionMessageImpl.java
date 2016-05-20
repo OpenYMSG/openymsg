@@ -3,6 +3,9 @@ package org.openymsg.message;
 import org.openymsg.YahooContact;
 import org.openymsg.connection.YahooConnection;
 import org.openymsg.connection.read.NoOpResponse;
+import org.openymsg.connection.read.ReaderRegistry;
+import org.openymsg.connection.write.Message;
+import org.openymsg.connection.write.PacketWriter;
 import org.openymsg.network.ServiceType;
 
 /**
@@ -16,14 +19,14 @@ public class SessionMessageImpl implements SessionMessage {
 	/** blank message number format */
 	private static final String blankMessageNumber = "0000000000000000";
 	/** executor for the messages */
-	protected YahooConnection connection;
+	protected final PacketWriter writer;
 	/** user name */
-	private String username;
+	protected final String username;
 	// TODO - random messageNumber start
 	/** initial message number */
 	private long messageNumber = System.currentTimeMillis();
 	/** callback for incoming messages and notifications */
-	private SessionMessageCallback callback;
+	private final SessionMessageCallback callback;
 
 	/**
 	 * Creates the manager for sending and receiving messages and typing notification
@@ -43,12 +46,13 @@ public class SessionMessageImpl implements SessionMessage {
 		if (callback == null) {
 			throw new IllegalArgumentException("Callback cannot be null");
 		}
-		this.connection = connection;
+		this.writer = connection.getPacketWriter();
 		this.username = username;
 		this.callback = callback;
-		this.connection.register(ServiceType.MESSAGE_ACK, new NoOpResponse());
-		this.connection.register(ServiceType.MESSAGE, new MessageResponse(this));
-		this.connection.register(ServiceType.NOTIFY, new TypingNotificationResponse(this));
+		ReaderRegistry registry = connection.getReaderRegistry();
+		registry.register(ServiceType.MESSAGE_ACK, new NoOpResponse());
+		registry.register(ServiceType.MESSAGE, new MessageResponse(this));
+		registry.register(ServiceType.NOTIFY, new TypingNotificationResponse(this));
 	}
 
 	@Override
@@ -67,7 +71,11 @@ public class SessionMessageImpl implements SessionMessage {
 			throw new IllegalArgumentException("Message cannot be null");
 		}
 		String messageId = buildMessageNumber();
-		this.connection.execute(new SendMessage(username, contact, message, messageId));
+		this.writer.execute(createSendMessageRequest(contact, message, messageId));
+	}
+
+	protected Message createSendMessageRequest(YahooContact contact, String message, String messageId) {
+		return new SendMessage(username, contact, message, messageId);
 	}
 
 	@Override
@@ -75,13 +83,13 @@ public class SessionMessageImpl implements SessionMessage {
 		if (contact == null) {
 			throw new IllegalArgumentException("Contact cannot be null");
 		}
-		this.connection.execute(new TypingNotificationMessage(username, contact, isTyping));
+		this.writer.execute(new TypingNotificationMessage(username, contact, isTyping));
 	}
 
 	// TODO - send ack if ignored?
 	public void receivedMessage(YahooContact contact, String message, String messageId) {
 		if (messageId != null) {
-			this.connection.execute(new MessageAckMessage(username, contact, messageId));
+			this.writer.execute(new MessageAckMessage(username, contact, messageId));
 		}
 		this.callback.receivedMessage(contact, message);
 	}
@@ -89,7 +97,7 @@ public class SessionMessageImpl implements SessionMessage {
 	// TODO - send ack if ignored?
 	public void receivedBuzz(YahooContact contact, String messageId) {
 		if (messageId != null) {
-			this.connection.execute(new MessageAckMessage(username, contact, messageId));
+			this.writer.execute(new MessageAckMessage(username, contact, messageId));
 		}
 		this.callback.receivedBuzz(contact);
 	}

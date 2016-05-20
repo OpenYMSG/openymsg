@@ -1,39 +1,50 @@
 package org.openymsg.context.auth;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.openymsg.testing.MessageAssert.argThatMessage;
 import static org.openymsg.testing.MessageAssert.argThatRequest;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.openymsg.config.SessionConfig;
 import org.openymsg.connection.YahooConnection;
+import org.openymsg.connection.read.ReaderRegistry;
+import org.openymsg.connection.write.PacketWriter;
 import org.openymsg.execute.Executor;
 
 public class SessionAuthorizeImplTest {
+	@Mock
 	private SessionConfig sessionConfig;
+	@Mock
 	private Executor executor;
+	@Mock
 	private YahooConnection connection;
+	@Mock
 	private SessionAuthenticationCallback callback;
+	@Mock
+	private PacketWriter writer;
+	@Mock
+	private ReaderRegistry registry;
 	private SessionAuthenticationImpl session;
 	private String username = "testuser";
 	private String password = "testpassword";
 
 	@Before
 	public void beforeMethod() {
-		sessionConfig = mock(SessionConfig.class);
-		executor = mock(Executor.class);
-		callback = mock(SessionAuthenticationCallback.class);
-		connection = mock(YahooConnection.class);
+		MockitoAnnotations.initMocks(this);
+		when(connection.getPacketWriter()).thenReturn(writer);
+		when(connection.getReaderRegistry()).thenReturn(registry);
 		session = new SessionAuthenticationImpl(sessionConfig, connection, executor, callback);
 	}
 
 	@Test
 	public void testLogin() {
 		session.login(username, password);
-		verify(connection).execute(argThatMessage(new LoginInitMessage(username)));
+		verify(writer).execute(argThatMessage(new LoginInitMessage(username)));
 	}
 
 	@Test

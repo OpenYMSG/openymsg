@@ -2,11 +2,12 @@ package org.openymsg.execute.dispatch;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openymsg.execute.Executor;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class DispatcherImpl implements Dispatcher {
+public class DispatcherImpl implements Executor {
 	/** logger */
 	private static final Log log = LogFactory.getLog(DispatcherImpl.class);
 	private DispatcherExecutorService executor = null;
