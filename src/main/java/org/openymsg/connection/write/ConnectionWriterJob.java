@@ -1,5 +1,7 @@
 package org.openymsg.connection.write;
 
+import java.util.Queue;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.execute.dispatch.MessageRequest;
@@ -7,14 +9,12 @@ import org.openymsg.execute.dispatch.Request;
 import org.openymsg.execute.dispatch.ScheduleTaskCompletionException;
 import org.openymsg.network.ConnectionHandler;
 
-import java.util.Queue;
-
 public class ConnectionWriterJob implements Request {
 	/** logger */
 	private static final Log log = LogFactory.getLog(ConnectionWriterJob.class);
 	private final ConnectionHandler connection;
-	private final Queue<MessageRequest> queue;
-	private boolean isFinished = false;
+	protected final Queue<MessageRequest> queue;
+	protected boolean isFinished = false;
 
 	public ConnectionWriterJob(Queue<MessageRequest> queue, ConnectionHandler connection) {
 		this.queue = queue;
@@ -67,5 +67,10 @@ public class ConnectionWriterJob implements Request {
 
 	public boolean isLocked(int millisDuration) {
 		return (this.connection != null) && this.connection.isLocked(millisDuration);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("ConnectionWriterJob [queue size=%s, isFinished=%s]", queue.size(), isFinished);
 	}
 }

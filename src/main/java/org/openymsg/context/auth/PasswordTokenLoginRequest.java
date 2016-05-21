@@ -116,4 +116,9 @@ public class PasswordTokenLoginRequest implements Request {
 		log.error("Failed token login", ex);
 		sessionAuthorize.setFailureState(AuthenticationFailure.STAGE2);
 	}
+
+	@Override
+	public String toString() {
+		return String.format("PasswordTokenLoginRequest [token=%s]", token);
+	}
 }

@@ -5,8 +5,9 @@ import org.apache.commons.logging.LogFactory;
 import org.openymsg.execute.dispatch.Request;
 
 /**
- * A request the sends a message when executed. This is primarily used for scheduling messages to be sent in the future
- * once or recurring.
+ * A request the sends a message when executed. This is primarily used for
+ * scheduling messages to be sent in the future once or recurring.
+ * 
  * @author neilhart
  */
 public class ScheduledMessageSender implements Request {
@@ -35,5 +36,10 @@ public class ScheduledMessageSender implements Request {
 	// TODO need to do something
 	public void failure(Exception ex) {
 		log.warn("Exception processing the message: " + message, ex);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("ScheduledMessageSender [message=%s]", message);
 	}
 }

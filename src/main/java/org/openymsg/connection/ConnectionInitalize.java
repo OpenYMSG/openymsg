@@ -39,4 +39,9 @@ public class ConnectionInitalize implements Request {
 		this.connectionState.setState(ConnectionState.FAILED_CONNECTING);
 		// TODO shutdown
 	}
+
+	@Override
+	public String toString() {
+		return String.format("ConnectionInitalize [connectionState=%s]", connectionState);
+	}
 }

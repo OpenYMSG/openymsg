@@ -48,4 +48,9 @@ public class MessageExecuteRequest implements MessageRequest {
 	public void setConnection(ConnectionHandler connection) {
 		this.connection = connection;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("MessageExecuteRequest [message=%s]", message);
+	}
 }

@@ -31,4 +31,9 @@ public class TimeoutChecker implements Request {
 	public void failure(Exception ex) {
 		log.warn("Failure", ex);
 	}
+
+	@Override
+	public String toString() {
+		return String.format("TimeoutChecker [strategy=%s]", strategy);
+	}
 }

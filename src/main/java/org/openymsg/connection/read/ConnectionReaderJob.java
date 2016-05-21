@@ -48,4 +48,9 @@ public class ConnectionReaderJob implements Request {
 	public void failure(Exception ex) {
 		log.error("Failed reading connection", ex);
 	}
+
+	@Override
+	public String toString() {
+		return String.format("ConnectionReaderJob [isFinished=%s]", isFinished);
+	}
 }

@@ -15,9 +15,13 @@ public class TimeoutCheckerShutdownStrategy implements TimeoutCheckerStrategy {
 
 	/**
 	 * Create a shutdown strategy
-	 * @param timeout minutes before timeout
-	 * @param executor executor to run the shutdown command
-	 * @param connection connection to shutdown
+	 * 
+	 * @param timeout
+	 *            minutes before timeout
+	 * @param executor
+	 *            executor to run the shutdown command
+	 * @param connection
+	 *            connection to shutdown
 	 */
 	public TimeoutCheckerShutdownStrategy(int timeout, Executor executor, YahooConnection connection) {
 		this.connection = connection;
@@ -44,5 +48,10 @@ public class TimeoutCheckerShutdownStrategy implements TimeoutCheckerStrategy {
 			TimeoutChecker.log.info("Timeout reached.  Shutting down");
 			executor.execute(new ShutdownRequest(connection));
 		}
+	}
+
+	@Override
+	public String toString() {
+		return String.format("TimeoutCheckerShutdownStrategy [lastKeepAlive=%s, timeout=%s]", lastKeepAlive, timeout);
 	}
 }

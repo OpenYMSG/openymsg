@@ -1,8 +1,10 @@
 package org.openymsg.execute.dispatch;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.RunnableScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -40,5 +42,19 @@ public class DispatcherExecutorService extends ScheduledThreadPoolExecutor {
 		if (t != null) {
 			this.callback.afterExecute(r, t);
 		}
+	}
+
+	@Override
+	protected <V> RunnableScheduledFuture<V> decorateTask(Runnable runnable,
+			RunnableScheduledFuture<V> scheduledFuture) {
+		System.out.println("calling runnable decorateTask: " + runnable);
+		return new RunnableScheduledFutureDecorator<V>(runnable, scheduledFuture);
+	}
+
+	@Override
+	protected <V> RunnableScheduledFuture<V> decorateTask(Callable<V> callable,
+			RunnableScheduledFuture<V> scheduledFuture) {
+		System.out.println("calling callable decorateTask: " + callable);
+		return new RunnableScheduledFutureDecorator<V>(callable, scheduledFuture);
 	}
 }

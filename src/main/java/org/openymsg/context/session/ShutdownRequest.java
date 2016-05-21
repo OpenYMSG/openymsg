@@ -48,4 +48,9 @@ public class ShutdownRequest implements Request {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("ShutdownRequest []");
+	}
 }

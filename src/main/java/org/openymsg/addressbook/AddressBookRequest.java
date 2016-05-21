@@ -1,5 +1,14 @@
 package org.openymsg.addressbook;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.config.SessionConfig;
@@ -12,15 +21,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 public class AddressBookRequest implements Request {
 	private static final Log log = LogFactory.getLog(AddressBookRequest.class);
@@ -105,7 +105,8 @@ public class AddressBookRequest implements Request {
 			id = lcsid;
 		}
 		YahooAddressBookEntry user = new YahooAddressBookEntry(id, firstName, lastName, nickName, groupName);
-		// log.trace("firstname: " + firstName + ", lastname: " + lastName + ", nickname: " +
+		// log.trace("firstname: " + firstName + ", lastname: " + lastName + ",
+		// nickname: " +
 		// nickName + ", groupName: " + groupName);
 		return user;
 	}
@@ -129,5 +130,10 @@ public class AddressBookRequest implements Request {
 	public void failure(Exception ex) {
 		// TODO - what to do
 		log.error("Failed running", ex);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("AddressBookRequest [cookieY=%s, cookieT=%s]", cookieY, cookieT);
 	}
 }

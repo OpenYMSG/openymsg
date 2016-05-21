@@ -6,12 +6,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 public class DispatcherExecutorServiceTest {
 	@Test
@@ -50,7 +51,10 @@ public class DispatcherExecutorServiceTest {
 		executor.execute(new SlowRunnable());
 		executor.execute(new SlowRunnable());
 		assertNull("Should not have an exception", callback.getException());
-		executor.shutdownNow();
+		List<Runnable> runnables = executor.shutdownNow();
+		for (Runnable runnable2 : runnables) {
+			System.out.println("runnable: " + runnable2);
+		}
 		runnable = new QuiteRunnable();
 		executor.execute(runnable);
 		assertFalse(((QuiteRunnable) runnable).hasRun());
@@ -92,12 +96,14 @@ public class DispatcherExecutorServiceTest {
 		}
 
 		/**
-		 * @param exception the exception to set
+		 * @param exception
+		 *            the exception to set
 		 */
 		public void setException(RuntimeException exception) {
 			this.exception = exception;
 		}
 	}
+
 	private class SlowRunnable implements Runnable {
 		boolean ran = false;
 
@@ -115,12 +121,14 @@ public class DispatcherExecutorServiceTest {
 			return this.ran;
 		}
 	}
+
 	private final class ExceptionRunnable implements Runnable {
 		@Override
 		public void run() {
 			throw new RuntimeException("test failure");
 		}
 	}
+
 	private final class TestingDispatcherExecutorCallback implements DispatcherExecutorCallback {
 		private LinkedBlockingQueue<Throwable> exceptions = new LinkedBlockingQueue<Throwable>();
 		private LinkedBlockingQueue<Runnable> runnables = new LinkedBlockingQueue<Runnable>();
