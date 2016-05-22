@@ -1,10 +1,13 @@
 package org.openymsg.connection.write;
 
-import org.openymsg.execute.dispatch.MessageRequest;
-
 import java.util.Queue;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openymsg.execute.dispatch.MessageRequest;
+
 public class PacketWriterImpl implements PacketWriter {
+	private static final Log log = LogFactory.getLog(PacketWriterImpl.class);
 	private final Queue<MessageRequest> queue;
 
 	public PacketWriterImpl(Queue<MessageRequest> queue) {
@@ -20,5 +23,14 @@ public class PacketWriterImpl implements PacketWriter {
 	protected MessageRequest wrapMessage(Message message) {
 		MessageRequest request = new MessageExecuteRequest(message);
 		return request;
+	}
+
+	@Override
+	public void drainAndExecute(Message message) {
+		for (MessageRequest messageRequest : queue) {
+			log.debug("draining message: " + messageRequest);
+		}
+		queue.clear();
+		execute(message);
 	}
 }

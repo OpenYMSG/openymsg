@@ -1,5 +1,7 @@
 package org.openymsg.contact.roster;
 
+import java.io.IOException;
+
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
 import org.openymsg.connection.write.Message;
@@ -7,12 +9,12 @@ import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
-import java.io.IOException;
-
 /**
- * Transmit a REMOVE_BUDDY packet. We should get a REMOVE_BUDDY packet back (usually preceded by a CONTACTNEW packet).
+ * Transmit a REMOVE_BUDDY packet. We should get a REMOVE_BUDDY packet back
+ * (usually preceded by a CONTACTNEW packet).
  * <p>
- * Note that removing a user from all groups that it is in, equals removing the user from the contact list completely.
+ * Note that removing a user from all groups that it is in, equals removing the
+ * user from the contact list completely.
  */
 public class ContactRemoveMessage implements Message {
 	private final String username;
@@ -48,4 +50,9 @@ public class ContactRemoveMessage implements Message {
 	// public void messageProcessed() {
 	// //TODO - remove contact
 	// }
+
+	@Override
+	public String toString() {
+		return String.format("ContactRemoveMessage [username=%s, contact=%s, group=%s]", username, contact, group);
+	}
 }

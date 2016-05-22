@@ -1,16 +1,16 @@
 package org.openymsg.contact.roster;
 
+import java.io.IOException;
+
 import org.openymsg.YahooContact;
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
-import java.io.IOException;
-
 public class ContactAddDeclineMessage implements Message {
 	private final YahooContact contact;
-	private String username;
+	private final String username;
 	private final String message;
 
 	public ContactAddDeclineMessage(String username, YahooContact contact, String message) {
@@ -21,7 +21,8 @@ public class ContactAddDeclineMessage implements Message {
 
 	@Override
 	public String toString() {
-		return "ContactAddDeclineMessage [contact=" + contact + ", username=" + username + ", message=" + message + "]";
+		return String.format("ContactAddDeclineMessage [contact=%s, username=%s, message=%s]", contact, username,
+				message);
 	}
 
 	@Override

@@ -1,15 +1,16 @@
 package org.openymsg.conference.message;
 
+import java.io.IOException;
+
 import org.openymsg.YahooConference;
 import org.openymsg.conference.ConferenceMembership;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
-import java.io.IOException;
-
 /**
- * Transmit an CONFLOGOFF packet. We send one of these when we wish to leave a conference.
+ * Transmit an CONFLOGOFF packet. We send one of these when we wish to leave a
+ * conference.
  */
 public class LeaveConferenceMessage extends AbstractConferenceMessage {
 	public LeaveConferenceMessage(String username, YahooConference conference, ConferenceMembership membership) {
@@ -35,5 +36,11 @@ public class LeaveConferenceMessage extends AbstractConferenceMessage {
 	@Override
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("LeaveConferenceMessage [membership=%s, conference=%s, username=%s]", membership,
+				conference, username);
 	}
 }

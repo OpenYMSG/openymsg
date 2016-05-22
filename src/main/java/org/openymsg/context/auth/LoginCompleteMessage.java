@@ -1,17 +1,18 @@
 package org.openymsg.context.auth;
 
+import java.io.IOException;
+
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.NetworkConstants;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
-import java.io.IOException;
-
 /**
- * Transmit an AUTHRESP packet, the second part of our login process. As we do not know our primary ID yet, both 0 and 1
- * use loginID . Note: message also contains our initial status. cookieY - plain response (not MD5Crypt'd) cookieT -
- * crypted response (MD5Crypt'd)
+ * Transmit an AUTHRESP packet, the second part of our login process. As we do
+ * not know our primary ID yet, both 0 and 1 use loginID . Note: message also
+ * contains our initial status. cookieY - plain response (not MD5Crypt'd)
+ * cookieT - crypted response (MD5Crypt'd)
  */
 public class LoginCompleteMessage implements Message {
 	// private String username;
@@ -29,7 +30,8 @@ public class LoginCompleteMessage implements Message {
 	public PacketBodyBuffer getBody() throws IOException {
 		// if (sessionStatus != SessionState.CONNECTED) {
 		// throw new IllegalStateException(
-		// "Cannot transmit an AUTHRESP packet if you're not completely connected to the Yahoo Network. Current state: "
+		// "Cannot transmit an AUTHRESP packet if you're not completely
+		// connected to the Yahoo Network. Current state: "
 		// + sessionStatus);
 		// }
 		PacketBodyBuffer body = new PacketBodyBuffer();
@@ -58,5 +60,10 @@ public class LoginCompleteMessage implements Message {
 	@Override
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.WEBLOGIN;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("LoginCompleteMessage [token=%s]", token);
 	}
 }

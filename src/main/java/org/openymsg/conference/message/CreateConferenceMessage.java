@@ -1,5 +1,8 @@
 package org.openymsg.conference.message;
 
+import java.io.IOException;
+import java.util.Set;
+
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
 import org.openymsg.connection.write.Message;
@@ -7,18 +10,15 @@ import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
-import java.io.IOException;
-import java.util.Set;
-
 /**
- * Transmit an CONFINVITE packet. This is sent when we want to create a new conference, with the specified users and
- * with a given welcome message.
+ * Transmit an CONFINVITE packet. This is sent when we want to create a new
+ * conference, with the specified users and with a given welcome message.
  */
 public class CreateConferenceMessage implements Message {
-	private String username;
-	private YahooConference conference;
-	private Set<YahooContact> contacts;
-	private String message;
+	private final String username;
+	private final YahooConference conference;
+	private final Set<YahooContact> contacts;
+	private final String message;
 
 	public CreateConferenceMessage(String username, YahooConference conference, Set<YahooContact> contacts,
 			String message) {
@@ -57,7 +57,15 @@ public class CreateConferenceMessage implements Message {
 	// public void messageProcessed() {
 	// // TODO - add conference
 	// // Create a new conference object
-	// // conferences.put(room, new YahooConference(identities.get(yid.toLowerCase()), room, msg, this, false));
+	// // conferences.put(room, new
+	// YahooConference(identities.get(yid.toLowerCase()), room, msg, this,
+	// false));
 	// // Send request to Yahoo
 	// }
+
+	@Override
+	public String toString() {
+		return String.format("CreateConferenceMessage [username=%s, conference=%s, contacts=%s, message=%s]", username,
+				conference, contacts, message);
+	}
 }

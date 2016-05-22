@@ -70,7 +70,7 @@ public class SessionSessionImplTest {
 	public void testLogout() {
 		session.loginComplete();
 		session.logout();
-		verify(writer).execute(argThatMessage(new LogoutMessage(username)));
+		verify(writer).drainAndExecute(argThatMessage(new LogoutMessage(username)));
 	}
 
 	@Test()

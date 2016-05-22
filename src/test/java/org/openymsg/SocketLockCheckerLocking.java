@@ -3,36 +3,39 @@ package org.openymsg;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openymsg.network.direct.SocketLockChecker;
 
 public class SocketLockCheckerLocking implements SocketLockChecker {
+	private static final Log log = LogFactory.getLog(SocketLockCheckerLocking.class);
 	private Lock lock = new ReentrantLock();
 	private boolean locked;
 
 	@Override
 	public void startWriting() {
-		System.out.println("startWriting: " + locked);
+		log.debug("startWriting: " + locked);
 		lock.lock();
 		locked = true;
 	}
 
 	@Override
 	public void finishWriting() {
-		System.out.println("finishWriting: " + locked);
+		log.debug("finishWriting: " + locked);
 		lock.unlock();
 		locked = false;
 	}
 
 	@Override
 	public boolean isLocked(int duration) {
-		System.out.println("isLocked: " + locked);
+		log.debug("isLocked: " + locked);
 		return locked;
 	}
 
 	public void lock() {
-		System.out.println("startLocking: " + locked);
+		log.debug("startLocking: " + locked);
 		lock.lock();
-		System.out.println("finishLocking");
+		log.debug("finishLocking");
 		locked = true;
 	}
 

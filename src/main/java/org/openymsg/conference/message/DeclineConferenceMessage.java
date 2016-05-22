@@ -1,18 +1,19 @@
 package org.openymsg.conference.message;
 
+import java.io.IOException;
+
 import org.openymsg.YahooConference;
 import org.openymsg.conference.ConferenceMembership;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
-import java.io.IOException;
-
 /**
- * Transmit an CONFDECLINE packet. We send one of these when we decline an offer to join a conference.
+ * Transmit an CONFDECLINE packet. We send one of these when we decline an offer
+ * to join a conference.
  */
 public class DeclineConferenceMessage extends AbstractConferenceMessage {
-	private String message;
+	private final String message;
 
 	public DeclineConferenceMessage(String username, YahooConference conference, ConferenceMembership membership,
 			String message) {
@@ -49,4 +50,10 @@ public class DeclineConferenceMessage extends AbstractConferenceMessage {
 	// // YahooConference yc = getConference(room);
 	// // yc.closeConference();
 	// }
+
+	@Override
+	public String toString() {
+		return String.format("DeclineConferenceMessage [message=%s, membership=%s, conference=%s, username=%s]",
+				message, membership, conference, username);
+	}
 }

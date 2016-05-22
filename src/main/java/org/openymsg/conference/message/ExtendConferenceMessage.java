@@ -1,5 +1,8 @@
 package org.openymsg.conference.message;
 
+import java.io.IOException;
+import java.util.Set;
+
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
 import org.openymsg.conference.ConferenceMembership;
@@ -7,15 +10,13 @@ import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
-import java.io.IOException;
-import java.util.Set;
-
 /**
- * Transmit an CONFADDINVITE packet. We send one of these when we wish to invite more users to our conference.
+ * Transmit an CONFADDINVITE packet. We send one of these when we wish to invite
+ * more users to our conference.
  */
 public class ExtendConferenceMessage extends AbstractConferenceMessage {
-	private Set<YahooContact> invitedContacts;
-	private String message;
+	private final Set<YahooContact> invitedContacts;
+	private final String message;
 
 	public ExtendConferenceMessage(String username, YahooConference conference, ConferenceMembership membership,
 			Set<YahooContact> invitedContacts, String message) {
@@ -61,4 +62,11 @@ public class ExtendConferenceMessage extends AbstractConferenceMessage {
 	// public void messageProcessed() {
 	// //TODO - add they are invited?
 	// }
+
+	@Override
+	public String toString() {
+		return String.format(
+				"ExtendConferenceMessage [invitedContacts=%s, message=%s, membership=%s, conference=%s, username=%s]",
+				invitedContacts, message, membership, conference, username);
+	}
 }

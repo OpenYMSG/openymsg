@@ -13,6 +13,7 @@ import org.openymsg.execute.dispatch.Request;
 import org.openymsg.network.ServiceType;
 
 public class SessionSessionImpl implements SessionSession {
+	private static final int ONE_SECOND = 1000;
 	/** logger */
 	private static final Log log = LogFactory.getLog(SessionSessionImpl.class);
 	private final String username;
@@ -91,18 +92,21 @@ public class SessionSessionImpl implements SessionSession {
 			throw new IllegalStateException("State is not logging in: " + state);
 		}
 		state = LoginState.LOGGING_OUT;
-		writer.execute(new LogoutMessage(username));
+		writer.drainAndExecute(new LogoutMessage(username));
 		// TODO schedule this incase no response from yahoo, not here
-		executor.scheduleOnce(new ShutdownRequest(connection), 1000);
+		executor.scheduleOnce(new ShutdownRequest(connection), ONE_SECOND);
 		// no longer getting a response from yahoo
 		state = LoginState.LOGGED_OUT_NORMAL;
 	}
 
 	/**
-	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc. If you want to login as invisible, set
-	 * this to Status.INVISIBLE before you call login(). Note: this setter is overloaded. The second version is intended
-	 * for use when setting custom status messages.
-	 * @param status The new Status to be set for this user.
+	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc.
+	 * If you want to login as invisible, set this to Status.INVISIBLE before
+	 * you call login(). Note: this setter is overloaded. The second version is
+	 * intended for use when setting custom status messages.
+	 * 
+	 * @param status
+	 *            The new Status to be set for this user.
 	 * @throws IllegalArgumentException
 	 */
 	@Override
@@ -121,10 +125,13 @@ public class SessionSessionImpl implements SessionSession {
 	}
 
 	/**
-	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc. Legit values are in the StatusConstants
-	 * interface. If you want to login as invisible, set this to Status.INVISIBLE before you call login() Note: setter
-	 * is overloaded, the second version is intended for use when setting custom status messages. The boolean is true if
-	 * available and false if away.
+	 * Sets the Yahoo status, ie: available, invisible, busy, not at desk, etc.
+	 * Legit values are in the StatusConstants interface. If you want to login
+	 * as invisible, set this to Status.INVISIBLE before you call login() Note:
+	 * setter is overloaded, the second version is intended for use when setting
+	 * custom status messages. The boolean is true if available and false if
+	 * away.
+	 * 
 	 * @param message
 	 * @param showBusyIcon
 	 * @throws IllegalArgumentException

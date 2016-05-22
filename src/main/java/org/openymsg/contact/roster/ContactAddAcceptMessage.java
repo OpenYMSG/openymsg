@@ -1,16 +1,16 @@
 package org.openymsg.contact.roster;
 
+import java.io.IOException;
+
 import org.openymsg.YahooContact;
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
-import java.io.IOException;
-
 public class ContactAddAcceptMessage implements Message {
 	private final YahooContact contact;
-	private String username;
+	private final String username;
 
 	public ContactAddAcceptMessage(String username, YahooContact contact) {
 		this.username = username;
@@ -37,5 +37,10 @@ public class ContactAddAcceptMessage implements Message {
 	@Override
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("ContactAddAcceptMessage [contact=%s, username=%s]", contact, username);
 	}
 }

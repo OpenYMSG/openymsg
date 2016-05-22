@@ -1,18 +1,19 @@
 package org.openymsg.conference.message;
 
+import java.io.IOException;
+
 import org.openymsg.YahooConference;
 import org.openymsg.conference.ConferenceMembership;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
-import java.io.IOException;
-
 /**
- * Transmit an CONFMSG packet. We send one of these when we wish to send a message to a conference.
+ * Transmit an CONFMSG packet. We send one of these when we wish to send a
+ * message to a conference.
  */
 public class SendConfereneMessage extends AbstractConferenceMessage {
-	private String message;
+	private final String message;
 
 	public SendConfereneMessage(String username, YahooConference conference, ConferenceMembership membership,
 			String message) {
@@ -39,5 +40,11 @@ public class SendConfereneMessage extends AbstractConferenceMessage {
 	@Override
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("SendConfereneMessage [message=%s, membership=%s, conference=%s, username=%s]", message,
+				membership, conference, username);
 	}
 }

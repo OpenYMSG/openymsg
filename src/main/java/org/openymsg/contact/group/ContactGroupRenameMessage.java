@@ -1,19 +1,21 @@
 package org.openymsg.contact.group;
 
+import java.io.IOException;
+
 import org.openymsg.YahooContactGroup;
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
-import java.io.IOException;
-
 /**
- * Transmit a GOTGROUPRENAME packet, to change the name of one of our friends groups.
+ * Transmit a GOTGROUPRENAME packet, to change the name of one of our friends
+ * groups.
  */
 /*
- * TODO: Currently, this behavior is as it was in jYMSG. Protocol specification would suggest that not 0x13
- * (GOTGROUPRENAME) but 0x89 (GROUPRENAME) should be used for this operation. Find out and make sure.
+ * TODO: Currently, this behavior is as it was in jYMSG. Protocol specification
+ * would suggest that not 0x13 (GOTGROUPRENAME) but 0x89 (GROUPRENAME) should be
+ * used for this operation. Find out and make sure.
  */
 public class ContactGroupRenameMessage implements Message {
 	private final String username;
@@ -48,4 +50,10 @@ public class ContactGroupRenameMessage implements Message {
 	// public void messageProcessed() {
 	// //TODO change group name
 	// }
+
+	@Override
+	public String toString() {
+		return String.format("ContactGroupRenameMessage [username=%s, group=%s, newGroupName=%s]", username, group,
+				newGroupName);
+	}
 }

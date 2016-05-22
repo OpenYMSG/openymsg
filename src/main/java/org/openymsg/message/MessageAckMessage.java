@@ -1,21 +1,22 @@
 package org.openymsg.message;
 
+import java.io.IOException;
+
 import org.openymsg.YahooContact;
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
-import java.io.IOException;
-
 /**
- * Send acknowledgement. If we don't do this then the official Yahoo Messenger client for Windows will send us the same
- * message 7 seconds later as an offline message. This is true for at least version 9.0.0.2162 on Windows XP.
+ * Send acknowledgement. If we don't do this then the official Yahoo Messenger
+ * client for Windows will send us the same message 7 seconds later as an
+ * offline message. This is true for at least version 9.0.0.2162 on Windows XP.
  */
 public class MessageAckMessage implements Message {
-	private String username;
-	private YahooContact contact;
-	private String messageId;
+	private final String username;
+	private final YahooContact contact;
+	private final String messageId;
 
 	public MessageAckMessage(String username, YahooContact contact, String messageId) {
 		this.username = username;
@@ -45,5 +46,10 @@ public class MessageAckMessage implements Message {
 	public MessageStatus getMessageStatus() {
 		// TODO - is this correct or use current?
 		return MessageStatus.DEFAULT;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("MessageAckMessage [username=%s, contact=%s, messageId=%s]", username, contact, messageId);
 	}
 }

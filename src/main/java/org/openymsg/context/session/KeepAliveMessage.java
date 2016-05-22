@@ -1,20 +1,21 @@
 package org.openymsg.context.session;
 
+import java.io.IOException;
+
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
-import java.io.IOException;
-
 /**
- * Transmits a Keep-Alive packet to the Yahoo network. At the time of implementation, this packet gets sent by the
- * official Yahoo client once every 60 seconds, and seems to replace the older PING service type (although this service
- * type is still received by the client just after authentication). The keep-alive does not appear to be sent to a Yahoo
- * Chatrooms.
+ * Transmits a Keep-Alive packet to the Yahoo network. At the time of
+ * implementation, this packet gets sent by the official Yahoo client once every
+ * 60 seconds, and seems to replace the older PING service type (although this
+ * service type is still received by the client just after authentication). The
+ * keep-alive does not appear to be sent to a Yahoo Chatrooms.
  */
 public class KeepAliveMessage implements Message {
-	private String username;
+	private final String username;
 
 	public KeepAliveMessage(String username) {
 		this.username = username;
@@ -35,5 +36,10 @@ public class KeepAliveMessage implements Message {
 	@Override
 	public MessageStatus getMessageStatus() {
 		return MessageStatus.DEFAULT;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("KeepAliveMessage [username=%s]", username);
 	}
 }

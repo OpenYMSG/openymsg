@@ -1,18 +1,18 @@
 package org.openymsg.conference.message;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+
 import org.openymsg.YahooConference;
 import org.openymsg.YahooContact;
 import org.openymsg.conference.ConferenceMembership;
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.PacketBodyBuffer;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
 public abstract class AbstractConferenceMessage implements Message {
-	private ConferenceMembership membership;
-	private YahooConference conference;
-	private String username;
+	protected final ConferenceMembership membership;
+	protected final YahooConference conference;
+	protected final String username;
 
 	public AbstractConferenceMessage(String username, YahooConference conference, ConferenceMembership membership) {
 		this.username = username;

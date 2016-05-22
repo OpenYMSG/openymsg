@@ -1,5 +1,7 @@
 package org.openymsg.contact.roster;
 
+import java.io.IOException;
+
 import org.openymsg.Name;
 import org.openymsg.YahooContact;
 import org.openymsg.YahooContactGroup;
@@ -8,11 +10,10 @@ import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
-import java.io.IOException;
-
 /**
- * Transmit a ADD_BUDDY packet. If all goes well we'll get a ADD_BUDDY packet back with the details of the friend to
- * confirm the transaction (usually preceded by a CONTACTNEW packet with well detailed info).
+ * Transmit a ADD_BUDDY packet. If all goes well we'll get a ADD_BUDDY packet
+ * back with the details of the friend to confirm the transaction (usually
+ * preceded by a CONTACTNEW packet with well detailed info).
  */
 public class ContactAddMessage implements Message {
 	private final String username;
@@ -33,8 +34,8 @@ public class ContactAddMessage implements Message {
 
 	@Override
 	public String toString() {
-		return "ContactAddMessage [username=" + username + ", contact=" + contact + ", group=" + group + ", message="
-				+ message + ", name=" + name + "]";
+		return String.format("ContactAddMessage [username=%s, contact=%s, group=%s, message=%s, name=%s]", username,
+				contact, group, message, name);
 	}
 
 	@Override
