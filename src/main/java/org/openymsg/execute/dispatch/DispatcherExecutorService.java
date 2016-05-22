@@ -47,14 +47,12 @@ public class DispatcherExecutorService extends ScheduledThreadPoolExecutor {
 	@Override
 	protected <V> RunnableScheduledFuture<V> decorateTask(Runnable runnable,
 			RunnableScheduledFuture<V> scheduledFuture) {
-		System.out.println("calling runnable decorateTask: " + runnable);
 		return new RunnableScheduledFutureDecorator<V>(runnable, scheduledFuture);
 	}
 
 	@Override
 	protected <V> RunnableScheduledFuture<V> decorateTask(Callable<V> callable,
 			RunnableScheduledFuture<V> scheduledFuture) {
-		System.out.println("calling callable decorateTask: " + callable);
 		return new RunnableScheduledFutureDecorator<V>(callable, scheduledFuture);
 	}
 }
