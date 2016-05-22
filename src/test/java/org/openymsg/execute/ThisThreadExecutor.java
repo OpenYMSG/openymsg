@@ -3,15 +3,19 @@ package org.openymsg.execute;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openymsg.execute.dispatch.Request;
 import org.openymsg.execute.dispatch.RequestWrapper;
 
 public class ThisThreadExecutor implements Executor {
+	private static final Log log = LogFactory.getLog(ThisThreadExecutor.class);
 	Set<Request> scheduleRequests = new HashSet<Request>();
 	Set<Request> scheduledOnceRequests = new HashSet<Request>();
 
 	@Override
 	public void execute(Request request) throws IllegalStateException {
+		log.info("execute: " + request);
 		new RequestWrapper(request).run();
 	}
 

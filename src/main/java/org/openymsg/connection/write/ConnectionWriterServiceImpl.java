@@ -8,9 +8,9 @@ import org.openymsg.execute.dispatch.MessageRequest;
 import org.openymsg.network.ConnectionHandler;
 
 public class ConnectionWriterServiceImpl implements ConnectionService {
-	private final Executor executor;
+	protected final Executor executor;
 	protected final Queue<MessageRequest> queue;
-	private ConnectionWriterJob writer;
+	protected ConnectionWriterJob writer;
 
 	// TODO only schedule when queue is active
 	public ConnectionWriterServiceImpl(Executor executor, Queue<MessageRequest> queue) {
