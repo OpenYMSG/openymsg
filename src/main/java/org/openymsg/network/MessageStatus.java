@@ -14,6 +14,7 @@ public enum MessageStatus {
 	SOMETHING3(3), // Contact Add Request response (Accept or Reject)
 	OFFLINE5(5), // Offline message
 	SOMETHING11(11), // Conference Extend
+	INVISIBLE(12), // Invisible status
 	NOTIFY(0x16),
 	WEBLOGIN(0x5a55aa55), // 1515563605
 	OFFLINE(0x5a55aa56);

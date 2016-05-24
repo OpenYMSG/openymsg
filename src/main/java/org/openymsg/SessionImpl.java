@@ -50,13 +50,14 @@ public class SessionImpl implements YahooSession {
 	 * {@inheritDoc} Initialize the connection and login to yahoo and return immediately.
 	 */
 	@Override
-	public void login(String username, String password) throws IllegalArgumentException, IllegalStateException {
+	public void login(String username, String password, boolean isInvisible)
+			throws IllegalArgumentException, IllegalStateException {
 		if (!this.state.isReadyToStart()) {
 			throw new IllegalStateException("Session in wrong state: " + state);
 		}
 		this.state = YahooSessionState.STARTED;
 		this.initialize(username);
-		this.context.login(username, password);
+		this.context.login(username, password, isInvisible);
 	}
 
 	private void initialize(String username) {

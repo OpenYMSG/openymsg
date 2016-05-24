@@ -20,7 +20,7 @@ public interface YahooSession extends SessionConnection, SessionContext, Session
 	 * @throws IllegalStateException if Session is not in correct state
 	 */
 	@Override
-	void login(String username, String password) throws IllegalArgumentException, IllegalStateException;
+	void login(String username, String password, boolean isInvisible) throws IllegalArgumentException, IllegalStateException;
 
 	/**
 	 * @throws IllegalStateException if Session is not in correct state

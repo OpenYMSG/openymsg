@@ -50,7 +50,7 @@ public class SessionIT {
 		YahooSessionCallback callback = mock(YahooSessionCallback.class);
 		YahooSession session = new SessionImpl(config, callback);
 		// callback.setSession(session);
-		session.login(badUsername, badUsernamePassword);
+		session.login(badUsername, badUsernamePassword, false);
 		try {
 			Thread.sleep(30000);
 		} catch (InterruptedException e) {
@@ -69,7 +69,7 @@ public class SessionIT {
 		YahooSessionCallback callback = mock(YahooSessionCallback.class);
 		YahooSession session = new SessionImpl(config, callback);
 		// callback.setSession(session);
-		session.login(badPasswordUsername, badPassword);
+		session.login(badPasswordUsername, badPassword, false);
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
@@ -90,7 +90,7 @@ public class SessionIT {
 		SessionConfig config = new SessionConfigSimple();
 		YahooSessionCallback callback1a = mock(YahooSessionCallback.class);
 		YahooSession session1a = new SessionImpl(config, callback1a);
-		session1a.login(username1, password1);
+		session1a.login(username1, password1, false);
 		// test login
 		try {
 			Thread.sleep(4 * 1000);
@@ -101,7 +101,7 @@ public class SessionIT {
 		// test duplicate login
 		YahooSessionCallback callback1 = mock(YahooSessionCallback.class);
 		YahooSession session1 = new SessionImpl(config, callback1);
-		session1.login(username1, password1);
+		session1.login(username1, password1, false);
 		try {
 			Thread.sleep(4 * 1000);
 		} catch (InterruptedException e) {

@@ -23,6 +23,7 @@ public class SessionSessionImpl implements SessionSession {
 	private final SessionSessionCallback callback;
 	private LoginState state;
 	private TimeoutChecker timeoutChecker;
+	private YahooStatus currentStatus;
 
 	public SessionSessionImpl(String username, Executor executor, YahooConnection connection, Integer timeout,
 			SessionSessionCallback callback) {
@@ -115,13 +116,16 @@ public class SessionSessionImpl implements SessionSession {
 		if (status == YahooStatus.CUSTOM) {
 			throw new IllegalArgumentException("Cannot set custom state without message");
 		}
-		writer.execute(new StatusChangeRequest(status));
-		// TODO set internal status
-		// status = status;
-		// customStatusMessage = null;
-		// TODO - Check status
-		// if (sessionStatus != SessionState.UNSTARTED) {
-		// }
+
+		if (currentStatus.isInvisible() && status.isOnlineVisible()) {
+			writer.execute(new VisibleToggleRequest(currentStatus, status));
+		} else if (currentStatus.isOnlineVisible() && status.isInvisible()) {
+			writer.execute(new VisibleToggleRequest(currentStatus, status));
+		} else {
+			writer.execute(new StatusChangeRequest(status));
+		}
+
+		currentStatus = status;
 	}
 
 	/**

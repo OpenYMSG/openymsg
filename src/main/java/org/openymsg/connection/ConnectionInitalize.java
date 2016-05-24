@@ -23,8 +23,13 @@ public class ConnectionInitalize implements Request {
 		// TODO - reconnect, reuse ?
 		ConnectionBuilder builder = config.getConnectionBuilder();
 		ConnectionHandler connection = builder.useCapacityServers().useScsServers().build();
-		// TODO - null
+
+		if (connection == null) {
+			this.connectionState.setState(ConnectionState.FAILED_CONNECTING);
+			return;
+		}
 		connection.addListener(connectionState);
+
 		ConnectionInfo status = builder.getConnectionInfo();
 		if (status.isConnected()) {
 			this.connectionState.setConnected(connection, status);

@@ -21,9 +21,11 @@ public class LoginCompleteMessage implements Message {
 	// private String base64;
 	// private String cookieB;
 	private final AuthenticationToken token;
+	private final boolean isInvisible;
 
-	public LoginCompleteMessage(AuthenticationToken token) {
+	public LoginCompleteMessage(AuthenticationToken token, boolean isInvisible) {
 		this.token = token;
+		this.isInvisible = isInvisible;
 	}
 
 	@Override
@@ -59,6 +61,9 @@ public class LoginCompleteMessage implements Message {
 
 	@Override
 	public MessageStatus getMessageStatus() {
+		if (isInvisible) {
+			return MessageStatus.INVISIBLE;
+		}
 		return MessageStatus.WEBLOGIN;
 	}
 

@@ -43,7 +43,7 @@ public class SessionAuthorizeImplTest {
 
 	@Test
 	public void testLogin() {
-		session.login(username, password);
+		session.login(username, password, false);
 		verify(writer).execute(argThatMessage(new LoginInitMessage(username)));
 	}
 
@@ -57,7 +57,7 @@ public class SessionAuthorizeImplTest {
 
 	@Test
 	public void testSeed() {
-		session.login(username, password);
+		session.login(username, password, false);
 		AuthenticationToken token = new AuthenticationToken();
 		token.setUsernameAndPassword(username, password);
 		session.receivedLoginInit();

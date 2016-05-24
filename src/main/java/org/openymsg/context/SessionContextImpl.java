@@ -33,8 +33,8 @@ public class SessionContextImpl implements SessionContext, SessionContextCallbac
 
 	@Override
 	// TODO already have username
-	public void login(String username, String password) throws IllegalArgumentException {
-		authentication.login(username, password);
+	public void login(String username, String password, boolean isInvisible) throws IllegalArgumentException {
+		authentication.login(username, password, isInvisible);
 	}
 
 	@Override

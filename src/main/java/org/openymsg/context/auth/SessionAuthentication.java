@@ -11,10 +11,11 @@ public interface SessionAuthentication {
 	 * authenticationFailure(AuthenticationFailure).
 	 * @param username user name
 	 * @param password password
+	 * @param isInvisible TODO
 	 * @throws IllegalArgumentException if username or password are not valid
 	 */
 	// TODO - check username and password
-	void login(String username, String password) throws IllegalArgumentException;
+	void login(String username, String password, boolean isInvisible) throws IllegalArgumentException;
 
 	AuthenticationFailure getFailureState();
 }

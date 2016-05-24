@@ -11,27 +11,15 @@ package org.openymsg;
 
 /**
  * Enumeration of all presence states.
+ * 
  * @author G. der Kinderen, Nimbuzz B.V. guus@nimbuzz.com
  * @author S.E. Morris
  */
 public enum YahooStatus {
 	OFFLINE(-100), // Internal missing value
 	PENDING(-99), // Internal Pending
-	ERROR(-1),
-	AVAILABLE(0),
-	BRB(1),
-	BUSY(2),
-	NOTATHOME(3),
-	NOTATDESK(4),
-	NOTINOFFICE(5),
-	ONPHONE(6),
-	ONVACATION(7),
-	OUTTOLUNCH(8),
-	STEPPEDOUT(9),
-	AWAY(10),
-	INVISIBLE(12),
-	CUSTOM(99),
-	IDLE(999);
+	ERROR(-1), AVAILABLE(0), BRB(1), BUSY(2), NOTATHOME(3), NOTATDESK(4), NOTINOFFICE(5), ONPHONE(6), ONVACATION(
+			7), OUTTOLUNCH(8), STEPPEDOUT(9), AWAY(10), INVISIBLE(12), CUSTOM(99), IDLE(999);
 	// OFFLINE(0x5a55aa56),
 	// WEBLOGIN(0x5a55aa55),
 	// TYPING(0x16);
@@ -40,7 +28,9 @@ public enum YahooStatus {
 
 	/**
 	 * Creates a new Status, based on a unique long value identifier.
-	 * @param value Unique long value for the Status to be created.
+	 * 
+	 * @param value
+	 *            Unique long value for the Status to be created.
 	 */
 	private YahooStatus(long value) {
 		this.value = value;
@@ -48,6 +38,7 @@ public enum YahooStatus {
 
 	/**
 	 * Gets the (unique) long value that identifies this Status.
+	 * 
 	 * @return long value identifying this Status.
 	 */
 	public long getValue() {
@@ -55,9 +46,12 @@ public enum YahooStatus {
 	}
 
 	/**
-	 * Returns the Status that is identified by the provided long value. This method throws an IllegalArgumentException
-	 * if no matching Status is defined in this enumeration.
-	 * @param value Status identifier.
+	 * Returns the Status that is identified by the provided long value. This
+	 * method throws an IllegalArgumentException if no matching Status is
+	 * defined in this enumeration.
+	 * 
+	 * @param value
+	 *            Status identifier.
 	 * @return Status identified by 'value'.
 	 */
 	public static YahooStatus getStatus(long value) {
@@ -68,6 +62,14 @@ public enum YahooStatus {
 			}
 		}
 		throw new IllegalArgumentException("No Status matching long value '" + value + "'.");
+	}
+
+	public boolean isInvisible() {
+		return this == YahooStatus.INVISIBLE;
+	}
+
+	public boolean isOnlineVisible() {
+		return this != YahooStatus.OFFLINE && this != YahooStatus.PENDING && this != YahooStatus.INVISIBLE;
 	}
 
 	public boolean isCustom() {

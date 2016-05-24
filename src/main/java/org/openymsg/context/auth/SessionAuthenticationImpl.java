@@ -20,6 +20,7 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 	private SessionAuthenticationCallback callback;
 	private SessionConfig sessionConfig;
 	private AuthenticationFailure failureState;
+	private boolean isInvisible;
 
 	public SessionAuthenticationImpl(SessionConfig sessionConfig, YahooConnection connection, Executor executor,
 			SessionAuthenticationCallback callback) {
@@ -34,7 +35,7 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 	}
 
 	@Override
-	public void login(String username, String password) throws IllegalArgumentException {
+	public void login(String username, String password, boolean isInvisible) throws IllegalArgumentException {
 		log.trace("login: " + username + "/" + password);
 		if (username == null || username.isEmpty()) {
 			throw new IllegalArgumentException("username may not be null");
@@ -43,6 +44,7 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 			throw new IllegalArgumentException("password may not be null");
 		}
 		token.setUsernameAndPassword(username, password);
+		this.isInvisible = isInvisible;
 		// TODO move status check to Session
 		// ConnectionState executionState = this.executor.getState();
 		// if (executionState.isLoginable()) {
@@ -77,7 +79,7 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 	}
 
 	protected void receivedPasswordTokenLogin() {
-		execute(new LoginCompleteMessage(token));
+		execute(new LoginCompleteMessage(token, isInvisible));
 		this.callback.authenticationSuccess();
 	}
 
