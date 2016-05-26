@@ -13,6 +13,7 @@ public class SessionContextImpl implements SessionContext, SessionContextCallbac
 	protected final SessionAuthenticationImpl authentication;
 	protected final SessionSessionImpl session;
 	private final SessionContextCallback callback;
+	private boolean isInvisible;
 
 	public SessionContextImpl(SessionConfig sessionConfig, Executor executor, YahooConnection connection,
 			String username, SessionContextCallback callback) {
@@ -34,7 +35,9 @@ public class SessionContextImpl implements SessionContext, SessionContextCallbac
 	@Override
 	// TODO already have username
 	public void login(String username, String password, boolean isInvisible) throws IllegalArgumentException {
+		this.isInvisible = isInvisible;
 		authentication.login(username, password, isInvisible);
+
 	}
 
 	@Override
@@ -45,6 +48,7 @@ public class SessionContextImpl implements SessionContext, SessionContextCallbac
 	@Override
 	public void setStatus(YahooStatus status) throws IllegalArgumentException {
 		session.setStatus(status);
+		isInvisible = (status == YahooStatus.INVISIBLE);
 	}
 
 	@Override
@@ -54,7 +58,7 @@ public class SessionContextImpl implements SessionContext, SessionContextCallbac
 
 	@Override
 	public void authenticationSuccess() {
-		session.loginComplete();
+		session.loginComplete(isInvisible);
 		callback.authenticationSuccess();
 	}
 

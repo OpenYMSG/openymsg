@@ -23,7 +23,7 @@ public class SessionSessionImpl implements SessionSession {
 	private final SessionSessionCallback callback;
 	private LoginState state;
 	private TimeoutChecker timeoutChecker;
-	private YahooStatus currentStatus;
+	private boolean currentInvisibleStatus = false;
 
 	public SessionSessionImpl(String username, Executor executor, YahooConnection connection, Integer timeout,
 			SessionSessionCallback callback) {
@@ -66,13 +66,14 @@ public class SessionSessionImpl implements SessionSession {
 	/**
 	 * Notify session that login is complete
 	 */
-	public void loginComplete() {
+	public void loginComplete(boolean isInvisible) {
 		if (!state.isLoggingIn()) {
 			throw new IllegalStateException("State is not logging in: " + state);
 		}
 		state = LoginState.LOGGED_IN;
 		executor.schedule(createPingSchedule(), (60 * 60 * 1000));
 		executor.schedule(createKeepAliveSchedule(), (60 * 1000));
+		this.currentInvisibleStatus = isInvisible;
 	}
 
 	protected Request createKeepAliveSchedule() {
@@ -117,15 +118,15 @@ public class SessionSessionImpl implements SessionSession {
 			throw new IllegalArgumentException("Cannot set custom state without message");
 		}
 
-		if (currentStatus.isInvisible() && status.isOnlineVisible()) {
-			writer.execute(new VisibleToggleRequest(currentStatus, status));
-		} else if (currentStatus.isOnlineVisible() && status.isInvisible()) {
-			writer.execute(new VisibleToggleRequest(currentStatus, status));
+		if (currentInvisibleStatus && status.isOnlineVisible()) {
+			writer.execute(new VisibleToggleRequest(currentInvisibleStatus, false));
+		} else if (!currentInvisibleStatus && status.isInvisible()) {
+			writer.execute(new VisibleToggleRequest(currentInvisibleStatus, true));
 		} else {
 			writer.execute(new StatusChangeRequest(status));
 		}
 
-		currentStatus = status;
+		currentInvisibleStatus = status.isInvisible();
 	}
 
 	/**

@@ -2,28 +2,27 @@ package org.openymsg.context.session;
 
 import java.io.IOException;
 
-import org.openymsg.YahooStatus;
 import org.openymsg.connection.write.Message;
 import org.openymsg.network.MessageStatus;
 import org.openymsg.network.PacketBodyBuffer;
 import org.openymsg.network.ServiceType;
 
 public class VisibleToggleRequest implements Message {
-	private YahooStatus oldStatus;
-	private YahooStatus newStatus;
+	private boolean oldInvisibleStatus;
+	private boolean newInvisibleStatus;
 
-	public VisibleToggleRequest(YahooStatus oldStatus, YahooStatus newStatus) {
-		this.oldStatus = oldStatus;
-		this.newStatus = newStatus;
+	public VisibleToggleRequest(boolean oldInvisibleStatus, boolean newInvisibleStatus) {
+		this.oldInvisibleStatus = oldInvisibleStatus;
+		this.newInvisibleStatus = newInvisibleStatus;
 	}
 
 	@Override
 	public org.openymsg.network.PacketBodyBuffer getBody() throws IOException {
 		final PacketBodyBuffer body = new PacketBodyBuffer();
 
-		if (oldStatus.isInvisible() && !newStatus.isInvisible()) {
+		if (oldInvisibleStatus && !newInvisibleStatus) {
 			body.addElement("13", "1");
-		} else if (!oldStatus.isInvisible() && newStatus.isInvisible()) {
+		} else if (!oldInvisibleStatus && newInvisibleStatus) {
 			body.addElement("13", "2");
 		}
 

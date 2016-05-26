@@ -68,7 +68,7 @@ public class SessionSessionImplTest {
 
 	@Test
 	public void testLogout() {
-		session.loginComplete();
+		session.loginComplete(false);
 		session.logout();
 		verify(writer).drainAndExecute(argThatMessage(new LogoutMessage(username)));
 	}

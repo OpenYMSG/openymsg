@@ -31,6 +31,7 @@ public class ConnectionWriterJob implements Request {
 			if (request != null) {
 				request.setConnection(connection);
 				try {
+					log.debug("Executing request:" + request);
 					request.execute();
 				}
 				// TODO - Throwable

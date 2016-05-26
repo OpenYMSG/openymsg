@@ -17,6 +17,7 @@ public class PacketWriterImpl implements PacketWriter {
 	@Override
 	public void execute(Message message) {
 		MessageRequest request = wrapMessage(message);
+		log.debug("Putting request on outgpoing queue:" + request);
 		this.queue.add(request);
 	}
 
