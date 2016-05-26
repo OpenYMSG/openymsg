@@ -11,7 +11,7 @@ import org.openymsg.execute.Executor;
 import org.openymsg.execute.dispatch.Request;
 import org.openymsg.network.ServiceType;
 
-public class SessionAuthenticationImpl implements SessionAuthentication {
+public class SessionAuthenticationImpl implements SessionAuthentication, SessionAuthenticationAttemptCallback {
 	/** logger */
 	private static final Log log = LogFactory.getLog(SessionAuthenticationImpl.class);
 	private Executor executor;
@@ -56,7 +56,8 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 		// }
 	}
 
-	protected void setFailureState(AuthenticationFailure failureState) {
+	@Override
+	public void setFailureState(AuthenticationFailure failureState) {
 		log.info("Failed login: " + failureState);
 		this.failureState = failureState;
 		this.callback.authenticationFailure(failureState);
@@ -66,7 +67,8 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 		execute(new PasswordTokenRequest(this, sessionConfig, token));
 	}
 
-	protected void receivedPasswordToken() {
+	@Override
+	public void receivedPasswordToken() {
 		execute(new PasswordTokenLoginRequest(this, sessionConfig, token));
 	}
 
@@ -78,7 +80,8 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 		this.writer.execute(message);
 	}
 
-	protected void receivedPasswordTokenLogin() {
+	@Override
+	public void receivedPasswordTokenLogin() {
 		execute(new LoginCompleteMessage(token, isInvisible));
 		this.callback.authenticationSuccess();
 	}
@@ -89,5 +92,11 @@ public class SessionAuthenticationImpl implements SessionAuthentication {
 	@Override
 	public AuthenticationFailure getFailureState() {
 		return failureState;
+	}
+
+	@Override
+	public void setConnectionFailureStatus(AuthenticationStep step, AuthenticationAttemptStatus status) {
+		log.info("Failed connecting login: " + status.getError());
+		setFailureState(AuthenticationFailure.CONNECTION_FAILURE);
 	}
 }

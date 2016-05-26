@@ -1,64 +1,57 @@
 package org.openymsg.network.url;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
 // TODO - to stream with the info
 public class URLStreamStatus {
-	private int responseCode = -1;
-	private String responseMessage = null;
-	private MalformedURLException malformedURLException = null;
-	private IOException urlConnectionException = null;
-	private IOException responseException = null;
-	private IOException inputStreamException;
+	private URLCreationFailure buildUrlFailure;
+	private URLResponseFailure handlingResponseFailure;
+	private URLConnectionFailure handlingConnectingFailure;
+	private URLSystemFailure systemFailure;
 
 	public boolean isCorrect() {
-		return (responseCode == HttpURLConnection.HTTP_OK) && (malformedURLException == null)
-				&& (urlConnectionException == null) && (responseException == null) && (inputStreamException == null);
+		return (buildUrlFailure == null) && (handlingResponseFailure == null) && (handlingConnectingFailure == null)
+				&& (systemFailure == null);
 	}
 
-	public int getResponseCode() {
-		return responseCode;
+	public void call(UrlStreamStatusCallback callback) {
+		if (!isCorrect()) {
+			if (buildUrlFailure != null) {
+				callback.failed(buildUrlFailure);
+			} else if (handlingResponseFailure != null) {
+				callback.failed(handlingResponseFailure);
+			} else if (handlingConnectingFailure != null) {
+				callback.failed(handlingConnectingFailure);
+			} else if (systemFailure != null) {
+				callback.failed(systemFailure);
+			}
+		}
 	}
 
-	public void setResponseCode(int responseCode) {
-		this.responseCode = responseCode;
+	public void setFailedBuildingUrl(String url, MalformedURLException e) {
+		buildUrlFailure = new URLCreationFailure(url, e);
 	}
 
-	public String getResponseMessage() {
-		return responseMessage;
+	public void setFailedHandlingResponse(URL u, IOException e) {
+		handlingResponseFailure = new URLResponseFailure(u, e);
 	}
 
-	public void setResponseMessage(String responseMessage) {
-		this.responseMessage = responseMessage;
+	public void setFailedConnecting(URL u, IOException e) {
+		handlingConnectingFailure = new URLConnectionFailure(u, e);
 	}
 
-	public MalformedURLException getMalformedURLException() {
-		return malformedURLException;
+	public void setFailedHandlingResponse(URL u, String responseMessage, IOException e) {
+		handlingConnectingFailure = new URLConnectionFailure(u, responseMessage, e);
 	}
 
-	public void setMalformedURLException(MalformedURLException malformedURLException) {
-		this.malformedURLException = malformedURLException;
+	public void setFailedHandlingResponse(URL u, String responseMessage, int responseCode) {
+		handlingConnectingFailure = new URLConnectionFailure(u, responseMessage, responseCode);
 	}
 
-	public IOException getUrlConnectionException() {
-		return urlConnectionException;
-	}
-
-	public void setUrlConnectionException(IOException urlConnectionException) {
-		this.urlConnectionException = urlConnectionException;
-	}
-
-	public IOException getResponseException() {
-		return responseException;
-	}
-
-	public void setResponseException(IOException responseException) {
-		this.responseException = responseException;
-	}
-
-	public void setInputStreamException(IOException inputStreamException) {
-		this.inputStreamException = inputStreamException;
+	public void setFailedSystem(URL u, Class<? extends URLConnection> ucType) {
+		systemFailure = new URLSystemFailure(u, ucType);
 	}
 }

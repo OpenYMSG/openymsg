@@ -1,13 +1,13 @@
 package org.openymsg.connection.write;
 
-import java.util.Queue;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openymsg.execute.dispatch.MessageRequest;
 import org.openymsg.execute.dispatch.Request;
 import org.openymsg.execute.dispatch.ScheduleTaskCompletionException;
 import org.openymsg.network.ConnectionHandler;
+
+import java.util.Queue;
 
 public class ConnectionWriterJob implements Request {
 	/** logger */
@@ -26,7 +26,7 @@ public class ConnectionWriterJob implements Request {
 		if (this.isFinished) {
 			throw new ScheduleTaskCompletionException();
 		}
-		if (isReadyToRead()) {
+		if (isReadyToWrite()) {
 			MessageRequest request = this.queue.poll();
 			if (request != null) {
 				request.setConnection(connection);
@@ -47,7 +47,7 @@ public class ConnectionWriterJob implements Request {
 		}
 	}
 
-	protected boolean isReadyToRead() {
+	protected boolean isReadyToWrite() {
 		if (connection == null) {
 			log.info("connection not set");
 			return false;
@@ -65,6 +65,7 @@ public class ConnectionWriterJob implements Request {
 		ex.printStackTrace();
 	}
 
+	// **TODO
 	public boolean isLocked(int millisDuration) {
 		return (this.connection != null) && this.connection.isLocked(millisDuration);
 	}

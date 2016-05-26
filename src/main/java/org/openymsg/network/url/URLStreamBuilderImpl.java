@@ -20,7 +20,7 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 	private static final Log log = LogFactory.getLog(URLStreamBuilderImpl.class);
 	private String url;
 	private int timeout;
-	private URLStreamStatus status;
+	private final URLStreamStatus status;
 	private String cookie;
 	private boolean disableSSLCheck;
 
@@ -54,7 +54,7 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 			u = new URL(url);
 		} catch (MalformedURLException e) {
 			log.warn("Failed opening url: " + url, e);
-			this.status.setMalformedURLException(e);
+			this.status.setFailedBuildingUrl(url, e);
 			return null;
 		}
 		URLConnection uc = null;
@@ -62,7 +62,7 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 			uc = u.openConnection();
 		} catch (IOException e) {
 			log.warn("Failed connection url: " + u, e);
-			this.status.setUrlConnectionException(e);
+			this.status.setFailedConnecting(u, e);
 			return null;
 		}
 		if (uc == null) {
@@ -79,6 +79,7 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 			HttpsURLConnection httpUc = (HttpsURLConnection) uc;
 			if (disableSSLCheck) {
 				try {
+					log.debug("disabling ssl check: " + u);
 					TrustModifier.relaxHostChecking(httpUc);
 				} catch (Exception e) {
 					log.warn("Failed disabling ssl checking: " + u);
@@ -91,23 +92,23 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 				responseMessage = httpUc.getResponseMessage();
 			} catch (IOException e) {
 				log.warn("Failed reading responseCode and responseMessage", e);
-				this.status.setResponseException(e);
+				this.status.setFailedHandlingResponse(u, e);
 				return null;
 			}
-			this.status.setResponseCode(responseCode);
-			this.status.setResponseMessage(responseMessage);
 			if (responseCode == HttpURLConnection.HTTP_OK) {
 				InputStream inputStream = null;
 				try {
 					inputStream = uc.getInputStream();
 				} catch (IOException e) {
-					this.status.setInputStreamException(e);
+					log.warn("Failed getting input stream", e);
+					this.status.setFailedHandlingResponse(u, responseMessage, e);
 					return null;
 				}
 				Map<String, List<String>> headers = httpUc.getHeaderFields();
 				return new URLStream(inputStream, headers);
 			} else {
-				log.warn("Failed opening login url: " + url + " return code: " + responseCode);
+				log.warn("Failed opening url: " + url + " return code: " + responseCode);
+				this.status.setFailedHandlingResponse(u, responseMessage, responseCode);
 				return null;
 			}
 		} else {
@@ -115,8 +116,8 @@ public class URLStreamBuilderImpl implements URLStreamBuilder {
 			if (uc != null) {
 				ucType = uc.getClass();
 			}
-			log.error("Failed opening login url: " + url + " returns: " + ucType);
-			// TODO handle failure
+			log.error("Failed opening url: " + url + " returns: " + ucType);
+			this.status.setFailedSystem(u, ucType);
 			return null;
 		}
 	}

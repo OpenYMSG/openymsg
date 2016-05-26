@@ -1,5 +1,7 @@
 package org.openymsg.context.auth;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -17,7 +19,6 @@ public class PasswordTokenLoginRequestTest extends AbstractPasswordTokenTest {
 				+ EOL + "cookievalidfor=86400" + EOL;
 		when(stream.getHeaders()).thenReturn(buildHeader());
 		when(stream.getOutputStream()).thenReturn(buildResponse(responseString));
-		when(status.isCorrect()).thenReturn(true);
 		PasswordTokenLoginRequest request = new PasswordTokenLoginRequest(sessionAuthorize, config, token);
 		request.execute();
 		String cookieY =
@@ -32,19 +33,20 @@ public class PasswordTokenLoginRequestTest extends AbstractPasswordTokenTest {
 
 	@Test
 	public void testBadStatus() throws IOException {
-		when(status.isCorrect()).thenReturn(false);
+		status.setFailedHandlingResponse(null, null, null);
 		PasswordTokenLoginRequest request = new PasswordTokenLoginRequest(sessionAuthorize, config, token);
 		request.execute();
-		verify(sessionAuthorize).setFailureState(AuthenticationFailure.STAGE2);
+		verify(sessionAuthorize).setConnectionFailureStatus(eq(AuthenticationStep.PasswordTokenLoginRequest),
+				any(AuthenticationAttemptStatus.class));
 	}
 
 	@Test
 	public void testBadResponse() throws IOException {
-		when(status.isCorrect()).thenReturn(true);
 		when(stream.getHeaders()).thenReturn(buildHeader());
 		when(stream.getOutputStream()).thenReturn(buildResponse("1"));
 		PasswordTokenLoginRequest request = new PasswordTokenLoginRequest(sessionAuthorize, config, token);
 		request.execute();
-		verify(sessionAuthorize).setFailureState(AuthenticationFailure.STAGE2);
+		verify(sessionAuthorize).setConnectionFailureStatus(eq(AuthenticationStep.PasswordTokenLoginRequest),
+				any(AuthenticationAttemptStatus.class));
 	}
 }

@@ -90,10 +90,25 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>2.0.44-beta</version>
+			<version>2.0.53-beta</version>
 			<!-- Using beta for builder pattern mocks -->
+			<!--  using 42 to match mockit2 which has the cglib thing -->
 			<scope>test</scope>
 		</dependency>
+		<!-- 		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-mockito2</artifactId>
+			using 2 because of cglib issue, this may be fixed later
+			<version>1.6.5</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-module-junit4</artifactId>
+			<version>1.6.5</version>
+			<scope>test</scope>
+		</dependency>
+ -->
 	</dependencies>
 	<build>
 		<pluginManagement>

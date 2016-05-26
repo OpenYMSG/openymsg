@@ -35,8 +35,7 @@ public class AbstractPasswordTokenTest {
 	protected URLStreamBuilder builder;
 	@Mock
 	protected URLStream stream;
-	@Mock
-	protected URLStreamStatus status;
+	protected URLStreamStatus status = new URLStreamStatus();
 
 	public AbstractPasswordTokenTest() {
 		super();
