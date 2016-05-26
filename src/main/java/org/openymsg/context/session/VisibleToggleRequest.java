@@ -39,4 +39,10 @@ public class VisibleToggleRequest implements Message {
 		return MessageStatus.DEFAULT;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("VisibleToggleRequest [oldInvisibleStatus=%s, newInvisibleStatus=%s]", oldInvisibleStatus,
+				newInvisibleStatus);
+	}
+
 }
